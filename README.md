@@ -1,7 +1,7 @@
 
 # ansible developer - repo for ansible developer to use to stand up developer environment
 
-This is the repo for ansible developers to use for setting up the developer toolchain, including bash environment, python virtualenv, execution-execution environment build/test scripts/tools, etc.
+This is the repo for ansible developers to use for setting up the developer toolchain, including bash environment, python virtualenv, ansible-execution environment build/test scripts/tools, etc.
 
 ## Initial setup
 

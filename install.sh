@@ -196,7 +196,6 @@ function main() {
     abort 'Bash must not run in POSIX mode. Please unset POSIXLY_CORRECT and try again.'
   fi
 
-
   while [[ $# -gt 0 ]]
   do
     case "$1" in
@@ -221,7 +220,6 @@ function main() {
   tty_red="$(tty_mkbold 31)"
   tty_bold="$(tty_mkbold 39)"
   tty_reset="$(tty_escape 0)"
-
 
   checkRequiredCommands python3 rsync
 

@@ -64,7 +64,7 @@ echo "rsync env scripts"
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/ansible/*.sh ${HOME}/bin/
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/certs/*.sh ${HOME}/bin/
 chmod +x ${HOME}/bin/*.sh || true
-chmod +x ${HOME}/bin/*.py || true
+#chmod +x ${HOME}/bin/*.py || true
 
 echo "deploying secrets ${SECRETS_DIR}/.bash_secrets"
 rsync -arv --update "${SECRETS_DIR}/.bash_secrets" "${HOME}/"

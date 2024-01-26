@@ -102,7 +102,6 @@ echo "${rsync_cmd}"
 eval $rsync_cmd
 
 mirrorDirList="
-.github
 docs
 files
 scripts

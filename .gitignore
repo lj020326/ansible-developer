@@ -1,0 +1,20 @@
+
+## IDEs are developer-specific
+.vscode/
+.idea/
+.DS_Store
+
+## information stored locally - saved snapshots/etc
+save/
+
+## python virtual envs never in repo
+venv/
+
+## log files never in repo
+*.log
+
+## .vault* files never in repo
+.vault*
+
+## `ansible-test` integration_config.yml never in repo
+integration_config.yml

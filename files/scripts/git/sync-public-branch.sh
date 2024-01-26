@@ -102,9 +102,7 @@ echo "${rsync_cmd}"
 eval $rsync_cmd
 
 mirrorDirList="
-docs
 files
-scripts
 "
 
 IFS=$'\n'
@@ -161,7 +159,7 @@ echo "Finally, checkout ${GIT_DEFAULT_BRANCH} branch:" && \
 git checkout ${GIT_DEFAULT_BRANCH}
 
 echo "chmod project admin/maintenance scripts"
-chmod +x files/scripts/bashenv/*.sh
+chmod +x files/scripts/*.sh
 chmod +x files/scripts/git/*.sh
 
 echo "creating links for useful project scripts"

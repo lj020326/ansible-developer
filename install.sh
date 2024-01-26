@@ -277,21 +277,19 @@ function main() {
   if [[ -n "${INSTALL_ON_LINUX-}" ]]
   then
     USABLE_GIT="$(find_tool git)"
-    if [[ -z "$(command -v git)" ]]
-    then
-      abort "$(
+    if [[ -z "$(command -v git)" ]]; then
+      abort $(
         cat <<EOABORT
     You must install Git before installing ansible-developer.
-  EOABORT
-      )"
+EOABORT
+      )
     fi
-    if [[ -z "${USABLE_GIT}" ]]
-    then
+    if [[ -z "${USABLE_GIT}" ]]; then
       abort $(
         cat <<EOABORT
     The version of Git that was found does not satisfy requirements for install.
     Please install Git ${REQUIRED_GIT_VERSION} or newer and add it to your PATH.
-  EOABORT
+EOABORT
       )
     fi
     if [[ "${USABLE_GIT}" != /usr/bin/git ]]
@@ -305,21 +303,19 @@ function main() {
   if [[ -n "${INSTALL_ON_LINUX-}" ]]
   then
     USABLE_PYTHON3="$(find_tool python3)"
-    if [[ -z "$(command -v python3)" ]]
-    then
-      abort "$(
+    if [[ -z "$(command -v python3)" ]]; then
+      abort $(
         cat <<EOABORT
     You must install python3 before installing ansible-developer.
-  EOABORT
-      )"
+EOABORT
+      )
     fi
-    if [[ -z "${USABLE_PYTHON3}" ]]
-    then
+    if [[ -z "${USABLE_PYTHON3}" ]]; then
       abort $(
         cat <<EOABORT
     The version of python3 that was found does not satisfy requirements for install.
     Please install python3 ${REQUIRED_SYSTEM_PYTHON3_VERSION} or newer and add it to your PATH.
-  EOABORT
+EOABORT
       )
     fi
     if [[ "${USABLE_PYTHON3}" != /usr/bin/python3 ]]

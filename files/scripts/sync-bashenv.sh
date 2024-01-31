@@ -6,10 +6,13 @@ echo "**********************************"
 echo "*** installing bashrc         ****"
 echo "**********************************"
 
-## expect to be run at the project root
-PROJECT_DIR=$(git rev-parse --show-toplevel)
+#INITIAL_WD=`pwd`
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+SCRIPT_BASE_DIR="$( cd "$( dirname "$0" )/.." && pwd )"
 
-SCRIPTS_DIR="${PROJECT_DIR}/files/scripts"
+## expect to be run from any non-project location/directory
+PROJECT_DIR="$( cd "$SCRIPT_DIR/" && git rev-parse --show-toplevel )"
+
 BASHENV_DIR="${SCRIPTS_DIR}/bashenv"
 
 SECRETS_DIR="${PROJECT_DIR}/files/private/vault/bashenv"
@@ -63,10 +66,10 @@ echo "rsync env scripts"
 #rsync ${RSYNC_OPTIONS_HOME[@]} ${SECRETS_DIR}/git/*.sh ${HOME}/bin/
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/ansible/*.sh ${HOME}/bin/
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/certs/*.sh ${HOME}/bin/
-rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.sh ${HOME_DIR}/bin/
-rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.py ${HOME_DIR}/bin/
-chmod +x ${HOME}/bin/*.sh || true
-#chmod +x ${HOME}/bin/*.py || true
+rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.sh ${HOME}/bin/
+rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.py ${HOME}/bin/
+chmod +x ${HOME}/bin/*.sh
+chmod +x ${HOME}/bin/*.py
 
 echo "deploying secrets ${SECRETS_DIR}/.bash_secrets"
 rsync -arv --update "${SECRETS_DIR}/.bash_secrets" "${HOME}/"

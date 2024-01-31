@@ -26,6 +26,7 @@ PUBLIC_GITIGNORE=files/git/pub.gitignore
 ## ref: https://stackoverflow.com/questions/53839253/how-can-i-convert-an-array-into-a-comma-separated-string
 declare -a PRIVATE_CONTENT_ARRAY
 PRIVATE_CONTENT_ARRAY+=('**/private/***')
+PRIVATE_CONTENT_ARRAY+=('**/vault/***')
 PRIVATE_CONTENT_ARRAY+=('**/save/***')
 PRIVATE_CONTENT_ARRAY+=('**/vault.yml')
 PRIVATE_CONTENT_ARRAY+=('**/*vault.yml')

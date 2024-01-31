@@ -63,6 +63,8 @@ echo "rsync env scripts"
 #rsync ${RSYNC_OPTIONS_HOME[@]} ${SECRETS_DIR}/git/*.sh ${HOME}/bin/
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/ansible/*.sh ${HOME}/bin/
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/certs/*.sh ${HOME}/bin/
+rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.sh ${HOME_DIR}/bin/
+rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.py ${HOME_DIR}/bin/
 chmod +x ${HOME}/bin/*.sh || true
 #chmod +x ${HOME}/bin/*.py || true
 

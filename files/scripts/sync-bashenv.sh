@@ -13,7 +13,7 @@ SCRIPT_BASE_DIR="$( cd "$( dirname "$0" )/.." && pwd )"
 ## expect to be run from any non-project location/directory
 PROJECT_DIR="$( cd "$SCRIPT_DIR/" && git rev-parse --show-toplevel )"
 
-BASHENV_DIR="${SCRIPTS_DIR}/bashenv"
+BASHENV_DIR="${SCRIPT_DIR}/bashenv"
 
 SECRETS_DIR="${PROJECT_DIR}/files/private/vault/bashenv"
 export ANSIBLE_VAULT_PASSWORD_FILE=$HOME/.vault_pass
@@ -21,7 +21,7 @@ export ANSIBLE_VAULT_PASSWORD_FILE=$HOME/.vault_pass
 BACKUP_HOME_DIR="${HOME}/.bash-backups"
 BACKUP_REPO_DIR1="${REPO_DIR1}/save"
 
-echo "SCRIPTS_DIR=${SCRIPTS_DIR}"
+echo "SCRIPT_DIR=${SCRIPT_DIR}"
 echo "BASHENV_DIR=${BASHENV_DIR}"
 echo "HOME=${HOME}"
 echo "PROJECT_DIR=${PROJECT_DIR}"
@@ -64,8 +64,8 @@ rsync ${RSYNC_OPTIONS_HOME[@]} ${BASHENV_DIR}/ "${HOME}/"
 echo "rsync env scripts"
 #rsync ${RSYNC_OPTIONS_HOME[@]} ${SECRETS_DIR}/scripts/*.sh ${HOME}/bin/
 #rsync ${RSYNC_OPTIONS_HOME[@]} ${SECRETS_DIR}/git/*.sh ${HOME}/bin/
-rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/ansible/*.sh ${HOME}/bin/
-rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPTS_DIR}/certs/*.sh ${HOME}/bin/
+rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_DIR}/ansible/*.sh ${HOME}/bin/
+rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_DIR}/certs/*.sh ${HOME}/bin/
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.sh ${HOME}/bin/
 rsync ${RSYNC_OPTIONS_HOME[@]} ${SCRIPT_BASE_DIR}/pfsense/*.py ${HOME}/bin/
 chmod +x ${HOME}/bin/*.sh

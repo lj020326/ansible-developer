@@ -1,10 +1,22 @@
 
 log_prefix_bashenv=".bash_env"
 
+echo "${log_prefix_bashenv} setting environment vars"
+
+export NETWORK_INTERNAL_DOMAIN="johnson.int"
+
 ## ref: https://github.com/ansible/ansible/issues/33831
 #export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass
 
 export ANSIBLE_DEVELOPER_REPO="${HOME}/repos/ansible/ansible-developer"
+export ANSIBLE_DATACENTER_REPO="${HOME}/repos/ansible/ansible-datacenter"
+
+## if using public repo
+#export DEVENV_INSTALL_REMOTE_SCRIPT="https://raw.githubusercontent.com/lj020326/ansible-developer/main/install.sh"
+## if using internal repo
+export DEVENV_INSTALL_REMOTE_SCRIPT="https://raw.githubusercontent.com/lj020326/ansible-developer/main/install-ansibledev-pvt.sh"
+
+export CYBERARK_ACCOUNT_USERNAME="e-lee"
 
 export LANG='en_US.utf-8'
 
@@ -20,16 +32,23 @@ export PYTHON3_BIN_DIR=$PYTHON3_HOME
 #export PYTHONPATH=$ANSIBLE/lib
 #export ANSIBLE_LIBRARY=$ANSIBLE/library
 
-export MOLECULE_IMAGE_NAMESPACE="media.johnson.int:5000"
+export MOLECULE_IMAGE_NAMESPACE="media.${NETWORK_INTERNAL_DOMAIN}:5000"
 export EDITOR=/usr/local/bin/emacs
 
 export PYTHON_VERSION="3"
 export TEST_PYTHON_VERSION="3.10"
 
+SSH_KEY_GITHUB=~/.ssh/id_rsa
+
 ## ref: https://pythonspeed.com/articles/docker-buildkit/
 export DOCKER_BUILDKIT=1
 
-if [[ "$platform" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
+if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
+  ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
+  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+fi
+
+if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     echo "${log_prefix_bashenv} setting env for MSYS/MINGW platform"
 
     export GIT_SSH=/usr/bin/ssh
@@ -42,7 +61,7 @@ if [[ "$platform" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     export CMAKE_CXX_COMPILER=/usr/bin/g++
 
 	## always use /usr/bin unless explicitly overridden in shell
-#	if [[ "$platform" =~ ^(MINGW64)$ ]]; then
+#	if [[ "${PLATFORM}" =~ ^(MINGW64)$ ]]; then
 #		export CMAKE_C_COMPILER=/mingw64/bin/gcc
 #		export CMAKE_CXX_COMPILER=/mingw64/bin/g++
 #	fi
@@ -77,11 +96,16 @@ if [[ "$platform" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     #export MSYS_HOME=/c/apps/msys64
     export MINGW_HOME=/mingw64
 
-    #export JAVA_HOME=/c/apps/java/jre8
-#    [[ -z $JAVA_HOME ]] && export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
-#    export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
-#    export JAVA_HOME=/c/apps/Java/jre1.6
-    export JAVA_HOME=/c/apps/Java/jre1.8.0_231
+    ## install golang
+    ## ref: https://stackoverflow.com/questions/37198369/use-go-lang-with-msys2
+    export GOROOT=/mingw64/lib/go
+    export GOPATH=/mingw64
+
+#    #export JAVA_HOME=/c/apps/java/jre8
+##    [[ -z $JAVA_HOME ]] && export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
+##    export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
+##    export JAVA_HOME=/c/apps/Java/jre1.6
+#    export JAVA_HOME=/c/apps/Java/jre1.8.0_231
 #    export M2_HOME=/c/apps/apache-maven-3.5.2
     export M2_HOME=/c/apps/apache-maven-3.6.3
 
@@ -100,7 +124,7 @@ if [[ "$platform" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     ## set user path
 #    export PATH=/usr/bin:/usr/local/bin
     export PATH=/usr/local/bin:/usr/bin
-    if [[ "$platform" =~ ^(MINGW64)$ ]]; then
+    if [[ "${PLATFORM}" =~ ^(MINGW64)$ ]]; then
       export PATH=/usr/local/bin:/mingw64/bin:/usr/bin
     fi
 
@@ -131,14 +155,8 @@ if [[ "$platform" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     export PATH+=:${SCOOP_HOME}/shims
 
     export PATH+=:$VAGRANT_HOME/bin
-
-    ## ref: https://stackoverflow.com/questions/37198369/use-go-lang-with-msys2
-    #pacman --noconfirm -S mingw-w64-x86_64-go
-    export GOROOT=/mingw64/lib/go
-    export GOPATH=/mingw64
-
-#    export PATH+=:$GOLANG_HOME/bin
-#    export PATH+=:$GOLANG_LOCAL_HOME/bin
+    export PATH+=:$GOLANG_HOME/bin
+    export PATH+=:$GOLANG_LOCAL_HOME/bin
 
     export PATH+=:$POSH_HOME
     export PATH+=:$DIG_HOME/bin
@@ -150,7 +168,7 @@ if [[ "$platform" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     ## MINIKUBE
 #    export PATH+=:/c/apps/Kubernetes/Minikube
 
-elif [[ "${platform}" == *"DARWIN"* ]]; then
+elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     echo "${log_prefix_bashenv} setting path for DARWIN env"
 
     ## ref: https://apple.stackexchange.com/questions/371997/suppressing-the-default-interactive-shell-is-now-zsh-message-in-macos-catalina
@@ -169,12 +187,13 @@ elif [[ "${platform}" == *"DARWIN"* ]]; then
     export HOMEBREW_PREFIX="/usr/local"
 
     ## ref: https://www.topbug.net/blog/2013/04/14/install-and-use-gnu-command-line-tools-in-mac-os-x/
+    ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
     ## ref: https://formulae.brew.sh/formula/findutils
     export PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}"
-    #export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:${PATH}"
-    export PATH="${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin:${PATH}"
-    export PATH="${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin:${PATH}"
     export MANPATH+=":${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnuman"
+#    export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:${PATH}"
+#    export PATH="${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin:${PATH}"
+#    export PATH="${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin:${PATH}"
 
     ## ref: https://stackoverflow.com/questions/52509602/cant-compile-c-program-on-a-mac-after-upgrade-to-mojave
 #    export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
@@ -210,8 +229,32 @@ elif [[ "${platform}" == *"DARWIN"* ]]; then
     export JAVA_11_HOME=$(/usr/libexec/java_home -v11)
 #    export JAVA_13_HOME=$(/usr/libexec/java_home -v13)
 
+    ## ref: https://podman.io/docs/installation
+    export PODMAN_HOME=/opt/podman
+    export PODMAN_BINDIR="${PODMAN_HOME}/bin"
+
+    export PATH+=":${PODMAN_BINDIR}"
+
+    ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
+    # Reset/Empty the .bash_path file that holds GNU paths
+    [[ -f ~/.bash_path ]] && mv ~/.bash_path ~/.bash_path.orig
+
+    # Build PATH variable script in ~/.bash_path
+    for i in /usr/local/Cellar/*/*/bin; do
+      echo 'export PATH="'$i':$PATH"' >> ~/.bash_path
+    done
+    for i in /usr/local/Cellar/*/*/libexec/gnubin; do
+      echo 'export PATH="'$i':$PATH"' >> ~/.bash_path
+    done
+    for i in /usr/local/Cellar/*/*/share/man; do
+      echo 'export MANPATH="'$i':$MANPATH"' >> ~/.bash_path
+    done
+    for i in /usr/local/Cellar/*/*/libexec/gnuman; do
+      echo 'export MANPATH="'$i':$MANPATH"' >> ~/.bash_path
+    done
+
 else
-    echo "${log_prefix_bashenv} setting path for LINUX/Other env"
+    echo "${log_prefix_bashenv} setting environment vars for LINUX env"
 
     if [[ $EUID -eq 0 ]]; then
         #export KUBECONFIG=/opt/openshift/openshift.int.config/master/admin.kubeconfig
@@ -219,10 +262,10 @@ else
         # sudo -H cp ~/repos/pyutils/k8s/conf/admin.conf $HOME/.kube/config
         export KUBECONFIG=$HOME/.kube/config
     fi
-    if [ $HOSTNAME == "openshift.johnson.int" ]; then
-        export OPENSHIFT_INSTALL=/opt/openshift
-        export CURL_CA_BUNDLE=/opt/openshift/openshift.int.config/master/ca.crt
-    fi
+#    if [ "${HOSTNAME}" == "openshift.${NETWORK_INTERNAL_DOMAIN}" ]; then
+#        export OPENSHIFT_INSTALL=/opt/openshift
+#        export CURL_CA_BUNDLE=/opt/openshift/openshift.int.config/master/ca.crt
+#    fi
 
     export ANSIBLE_ROLES_PATH=/etc/ansible/roles:~/.ansible/roles
 
@@ -235,10 +278,14 @@ else
     # setenv-python 3
 fi
 
-echo "${log_prefix_bashenv} more PATH env var updates"
+if [ -f "${HOME}/.bash_path" ]; then
+    echo "${log_bash} sourcing .bash_path"
+    source ~/.bash_path
+fi
 
 if [ -d "${HOME}/.pyenv/bin" ]; then
     export PYENV_ROOT="$HOME/.pyenv"
+    echo "${log_prefix_bashenv} source ${PYENV_ROOT}/bin into PATH"
     export PATH="${PYENV_ROOT}/bin:$PATH"
 fi
 
@@ -246,6 +293,7 @@ fi
 ## ref: https://opensource.com/article/19/5/python-3-default-mac
 ## https://realpython.com/intro-to-pyenv/
 if command -v pyenv 1>/dev/null 2>&1; then
+    echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
     export PATH="$(pyenv root)/shims:$PATH"
 
     ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
@@ -270,13 +318,36 @@ if [ -d "${HOME}/.local/bin" ]; then
     export PATH="${HOME}/.local/bin:${PATH}"
 fi
 
-if [ -d "${HOME}/.pyenv/bin" ]; then
-  # Load pyenv automatically by adding
-  # the following to $HOME/.bashrc:
-  export PATH="${HOME}/.pyenv/bin:${PATH}"
-
-fi
-
 export PATH=".:${PATH}"
 
 echo "${log_prefix_bashenv} PATH=${PATH}"
+
+##############
+### Ansible Galaxy env vars
+###
+###   'ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN' set from ~/.bash_secrets
+###
+### ref: https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#configuring-the-ansible-galaxy-client
+#export ANSIBLE_GALAXY_SERVER_LIST="staging_repo,published_repo,rh_certified,community_repo"
+##export ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN="c2bcc7e30d4fcc1a1b18a3ae8b1744909d9a88ec"
+#export ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN="b028ba142a0b76feb0123bac66e127cc7d0638a1"
+#
+###[galaxy_server.staging_repo]
+#export ANSIBLE_GALAXY_SERVER_STAGING_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/staging/"
+#export ANSIBLE_GALAXY_SERVER_STAGING_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+#export ANSIBLE_GALAXY_SERVER_STAGING_REPO_VALIDATE_CERTS=no
+#
+###[galaxy_server.published_repo]
+#export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/published/"
+#export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+#export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_VALIDATE_CERTS=no
+#
+###[galaxy_server.rh_certified]
+#export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/rh-certified/"
+#export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+#export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_VALIDATE_CERTS=no
+#
+###[galaxy_server.community_repo]
+#export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/community/"
+#export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+#export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_VALIDATE_CERTS=no

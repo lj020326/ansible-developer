@@ -11,7 +11,7 @@ SSH_SOURCE="${WORK_USER_ID}@${SSH_HOST}:/home/${WORK_USER_ID}/repos/ansible/"
 ## https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
 #TMP_DIR=$(mktemp -d -p ~)
 #TMP_DIR=$(/usr/local/bin/gmktemp -d -p ~)
-TMP_DIR=$(/usr/local/bin/gmktemp -d)
+TMP_DIR=$(mktemp -d)
 echo "TMP_DIR=${TMP_DIR}"
 
 # keep track of the last executed command

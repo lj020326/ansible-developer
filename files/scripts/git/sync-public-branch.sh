@@ -103,6 +103,7 @@ echo "${rsync_cmd}"
 eval $rsync_cmd
 
 mirrorDirList="
+docs
 files
 "
 

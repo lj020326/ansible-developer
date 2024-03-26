@@ -9,52 +9,58 @@ This is the repo for ansible developers to use for setting up the developer tool
 
 ```shell
 $ echo "vaultpasswordhere" > ~/.vault_pass
-$ git clone 
+## make sure only readable by the owner
+$ chmod 600 ~/.vault_pass
 ```
 
 ### Run the latest install script from shell
 
+For install from public github: 
+
 ```shell
-$ INSTALL_REMOTE_SCRIPT="https://raw.githubusercontent.com/lj020326/ansible-developer/main/install.sh" && bash -c "$(curl -fsSL ${INSTALL_REMOTE_SCRIPT})"
+$ INSTALL_REMOTE_SCRIPT="https://raw.githubusercontent.com/lj020326/ansible-developer/main/install-ansibledev.sh" && bash -c "$(curl -fsSL ${INSTALL_REMOTE_SCRIPT})"
 ```
+
+For install from internal/private source:
+
+```shell
+$ INSTALL_REMOTE_SCRIPT="https://raw.githubusercontent.com/lj020326/ansible-developer/main/install-ansibledev-pvt.sh" && bash -c "$(curl -fsSL ${INSTALL_REMOTE_SCRIPT})"
+```
+
+Or if the repo has already been cloned just use the local install script to do the same:
+```shell
+$ bash install-ansibledev-local.sh
+```
+
+The installer shell script will:
+1) create the local developer repo directory under $HOME/repos/ansible
+2) clone the repo into the developer's local repo directory at $HOME/repos/ansible/ansible-developer
+3) setup/synchronize the developer's bash environment with source bash files located in `files/scripts/bashenv`
+4) source the bash env
+
 
 ### Test environment after installing
 
 ```shell
-$ ssh ${WORK_USER_ID}@ansutilp1s4${WORK_DOMAIN}
-\S
-Kernel \r on an \m
-Activate the web console with: systemctl enable --now cockpit.socket
-
-Last login: Tue Jan 23 15:25:44 2024 from 172.31.0.191
-.bashrc configuring shell env...
-.bash_functions configuring shell functions...
-.bashrc sourcing .bash_env
-.bash_env setting path for LINUX/Other env
-.bash_env more PATH env var updates
-.bash_env PATH=.:${HOME}/.pyenv/plugins/pyenv-virtualenv/shims:${HOME}/.pyenv/shims:${HOME}/.pyenv/bin:${HOME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-.bashrc sourcing ~/.bash_secrets
-.bashrc setting prompt
-.bash_prompt configuring bash prompt...
- setting aliases
-.bash_aliases configuring shell aliases...
-ljohnson@Lees-MBP:[ansible-developer](main)$
+ljohnson@Lees-MBP:[ansible-developer](main)$ . ~/.bashrc
+## or alias '.bash' does same
+ljohnson@Lees-MBP:[ansible-developer](main)$ .bash
 ljohnson@Lees-MBP:[ansible-developer](main)$
 ljohnson@Lees-MBP:[ansible-developer](main)$ which python3
 ~/.pyenv/shims/python3
 ljohnson@Lees-MBP:[ansible-developer](main)$ python3 -V
-Python 3.9.16
+Python 3.11.6
 ljohnson@Lees-MBP:[ansible-developer](main)$ 
 ljohnson@Lees-MBP:[ansible-developer](main)$ which ansible
 ~/.pyenv/shims/ansible
 ljohnson@Lees-MBP:[ansible-developer](main)$ ansible --version
-ansible [core 2.15.8]
-  config file = /etc/ansible/ansible.cfg
-  configured module search path = ['${HOME}/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
-  ansible python module location = ${HOME}/.pyenv/versions/3.9.16/lib/python3.9/site-packages/ansible
-  ansible collection location = ${HOME}/.ansible/collections:/usr/share/ansible/collections
-  executable location = ${HOME}/.pyenv/versions/3.9.16/bin/ansible
-  python version = 3.9.16 (main, Jan 23 2024, 13:14:47) [GCC 8.5.0 20210514 (Red Hat 8.5.0-18)] (${HOME}/.pyenv/versions/3.9.16/bin/python3.9)
+ansible [core 2.16.2]
+  config file = None
+  configured module search path = ['/Users/ljohnson/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /Users/ljohnson/.pyenv/versions/3.11.6/lib/python3.11/site-packages/ansible
+  ansible collection location = /Users/ljohnson/.ansible/collections:/usr/share/ansible/collections
+  executable location = /Users/ljohnson/.pyenv/versions/3.11.6/bin/ansible
+  python version = 3.11.6 (main, Jan 18 2024, 13:13:46) [Clang 15.0.0 (clang-1500.0.40.1)] (/Users/ljohnson/.pyenv/versions/3.11.6/bin/python3.11)
   jinja version = 3.1.3
   libyaml = True
 ljohnson@Lees-MBP:[ansible-developer](main)$ 
@@ -72,7 +78,10 @@ total 0
 drwxr-xr-x. 3 ljohnson domain users  31 Jan 23 15:35 ./
 drwxr-xr-x. 3 ljohnson domain users  21 Jan 23 15:35 ../
 drwxr-xr-x. 5 ljohnson domain users 154 Jan 23 15:35 ansible-developer/
-ljohnson@Lees-MBP:[ansible]$ cd ansible-developer/
+ljohnson@Lees-MBP:[ansible]$ cd ~
+ljohnson@Lees-MBP:[~]$ cd ~/repos/ansible-developer/
+## 'cddev' alias does the same
+ljohnson@Lees-MBP:[~]$ cddev
 ljohnson@Lees-MBP:[ansible-developer](main)$ 
 ljohnson@Lees-MBP:[ansible-developer](main)$ git remote -v
 origin	git@github.com:lj020326/ansible-developer.git (fetch)
@@ -101,6 +110,9 @@ ljohnson@Lees-MBP:[ansible-developer](main)$
 ```shell
 $ git clone git@github.com:lj020326/ansible-developer.git 
 $ git checkout -b "develop-[developer-initials-here]"
+## make enahncements/modification
+$ git add .
+$ git commit -m 'enhancements'
 $ git push -u origin develop-[developer-initials-here]
 ```
 
@@ -112,15 +124,19 @@ The developer bash environment assumes you are working in one of the following p
 3) Linux bash
 
 ```shell
-$ cd $PROJECT_DIR
-$ git switch "develop-[developer-initials-here]"
-$ cp -p files/scripts/bashenv/.bash* ~/ 
+ljohnson@Lees-MBP:[ansible-developer](~)$ cddev
+ljohnson@Lees-MBP:[ansible-developer](main)$ git switch "develop-[developer-initials-here]"
+ljohnson@Lees-MBP:[ansible-developer](develop-lj)$ cp -p files/scripts/bashenv/.bash* ~/ 
 ```
 
 ### Source the bash env
 
 ```shell
-. ~/.bashrc
+ljohnson@Lees-MBP:[ansible-developer](main)$ . ~/.bashrc
+## or alias '.bash' does same if the ansible-developer env was already loaded 
+## and want to reload latest env/alias/function definitions
+ljohnson@Lees-MBP:[ansible-developer](main)$ .bash
+ljohnson@Lees-MBP:[ansible-developer](main)$
 ```
 
 
@@ -155,7 +171,7 @@ ANSIBLE_DEVELOPER_REPO=$HOME/repos/ansible/ansible-developer
 
 This is used for all git ssh related aliases/functions
 
-## Use ansible-setup-env.sh to install ansible with pipenv
+## Use ansible-setup-env.sh to install ansible with pyenv
 
 ref: https://www.buildahomelab.com/2022/04/26/how-to-install-ansible-with-pipenv-pyenv/
 
@@ -164,9 +180,38 @@ ref: https://www.buildahomelab.com/2022/04/26/how-to-install-ansible-with-pipenv
 ```shell
 ### ALIASES
 cagetpwd ## get ca pwd for user defined in env var $CYBERARK_ACCOUNT_USERNAME
-syncbashenv  ## perform rsync from repo/files/scripts/bashenv/.bash* to $HOME/ and copy decrypted .bash_secrets to ~/
+syncbashenv  ## perform rsync from repo/files/scripts/bashenv/.bash* to $HOME/ and copy encrypted .bash_secrets to ~/
 
-getsitecertinfo
+getsitecertinfo ## pass the site endpoint to get site ssl cert info (e.g., 'getsitecertinfo somesite.example.com 443') 
+
+ll
+la
+lld
+lll
+
+cdrepos
+cddocs
+cdtechdocs
+
+cddocker
+cdjenkins
+cdnode
+cdpython
+cdansible
+cddc
+cddev
+cdkube
+cdmeteor
+cdreact
+cdjava
+cdcpp
+cdblog
+cdk8s
+cdkolla
+cdpyutils
+
+.bash
+.k8sh
 
 gitpullsub
 gitmergesub
@@ -213,7 +258,7 @@ venv ## create local venv in directory $pwd/.venv
 .venv ## source local venv in directory $pwd/.venv
 
 ### FUNCTIONS
-blastit  ## git pull && git add . && git commit -m getgitcomment() && git push origin CURRENT_BRANCH
+blastit  ## git pull && git add . && git commit -m "$(getgitcomment)" && git push
 cagetaccountpwd
 certinfo
 change-commit-msg
@@ -246,9 +291,9 @@ sshpackerwork
 
 ## Alias / Function
 
-### `blastit` function -- maybe a better name would be `git_pacp` :)
+### `blastit` function -- maybe a better name would be `git_pacp` ;)
 
-This is basically a `git pull && git add . && git commit -m "${PREGENERATED_COMMIT_MSG}" && git push`
+This is wrapper for `git pull && git add . && git commit -m "$(getgitcomment)" && git push`
 
 ```shell
 [ansible-developer](main)$ blastit
@@ -273,71 +318,68 @@ Everything up-to-date
 **********************************
 *** installing bashrc         ****
 **********************************
-SCRIPT_DIR=[/Users/ljohnson/repos/ansible/ansible-datacenter/files/scripts/bashenv]
-HOME_DIR=[/Users/ljohnson]
-PROJECT_DIR=[/Users/ljohnson/repos/ansible/ansible-datacenter]
-FROM=[/Users/ljohnson/repos/ansible/ansible-datacenter/files/scripts/bashenv/.bash*]
-SECRETS_DIR=[/Users/ljohnson/repos/ansible/ansible-datacenter/files/private/env]
-rsync -arv --update --exclude=.idea --exclude=.git --exclude=venv --exclude=save --backup --backup-dir=/Users/ljohnson/.bash-backups /Users/ljohnson/repos/ansible/ansible-datacenter/files/scripts/bashenv/.bash* /Users/ljohnson/
+==> SCRIPT_DIR=/Users/ljohnson/repos/ansible/ansible-developer
+==> SCRIPT_BASE_DIR=/Users/ljohnson/repos/ansible/ansible-developer/files/scripts
+==> BASHENV_DIR=/Users/ljohnson/repos/ansible/ansible-developer/files/scripts/bashenv
+==> HOME=/Users/ljohnson
+==> PROJECT_DIR=/Users/ljohnson/repos/ansible/ansible-developer
+==> PRIVATE_DIR=/Users/ljohnson/repos/ansible/ansible-developer/files/private/env
+From bitbucket.org:lj020326/ansible-developer
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+==> rsync -arv --update --exclude=.idea --exclude=.git --exclude=venv --exclude=save --backup --backup-dir=/Users/ljohnson/.bash-backups /Users/ljohnson/repos/ansible/ansible-developer/files/scripts/bashenv/ /Users/ljohnson/
 sending incremental file list
 
-sent 149 bytes  received 12 bytes  322.00 bytes/sec
-total size is 54,872  speedup is 340.82
-rsync env scripts
-sending incremental file list
-ansible-test-integration.sh
-install_worksite_cacerts.sh
-mount-sshfs-work.sh
-sync-dns-hosts-to-pfsense.sh
-sync-sshfs-work.sh
-unmount-sshfs-work.sh
-
-sent 26,725 bytes  received 130 bytes  53,710.00 bytes/sec
-total size is 26,216  speedup is 0.98
-sending incremental file list
-setup-ssh-key-identities.sh
-
-sent 1,776 bytes  received 35 bytes  3,622.00 bytes/sec
-total size is 1,646  speedup is 0.91
+sent 201 bytes  received 12 bytes  426.00 bytes/sec
+total size is 54,748  speedup is 257.03
+==> rsync private env scripts
 sending incremental file list
 
-sent 222 bytes  received 19 bytes  482.00 bytes/sec
-total size is 8,220  speedup is 34.11
+sent 303 bytes  received 19 bytes  644.00 bytes/sec
+total size is 57,904  speedup is 179.83
+==> rsync private env configs
 sending incremental file list
 
-sent 838 bytes  received 85 bytes  1,846.00 bytes/sec
-total size is 78,948  speedup is 85.53
+sent 72 bytes  received 12 bytes  168.00 bytes/sec
+total size is 177  speedup is 2.11
+==> rsync private env git configs
 sending incremental file list
 
-sent 111 bytes  received 22 bytes  266.00 bytes/sec
-total size is 66,315  speedup is 498.61
-deploying secrets /Users/ljohnson/repos/ansible/ansible-datacenter/files/private/env/.bash_secrets
-ansible-vault decrypt /Users/ljohnson/repos/ansible/ansible-datacenter/files/private/env/.bash_secrets --output /Users/ljohnson/.bash_secrets --vault-password-file /Users/ljohnson/.vault_pass
-Decryption successful
+sent 83 bytes  received 12 bytes  190.00 bytes/sec
+total size is 1,646  speedup is 17.33
+==> rsync env scripts
+sending incremental file list
+
+sent 115 bytes  received 22 bytes  274.00 bytes/sec
+total size is 66,253  speedup is 483.60
+sending incremental file list
+
+sent 86 bytes  received 19 bytes  210.00 bytes/sec
+total size is 216  speedup is 2.06
+sending incremental file list
+
+sent 163 bytes  received 22 bytes  370.00 bytes/sec
+total size is 65,260  speedup is 352.76
+==> deploying secrets /Users/ljohnson/repos/ansible/ansible-developer/files/private/vault/bashenv/.bash_secrets
+sending incremental file list
+
+sent 72 bytes  received 19 bytes  182.00 bytes/sec
+total size is 32,365  speedup is 355.66
 .bashrc configuring shell env...
-platform=[DARWIN]
-setting functions
+.bashrc PLATFORM=[DARWIN]
+.bashrc setting functions
 .bash_functions configuring shell functions...
 .bashrc sourcing .bash_env
-.bash_env PYUTILS_DIR=[/Users/ljohnson/repos/python/pyutils]
 .bash_env setting path for DARWIN env
--bash: python: command not found
-python_version=[3]
-PYTHON_HOME=[/usr/local/bin]
 .bash_env more PATH env var updates
-.bashrc sourcing .bash_secrets
+.bash_env PATH=.:/Users/ljohnson/.local/bin:/Users/ljohnson/bin:/usr/local/Cellar/pyenv-virtualenv/1.2.1/shims:/Users/ljohnson/.pyenv/shims:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/opt/podman/bin
+.bashrc sourcing .bash_path
+.bashrc sourcing ~/.bash_secrets
 .bashrc setting prompt
 .bash_prompt configuring bash prompt...
-.bash_prompt setting aliases
+ setting aliases
 .bash_aliases configuring shell aliases...
 .bash_aliases setting aliases for DARWIN env
-sync /Users/ljohnson/repos/ansible/ansible-datacenter/files/private/env/git/git-ssh-config.ini to ~/.ssh/config
-current ssh key identities
-The agent has no identities.
-remove ssh key identities
-All identities removed.
-sync /Users/ljohnson/repos/ansible/ansible-datacenter/files/private/env/git/.gitconfig.home.ini to /Users/ljohnson/.gitconfig
-sync /Users/ljohnson/repos/ansible/ansible-datacenter/files/private/env/git/.gitconfig.work.ini to /Users/ljohnson/repos/work/.gitconfig
 [ansible-developer](main)$ 
 ```
 
@@ -348,9 +390,19 @@ sync /Users/ljohnson/repos/ansible/ansible-datacenter/files/private/env/git/.git
 CA_ACCOUNT_PWD=",sdkjfh;kewl4j<"
 ```
 
+The alias/function definition above assumes/requires the developer to have configured the following env vars in the vaulted file at './files/private/vault/bashenv/.bash_secrets':
+```shell
+export CYBERARK_API_ENDPOINT="cyberarkpas.example.int"
+export CYBERARK_API_BASE_URL="https://${CYBERARK_API_ENDPOINT}"
+export CYBERARK_API_USERNAME="ca-user-account"
+export CYBERARK_API_PASSWORD="ca-password"
+## e.g., 'leej'
+export CYBERARK_ACCOUNT_USERNAME="ca-user-safe-account-name"
+```
+
 ### ssh aliases
 
-These assumes that the developer has already added their ssh public key to the linux hosts `~/.ssh/authorized_keys` 
+The following alias definitions assume that the developer has already added the necessary ssh public key to the target linux host user ssh authorized  keys configuration file at '${HOME}/.ssh/authorized_keys':
 
 ```shell
 [ansible-developer](main)$ sshtestd1s1

@@ -7,16 +7,16 @@
 log_bash=".bashrc"
 echo "${log_bash} configuring shell env..."
 
-#OS="$(/bin/uname -s)"
-OS="$(uname -s)"
-case "${OS}" in
-    Linux*)     PLATFORM=Linux;;
-    Darwin*)    PLATFORM=DARWIN;;
-    CYGWIN*)    PLATFORM=CYGWIN;;
-    MINGW64*)   PLATFORM=MINGW64;;
-    MINGW32*)   PLATFORM=MINGW32;;
-    MSYS*)      PLATFORM=MSYS;;
-    *)          PLATFORM="UNKNOWN:${OS}"
+PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
+
+case "${PLATFORM_OS}" in
+    linux*)     PLATFORM=LINUX;;
+    darwin*)    PLATFORM=DARWIN;;
+    cygwin*)    PLATFORM=CYGWIN;;
+    mingw64*)   PLATFORM=MINGW64;;
+    mingw32*)   PLATFORM=MINGW32;;
+    msys*)      PLATFORM=MSYS;;
+    *)          PLATFORM="UNKNOWN:${PLATFORM_OS}"
 esac
 
 echo "${log_bash} PLATFORM=[${PLATFORM}]"
@@ -35,14 +35,20 @@ if [ -f "${HOME}/.bash_functions" ]; then
     source "${HOME}/.bash_functions"
 fi
 
+if [ -f "${HOME}/.bash_secrets" ]; then
+    if [ ! -f "${HOME}/.vault_pass" ]; then
+        echo "${log_bash} ~/.vault_pass not found, skip loading ${HOME}/.bash_secrets"
+    elif ! isInstalled ansible-vault; then
+        echo "${log_bash} ansible-vault not installed, skip loading ${HOME}/.bash_secrets"
+    else
+        echo "${log_bash} sourcing ~/.bash_secrets"
+        eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
+    fi
+fi
+
 if [ -f "${HOME}/.bash_env" ]; then
     echo "${log_bash} sourcing .bash_env"
     source ~/.bash_env
-fi
-
-if [ -f "${HOME}/.bash_secrets" ] && isInstalled ansible-vault; then
-    echo "${log_bash} sourcing ~/.bash_secrets"
-    eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
 fi
 
 #if [[ "$PLATFORM" =~ ^(MSYS|MINGW)$ ]]; then
@@ -55,7 +61,3 @@ if [ -f "${HOME}/.bash_aliases" ]; then
     echo "${log_prefix} setting aliases"
     source "${HOME}/.bash_aliases"
 fi
-
-#export ANSIBLE_ROLES_PATH=/etc/ansible/roles:~/.ansible/roles
-#export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-

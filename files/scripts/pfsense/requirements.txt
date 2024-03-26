@@ -26,6 +26,7 @@ cffi
 #chardet
 #charset-normalizer
 click
+click-loguru
 click-help-colors
 colorama
 commonmark

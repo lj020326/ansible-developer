@@ -3,9 +3,14 @@ log_prefix_functions=".bash_functions"
 
 echo "${log_prefix_functions} configuring shell functions..."
 
+##
+##
+unset -f install-dev-env || true
+function install-dev-env() {
+  echo "DEVENV_INSTALL_REMOTE_SCRIPT=${DEVENV_INSTALL_REMOTE_SCRIPT}"
+  bash -c "$(curl -fsSL "${DEVENV_INSTALL_REMOTE_SCRIPT}")"
+}
 
-##
-##
 unset -f setenv-python || true
 function setenv-python() {
 	python_version=${1:-"3WIN"}
@@ -132,6 +137,29 @@ function certinfo () {
   (openssl s_client -showcerts -servername $1 -connect $1:$2 <<< "Q" | openssl x509 -text | grep "DNS After")
 }
 
+unset -f reset_local_dns || true
+function reset_local_dns() {
+  local LOG_PREFIX="reset_local_dns():"
+
+  if [[ "${PLATFORM}" == *"DARWIN"* ]]; then
+    local RESET_DNS_CACHE="sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
+
+    echo "${LOG_PREFIX} ${RESET_DNS_CACHE}"
+    eval "${RESET_DNS_CACHE}"
+
+    echo "${LOG_PREFIX} Restart eaacloop"
+
+    ## ref: https://serverfault.com/questions/194832/how-to-start-stop-restart-launchd-services-from-the-command-line#194886
+    local RESTART_EAACLOOP="sudo launchctl kickstart -k system/net.eaacloop.wapptunneld"
+
+    echo "${LOG_PREFIX} ${RESTART_EAACLOOP}"
+    eval "${RESTART_EAACLOOP}"
+  else
+    echo "${LOG_PREFIX} function not implemented/defined for current system platform ${PLATFORM} ...yet"
+  fi
+}
+
+
 unset -f create-git-project || true
 function create-git-project() {
     $project=$1
@@ -211,6 +239,67 @@ function cdnvm(){
 #alias gitsetupstream="git branch --set-upstream-to=origin/$(git symbolic-ref HEAD 2>/dev/null)"
 
 
+unalias gitresetpublicbranch 1>/dev/null 2>&1
+unset -f gitresetpublicbranch || true
+function gitresetpublicbranch(){
+  GIT_DEFAULT_BRANCH=main
+
+  ## ref: https://intoli.com/blog/exit-on-errors-in-bash-scripts/
+  # exit when any command fails
+  set -e
+
+  # keep track of the last executed command
+  trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+  # echo an error message before exiting
+  trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+
+  echo "Check out ${GIT_DEFAULT_BRANCH} branch:"
+  git checkout ${GIT_DEFAULT_BRANCH}
+
+  #echo "Delete current local public branch:"
+  #git branch -D public
+
+  echo "Check out to a temporary branch:"
+  git checkout --orphan TEMP_BRANCH
+
+  echo "Update public files:"
+  if [ -d docs ]; then
+    rm -fr docs/
+  fi
+  if [ -d private ]; then
+    rm -fr private/
+  fi
+  if [ -d files/private ]; then
+    rm -fr files/private/
+  fi
+  find . -name secrets.yml -exec rm -rf {} \;
+  find . -name vault.yml -exec rm -rf {} \;
+
+  echo "Add all the files:"
+  git add -A
+
+  echo "Commit the changes:"
+  git commit -am "Initial commit"
+
+  echo "Delete the old branch:"
+  git branch -D public
+
+  echo "Rename the temporary branch to public:"
+  ## ref: https://gist.github.com/heiswayi/350e2afda8cece810c0f6116dadbe651
+  git branch -m public
+
+  echo "Force public branch update to origin repository:"
+  git push -f origin public
+  #git push -f --set-upstream origin public
+
+  echo "Force public branch update to github repository:"
+  git push -f -u github public:main
+
+  echo "Finally, checkout ${GIT_DEFAULT_BRANCH} branch:"
+  git checkout ${GIT_DEFAULT_BRANCH}
+}
+
+
 unalias gitshowupstream 1>/dev/null 2>&1
 unset -f gitshowupstream || true
 function gitshowupstream(){
@@ -288,7 +377,7 @@ unalias gitbranchdelete 1>/dev/null 2>&1
 unset -f gitbranchdelete || true
 function gitbranchdelete(){
   REPO_ORIGIN_URL="$(git config --get remote.origin.url)" && \
-  REPO_DEFAULT_BRANCH="$(git ls-remote --symref "${REPO_ORIGIN_URL}" HEAD | gsed -nE 's|^ref: refs/heads/(\S+)\s+HEAD|\1|p')" && \
+  REPO_DEFAULT_BRANCH="$(git ls-remote --symref "${REPO_ORIGIN_URL}" HEAD | sed -nE 's|^ref: refs/heads/(\S+)\s+HEAD|\1|p')" && \
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
@@ -297,6 +386,23 @@ function gitbranchdelete(){
   git branch -D "${LOCAL_BRANCH}" && \
   echo "==> Deleting remote ${REMOTE} branch ${REMOTE_BRANCH}" && \
   git push -d "${REMOTE}" "${REMOTE_BRANCH}"
+}
+
+unalias gitbranchrecreate 1>/dev/null 2>&1
+unset -f gitbranchrecreate || true
+function gitbranchrecreate() {
+  REPO_ORIGIN_URL="$(git config --get remote.origin.url)" && \
+  REPO_DEFAULT_BRANCH="$(git ls-remote --symref "${REPO_ORIGIN_URL}" HEAD | sed -nE 's|^ref: refs/heads/(\S+)\s+HEAD|\1|p')" && \
+  LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
+  REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
+  IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
+  git fetch origin "${REPO_DEFAULT_BRANCH}":"${REPO_DEFAULT_BRANCH}" && \
+  echo "==> Deleting existing branch ${LOCAL_BRANCH}" && \
+  gitbranchdelete && \
+  echo "==> Creating new branch ${LOCAL_BRANCH}" && \
+  git checkout -b "${LOCAL_BRANCH}" && \
+  echo "==> Pushing new branch ${LOCAL_BRANCH}" && \
+  git push -u "${REMOTE}" "${LOCAL_BRANCH}"
 }
 
 unalias getbranchhist 1>/dev/null 2>&1
@@ -514,14 +620,21 @@ function get-largest-docker-image-sizes() {
 unalias explodeansibletest 1>/dev/null 2>&1
 unset -f explodeansibletest || true
 function explodeansibletest() {
-
-  recent=$(find . -name \*.py | head -n1) && \
+  recent=$(find . -name AnsiballZ_\*.py | head -n1) && \
   python3 ${recent} explode && \
-  cat debug_dir/args | jq > debug_dir/args.json && \
+  cat debug_dir/args | jq '.ANSIBLE_MODULE_ARGS.logging_level = "DEBUG"' > debug_dir/args.json && \
   cp debug_dir/args.json debug_dir/args && \
   cp debug_dir/args.json debug_dir/args.orig.json
-
 }
+#function explodeansibletest() {
+#
+#  recent=$(find . -name \*.py | head -n1) && \
+#  python3 ${recent} explode && \
+#  cat debug_dir/args | jq > debug_dir/args.json && \
+#  cp debug_dir/args.json debug_dir/args && \
+#  cp debug_dir/args.json debug_dir/args.orig.json
+#
+#}
 
 unalias cagetaccountpwd 1>/dev/null 2>&1
 unset -f cagetaccountpwd || true

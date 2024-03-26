@@ -10,38 +10,16 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "SCRIPT_DIR=[${SCRIPT_DIR}]"
 
+## uname and platform vars are now set in shared certs script
+source "${SCRIPT_DIR}/get_curl_ca_opts.sh"
+##UNAME=$(/bin/uname -s | tr "[:upper:]" "[:lower:]")
+#UNAME=$(uname -s | tr "[:upper:]" "[:lower:]")
+
 SCRIPT_NAME=$(basename $0)
 SCRIPT_NAME="${SCRIPT_NAME%.*}"
 logFile="${SCRIPT_NAME}.log"
 
 INSTALL_JDK_CACERT=0
-
-CA_DOMAIN="johnson.int"
-
-SITE_LIST_DEFAULT="
-bitbucket.${CA_DOMAIN}:8443
-anshubp1s4.${CA_DOMAIN}:443
-ansible-galaxy.${CA_DOMAIN}:443
-"
-
-__SITE_LIST="${CA_SITE_LIST:-${SITE_LIST_DEFAULT}}"
-
-## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-SSL_CERT_PATH=$(python -m certifi)
-export SSL_CERT_FILE=${SSL_CERT_PATH}
-export SSL_CERT_DIR=$(dirname "${SSL_CERT_PATH}")
-
-### functions followed by main
-
-writeToLog() {
-  echo -e "==> ${1}" | tee -a "${logFile}"
-  #    echo -e "${1}" >> "${logFile}"
-}
-
-## https://stackoverflow.com/questions/26988262/best-way-to-find-the-os-name-and-version-on-a-unix-linux-platform#26988390
-UNAME=$(uname -s | tr "[:upper:]" "[:lower:]")
-PLATFORM=""
-DISTRO=""
 
 if [[ "$UNAME" != "cygwin" && "$UNAME" != "msys" ]]; then
   if [ "$EUID" -ne 0 ]; then
@@ -50,78 +28,12 @@ if [[ "$UNAME" != "cygwin" && "$UNAME" != "msys" ]]; then
   fi
 fi
 
-CACERT_TRUST_DIR=/etc/pki/ca-trust/extracted
-CACERT_TRUST_IMPORT_DIR=/etc/pki/ca-trust/source/anchors
-CACERT_BUNDLE=${CACERT_TRUST_DIR}/openssl/ca-bundle.trust.crt
-CACERT_TRUST_FORMAT="pem"
+### functions followed by main
 
-## ref: https://askubuntu.com/questions/459402/how-to-know-if-the-running-platform-is-ubuntu-or-centos-with-help-of-a-bash-scri
-case "${UNAME}" in
-    linux*)
-      if type "lsb_release" > /dev/null; then
-        LINUX_OS_DIST=$(lsb_release -a | tr "[:upper:]" "[:lower:]")
-      else
-        LINUX_OS_DIST=$(awk -F= '/^NAME/{print $2}' /etc/os-release | tr "[:upper:]" "[:lower:]")
-      fi
-      PLATFORM=Linux
-      case "${LINUX_OS_DIST}" in
-        *ubuntu* | *debian*)
-          # Debian Family
-          #CACERT_TRUST_DIR=/usr/ssl/certs
-          CACERT_TRUST_DIR=/etc/ssl/certs
-          CACERT_TRUST_IMPORT_DIR=/usr/local/share/ca-certificates
-          CACERT_BUNDLE=${CACERT_TRUST_DIR}/ca-certificates.crt
-          DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
-          CACERT_TRUST_COMMAND="update-ca-certificates"
-          CACERT_TRUST_FORMAT="crt"
-          ;;
-        *redhat* | *centos* | *fedora* )
-          # RedHat Family
-          CACERT_TRUST_DIR=/etc/pki/tls/certs
-          #CACERT_TRUST_IMPORT_DIR=/etc/pki/ca-trust/extracted/openssl
-          #CACERT_BUNDLE=${CACERT_TRUST_DIR}/ca-bundle.trust.crt
-          #CACERT_TRUST_DIR=/etc/pki/ca-trust/extracted/pem
-          CACERT_TRUST_IMPORT_DIR=/etc/pki/ca-trust/source/anchors
-          CACERT_BUNDLE=${CACERT_TRUST_DIR}/tls-ca-bundle.pem
-          DISTRO=$(cat /etc/system-release)
-          CACERT_TRUST_COMMAND="update-ca-trust extract"
-          CACERT_TRUST_FORMAT="pem"
-          ;;
-        *)
-          # Otherwise, use release info file
-          CACERT_TRUST_DIR=/usr/ssl/certs
-          CACERT_TRUST_IMPORT_DIR=/etc/pki/ca-trust/source/anchors
-          CACERT_BUNDLE=${CACERT_TRUST_DIR}/ca-bundle.crt
-          DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
-          CACERT_TRUST_COMMAND="update-ca-certificates"
-          CACERT_TRUST_FORMAT="pem"
-      esac
-      ;;
-    darwin*)
-      PLATFORM=DARWIN
-      CACERT_TRUST_DIR=/etc/ssl
-      CACERT_TRUST_IMPORT_DIR=/usr/local/share/ca-certificates
-      CACERT_BUNDLE=${CACERT_TRUST_DIR}/cert.pem
-      ;;
-    cygwin* | mingw64* | mingw32* | msys*)
-      PLATFORM=MSYS
-      ## https://packages.msys2.org/package/ca-certificates?repo=msys&variant=x86_64
-      CACERT_TRUST_DIR=/etc/pki/ca-trust/extracted
-      CACERT_TRUST_IMPORT_DIR=/etc/pki/ca-trust/source/anchors
-      CACERT_BUNDLE=${CACERT_TRUST_DIR}/openssl/ca-bundle.trust.crt
-      ;;
-    *)
-      PLATFORM="UNKNOWN:${UNAME}"
-esac
-
-writeToLog "UNAME=${UNAME}"
-writeToLog "LINUX_OS_DIST=${OS_DIST}"
-writeToLog "PLATFORM=[${PLATFORM}]"
-writeToLog "DISTRO=[${DISTRO}]"
-writeToLog "CACERT_TRUST_DIR=${CACERT_TRUST_DIR}"
-writeToLog "CACERT_TRUST_IMPORT_DIR=${CACERT_TRUST_IMPORT_DIR}"
-writeToLog "CACERT_BUNDLE=${CACERT_BUNDLE}"
-writeToLog "CACERT_TRUST_COMMAND=${CACERT_TRUST_COMMAND}"
+writeToLog() {
+  echo -e "==> ${1}" | tee -a "${logFile}"
+  #    echo -e "${1}" >> "${logFile}"
+}
 
 function get_java_keystore() {
   ## default jdk location
@@ -403,14 +315,13 @@ if [ -d "${CACERT_TRUST_DIR}" ]; then
   find "${CACERT_TRUST_DIR}/" -xtype l -delete
 fi
 
-writeToLog "Add site certs to cacerts"
-IFS=$'\n'
-for SITE in ${__SITE_LIST}
-do
+## ref: https://superuser.com/questions/97201/how-to-save-a-remote-server-ssl-certificate-locally-as-a-file
+## ref: https://serverfault.com/questions/661978/displaying-a-remote-ssl-certificate-details-using-cli-tools
+SITE=${1:-host01.johnson.int:443}
 
-  install_site_cert "${SITE}" "${INSTALL_JDK_CACERT}"
+echo "SITE=${SITE}"
 
-done
+install_site_cert "${SITE}" "${INSTALL_JDK_CACERT}"
 
 if [[ "$UNAME" == "darwin"* ]]; then
   writeToLog "SSL_CERT_DIR=${SSL_CERT_DIR}"

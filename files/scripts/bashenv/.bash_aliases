@@ -40,6 +40,8 @@ alias la='ls -alrt --color'
 alias lld='ll | grep ^d'
 alias lll='ll | grep ^l'
 
+alias installdevenv="install-dev-env"
+
 alias cdrepos='cd ~/repos'
 alias cddocs='cd ~/docs'
 alias cdtechdocs='cd ~/repos/docs/docs-tech/infrastructure'
@@ -49,8 +51,8 @@ alias cdjenkins='cd ~/repos/jenkins'
 alias cdnode='cd ~/repos/nodejs'
 alias cdpython='cd ~/repos/python'
 alias cdansible='cd ~/repos/ansible'
-#alias cddc='cd ~/repos/ansible/ansible-datacenter'
-alias cddc="cd ${ANSIBLE_DEVELOPER_REPO}"
+alias cddc="cd ${ANSIBLE_DATACENTER_REPO}"
+alias cddev="cd ${ANSIBLE_DEVELOPER_REPO}"
 alias cdkube='cd ~/repos/ansible/ansible-kubespray'
 alias cdmeteor='cd ~/repos/meteor'
 alias cdreact='cd ~/repos/react-native'
@@ -121,6 +123,10 @@ alias dnsreset="ipconfig //flushdns"
 alias dot-turd-show="find . -type f -name '._*' -print"
 alias dot-turd-rm="find . -type f -name '._*' -print -delete"
 
+## DNS alias wrappers around functions
+alias dnsresetcache="reset_local_dns"
+alias dnsreset="reset_local_dns"
+
 alias sshsetupkeyaliases="setup-ssh-key-identities.sh"
 alias sshvcenter='ssh root@vcenter7.dettonville.int'
 alias sshvcenter7='ssh root@vcenter7.dettonville.int'
@@ -148,6 +154,9 @@ alias sshmail='ssh administrator@mail.johnson.int'
 alias sshcgminer='ssh root@cgminer.johnson.int'
 alias sshminer='ssh root@cgminer.johnson.int'
 
+## ref: https://www.tecmint.com/enable-debugging-mode-in-ssh/
+alias sshdebugadmin01='ssh -v administrator@admin01.johnson.int'
+
 alias sshalgo='ssh administrator@algotrader.johnson.int'
 alias sshwp='ssh administrator@wordpress.johnson.int'
 alias sshk8s='ssh administrator@k8s.johnson.int'
@@ -165,6 +174,9 @@ alias sshresetkeys="ssh-keygen -R ${TARGET_HOST} && ssh-keyscan -H ${TARGET_HOST
 alias create-crypt-passwd="openssl passwd -1 "
 
 alias dockernuke='docker ps -a -q | xargs --no-run-if-empty docker rm -f'
+## ref: https://stackoverflow.com/questions/32723111/how-to-remove-old-and-unused-docker-images#34616890
+alias docker-clean='docker container prune -f ; docker image prune -f ; docker network prune -f ; docker volume prune -f'
+
 ## https://www.howtogeek.com/devops/what-is-a-docker-image-manifest/
 ## https://github.com/docker/hub-feedback/issues/2043#issuecomment-1161578466
 ## docker manifest inspect lj020326/centos8-systemd-python:latest | jq .manifests[0].digest
@@ -173,7 +185,7 @@ alias gethist="history | tr -s ' ' | cut -d' ' -f3-"
 alias startheroku='heroku local'
 
 # alias syncbashenv='rsync1 ${ANSIBLE_DEVELOPER_REPO}/files/scripts/bashenv/msys2/.bash* ~/'
-alias syncbashenv="${ANSIBLE_DEVELOPER_REPO}/sync-bashenv.sh && .bash"
+alias syncbashenv="${ANSIBLE_DEVELOPER_REPO}/sync-bashenv.sh && source ${HOME}/.bashrc"
 alias getsitecertinfo="get_site_cert_info.sh"
 
 ## see function for more dynamic/robust version of the same shortcut
@@ -188,6 +200,7 @@ alias gitmergesub="git submodule update --remote --merge && blastit"
 alias gitresetsub="git submodule deinit -f . && git submodule update --init --recursive --remote"
 alias gitgetcomment="getgitcomment"
 alias gitgetrequestid="getgitrequestid"
+alias gitdeletebranch="gitbranchdelete"
 
 ## resolve issue "Fatal: Not possible to fast-forward, aborting"
 #alias gitpullrebase="git pull origin <branch> --rebase"
@@ -223,6 +236,10 @@ alias gitaddorigin="git remote add origin ssh://git@gitea.admin.dettonville.int:
 #alias gitsetupstream="git branch --set-upstream-to=origin/master"
 alias gitsetupstream="git branch --set-upstream-to=origin/$(git symbolic-ref HEAD 2>/dev/null)"
 
+## ref: https://stackoverflow.com/questions/9662249/how-to-overwrite-local-tags-with-git-fetch
+alias gitfetchtags="git fetch origin --tags --force"
+alias gitsynctags="git fetch origin --tags --force --prune"
+
 ## make these function so they evaluate at time of exec and not upon shell startup
 ## Prevent bash alias from evaluating statement at shell start
 ## ref: https://stackoverflow.com/questions/13260969/prevent-bash-alias-from-evaluating-statement-at-shell-start
@@ -232,6 +249,8 @@ alias gitsetupstream="git branch --set-upstream-to=origin/$(git symbolic-ref HEA
 
 alias gitfold="bash folder.sh fold"
 alias gitunfold="bash folder.sh unfold"
+alias gitfetchmain="git fetch origin main:main"
+alias gitfetchdevelopment="git fetch origin development:development"
 
 alias decrypt="ansible-vault decrypt"
 alias vaultdecrypt="ansible-vault decrypt --vault-password-file=~/.vault_pass"
@@ -266,16 +285,19 @@ alias spacemacs='emacs -q --load "$HOME/.spacemacs.d/init.el"'
 
 alias fetchimagesfrommarkdown="~/bin/fetch_images_from_markdown.sh"
 alias fetchsitesslcert.sh="~/bin/fetch_site_ssl_cert.sh"
+
 ## use with host:port
 #alias fetch-and-import-site-cert="sudo ~/bin/fetch_and_import_site_cert_pem.sh"
 ## use with host:port
-alias importsitecerts="sudo ~/bin/install_site_cacerts.sh"
+alias importsitecerts="sudo ~/bin/install-cacerts.sh"
+alias installcacerts="sudo ~/bin/install-cacerts.sh"
+
 ## use with host:port
-alias importsslcert="sudo ~/bin/import_site_cert.sh"
+alias importsslcert="sudo ~/bin/import-ssl-cert.sh"
 
 alias syncpythoncerts="sudo ~/bin/sync-python-certs-with-system-cabundle.sh"
 
-if [[ "$platform" =~ ^(MSYS|MINGW32|MINGW64)$ ]]; then
+if [[ "${PLATFORM}" =~ ^(MSYS|MINGW32|MINGW64)$ ]]; then
   echo "${log_prefix_aliases} setting aliases specific to MSYS/MINGW platform"
 
   alias flushdns="ipconfig //flushdns"
@@ -306,7 +328,7 @@ if [[ "$platform" =~ ^(MSYS|MINGW32|MINGW64)$ ]]; then
   # per https://epsil.github.io/blog/2016/04/20/
   alias open='start'
 
-elif [[ "${platform}" == *"DARWIN"* ]]; then
+elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
   echo "${log_prefix_aliases} setting aliases for DARWIN env"
   # alias emacs='emacs -q --load "${HOME}/.emacs.d/init.el"'
 
@@ -326,7 +348,7 @@ elif [[ "${platform}" == *"DARWIN"* ]]; then
   alias dnslookup2='dscacheutil -q host -a name '
   alias dnslookup3='dns-sd -G v4v6 '
   alias dnsflushcache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
-  alias dnsresetcache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+#  alias dnsresetcache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
   alias dnsresolvers='scutil --dns'
 
   ## ref: https://discussions.apple.com/thread/250681170
@@ -356,10 +378,13 @@ fi
 ## work related
 alias cdwork='cd ~/repos/work'
 
+alias importworksitecerts="sudo ~/bin/install-worksite-cacerts.sh"
+alias installworksitecerts="sudo ~/bin/install-worksite-cacerts.sh"
+
 alias gitaddworkkey="git config core.sshCommand 'ssh -i ~/.ssh/${SSH_KEY_WORK}'"
 alias gitaddworkkey2="git config core.sshCommand 'ssh -i ~/.ssh/${SSH_KEY_WORK2}'"
 alias gitclonework="GIT_SSH_COMMAND=\"ssh -i ~/.ssh/${SSH_KEY_WORK2}\" git clone"
-#alias gitclonework2="GIT_SSH_COMMAND=\"ssh -i ~/.ssh/${SSH_KEY_WORK2}\" git clone"
+alias gitclonework2="GIT_SSH_COMMAND=\"ssh -i ~/.ssh/${SSH_KEY_WORK}\" git clone"
 alias gitwork="GIT_SSH_COMMAND=\"ssh -i ~/.ssh/${SSH_KEY_WORK2}\""
 
 alias sshcicd="ssh -i ~/.ssh/${SSH_KEY_WORK} ${TEST_SSH_ID}@INFRACICDD1S1.${WORK_DOMAIN}"
@@ -389,6 +414,8 @@ alias sshawxp2s4="ssh -i ~/.ssh/${SSH_KEY_WORK} ${TEST_SSH_ID}@atrsnp2s4.${WORK_
 
 alias mountwork="mount-sshfs-work.sh"
 alias unmountwork="unmount-sshfs-work.sh"
+alias syncworksshfs="sync-sshfs-work.sh"
+alias syncworkdns="sudo sync-dns-hosts-to-pfsense.sh"
 
 alias cagetpwd="cagetaccountpwd ${CYBERARK_API_BASE_URL} ${CYBERARK_API_USERNAME} ${CYBERARK_API_PASSWORD} ${CYBERARK_ACCOUNT_USERNAME}"
 alias getcapwd="cagetpwd"

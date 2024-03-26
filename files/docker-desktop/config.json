@@ -1,0 +1,22 @@
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "cgroup-parent": "docker.slice",
+  "debug": true,
+  "dns": [
+    "10.0.0.1"
+  ],
+  "experimental": false,
+  "insecure-registries": [
+    "media.johnson.int:5000",
+    "admin.dettonville.int:5000"
+  ],
+  "registry-mirrors": [
+    "https://media.johnson.int:5000",
+    "https://admin.dettonville.int:5000"
+  ]
+}

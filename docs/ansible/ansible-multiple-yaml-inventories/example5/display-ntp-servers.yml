@@ -1,0 +1,13 @@
+- name: "Run trace var play"
+  hosts: ntp
+  gather_facts: false
+  connection: local
+  tasks:
+    - debug:
+        var: trace_var
+    - debug:
+        var: group_trace_var
+    - debug:
+        var: group_names
+    - debug:
+        var: ntp_servers

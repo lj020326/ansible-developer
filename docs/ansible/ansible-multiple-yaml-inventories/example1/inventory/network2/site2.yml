@@ -1,0 +1,34 @@
+---
+## ref: https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_inventory.html
+all:
+  hosts:
+    web01.qa.net2site2.example.int:
+      trace_var: network2/site2/web01.qa.net2site2.example.int
+    web02.qa.net2site2.example.int:
+      trace_var: network2/site2/web02.qa.net2site2.example.int
+  children:
+    rhel7:
+      vars:
+        trace_var: network2/site2/rhel7
+      hosts:
+        web01.qa.net2site2.example.int: {}
+        web02.qa.net2site2.example.int: {}
+    environment_qa:
+      vars:
+        trace_var: network2/site2/environment_qa
+      hosts:
+        web01.qa.net2site2.example.int: {}
+        web02.qa.net2site2.example.int: {}
+    location_site2:
+      vars:
+        trace_var: network2/site2/location_site2
+      hosts:
+        web01.qa.net2site2.example.int: {}
+        web02.qa.net2site2.example.int: {}
+    network2:
+      vars:
+        trace_var: network2/site2/network2
+      hosts:
+        web01.qa.net2site2.example.int: {}
+        web02.qa.net2site2.example.int: {}
+    ungrouped: {}

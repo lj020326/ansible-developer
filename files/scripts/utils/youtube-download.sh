@@ -1,6 +1,6 @@
 #!/bin/bash
 #author: Paolo Frigo, https://www.scriptinglibrary.com
-video_list="videos.txt"
+video_list="youtube-videos.txt"
 total=$(wc -l $video_list | awk '{ print $1 }')
 counter=0
 help="Please, install it: 

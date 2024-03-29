@@ -918,9 +918,9 @@ def get_configuration_history_status_log(
             if find not in str(log_item.values()):
                 continue
 
-        ## ref: https://stackoverflow.com/questions/9744775/how-to-convert-integer-timestamp-into-a-datetime
+        # ref: https://stackoverflow.com/questions/9744775/how-to-convert-integer-timestamp-into-a-datetime
         log_time = datetime.datetime.fromtimestamp(log_item['time'] / 1e3)
-        ## ref: https://stackoverflow.com/questions/3961581/in-python-how-to-display-current-time-in-readable-format
+        # ref: https://stackoverflow.com/questions/3961581/in-python-how-to-display-current-time-in-readable-format
         log_time_string = log_time.strftime("%Y-%m-%d %H:%M:%S")
 
         log_item_message = f"{log_time_string}"

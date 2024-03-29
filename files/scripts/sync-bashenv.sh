@@ -64,6 +64,16 @@ RSYNC_OPTIONS_REPO1=(
 echo "==> rsync ${RSYNC_OPTIONS_HOME[@]} ${BASHENV_DIR}/ ${HOME}/"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${BASHENV_DIR}/" "${HOME}/"
 
+echo "==> rsync env scripts"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/git/"*.sh "${HOME}/bin/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/pfsense/"*.py "${HOME}/bin/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/ansible/"*.sh "${HOME}/bin/"
+if [[ -d "${SCRIPT_BASE_DIR}/certs" ]]; then
+  rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/certs/"*.sh "${HOME}/bin/"
+fi
+chmod +x "${HOME}/bin/"*.sh || true
+chmod +x "${HOME}/bin/"*.py || true
+
 #chmod +x ${PRIVATE_ENV_DIR}/scripts/*.sh
 #chmod +x ${PRIVATE_ENV_DIR}/git/*.sh
 
@@ -80,14 +90,6 @@ if [[ -d "${PRIVATE_ENV_DIR}/git" ]]; then
   rsync "${RSYNC_OPTIONS_HOME[@]}" "${PRIVATE_ENV_DIR}/git/"*.sh "${HOME}/bin/"
 fi
 
-echo "==> rsync env scripts"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/pfsense/"*.py "${HOME}/bin/"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/ansible/"*.sh "${HOME}/bin/"
-if [[ -d "${SCRIPT_BASE_DIR}/certs" ]]; then
-  rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/certs/"*.sh "${HOME}/bin/"
-fi
-chmod +x "${HOME}/bin/"*.sh || true
-chmod +x "${HOME}/bin/"*.py || true
 
 if [[ -e "${VAULT_BASHENV_DIR}/.bash_secrets" ]]; then
   echo "==> deploying secrets ${VAULT_BASHENV_DIR}/.bash_secrets"

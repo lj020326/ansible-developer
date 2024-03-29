@@ -293,7 +293,8 @@ alias importsitecerts="sudo ~/bin/install-cacerts.sh"
 alias installcacerts="sudo ~/bin/install-cacerts.sh"
 
 ## use with host:port
-alias importsslcert="sudo ~/bin/import-ssl-cert.sh"
+alias importsslcerts="sudo ~/bin/import-ssl-certs.sh"
+alias importworksslcerts="sudo ~/bin/import-worksite-ssl-certs.sh"
 
 alias syncpythoncerts="sudo ~/bin/sync-python-certs-with-system-cabundle.sh"
 

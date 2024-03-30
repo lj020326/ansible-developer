@@ -28,6 +28,7 @@ PROJECT_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
 #PROJECT_DIR=$(git rev-parse --show-toplevel)
 
 MIRROR_DIR_LIST="
+.github
 docs
 files
 "

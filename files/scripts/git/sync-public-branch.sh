@@ -101,7 +101,7 @@ function checkRequiredCommands() {
 }
 
 function search_repo_keywords () {
-  local LOG_PREFIX="==> search_repo_keywords():"
+  local LOG_PREFIX="search_repo_keywords():"
 
   local REPO_EXCLUDE_DIR_LIST=(".git")
   REPO_EXCLUDE_DIR_LIST+=(".idea")

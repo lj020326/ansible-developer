@@ -425,3 +425,6 @@ alias getcapwd="cagetpwd"
 #alias sshpackerwork="ssh -i ~/.ssh/${SSH_ANSIBLE_KEY_WORK}"
 
 alias sshansiblework="ssh -i ~/.ssh/${SSH_ANSIBLE_KEY_WORK}"
+
+alias bashenv-no-gnutools="export ADD_GNUTOOLS_BASH_PATH=0 && source ~/.bashrc"
+alias bashenv-gnutools="export ADD_GNUTOOLS_BASH_PATH=1 && source ~/.bashrc"

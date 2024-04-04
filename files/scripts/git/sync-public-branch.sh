@@ -7,6 +7,20 @@ GIT_PUBLIC_BRANCH=public
 # exit when any command fails
 set -e
 
+function gitcommitpush() {
+  local LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
+  local REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
+  IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
+  echo "Staging changes:" && \
+  git add -A || true && \
+  echo "Committing changes:" && \
+  git commit -am "group updates to public branch" || true && \
+  echo "Pushing branch '${LOCAL_BRANCH}' to remote origin branch '${LOCAL_BRANCH}':" && \
+  git push -f origin ${LOCAL_BRANCH} || true && \
+  echo "Pushing branch '${LOCAL_BRANCH}' to remote '${REMOTE}' branch '${REMOTE_BRANCH}':" && \
+  git push -f -u ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH} || true
+}
+
 ## https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
 TMP_DIR=$(mktemp -d -p ~)
 
@@ -25,7 +39,6 @@ SCRIPT_DIR="$(dirname "$0")"
 ## PURPOSE RELATED VARS
 #PROJECT_DIR=$( git rev-parse --show-toplevel )
 PROJECT_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
-#PROJECT_DIR=$(git rev-parse --show-toplevel)
 
 source "${PROJECT_DIR}/files/scripts/logger.sh"
 
@@ -59,7 +72,7 @@ logDebug "EXCLUDE_AND_REMOVE=${EXCLUDE_AND_REMOVE}"
 
 ## ref: https://stackoverflow.com/questions/53839253/how-can-i-convert-an-array-into-a-comma-separated-string
 declare -a EXCLUDES_ARRAY
-EXCLUDES_ARRAY=('.git')
+EXCLUDES_ARRAY+=('.git')
 EXCLUDES_ARRAY+=('.gitmodule')
 EXCLUDES_ARRAY+=('.idea')
 EXCLUDES_ARRAY+=('.vscode')
@@ -229,20 +242,8 @@ function sync_public_branch() {
   
   ## https://stackoverflow.com/questions/5738797/how-can-i-push-a-local-git-branch-to-a-remote-with-a-different-name-easily
   logInfo "Add all the files:"
-  LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
-  REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
-  IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
-  logInfo "Staging changes:" && \
-  git add -A || true && \
-  logInfo "Committing changes:" && \
-  git commit -am "group updates to public branch" || true && \
-  logInfo "Pushing branch '${LOCAL_BRANCH}' to remote origin branch '${LOCAL_BRANCH}':" && \
-  git push -f origin ${LOCAL_BRANCH} || true && \
-  logInfo "Pushing branch '${LOCAL_BRANCH}' to remote '${REMOTE}' branch '${REMOTE_BRANCH}':" && \
-  git push -f -u ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH} || true && \
-  logInfo "Finally, checkout ${GIT_DEFAULT_BRANCH} branch:" && \
-  git checkout ${GIT_DEFAULT_BRANCH}
-  
+  gitcommitpush
+
   logInfo "chmod project admin/maintenance scripts"
   chmod +x files/scripts/*.sh
   chmod +x files/scripts/git/*.sh
@@ -294,9 +295,7 @@ function main() {
 #  search_repo_keywords
   eval search_repo_keywords
   local RETURN_STATUS=$?
-  if [[ $RETURN_STATUS -eq 0 ]]; then
-    logInfo "${LOG_PREFIX} search_repo_keywords: SUCCESS"
-  else
+  if [[ $RETURN_STATUS -ne 0 ]]; then
     logError "${LOG_PREFIX} search_repo_keywords: FAILED"
     exit ${RETURN_STATUS}
   fi

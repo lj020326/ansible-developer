@@ -250,6 +250,16 @@ function setup_python_env() {
 
 }
 
+function setup_cacerts() {
+
+  ohai "Setup user bash environment..."
+  (
+    eval "${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
+  ) || exit 1
+
+  echo
+}
+
 function setup_user_env() {
 
   ohai "Setup user bash environment..."
@@ -465,6 +475,8 @@ EOABORT
   fi
 
   setup_python_env
+
+  setup_cacerts
 
   setup_user_env
 

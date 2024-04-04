@@ -19,9 +19,10 @@ INSTALL_JDK_CACERT=1
 SETUP_PYTHON_CACERTS_ONLY=0
 
 SITE_LIST_DEFAULT=("pfsense.johnson.int")
+SITE_LIST_DEFAULT+=("gitea.admin.dettonville.int")
+SITE_LIST_DEFAULT+=("admin.dettonville.int")
 SITE_LIST_DEFAULT+=("media.johnson.int:5000")
 SITE_LIST_DEFAULT+=("media.johnson.int")
-SITE_LIST_DEFAULT+=("admin.dettonville.int")
 SITE_LIST_DEFAULT+=("pypi.python.org")
 SITE_LIST_DEFAULT+=("files.pythonhosted.org")
 SITE_LIST_DEFAULT+=("bootstrap.pypa.io")
@@ -438,10 +439,12 @@ function install_site_cert() {
 function setup_python_cacerts() {
   local LOG_PREFIX="setup_python_cacerts():"
 
-  ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-  pip_install_certifi
-
-  local PYTHON_SSL_CERT_FILE=$(python3 -m certifi)
+#  ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
+#  pip_install_certifi
+#
+#  local PYTHON_SSL_CERT_FILE=$(python3 -m certifi)
+  # ref: https://askubuntu.com/a/1296373/1157235
+  local PYTHON_SSL_CERT_FILE=$(python3 -c 'import ssl; print(ssl.get_default_verify_paths().openssl_cafile)')
   local PYTHON_SSL_CERT_DIR=$(dirname "${PYTHON_SSL_CERT_FILE}")
 
   logInfo "${LOG_PREFIX} PYTHON_SSL_CERT_DIR=${PYTHON_SSL_CERT_DIR}"
@@ -453,7 +456,11 @@ function setup_python_cacerts() {
       logInfo "${LOG_PREFIX} Running [${MACOS_CACERT_EXPORT_COMMAND}]"
       eval "${MACOS_CACERT_EXPORT_COMMAND}"
     fi
-    mv "${PYTHON_SSL_CERT_FILE}" "${PYTHON_SSL_CERT_FILE}.bak"
+    if [ -f "${PYTHON_SSL_CERT_FILE}" ]; then
+      mv "${PYTHON_SSL_CERT_FILE}" "${PYTHON_SSL_CERT_FILE}.bak"
+    else
+      cp -p "${CACERT_BUNDLE}" "${PYTHON_SSL_CERT_FILE}.bak"
+    fi
     logInfo "${LOG_PREFIX} Appending system cacerts to python cacerts"
     if [[ "$UNAME" == "darwin"* ]]; then
       cat "${PYTHON_SSL_CERT_FILE}.bak" "${PYTHON_SSL_CERT_DIR}/systemBundleCA.pem" > "${PYTHON_SSL_CERT_FILE}"

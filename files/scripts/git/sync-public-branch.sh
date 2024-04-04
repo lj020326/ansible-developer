@@ -243,6 +243,8 @@ function sync_public_branch() {
   ## https://stackoverflow.com/questions/5738797/how-can-i-push-a-local-git-branch-to-a-remote-with-a-different-name-easily
   logInfo "Add all the files:"
   gitcommitpush
+  echo "Checkout ${GIT_DEFAULT_BRANCH} branch:" && \
+  git checkout ${GIT_DEFAULT_BRANCH}
 
   logInfo "chmod project admin/maintenance scripts"
   chmod +x files/scripts/*.sh

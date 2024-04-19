@@ -35,6 +35,11 @@ if [ -f "${HOME}/.bash_functions" ]; then
     source "${HOME}/.bash_functions"
 fi
 
+if [ -f "${HOME}/.bash_env" ]; then
+    echo "${log_bash} sourcing .bash_env"
+    source ~/.bash_env
+fi
+
 if [ -f "${HOME}/.bash_secrets" ]; then
     if [ ! -f "${HOME}/.vault_pass" ]; then
         echo "${log_bash} ~/.vault_pass not found, skip loading ${HOME}/.bash_secrets"
@@ -44,11 +49,6 @@ if [ -f "${HOME}/.bash_secrets" ]; then
         echo "${log_bash} sourcing ~/.bash_secrets"
         eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
     fi
-fi
-
-if [ -f "${HOME}/.bash_env" ]; then
-    echo "${log_bash} sourcing .bash_env"
-    source ~/.bash_env
 fi
 
 #if [[ "$PLATFORM" =~ ^(MSYS|MINGW)$ ]]; then

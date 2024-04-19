@@ -18,11 +18,11 @@ REQUIRED_SYSTEM_PYTHON3_VERSION=3.6.1
 REQUIRED_GIT_VERSION=1.8.3
 #REQUIRED_GIT_VERSION=2.7.0
 
-#REQUIRED_VENV_PYTHON3_VERSION="3.9.16"
-#REQUIRED_VENV_PYTHON3_VERSION="3.10.13"
-REQUIRED_VENV_PYTHON3_VERSION="3.11.7"
+#REQUIRED_VENV_PYTHON_VERSION="3.9.16"
+#REQUIRED_VENV_PYTHON_VERSION="3.10.13"
+REQUIRED_VENV_PYTHON_VERSION="3.11.7"
 
-REQUIRED_PIP3_LIBS="ansible certifi"
+REQUIRED_PYTHON_LIBS="ansible certifi"
 
 # We don't need return codes for "$(command)", only stdout is needed.
 # Allow `[[ -n "$(command)" ]]`, `func "$(command)"`, pipes, etc.
@@ -222,30 +222,48 @@ function setup_python_env() {
 
   ohai "Setup pyenv and user python environment..."
   (
-  #  execute "bash -x ${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh"
-    bash -x "${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh" "${REQUIRED_VENV_PYTHON3_VERSION}"
+#    bash -x "${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh" "${REQUIRED_VENV_PYTHON_VERSION}"
+    execute "bash" "${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh" "${REQUIRED_VENV_PYTHON_VERSION}"
 
-    if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
-      export PATH="${HOME}/.pyenv/bin:${PATH}"
-#      local PYENV_BIN="${PYENV_ROOT}/bin/pyenv"
+    if [ -d "${HOME}/.pyenv/bin" ]; then
+      PYENV_ROOT="${HOME}/.pyenv"
+      PYTHON_VENV_DIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}"
+      PYTHON_VENV_BINDIR="${PYTHON_VENV_DIR}/bin"
+      PYTHON_BIN="${PYTHON_VENV_BINDIR}/python"
+    elif [ -d "${HOME}/.pyenv/pyenv-win/bin" ]; then
+      PYENV_ROOT="${HOME}/.pyenv/pyenv-win"
+      PYTHON_VENV_DIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}"
+      PYTHON_VENV_BINDIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}/Scripts"
+      PYTHON_BIN="${PYTHON_VENV_DIR}/python"
     fi
+#    export PYENV_ROOT="${HOME}/.pyenv"
 
-    export PYENV_ROOT="${HOME}/.pyenv"
+    if [ -z "${PYENV_ROOT}" ]; then
+      fail "pyenv not found"
+    fi
+    PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+    export PATH="${PYENV_BIN_DIR}:${PATH}"
 
-    local PYTHON_VENV_BINDIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON3_VERSION}/bin"
-    local PIP3_BIN="${PYTHON_VENV_BINDIR}/pip3"
+    local PIP_BIN="${PYTHON_VENV_BINDIR}/pip"
     local ANSIBLE_BIN="${PYTHON_VENV_BINDIR}/ansible"
 
     ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
-#    ${PYENV_BIN} global "${REQUIRED_VENV_PYTHON3_VERSION}"
-    pyenv global "${REQUIRED_VENV_PYTHON3_VERSION}"
+    echo "pyenv global ${REQUIRED_VENV_PYTHON_VERSION}"
+    eval "pyenv global ${REQUIRED_VENV_PYTHON_VERSION}"
     export PATH="${PYTHON_VENV_BINDIR}:${PATH}"
 
-    "${PIP3_BIN}" --version
-    "${PIP3_BIN}" install --upgrade pip
-    "${PIP3_BIN}" install --upgrade ${REQUIRED_PIP3_LIBS}
+    echo "${PIP_BIN} --version"
+    ${PIP_BIN} --version
 
-    "${ANSIBLE_BIN}" --version
+#    echo "${PIP_BIN} install --upgrade pip"
+#    eval "${PIP_BIN} install --upgrade pip"
+    echo "${PYTHON_BIN} -m pip install --upgrade pip"
+    eval "${PYTHON_BIN} -m pip install --upgrade pip"
+
+    echo "${PIP_BIN} install --upgrade ${REQUIRED_PYTHON_LIBS}"
+    eval "${PIP_BIN} install --upgrade ${REQUIRED_PYTHON_LIBS}"
+
+    eval "${ANSIBLE_BIN} --version"
   ) || exit 1
 
 }
@@ -270,7 +288,24 @@ function setup_user_env() {
   echo
 }
 
-function setup_brew_gnutools() {
+## ref: https://medium.com/@michael.schladt/bringing-gnu-linux-tools-to-windows-w-msys2-f663f89d8d08
+function setup_windows() {
+  ohai "Setup windows environment..."
+  (
+#    yes | pacman -Syu && \
+    pacman --noconfirm -Syu && \
+    pacman --noconfirm -S --needed base-devel \
+      mingw-w64-i686-toolchain \
+      mingw-w64-x86_64-toolchain \
+      git \
+      mingw-w64-i686-cmake \
+      mingw-w64-x86_64-cmake
+  ) || exit 1
+
+  echo
+}
+
+function setup_macos() {
 
   ## ref: https://brew.sh/
   ## ref: https://docs.brew.sh/Installation#unattended-installation
@@ -467,7 +502,12 @@ EOABORT
 
   if [[ -n "${INSTALL_ON_MACOS-}" ]]
   then
-    setup_brew_gnutools
+    setup_macos
+  fi
+
+  if [[ -n "${INSTALL_ON_MSYS-}" ]]
+  then
+    setup_windows
   fi
 
   if [[ "${INSTALL_GIT_REPO-}" -eq 1 ]]; then

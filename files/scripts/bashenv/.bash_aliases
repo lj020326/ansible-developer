@@ -173,9 +173,11 @@ alias sshresetkeys="ssh-keygen -R ${TARGET_HOST} && ssh-keyscan -H ${TARGET_HOST
 
 alias create-crypt-passwd="openssl passwd -1 "
 
+## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
+alias dockerprune='docker system prune -a -f; docker system df'
 alias dockernuke='docker ps -a -q | xargs --no-run-if-empty docker rm -f'
 ## ref: https://stackoverflow.com/questions/32723111/how-to-remove-old-and-unused-docker-images#34616890
-alias docker-clean='docker container prune -f ; docker image prune -f ; docker network prune -f ; docker volume prune -f'
+alias dockerclean='docker container prune -f ; docker image prune -f ; docker network prune -f ; docker volume prune -f'
 
 ## https://www.howtogeek.com/devops/what-is-a-docker-image-manifest/
 ## https://github.com/docker/hub-feedback/issues/2043#issuecomment-1161578466
@@ -201,6 +203,9 @@ alias gitresetsub="git submodule deinit -f . && git submodule update --init --re
 alias gitgetcomment="getgitcomment"
 alias gitgetrequestid="getgitrequestid"
 alias gitdeletebranch="gitbranchdelete"
+alias gitfetchmainanddev="git fetch origin main:main && git fetch origin development:development"
+alias gitfetchdev="git fetch origin development:development"
+alias gitfetchmain="git fetch origin main:main"
 
 ## resolve issue "Fatal: Not possible to fast-forward, aborting"
 #alias gitpullrebase="git pull origin <branch> --rebase"

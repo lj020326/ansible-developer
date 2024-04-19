@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
+
 # Python 3
 #PYTHON_VERSION_DEFAULT="3.9.7"
 #PYTHON_VERSION_DEFAULT=3.10.9
@@ -17,28 +20,53 @@ PYTHON3_DEB_LIBS="libreadline-dev libbz2-dev libffi-dev libncurses-dev libsqlite
 
 PYTHON_VERSION=${1-"${PYTHON_VERSION_DEFAULT}"}
 
+
 function setup_pyenv_linux() {
 
+  if [[ -n "$(command -v dnf)" ]]; then
+    sudo dnf install -y ${PYTHON3_RH_LIBS} && \
+      sudo yum group install "Development Tools"
+  elif [[ -n "$(command -v yum)" ]]; then
+    sudo yum install -y ${PYTHON3_RH_LIBS} && \
+      sudo yum group install "Development Tools"
+  elif [[ -n "$(command -v apt-get)" ]]; then
+    sudo apt-get install -y ${PYTHON3_DEB_LIBS}
+  fi
+
   PYENV_ROOT="${HOME}/.pyenv"
-  PYENV_BIN="${PYENV_ROOT}/bin/pyenv"
+  PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+  PYENV_BIN="${PYENV_BIN_DIR}/pyenv"
 
   if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
     curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | /bin/bash
   fi
 
-  PYENV_IN_BASHENV=$(grep -c "pyenv init" ${HOME}/.bashrc)
+#  PYENV_IN_BASHENV=$(grep -c "pyenv init" ${HOME}/.bashrc)
 
-  export PATH="${HOME}/.pyenv/bin:${PATH}"
-  eval "$(pyenv init -)"
-  eval "$(pyenv virtualenv-init -)"
+  export PATH="${PYENV_BIN_DIR}:${PATH}"
+  eval "${PYENV_BIN} init -"
+  eval "${PYENV_BIN} virtualenv-init -"
 
-  mkdir -p $HOME/.pyenv/cache
+  mkdir -p "${PYENV_ROOT}/cache"
+
+}
+
+function setup_pyenv_msys2() {
+#  # ref: https://dev.to/taijidude/execute-a-powershell-script-from-inside-the-git-bash-1enj
+#  powershell -File files\\scripts\\python\\pyenv-install.ps1
+  PYENV_INSTALL_SCRIPT="${SCRIPT_DIR}/pyenv-install.ps1"
+  eval "powershell.exe -noprofile -executionpolicy bypass -file ${PYENV_INSTALL_SCRIPT}"
+
+  PYENV_ROOT="${HOME}/.pyenv/pyenv-win"
+  PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+
+#  PYENV_IN_BASHENV=$(grep -c "pyenv init" ${HOME}/.bashrc)
+
+  export PATH="${PYENV_BIN_DIR}:${PATH}"
 
 }
 
 function main() {
-
-  PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
 
   case "${PLATFORM_OS}" in
     linux*)
@@ -58,15 +86,6 @@ function main() {
   ## ref: https://www.pythonpool.com/fixed-modulenotfounderror-no-module-named-_bz2/
   ## ref: https://stackoverflow.com/questions/27022373/python3-importerror-no-module-named-ctypes-when-using-value-from-module-mul#48045929
   if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
-    if [[ -n "$(command -v dnf)" ]]; then
-      sudo dnf install -y ${PYTHON3_RH_LIBS} && \
-        sudo yum group install "Development Tools"
-    elif [[ -n "$(command -v yum)" ]]; then
-      sudo yum install -y ${PYTHON3_RH_LIBS} && \
-        sudo yum group install "Development Tools"
-    elif [[ -n "$(command -v apt-get)" ]]; then
-      sudo apt-get install -y ${PYTHON3_DEB_LIBS}
-    fi
     setup_pyenv_linux
   fi
   if [[ -n "${INSTALL_ON_MACOS-}" ]]; then
@@ -74,9 +93,16 @@ function main() {
     brew install gcc make
     brew install pyenv
   fi
+  if [[ -n "${INSTALL_ON_MSYS-}" ]]; then
+    setup_pyenv_msys2
+  fi
 
-  if [ -d "$(pyenv root)/versions/${PYTHON_VERSION}" ]; then
-    echo "python version ${PYTHON_VERSION} already exists at [$(pyenv root)/versions/${PYTHON_VERSION}]"
+  PYENV_VERSION_EXISTS=$(pyenv version | grep -c "${PYTHON_VERSION}")
+
+#  if [ -d "$(pyenv root)/versions/${PYTHON_VERSION}" ]; then
+#    echo "python version ${PYTHON_VERSION} already exists at [$(pyenv root)/versions/${PYTHON_VERSION}]"
+  if [ "${PYENV_VERSION_EXISTS}" -ne 0 ]; then
+    echo "python version ${PYTHON_VERSION} already exists"
     exit 0
   fi
 

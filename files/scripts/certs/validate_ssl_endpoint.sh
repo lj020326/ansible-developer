@@ -94,6 +94,12 @@ echo "performing curl with cert validation on endpoint ${ENDPOINT}"
 #curl -vIsS --capath ${CACERT_TRUST_DIR} --cacert ${CACERT} https://${ENDPOINT}/${CONTEXT_PATH}
 #curl -vIsSL --capath ${CACERT_TRUST_DIR} --cacert ${CACERT} -vsSL https://${ENDPOINT}/${CONTEXT_PATH}
 
-curlCmd="curl -vs ${CURL_CRED_ARGS} ${CURL_CA_OPTS} https://${ENDPOINT}/${CONTEXT_PATH}"
+if [[ "$PLATFORM" == "LINUX" ]]; then
+  curlCmd="curl -vs ${CURL_CRED_ARGS} ${CURL_CA_OPTS} https://${ENDPOINT}/${CONTEXT_PATH}"
+elif [[ "$UNAME" == "darwin"* ]]; then
+  ## not explicitly setting the ca options and MacOS curl will automatically use the system trust store
+  ## ref: https://unix.stackexchange.com/questions/591211/how-does-curl-access-ssl-certs-in-macos
+  curlCmd="curl -vs ${CURL_CRED_ARGS} https://${ENDPOINT}/${CONTEXT_PATH}"
+fi
 echo "${curlCmd} | jq"
 ${curlCmd} | jq

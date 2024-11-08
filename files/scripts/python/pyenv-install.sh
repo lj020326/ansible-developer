@@ -6,8 +6,8 @@ PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
 # Python 3
 #PYTHON_VERSION_DEFAULT="3.9.7"
 #PYTHON_VERSION_DEFAULT=3.10.9
-PYTHON_VERSION_DEFAULT=3.11.7
-#PYTHON_VERSION_DEFAULT=3.12.1
+#PYTHON_VERSION_DEFAULT=3.11.7
+PYTHON_VERSION_DEFAULT=3.12.3
 
 ## source: https://gist.github.com/simonkuang/14abf618f631ba3f0c7fee7b4ea3f214
 #PYTHON3_RH_LIBS=epel-release
@@ -96,6 +96,9 @@ function main() {
   if [[ -n "${INSTALL_ON_MSYS-}" ]]; then
     setup_pyenv_msys2
   fi
+
+  ## update pyenv to get most recent python dist info
+  pyenv update
 
   PYENV_VERSION_EXISTS=$(pyenv version | grep -c "${PYTHON_VERSION}")
 

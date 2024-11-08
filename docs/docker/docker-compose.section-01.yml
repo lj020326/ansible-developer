@@ -1,0 +1,10 @@
+version: "3"
+services:
+  phobos:
+    container_name: phobos
+    image: busybox
+    command: sleep infinity
+  deimos:
+    container_name: deimos
+    image: busybox
+    command: sleep infinity

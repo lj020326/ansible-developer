@@ -3,6 +3,40 @@ log_prefix_functions=".bash_functions"
 
 echo "${log_prefix_functions} configuring shell functions..."
 
+unalias ansible_debug_variable 1>/dev/null 2>&1
+unset -f ansible_debug_variable || true
+function ansible_debug_variable() {
+  local ANSIBLE_INVENTORY_HOST=${1:-"control01"}
+  local ANSIBLE_VARIABLE_NAME=${2:-"group_names"}
+
+  local RUN_ANSIBLE_COMMAND_ARRAY=()
+  RUN_ANSIBLE_COMMAND_ARRAY+=("ansible")
+  if [ -f "${ANSIBLE_DATACENTER_REPO}/.vault_pass" ]; then
+    RUN_ANSIBLE_COMMAND_ARRAY+=("--vault-password-file ${ANSIBLE_DATACENTER_REPO}/.vault_pass")
+  elif [ -f "${HOME}/.vault_pass" ]; then
+    RUN_ANSIBLE_COMMAND_ARRAY+=("--vault-password-file ${HOME}/.vault_pass")
+  fi
+  RUN_ANSIBLE_COMMAND_ARRAY+=("-e @${ANSIBLE_DATACENTER_REPO}/vars/vault.yml")
+  if [ -f "${ANSIBLE_DATACENTER_REPO}/vars/test-vars.yml" ]; then
+    RUN_ANSIBLE_COMMAND_ARRAY+=("-e @${ANSIBLE_DATACENTER_REPO}/vars/test-vars.yml")
+  fi
+  RUN_ANSIBLE_COMMAND_ARRAY+=("-i ${ANSIBLE_INVENTORY_DIR}")
+  RUN_ANSIBLE_COMMAND_ARRAY+=("-m debug")
+  RUN_ANSIBLE_COMMAND_ARRAY+=("-a var=${ANSIBLE_VARIABLE_NAME}")
+  RUN_ANSIBLE_COMMAND_ARRAY+=("${ANSIBLE_INVENTORY_HOST}")
+
+  local RUN_ANSIBLE_COMMAND="${RUN_ANSIBLE_COMMAND_ARRAY[*]}"
+
+  echo "${RUN_ANSIBLE_COMMAND}"
+  eval "${RUN_ANSIBLE_COMMAND}"
+#  ansible -e @"${ANSIBLE_DATACENTER_REPO}/test-vars.yml" \
+#    -e @"${ANSIBLE_DATACENTER_REPO}/vars/vault.yml" \
+#    --vault-password-file "${ANSIBLE_DATACENTER_REPO}/.vault_pass" \
+#    -i "${ANSIBLE_INVENTORY_DIR}" \
+#    -m debug \
+#    -a "var=${ANSIBLE_VARIABLE_NAME}"
+}
+
 ##
 ##
 unset -f install-dev-env || true
@@ -11,6 +45,21 @@ function install-dev-env() {
   bash -c "$(curl -fsSL "${DEVENV_INSTALL_REMOTE_SCRIPT}")"
 }
 
+## ref: https://gist.github.com/vby/ef4d72e6ae51c64acbe7790ca7d89606#file-msys2-bashrc-sh
+unset -f add_winpath || true
+function add_winpath() {
+    paths=''
+    __IFS=$IFS
+    IFS=';'
+    for path in `cat $1/Path`; do
+        paths="$paths:`cygpath -u $path`"
+    done
+    IFS=$__IFS
+    export PATH="$PATH:$paths"
+}
+
+##
+##
 unset -f setenv-python || true
 function setenv-python() {
 	python_version=${1:-"3WIN"}
@@ -188,9 +237,75 @@ function find-up () {
     echo "$path"
 }
 
+unalias search-repo-keywords 1>/dev/null 2>&1
+unset -f search-repo-keywords || true
+function search-repo-keywords () {
+  local LOG_PREFIX="searchrepokeywords():"
+
+  local REPO_EXCLUDE_DIR_LIST=(".git")
+  REPO_EXCLUDE_DIR_LIST+=(".idea")
+  REPO_EXCLUDE_DIR_LIST+=("venv")
+  REPO_EXCLUDE_DIR_LIST+=("private")
+  REPO_EXCLUDE_DIR_LIST+=("save")
+
+  #export -p | sed 's/declare -x //' | sed 's/export //'
+  if [ -z ${REPO_EXCLUDE_KEYWORDS+x} ]; then
+    echo "${LOG_PREFIX} REPO_EXCLUDE_KEYWORDS not set/defined"
+    exit 1
+  fi
+
+  echo "${LOG_PREFIX} REPO_EXCLUDE_KEYWORDS=${REPO_EXCLUDE_KEYWORDS}"
+
+  IFS=',' read -ra REPO_EXCLUDE_KEYWORDS_ARRAY <<< "$REPO_EXCLUDE_KEYWORDS"
+
+  echo "${LOG_PREFIX} REPO_EXCLUDE_KEYWORDS_ARRAY=${REPO_EXCLUDE_KEYWORDS_ARRAY[*]}"
+
+  # ref: https://superuser.com/questions/1371834/escaping-hyphens-with-printf-in-bash
+  #'-e' ==> '\055e'
+  local GREP_DELIM=' \055e '
+  printf -v GREP_PATTERN_SEARCH "${GREP_DELIM}%s" "${REPO_EXCLUDE_KEYWORDS_ARRAY[@]}"
+
+  ## strip prefix
+  local GREP_PATTERN_SEARCH=${GREP_PATTERN_SEARCH#"$GREP_DELIM"}
+  ## strip suffix
+  #GREP_PATTERN_SEARCH=${GREP_PATTERN_SEARCH%"$GREP_DELIM"}
+
+  echo "${LOG_PREFIX} GREP_PATTERN_SEARCH=${GREP_PATTERN_SEARCH}"
+
+  local GREP_COMMAND="grep ${GREP_PATTERN_SEARCH}"
+  echo "${LOG_PREFIX} GREP_COMMAND=${GREP_COMMAND}"
+
+  local FIND_DELIM=' -o '
+#  printf -v FIND_EXCLUDE_DIRS "\055path '*/%s/*' -prune${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
+  printf -v FIND_EXCLUDE_DIRS "! -path '*/%s/*'${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
+  local FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS%$FIND_DELIM}
+
+  echo "${LOG_PREFIX} FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS}"
+
+  ## this works:
+  ## find . \( -path '*/.git/*' \) -prune -name '.*' -o -exec grep -i example {} 2>/dev/null +
+  ## find . \( -path '*/save/*' -prune -o -path '*/.git/*' -prune \) -o -exec grep -i client1 {} 2>/dev/null +
+  ## find . \( ! -path '*/save/*' -o ! -path '*/.git/*' \) -o -exec grep -i client1 {} 2>/dev/null +
+  ## ref: https://stackoverflow.com/questions/6565471/how-can-i-exclude-directories-from-grep-r#8692318
+  ## ref: https://unix.stackexchange.com/questions/342008/find-and-echo-file-names-only-with-pattern-found
+  ## ref: https://www.baeldung.com/linux/find-exclude-paths
+  local FIND_CMD="find . \( ${FIND_EXCLUDE_DIRS} \) -o -exec ${GREP_COMMAND} {} 2>/dev/null +"
+  echo "${LOG_PREFIX} ${FIND_CMD}"
+
+  local EXCEPTION_COUNT=$(eval "${FIND_CMD} | wc -l")
+  if [[ $EXCEPTION_COUNT -eq 0 ]]; then
+    echo "${LOG_PREFIX} SUCCESS => No exclusion keyword matches found!!"
+  else
+    echo "${LOG_PREFIX} There are [${EXCEPTION_COUNT}] exclusion keyword matches found:"
+    eval "${FIND_CMD}"
+  fi
+  return "${EXCEPTION_COUNT}"
+}
+
+
 unset -f cdnvm || true
 function cdnvm(){
-    cd $@;
+    cd "$@";
     nvm_path=$(find-up .nvmrc | tr -d '[:space:]')
 
     # If there are no .nvmrc file, use the default nvm version
@@ -424,6 +539,8 @@ function getgitrequestid() {
   if [[ $COMMENT_PREFIX = *develop* || $COMMENT_PREFIX = *main* || $COMMENT_PREFIX = *master* ]]; then
     if [ -f ${PROJECT_DIR}/.git.request.refid ]; then
       COMMENT_PREFIX=$(cat ${PROJECT_DIR}/.git.request.refid)
+    elif [ -f ${HOME}/.git.request.refid ]; then
+      COMMENT_PREFIX=$(cat ${HOME}/.git.request.refid)
     elif [ -f ${PROJECT_DIR}/save/.git.request.refid ]; then
       COMMENT_PREFIX=$(cat ${PROJECT_DIR}/save/.git.request.refid)
     elif [ -f ./.git.request.refid ]; then
@@ -587,6 +704,35 @@ function dockerbash() {
   docker run -it --entrypoint /bin/bash "${CONTAINER_IMAGE_ID}"
 }
 
+## ref: https://stackoverflow.com/questions/26423515/how-to-automatically-update-your-docker-containers-if-base-images-are-updated
+##
+unalias docker_sync_image 1>/dev/null 2>&1
+unset -f docker_sync_image || true
+function docker_sync_image() {
+  BASE_IMAGE=${1:-registry}
+  REGISTRY=${2:-media.johnson.int:5000}
+  #REGISTRY="registry.hub.docker.com"
+  IMAGE="${REGISTRY}/${BASE_IMAGE}"
+  CID=$(docker ps | grep "${IMAGE}" | awk '{print $1}')
+  docker pull "${IMAGE}"
+
+  for im in $CID
+  do
+    LATEST=`docker inspect --format "{{.Id}}" "${IMAGE}"`
+    RUNNING=`docker inspect --format "{{.Image}}" $im`
+    NAME=`docker inspect --format '{{.Name}}' $im | sed "s/\///g"`
+    echo "Latest: ${LATEST}"
+    echo "Running: ${RUNNING}"
+    if [ "$RUNNING" != "$LATEST" ];then
+      echo "upgrading $NAME"
+      docker stop "${NAME}"
+      docker rm -f "${NAME}"
+      docker start "${NAME}"
+    else
+      echo "${NAME} up to date"
+    fi
+  done
+}
 
 ## source: https://fabianlee.org/2021/04/08/docker-determining-container-responsible-for-largest-overlay-directories/
 ##

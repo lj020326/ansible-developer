@@ -12,6 +12,7 @@ export NETWORK_INTERNAL_DOMAIN="johnson.int"
 
 export ANSIBLE_DEVELOPER_REPO="${HOME}/repos/ansible/ansible-developer"
 export ANSIBLE_DATACENTER_REPO="${HOME}/repos/ansible/ansible-datacenter"
+export ANSIBLE_INVENTORY_DIR="${ANSIBLE_DATACENTER_REPO}/inventory/PROD"
 
 ## if using public repo
 #export DEVENV_INSTALL_REMOTE_SCRIPT="https://raw.githubusercontent.com/lj020326/ansible-developer/main/install.sh"
@@ -33,6 +34,8 @@ export PYTHON3_BIN_DIR=$PYTHON3_HOME
 #export PATH=$PATH:$ANSIBLE/bin
 #export PYTHONPATH=$ANSIBLE/lib
 #export ANSIBLE_LIBRARY=$ANSIBLE/library
+
+export DOCKER_REGISTRY_INTERNAL="media.${NETWORK_INTERNAL_DOMAIN}:5000"
 
 export MOLECULE_IMAGE_NAMESPACE="media.${NETWORK_INTERNAL_DOMAIN}:5000"
 export EDITOR=/usr/local/bin/emacs
@@ -237,6 +240,9 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
 
     export PATH+=":${PODMAN_BINDIR}"
 
+    ## ref: https://docs.kics.io/latest/documentation/
+    export KICS_QUERIES_PATH=/usr/local/opt/kics/share/kics/assets/queries
+
     ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
     # Reset/Empty the .bash_path file that holds GNU paths
     [[ -f "${HOME}/.bash_path" ]] && mv "${HOME}/.bash_path" "${HOME}/.bash_path.orig"
@@ -336,7 +342,7 @@ fi
 
 export PATH=".:${PATH}"
 
-echo "${log_prefix_bashenv} PATH=${PATH}"
+#echo "${log_prefix_bashenv} PATH=${PATH}"
 
 ##############
 ### Ansible Galaxy env vars

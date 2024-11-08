@@ -5,12 +5,12 @@ UNAME=$(uname -s | tr "[:upper:]" "[:lower:]")
 PLATFORM=""
 DISTRO=""
 
-if [[ "$UNAME" != "cygwin" && "$UNAME" != "msys" ]]; then
-  if [ "$EUID" -ne 0 ]; then
-    echo "Must run this script as root. run 'sudo $SCRIPT_NAME'"
-    exit
-  fi
-fi
+#if [[ "$UNAME" != "cygwin" && "$UNAME" != "msys" ]]; then
+#  if [ "$EUID" -ne 0 ]; then
+#    echo "Must run this script as root. run 'sudo $SCRIPT_NAME'"
+#    exit
+#  fi
+#fi
 
 CACERT_TRUST_DIR=/etc/pki/ca-trust/extracted
 CACERT_TRUST_IMPORT_DIR=/etc/pki/ca-trust/source/anchors

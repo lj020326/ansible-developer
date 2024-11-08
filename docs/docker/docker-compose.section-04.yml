@@ -1,0 +1,7 @@
+version: "3"
+services:
+  web:
+    container_name: hello_world
+    image: nginx
+    ports:
+      - 8000:80

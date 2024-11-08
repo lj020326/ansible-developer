@@ -46,7 +46,7 @@ EXCLUDES+=" --exclude=venv"
 EXCLUDES+=" --exclude=save"
 
 RSYNC_OPTIONS_HOME=(
-    -arv
+    -rog
     --update
     ${EXCLUDES}
     --backup
@@ -54,7 +54,7 @@ RSYNC_OPTIONS_HOME=(
 )
 
 RSYNC_OPTIONS_REPO1=(
-    -arv
+    -rog
     --update
     ${EXCLUDES}
     --backup
@@ -90,10 +90,9 @@ if [[ -d "${PRIVATE_ENV_DIR}/git" ]]; then
   rsync "${RSYNC_OPTIONS_HOME[@]}" "${PRIVATE_ENV_DIR}/git/"*.sh "${HOME}/bin/"
 fi
 
-
 if [[ -e "${VAULT_BASHENV_DIR}/.bash_secrets" ]]; then
   echo "==> deploying secrets ${VAULT_BASHENV_DIR}/.bash_secrets"
-  rsync -arv --update "${VAULT_BASHENV_DIR}/.bash_secrets" "${HOME}/"
+  rsync -rog --update "${VAULT_BASHENV_DIR}/.bash_secrets" "${HOME}/"
   chmod 600 "${HOME}/.bash_secrets"
 fi
 

@@ -39,6 +39,8 @@ alias ll='ls -Fla --color'
 alias la='ls -alrt --color'
 alias lld='ll | grep ^d'
 alias lll='ll | grep ^l'
+## ref: https://stackoverflow.com/questions/8513133/how-do-i-find-all-of-the-symlinks-in-a-directory-tree#8513194
+alias findlinks="find . -type l"
 
 alias installdevenv="install-dev-env"
 
@@ -71,8 +73,11 @@ alias installyarn='npm install -g yarn'
 
 alias startminishift='minishift start --vm-driver=virtualbox'
 
-alias space='du -h --max-depth=1 --exclude=nfs --exclude=proc --exclude=aufs --exclude=srv --no-dereference | sed '\''s/^\([0-9].*\)\([G|K|M]\)\(.*\)/\2 \1 \3/'\'' | sort --key=1,2 -n'
-alias space1='du -h --max-depth=1 --exclude=nfs --exclude=proc --no-dereference'
+alias space='du -h --max-depth=1 --exclude=nfs --exclude=proc --exclude=aufs --exclude=srv --apparent-size --no-dereference | sed '\''s/^\([0-9].*\)\([G|K|M]\)\(.*\)/\2 \1 \3/'\'' | sort --key=1,2 -n'
+## ref: https://askubuntu.com/questions/5444/how-to-find-out-how-much-disk-space-is-remaining
+alias space0='ncdu -x'
+alias space1='du -h --max-depth=1 --exclude=nfs --exclude=proc --no-dereference --apparent-size'
+#alias space1='du -h --max-depth=1 --exclude=nfs --exclude=proc --no-dereference'
 alias space2='du -hs --exclude=nfs --exclude=proc --no-dereference * | sort -h'
 alias space3='du -h --max-depth=1 --exclude=nfs --exclude=proc --no-dereference | sort -nr | cut -f2- | xargs du -hs'
 #alias space3='du --exclude=nfs --exclude=proc --no-dereference | sort -nr | cut -f2- | xargs du -hs'
@@ -89,14 +94,20 @@ alias genpwd='openssl rand -base64 8 | md5sum | head -c8;echo'
 ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
 ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
 alias rsync0='rsync -ar --info=progress2 --links --delete --update'
-alias rsync1='rsync -argv --update --progress'
-alias rsync2='rsync -arv --no-links --update --progress --exclude=.idea --exclude=.git --exclude=node_modules --exclude=venv'
+alias rsync1='rsync -arog --info=progress2'
+alias rsync2='rsync -arv --update --progress --exclude=.idea --exclude=.git --exclude=node_modules --exclude=venv'
 alias rsync3='rsync -arv --no-links --update --progress --exclude=.idea --exclude=.git --exclude=node_modules --exclude=venv --exclude=save'
 #alias rsync2='rsync -arv --no-links --update --progress -exclude={.idea,.git,node_modules,venv}'
 #alias rsync3='rsync -arv --no-links --update --progress -exclude={.idea,.git,node_modules,venv,**/save}'
+alias rsync4='rsync -argv --update --progress'
+
 alias rsyncisofile="rsync -arP -e'ssh -o StrictHostKeyChecking=no' --rsync-path 'sudo -u root rsync' \
   ~/Downloads/rhel-server-7.9-x86_64-dvd.iso \
   administrator@control01.johnson.int:/data/datacenter/vmware/iso-repos/linux/RedHat/7/"
+
+alias rsync_cacerts="rsync -arog --update -e'ssh -o StrictHostKeyChecking=no' --rsync-path 'sudo -u root rsync' \
+  /usr/local/ssl/ \
+  administrator@vcontrol01.johnson.int:/usr/local/ssl/"
 
 #alias rsyncnew='rsync -arv --no-links --update --progress --exclude=node_modules --exclude=venv /jdrive/media/torrents/completed/new /x/save/movies/; rm /jdrive/media/torrents/completed/new/*'
 alias rsyncmirror='rsync -ar --info=progress2 --delete --update'
@@ -113,6 +124,10 @@ alias find_dupe_files="find . -not -empty -type f -printf '%s\n' | sort -rn | un
 
 alias find_old_dirs="find . -mtime +14 -type d"
 alias delete_old_dirs="find . -mtime +14 -type d | xargs rm -f -r;"
+alias clean_old_dirs="find . -mtime +14 -type d | xargs rm -f -r;"
+
+alias find_git_dirs="find . -type d -name '.git' -print"
+alias remove_git_dirs="find . -type d -name '.git' | xargs rm -f -r;"
 
 alias systemctl-list='systemctl list-unit-files | sort | grep enabled'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -120,8 +135,8 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 alias dnsreset="ipconfig //flushdns"
 
 ## ref: https://apple.stackexchange.com/questions/14980/why-are-dot-underscore-files-created-and-how-can-i-avoid-them
-alias dot-turd-show="find . -type f -name '._*' -print"
-alias dot-turd-rm="find . -type f -name '._*' -print -delete"
+alias dot-turd-show="find . -type f \( -name '._*' -o -name '.DS_Store' -o -name 'SystemOut.log' \) -print"
+alias dot-turd-rm="find . -type f \( -name '._*' -o -name '.DS_Store' -o -name 'SystemOut.log' \) -print -delete"
 
 ## DNS alias wrappers around functions
 alias dnsresetcache="reset_local_dns"
@@ -165,7 +180,8 @@ alias sshcontrol='ssh administrator@control01.johnson.int'
 alias sshvcontrol='ssh administrator@vcontrol01.johnson.int'
 
 alias getansiblelog="scp administrator@admin01.johnson.int:/home/administrator/repos/ansible/ansible-datacenter/ansible.log ."
-alias ansible-test-integration="ansible-test-integration.sh"
+alias ansibletestintegration="ansible-test-integration.sh"
+alias ansibledebugvar="ansible_debug_variable"
 
 ## ref: https://askubuntu.com/questions/20865/is-it-possible-to-remove-a-particular-host-key-from-sshs-known-hosts-file
 alias sshclearhostkey='ssh-keygen -R'
@@ -178,6 +194,9 @@ alias dockerprune='docker system prune -a -f; docker system df'
 alias dockernuke='docker ps -a -q | xargs --no-run-if-empty docker rm -f'
 ## ref: https://stackoverflow.com/questions/32723111/how-to-remove-old-and-unused-docker-images#34616890
 alias dockerclean='docker container prune -f ; docker image prune -f ; docker network prune -f ; docker volume prune -f'
+
+alias dockersyncimage="docker_sync_image"
+alias dockerimagesync="docker_sync_image"
 
 ## https://www.howtogeek.com/devops/what-is-a-docker-image-manifest/
 ## https://github.com/docker/hub-feedback/issues/2043#issuecomment-1161578466
@@ -203,7 +222,7 @@ alias gitresetsub="git submodule deinit -f . && git submodule update --init --re
 alias gitgetcomment="getgitcomment"
 alias gitgetrequestid="getgitrequestid"
 alias gitdeletebranch="gitbranchdelete"
-alias gitfetchmainanddev="git fetch origin main:main && git fetch origin development:development"
+alias gitfetchmaindev="git fetch origin main:main && git fetch origin development:development"
 alias gitfetchdev="git fetch origin development:development"
 alias gitfetchmain="git fetch origin main:main"
 
@@ -222,6 +241,11 @@ alias gitpulltheirs='git pull -X theirs'
 #alias gitpush-='git push origin'
 #alias gitcommitpush-="git add . && git commit -a -m 'updates from ${HOSTNAME}' && git push origin"
 #alias gitremovecached-="git rm -r --cached . && git add . && git commit -am 'Remove ignored files' && git push origin"
+alias gitremovecached-="gitremovecached"
+
+## ref: https://stackoverflow.com/questions/61212/how-do-i-remove-local-untracked-files-from-the-current-git-working-tree
+alias gitshowuntracked="git clean -n -d"
+alias gitcleanuntracked="git clean -f"
 
 ## ref: https://www.cloudsavvyit.com/13904/how-to-view-commit-history-with-git-log/
 alias gitlog="git log --graph --branches --oneline"
@@ -256,6 +280,8 @@ alias gitfold="bash folder.sh fold"
 alias gitunfold="bash folder.sh unfold"
 alias gitfetchmain="git fetch origin main:main"
 alias gitfetchdevelopment="git fetch origin development:development"
+
+alias searchrepokeywords="search-repo-keywords"
 
 alias decrypt="ansible-vault decrypt"
 alias vaultdecrypt="ansible-vault decrypt --vault-password-file=~/.vault_pass"
@@ -302,6 +328,8 @@ alias importsslcerts="sudo ~/bin/import-ssl-certs.sh"
 alias importworksslcerts="sudo ~/bin/import-worksite-ssl-certs.sh"
 
 alias syncpythoncerts="sudo ~/bin/sync-python-certs-with-system-cabundle.sh"
+
+alias dockerlogin="docker login -u ${DOCKER_REGISTRY_USERNAME} -p \"${DOCKER_REGISTRY_PASSWORD}\" ${DOCKER_REGISTRY_INTERNAL}"
 
 if [[ "${PLATFORM}" =~ ^(MSYS|MINGW32|MINGW64)$ ]]; then
   echo "${log_prefix_aliases} setting aliases specific to MSYS/MINGW platform"
@@ -433,3 +461,5 @@ alias sshansiblework="ssh -i ~/.ssh/${SSH_ANSIBLE_KEY_WORK}"
 
 alias bashenv-no-gnutools="export ADD_GNUTOOLS_BASH_PATH=0 && source ~/.bashrc"
 alias bashenv-gnutools="export ADD_GNUTOOLS_BASH_PATH=1 && source ~/.bashrc"
+
+alias dockerloginwork="docker login -u ${WORK_DOMAIN_USERNAME} -p \"${WORK_DOMAIN_REGISTRY_PASSWORD}\" ${WORK_DOMAIN_REGISTRY}"

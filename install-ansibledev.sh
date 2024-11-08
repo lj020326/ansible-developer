@@ -18,9 +18,8 @@ REQUIRED_SYSTEM_PYTHON3_VERSION=3.6.1
 REQUIRED_GIT_VERSION=1.8.3
 #REQUIRED_GIT_VERSION=2.7.0
 
-#REQUIRED_VENV_PYTHON_VERSION="3.9.16"
-#REQUIRED_VENV_PYTHON_VERSION="3.10.13"
-REQUIRED_VENV_PYTHON_VERSION="3.11.7"
+#REQUIRED_VENV_PYTHON_VERSION="3.11.7"
+REQUIRED_VENV_PYTHON_VERSION="3.12.3"
 
 REQUIRED_PYTHON_LIBS="ansible certifi"
 
@@ -270,7 +269,7 @@ function setup_python_env() {
 
 function setup_cacerts() {
 
-  ohai "Setup user bash environment..."
+  ohai "Setup CA certs..."
   (
     eval "${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
   ) || exit 1

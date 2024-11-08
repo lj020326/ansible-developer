@@ -509,11 +509,13 @@ class PFSenseAPIClient:
     def dig_host_ip_list(
             hostname: str,
             dns_nameserver: str,
-            debug: bool = False,
     ) -> List[str]:
         dig_command = "dig +short %s @%s | grep '^[.0-9]*$'" % (hostname, dns_nameserver)
-        if debug:
-            logger.debug("dig_command=%s" % dig_command)
+
+        logger.debug("hostname=%s" % hostname)
+        logger.debug("dns_nameserver=%s" % dns_nameserver)
+
+        logger.debug("dig_command=%s" % dig_command)
         a = subprocess.run(dig_command,
                            capture_output=True,
                            text=True,
@@ -533,13 +535,11 @@ class PFSenseAPIClient:
             self,
             hostname: str,
             dns_nameservers: List[str],
-            debug: bool = False,
     ) -> List[str]:
         # ref: https://stackoverflow.com/questions/50168439/resolve-an-ip-from-a-specific-dns-server-in-python#50177214
 
-        if debug:
-            logger.debug("hostname=%s" % hostname)
-            logger.debug("dns_nameservers=%s" % dns_nameservers)
+        logger.debug("hostname=%s" % hostname)
+        logger.debug("dns_nameservers=%s" % dns_nameservers)
 
         dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
 
@@ -559,12 +559,10 @@ class PFSenseAPIClient:
                 print("soa_record.response_full=%s" % soa_record.response_full)
                 print("soa_record.answer=%s" % soa_record.answer)
 
-                if debug:
-                    logger.debug("__dns_nameserver_ip_list=%s" % __dns_nameserver_ip_list)
+                logger.debug("__dns_nameserver_ip_list=%s" % __dns_nameserver_ip_list)
                 dns_nameserver_ip_list.extend(__dns_nameserver_ip_list)
 
-        if debug:
-            logger.debug("dns_nameserver_ip_list=%s" % dns_nameserver_ip_list)
+        logger.debug("dns_nameserver_ip_list=%s" % dns_nameserver_ip_list)
         dns.resolver.default_resolver.nameservers = dns_nameserver_ip_list
 
         host_ip_list = []
@@ -590,21 +588,17 @@ class PFSenseAPIClient:
     def get_service_unbound_host_overrides_by_hostname(
             self,
             hostname: str,
-            debug: bool = False,
     ) -> List[Dict[str, Any]]:
         (host, domain) = hostname.split('.', 1)
         host_override_data: List[Dict[str, str]] = self.get_service_unbound_host_overrides()
         host_override_list = []
         for host_override in host_override_data:
-            # if debug:
-            #     logger.debug("key=%s, host_override=%s" % (key, host_override))
+            # logger.debug("key=%s, host_override=%s" % (key, host_override))
             if host.lower() != host_override["host"].lower():
-                # if debug:
-                #     logger.debug("Skipping this because host doesn't match: {}", host_override)
+                # logger.debug("Skipping this because host doesn't match: {}", host_override)
                 continue
             if domain.lower() != host_override["domain"].lower():
-                # if debug:
-                #     logger.debug("Skipping this because domain doesn't match: {}", host_override)
+                # logger.debug("Skipping this because domain doesn't match: {}", host_override)
                 continue
 
             host_override_list.append(host_override)
@@ -615,7 +609,6 @@ class PFSenseAPIClient:
             self,
             id: str,
             apply: bool = False,
-            debug: bool = False,
     ) -> List[Dict[str, str]]:
 
         logger.debug("deleting host override id {}", id)
@@ -626,8 +619,7 @@ class PFSenseAPIClient:
 
         kwargs: Dict[str, Any] = {"params": host_override_delete}
 
-        if debug:
-            logger.debug("kwargs=%s" % kwargs)
+        logger.debug("kwargs=%s" % kwargs)
 
         host_override_result = self.delete_service_unbound_host_override(**kwargs)
         host_override_result_data: List[Dict[str, str]] = host_override_result.data
@@ -639,24 +631,21 @@ class PFSenseAPIClient:
             self,
             hostname: str,
             apply: bool = False,
-            debug: bool = False,
     ) -> None:
         (host, domain) = hostname.split('.', 1)
         host_override_list: List[Dict[str, Any]] = self.get_service_unbound_host_overrides_by_hostname(
             hostname=hostname)
 
         for host_override in host_override_list:
-            if debug:
-                logger.debug("host_override=%s" % host_override)
+            logger.debug("host_override=%s" % host_override)
 
             host_override_id = host_override['id']
             self.delete_service_unbound_host_override_by_id(
                 id=host_override_id,
-                apply=apply,
-                debug=debug)
+                apply=apply)
 
 
-def get_client() -> PFSenseAPIClient:
+def get_client(loglevel: str = None) -> PFSenseAPIClient:
     """ client factory """
 
     # ref: https://betterstack.com/community/guides/logging/loguru/
@@ -665,8 +654,12 @@ def get_client() -> PFSenseAPIClient:
     #            sink=sys.stdout,
     #            level="INFO")
 
-    # ref: https://github.com/Delgan/loguru/issues/138#issuecomment-1740069619
-    logger.configure(handlers=[{"sink": sys.stdout, "level": "INFO"}])
+    if loglevel:
+        logger.configure(handlers=[{"sink": sys.stdout, "level": loglevel}])
+    else:
+        # ref: https://github.com/Delgan/loguru/issues/138#issuecomment-1740069619
+        # logger.configure(handlers=[{"sink": sys.stdout, "level": "INFO"}])
+        logger.configure(handlers=[{"sink": sys.stdout, "level": "INFO"}])
 
     client = PFSenseAPIClient(
         config_filename="~/.config/pfsense-api.json"
@@ -682,7 +675,7 @@ def cli():
 
 @cli.command()
 def set_loglevel(
-        logLevel: str
+    logLevel: str
 ):
     """ Sets the Log Level
 
@@ -691,24 +684,25 @@ def set_loglevel(
 
     # ref: https://github.com/Delgan/loguru/issues/138#issuecomment-1740069619
     logger.configure(handlers=[{"sink": sys.stdout, "level": logLevel}])
-    # """Log at different severity levels."""
-    # logger.debug("debug message")
-    # logger.info("info message")
-    # logger.warning("warning message")
-    # logger.error("error message")
+    # """Log at different severity levels to view based on new loglevel."""
+    logger.debug("debug message")
+    logger.info("info message")
+    logger.warning("warning message")
+    logger.error("error message")
 
 
 @cli.command()
 @click.option("--find", "-f", help="Does a wildcard match based on this")
 @click.option("--expired", "-e", is_flag=True, default=False, help="Includes expired leases, off by default.")
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def list_leases(
         find: Optional[str] = None,
         expired: bool = False,
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ lists DHCP leases """
-    client = get_client()
+    client = get_client(loglevel)
     lease_info = client.get_dhcpd_leases()
 
     # print("lease_info=%s" % lease_info)
@@ -727,65 +721,65 @@ def list_leases(
             logger.debug(lease_message)
         else:
             logger.debug(lease_message)
-        if debug:
-            logger.debug(lease)
+        logger.debug(lease)
 
 
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def get_system_api_version(
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ lists system api version """
-    client = get_client()
+    client = get_client(loglevel)
     api_version_info = client.get_system_api_version()
 
-    if debug:
-        logger.debug("api_version_info=%s" % api_version_info)
+    logger.debug("api_version_info=%s" % api_version_info)
     api_version_data: Dict[str, str] = api_version_info.data
 
     logger.info(api_version_data)
 
 
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def get_system_status(
-        debug: bool = False,
+    loglevel: str = None,
 ) -> None:
     """ lists system status """
-    client = get_client()
+    client = get_client(loglevel)
     system_status_info = client.get_system_status()
 
-    if debug:
-        logger.debug("system_status_info=%s" % system_status_info)
+    logger.debug("system_status_info=%s" % system_status_info)
     system_status_data: Dict[str, str] = system_status_info.data
 
     logger.info(system_status_data)
 
 
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def get_gateway_status(
-        debug: bool = False,
+    loglevel: str = None,
 ) -> None:
     """ lists gateway leases """
-    client = get_client()
+    client = get_client(loglevel)
     gateway_status_info = client.get_gateway_status()
 
-    if debug:
-        logger.debug("gateway_status_info=%s" % gateway_status_info)
+    logger.debug("gateway_status_info=%s" % gateway_status_info)
     gateway_status_data: List[Dict[str, str]] = gateway_status_info.data
 
     logger.info(gateway_status_data)
 
 
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def get_interface_status(
-        debug: bool = False,
+    loglevel: str = None,
 ) -> None:
     """ lists interface status """
-    client = get_client()
+    client = get_client(loglevel)
     interface_status_info = client.get_interface_status()
 
     logger.debug("interface_status_info=%s" % interface_status_info)
@@ -795,16 +789,16 @@ def get_interface_status(
 
 
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def get_service_unbound_access_list(
-        debug: bool = False,
+    loglevel: str = None,
 ) -> None:
     """ lists service_unbound_access_list """
-    client = get_client()
+    client = get_client(loglevel)
     service_unbound_access_list_info = client.get_service_unbound_access_list()
 
-    if debug:
-        logger.debug("service_unbound_access_list_info=%s" % service_unbound_access_list_info)
+    logger.debug("service_unbound_access_list_info=%s" % service_unbound_access_list_info)
     service_unbound_access_list_data: List[Dict[str, str]] = service_unbound_access_list_info.data
 
     logger.info(service_unbound_access_list_data)
@@ -812,13 +806,14 @@ def get_service_unbound_access_list(
 
 @cli.command()
 @click.option("--find", "-f", help="Does a wildcard match based on this")
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def get_service_unbound_host_overrides(
-        find: Optional[str] = None,
-        debug: bool = False,
+    find: Optional[str] = None,
+    loglevel: str = None,
 ) -> None:
     """ lists service_unbound_host_override """
-    client = get_client()
+    client = get_client(loglevel)
     service_unbound_host_override_info = client.get_service_unbound_host_overrides()
 
     logger.debug("service_unbound_host_override_info=%s" % service_unbound_host_override_info)
@@ -826,8 +821,7 @@ def get_service_unbound_host_overrides(
     host_override_data: List[Dict[str, str]] = service_unbound_host_override_info
 
     for host_override in host_override_data:
-        if debug:
-            logger.debug("host_override=%s" % host_override)
+        logger.debug("host_override=%s" % host_override)
         if find is not None:
             if find not in str(host_override.values()):
                 continue
@@ -856,21 +850,20 @@ def get_service_unbound_host_overrides(
 
 
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 @click.argument('hostname')
 def get_service_unbound_host_overrides_by_hostname(
-        hostname: str,
-        debug: bool = False,
+    hostname: str,
+    loglevel: str = None,
 ) -> None:
     """ lists service_unbound_host_override """
-    client = get_client()
+    client = get_client(loglevel)
     host_override_data: List[Dict[str, str]] = client.get_service_unbound_host_overrides_by_hostname(
-        hostname=hostname,
-        debug=debug)
+        hostname=hostname)
 
     for host_override in host_override_data:
-        if debug:
-            logger.debug("host_override=%s" % host_override)
+        logger.debug("host_override=%s" % host_override)
 
         linebreak = '=' * 100
         host_override_message = f"{linebreak}"
@@ -898,22 +891,21 @@ def get_service_unbound_host_overrides_by_hostname(
 
 @cli.command()
 @click.option("--find", "-f", help="Does a wildcard match based on this")
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def get_configuration_history_status_log(
         find: Optional[str] = None,
-        debug: bool = False,
+        loglevel: Optional[str] = None
 ) -> None:
     """ lists configuration history status log """
-    client = get_client()
+    client = get_client(loglevel)
     configuration_history_status_info = client.get_configuration_history_status_log()
 
-    if debug:
-        logger.debug("configuration_history_status_info=%s" % configuration_history_status_info)
+    logger.debug("configuration_history_status_info=%s" % configuration_history_status_info)
     log_status_data: List[Dict[str, str]] = configuration_history_status_info.data
 
     for log_item in log_status_data:
-        if debug:
-            logger.debug("log_item=%s" % log_item)
+        logger.debug("log_item=%s" % log_item)
         if find is not None:
             if find not in str(log_item.values()):
                 continue
@@ -934,23 +926,24 @@ def get_configuration_history_status_log(
 @click.option("--mac", "-m", help="Delete by MAC address")
 @click.option("--hostname", "-h", help="Delete by hostname")
 @click.option("--ip", "-i", help="Delete by IP Address")
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def delete_lease(
         mac: Optional[str] = None,
         hostname: Optional[str] = None,
         ip: Optional[str] = None,
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ Delete a DHCP lease, not actually supported by the pFsense API yet... https://github.com/jaredhendrickson13/pfsense-api/issues/212 """
-    client = get_client()
+    client = get_client(loglevel)
     lease_info = client.get_dhcpd_leases()
     lease_data: List[Dict[str, str]] = lease_info.data
 
-    if mac and debug:
+    if mac:
         logger.debug("Searching for MAC: {}", mac.lower())
-    if hostname and debug:
+    if hostname:
         logger.debug("Searching for hostname: {}", hostname.lower())
-    if ip and debug:
+    if ip:
         logger.debug("Searching for IP: {}", ip.lower())
 
     if not (mac or hostname or ip):
@@ -960,18 +953,15 @@ def delete_lease(
     for lease in lease_data:
         if mac and "mac" in lease:
             if mac.lower() != lease["mac"].lower():
-                if debug:
-                    logger.debug("Skipping this because MAC doesn't match: {}", lease)
+                logger.debug("Skipping this because MAC doesn't match: {}", lease)
                 continue
         if hostname and "hostname" in lease:
             if hostname.lower() != lease["hostname"].lower():
-                if debug:
-                    logger.debug("Skipping this because hostname doesn't match: {}", lease)
+                logger.debug("Skipping this because hostname doesn't match: {}", lease)
                 continue
         if ip and "ip" in lease:
             if ip.lower() != lease["ip"].lower():
-                if debug:
-                    logger.debug("Skipping this because IP Address doesn't match: {}", lease)
+                logger.debug("Skipping this because IP Address doesn't match: {}", lease)
                 continue
         logger.warning("Target:")
         for key, item in lease.items():
@@ -988,7 +978,8 @@ def delete_lease(
               default=False,
               help="Overwrite existing host entry if found. (Default is to add to existing entry.")
 @click.option("--apply", "-a", is_flag=True, default=False, help="Apply changes.")
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 @click.argument('host')
 @click.argument('domain')
 @click.argument('ip')
@@ -998,7 +989,7 @@ def add_service_unbound_host_override(
         ip: str,
         overwrite: bool,
         apply: bool,
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ Add Unbound Host Override
 
@@ -1007,7 +998,7 @@ def add_service_unbound_host_override(
     IP      : IPv4 address of unbound dns entry.  May also be a comma delimited list.\n
     APPLY   : boolean to specify if the override should be immediately applied or not.
     """
-    client = get_client()
+    client = get_client(loglevel)
 
     ip_list = []
     if ',' in ip:
@@ -1018,20 +1009,17 @@ def add_service_unbound_host_override(
     hostname = "%s.%s" % (host, domain)
     if overwrite:
         host_override_list = client.get_service_unbound_host_overrides_by_hostname(
-            hostname=hostname,
-            debug=debug)
+            hostname=hostname)
 
         for host_override in host_override_list:
             host_override_ip_list = host_override['ip']
-            if debug:
-                logger.debug("overwriting host_override [%s]" % host_override)
+            logger.debug("overwriting host_override [%s]" % host_override)
 
             if host_override_ip_list != ip_list:
                 host_override_id = host_override['id']
                 client.delete_service_unbound_host_override_by_id(
                     id=host_override_id,
-                    apply=apply,
-                    debug=debug)
+                    apply=apply)
 
     # ref: https://github.com/TimurNurlygayanov/qa_launchpad_weekly_reports/blob/master/testrail_client.py#L203
     # host_override = dict(
@@ -1048,8 +1036,7 @@ def add_service_unbound_host_override(
 
     kwargs: Dict[str, Any] = {"data": host_override}
 
-    if debug:
-        logger.debug("kwargs=%s" % kwargs)
+    logger.debug("kwargs=%s" % kwargs)
 
     host_override_result = client.add_service_unbound_host_override(**kwargs)
     host_override_result_data: List[Dict[str, str]] = host_override_result.data
@@ -1060,7 +1047,8 @@ def add_service_unbound_host_override(
 # pylint: disable=too-many-branches,invalid-name
 @cli.command()
 @click.option("--apply", "-a", is_flag=True, default=False, help="Apply changes.")
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 @click.argument('host')
 @click.argument('domain')
 @click.argument('ip')
@@ -1069,7 +1057,7 @@ def delete_service_unbound_host_override(
         domain: str,
         ip: str,
         apply: bool,
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ Delete Unbound Host Override
 
@@ -1077,23 +1065,19 @@ def delete_service_unbound_host_override(
     DOMAIN  : the domain name of the unbound dns override.\n
     IP      : IPv4 address of unbound dns entry.  May also be a comma delimited list.
     """
-    client = get_client()
+    client = get_client(loglevel)
     host_override_data: List[Dict[str, str]] = client.get_service_unbound_host_overrides()
     for host_override in host_override_data:
-        if debug:
-            logger.debug("host_override=%s" % host_override)
+        logger.debug("host_override=%s" % host_override)
 
         if host.lower() != host_override["host"].lower():
-            if debug:
-                logger.debug("Skipping this because host doesn't match: {}", host_override)
+            logger.debug("Skipping this because host doesn't match: {}", host_override)
             continue
         if domain.lower() != host_override["domain"].lower():
-            if debug:
-                logger.debug("Skipping this because domain doesn't match: {}", host_override)
+            logger.debug("Skipping this because domain doesn't match: {}", host_override)
             continue
         if ip.lower() != host_override["ip"].lower():
-            if debug:
-                logger.debug("Skipping this because IP Address doesn't match: {}", host_override)
+            logger.debug("Skipping this because IP Address doesn't match: {}", host_override)
             continue
 
         host_override_id = host_override['id']
@@ -1103,8 +1087,7 @@ def delete_service_unbound_host_override(
             logger.debug("deleting item {}", host_override)
             host_override_result_data: List[Dict[str, str]] = client.delete_service_unbound_host_override_by_id(
                 id=host_override_id,
-                apply=apply,
-                debug=debug
+                apply=apply
             )
             # host_override_delete = {
             #     'id': host_override_id,
@@ -1114,8 +1097,7 @@ def delete_service_unbound_host_override(
             # # kwargs: Dict[str, Any] = {"data": host_override_delete}
             # kwargs: Dict[str, Any] = {"params": host_override_delete}
             #
-            # if debug:
-            #     logger.debug("kwargs=%s" % kwargs)
+            # logger.debug("kwargs=%s" % kwargs)
             #
             # host_override_result = client.delete_service_unbound_host_override(**kwargs)
             # host_override_result_data: List[Dict[str, str]] = host_override_result.data
@@ -1126,25 +1108,24 @@ def delete_service_unbound_host_override(
 # pylint: disable=too-many-branches,invalid-name
 @cli.command()
 @click.option("--apply", "-a", is_flag=True, default=False, help="Apply changes.")
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 @click.argument('hostname')
 def delete_service_unbound_host_overrides_by_hostname(
         hostname: str,
         apply: bool,
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ Delete Unbound Host Overrides by hostname
 
     HOSTNAME        : the hostname to perform the dig resolve.
     """
-    client = get_client()
+    client = get_client(loglevel)
     host_override_list = client.get_service_unbound_host_overrides_by_hostname(
-        hostname=hostname,
-        debug=debug)
+        hostname=hostname)
 
     for host_override in host_override_list:
-        if debug:
-            logger.debug("host_override=%s" % host_override)
+        logger.debug("host_override=%s" % host_override)
         host_override_id = host_override['id']
         logger.warning("Target:")
         logger.info("{:10} {}", host_override_id, host_override)
@@ -1152,8 +1133,7 @@ def delete_service_unbound_host_overrides_by_hostname(
             logger.debug("deleting item {}", host_override)
             host_override_result_data: List[Dict[str, str]] = client.delete_service_unbound_host_override_by_id(
                 id=host_override_id,
-                apply=apply,
-                debug=debug
+                apply=apply
             )
 
             logger.info(host_override_result_data)
@@ -1163,44 +1143,47 @@ def delete_service_unbound_host_overrides_by_hostname(
 @cli.command()
 @click.argument('hostname')
 @click.argument('dns_nameserver')
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 def dig_host_ip_list(
         hostname: str,
         dns_nameserver: str,
+        loglevel: str = None,
 ) -> None:
     """ Perform dig for hostname using specified dns nameserver
 
     HOSTNAME        : the hostname to perform the dig resolve.\n
     DNS_NAMESERVER  : the dns server to perform the resolve.\n
     """
-    client = get_client()
-    host_list: List[str] = client.dig_host_ip_list(hostname=hostname, dns_nameserver=dns_nameserver)
-
+    client = get_client(loglevel)
     logger.debug("host_list=%s" % host_list)
+    logger.debug("dns_nameserver=%s" % dns_nameserver)
+    host_list: List[str] = client.dig_host_ip_list(hostname=hostname, dns_nameserver=dns_nameserver)
 
 
 # pylint: disable=too-many-branches,invalid-name
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 @click.argument('hostname')
 @click.argument('dns_nameservers')
 def dns_resolve_host_ip_list(
         hostname: str,
         dns_nameservers: str,
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ Perform dns resolve for hostname using specified dns nameserver
 
     HOSTNAME        : the hostname to perform the dig resolve.\n
     DNS_NAMESERVER  : the dns server to perform the resolve.\n
     """
-    client = get_client()
+    client = get_client(loglevel)
     # dns_nameserver_list = dns_nameservers.split(',')
     dns_nameserver_list: List[str] = dns_nameservers.split(',')
 
     host_list: List[str] = client.dns_resolve_host_ip_list(
         hostname=hostname,
-        dns_nameservers=dns_nameserver_list,
-        debug=debug
+        dns_nameservers=dns_nameserver_list
     )
 
     logger.debug("host_list=%s" % host_list)
@@ -1208,7 +1191,8 @@ def dns_resolve_host_ip_list(
 
 # pylint: disable=too-many-branches,invalid-name
 @cli.command()
-@click.option("--debug", "-d", is_flag=True, default=False, help="Debug mode, dump more data.")
+@click.option("--loglevel", "-l", default="INFO", help="Logging level: [DEBUG, INFO, WARN, ERROR]",
+              type=click.Choice(['DEBUG', 'INFO', 'WARN', 'ERROR'], case_sensitive=False))
 @click.option("--apply", "-a", is_flag=True, default=False, help="Apply changes.")
 @click.argument('hostname')
 @click.argument('dns_nameserver')
@@ -1216,22 +1200,20 @@ def sync_host_ip_list(
         hostname: str,
         dns_nameserver: str,
         apply: bool,
-        debug: bool = False,
+        loglevel: str = None,
 ) -> None:
     """ Synchronize host ip list for specified dns nameserver to pfsense unbound with respective host overrides
 
     HOSTNAME        : the host name of the unbound dns override.\n
     DNS_NAMESERVER  : the dns server to perform the resolve.
     """
-    client = get_client()
+    client = get_client(loglevel)
     host_ip_list: List[str] = client.dig_host_ip_list(hostname=hostname, dns_nameserver=dns_nameserver)
 
-    if debug:
-        logger.debug("host_ip_list=%s" % host_ip_list)
+    logger.debug("host_ip_list=%s" % host_ip_list)
 
     ip_list = sorted(host_ip_list)
-    if debug:
-        logger.debug("ip_list=%s" % ip_list)
+    logger.debug("ip_list=%s" % ip_list)
 
     ip_list_string = ','.join(ip_list)
     logger.debug("ip_list_string=%s" % ip_list_string)
@@ -1239,22 +1221,18 @@ def sync_host_ip_list(
     (host, domain) = hostname.split('.', 1)
 
     host_override_list = client.get_service_unbound_host_overrides_by_hostname(
-        hostname=hostname,
-        debug=debug)
+        hostname=hostname)
 
-    if debug:
-        logger.debug("host_override_list=%s" % host_override_list)
+    logger.debug("host_override_list=%s" % host_override_list)
 
     for host_override in host_override_list:
-        if debug:
-            logger.debug("host_override=%s" % host_override)
+        logger.debug("host_override=%s" % host_override)
         host_override_ip_list = host_override['ip']
         if host_override_ip_list != ip_list_string:
             host_override_id = host_override['id']
             client.delete_service_unbound_host_override_by_id(
                 id=host_override_id,
-                apply=apply,
-                debug=debug)
+                apply=apply)
         else:
             logger.debug("host_override already exists => [%s]" % host_override)
             return
@@ -1267,8 +1245,7 @@ def sync_host_ip_list(
     }
     kwargs: Dict[str, Any] = {"data": host_override}
 
-    if debug:
-        logger.debug("kwargs=%s" % kwargs)
+    logger.debug("kwargs=%s" % kwargs)
 
     host_override_result = client.add_service_unbound_host_override(**kwargs)
     host_override_result_data: List[Dict[str, str]] = host_override_result.data

@@ -1,0 +1,18 @@
+version: "3"
+services:
+  deimos:
+    container_name: deimos
+    image: busybox
+    command: sleep infinity
+    networks:
+      - mars
+  phobos:
+    container_name: phobos
+    image: busybox
+    command: sleep infinity
+    networks:
+      - mars
+networks:
+  mars:
+    name: mars
+    driver: bridge

@@ -16,13 +16,16 @@ SCRIPT_NAME="${SCRIPT_NAME%.*}"
 logFile="${SCRIPT_NAME}.log"
 
 INSTALL_JDK_CACERT=1
+INSTALL_DOCKER_CACERT=0
 SETUP_PYTHON_CACERTS_ONLY=0
 
-SITE_LIST_DEFAULT=("pfsense.johnson.int")
+SITE_LIST_DEFAULT=()
+SITE_LIST_DEFAULT+=("pfsense.johnson.int")
 SITE_LIST_DEFAULT+=("gitea.admin.dettonville.int")
 SITE_LIST_DEFAULT+=("admin.dettonville.int")
-#SITE_LIST_DEFAULT+=("media.johnson.int:5000")
 SITE_LIST_DEFAULT+=("media.johnson.int")
+SITE_LIST_DEFAULT+=("media.johnson.int:5000")
+SITE_LIST_DEFAULT+=("diskstation01.johnson.int:5001")
 SITE_LIST_DEFAULT+=("pypi.python.org")
 SITE_LIST_DEFAULT+=("files.pythonhosted.org")
 SITE_LIST_DEFAULT+=("bootstrap.pypa.io")
@@ -290,6 +293,39 @@ function install_java_cacerts() {
   fi
 }
 
+# ref: https://stackoverflow.com/questions/50768317/docker-pull-certificate-signed-by-unknown-authority
+# ref: https://docs.docker.com/desktop/faqs/macfaqs/#how-do-i-add-tls-certificates
+# ref: https://stackoverflow.com/questions/50768317/docker-pull-certificate-signed-by-unknown-authority
+function install_docker_cacert() {
+  local LOG_PREFIX="install_docker_cacert():"
+  local CACERTS_SRC=$1
+  local ENDPOINT=$2
+
+  local DOCKER_CERT_DIR="/etc/docker/certs.d/${ENDPOINT}"
+  mkdir -p "${DOCKER_CERT_DIR}"
+
+  # shellcheck disable=SC2206
+  CERTS=(${CACERTS_SRC}/cert*.pem)
+  CA_ROOT_CERT=${CERTS[-1]}
+  logInfo "${LOG_PREFIX} Located site root cert for ${ENDPOINT} ==> [${CA_ROOT_CERT}]"
+
+  logInfo "${LOG_PREFIX} Copy ${ENDPOINT} site root cert to DOCKER_CERT_DIR=${DOCKER_CERT_DIR}"
+
+  local COPY_CMD="cp ${CA_ROOT_CERT} ${DOCKER_CERT_DIR}/"
+  logInfo "${LOG_PREFIX} [${COPY_CMD}]"
+  eval "${COPY_CMD}"
+
+  if [[ "$UNAME" == "darwin"* ]]; then
+    local DOCKER_USER_CERT_DIR="${HOME}/.docker/certs.d/${ENDPOINT}"
+    mkdir -p "${DOCKER_USER_CERT_DIR}"
+    logInfo "${LOG_PREFIX} Copy ${ENDPOINT} site root cert to DOCKER_USER_CERT_DIR=${DOCKER_USER_CERT_DIR}"
+    ## ref: https://docs.docker.com/desktop/faqs/macfaqs/#how-do-i-add-tls-certificates
+    local COPY_CMD="cp ${CA_ROOT_CERT} ${DOCKER_USER_CERT_DIR}/"
+    logInfo "${LOG_PREFIX} [${COPY_CMD}]"
+    eval "${COPY_CMD}"
+  fi
+}
+
 function install_cert_to_truststore() {
   local LOG_PREFIX="install_cert_to_truststore():"
   local HOST=$1
@@ -372,8 +408,7 @@ function install_cert_to_truststore() {
 function install_site_cert() {
   local LOG_PREFIX="install_site_cert():"
   local SITE=$1
-  local INSTALL_JDK_CACERT=${2-0}
-  local KEYSTORE_PASS=${3:-"changeit"}
+  local KEYSTORE_PASS=${2:-"changeit"}
 
   #local DATE=`date +&%%m%d%H%M%S`
   local DATE=$(date +%Y%m%d)
@@ -432,6 +467,11 @@ function install_site_cert() {
       install_java_cacerts "${CACERTS_SRC}" "${ALIAS}" "${KEYSTORE_PASS}"
     fi
   fi
+  if [ "$INSTALL_DOCKER_CACERT" -eq 1 ]; then
+    if [ -n "${JAVA_HOME}" ]; then
+      install_docker_cacert "${CACERTS_SRC}" "${ENDPOINT}"
+    fi
+  fi
 
   logInfo "${LOG_PREFIX} **** Finished ****"
 }
@@ -442,9 +482,9 @@ function setup_python_cacerts() {
 #  ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
 #  pip_install_certifi
 #
-#  local PYTHON_SSL_CERT_FILE=$(python3 -m certifi)
+  local PYTHON_SSL_CERT_FILE=$(python3 -m certifi)
   # ref: https://askubuntu.com/a/1296373/1157235
-  local PYTHON_SSL_CERT_FILE=$(python3 -c 'import ssl; print(ssl.get_default_verify_paths().openssl_cafile)')
+#  local PYTHON_SSL_CERT_FILE=$(python3 -c 'import ssl; print(ssl.get_default_verify_paths().openssl_cafile)')
   local PYTHON_SSL_CERT_DIR=$(dirname "${PYTHON_SSL_CERT_FILE}")
 
   logInfo "${LOG_PREFIX} PYTHON_SSL_CERT_DIR=${PYTHON_SSL_CERT_DIR}"
@@ -555,6 +595,7 @@ function usage() {
   echo "  Options:"
   echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
   echo "       -v : show script version"
+  echo "       -d : setup cacert in docker client config (/etc/docker/certs.d/)"
   echo "       -p : setup python cacerts only"
   echo "       -h : help"
   echo ""
@@ -576,10 +617,11 @@ function main() {
     fi
   fi
 
-  while getopts "L:r:vph" opt; do
+  while getopts "L:r:vdph" opt; do
       case "${opt}" in
           L) setLogLevel "${OPTARG}" ;;
           v) echo "${VERSION}" && exit ;;
+          d) INSTALL_DOCKER_CACERT=1 ;;
           p) SETUP_PYTHON_CACERTS_ONLY=1 ;;
           h) usage 1 ;;
           \?) usage 2 ;;
@@ -606,7 +648,7 @@ function main() {
     logDebug "Add site certs [${__SITE_LIST[*]}] to cacerts"
     for SITE in "${__SITE_LIST[@]}"; do
       logDebug "SITE=${SITE}"
-      install_site_cert "${SITE}" "${INSTALL_JDK_CACERT}"
+      install_site_cert "${SITE}"
     done
   fi
 

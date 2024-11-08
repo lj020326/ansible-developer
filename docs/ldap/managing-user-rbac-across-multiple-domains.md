@@ -27,7 +27,7 @@ Towards that objective/goal, and to greatly accelerate the non-prod LDAP network
 
 See the [openldap ldif jinja2 template here](https://github.com/lj020326/ansible-datacenter/blob/main/files/openldap/ldif/ldap_seed_info.ldif.j2) used to seed the openldap docker container instance for each non-prod domain. 
 
-See the [docker-compose.yml template here](https://github.com/lj020326/ansible-datacenter/blob/main/roles/docker-stack/vars/app-services/v2/docker_stack_openldap.yml) element used by the [docker stack orchestration role](https://github.com/lj020326/ansible-datacenter/tree/main/roles/docker-stack) here. 
+See the [docker-compose.yml template here](https://github.com/lj020326/ansible-datacenter/blob/main/roles/bootstrap_docker_stack/vars/app-services/v2/docker_stack_openldap.yml) element used by the [docker stack orchestration role](https://github.com/lj020326/ansible-datacenter/tree/main/roles/bootstrap_docker_stack) here. 
 
 Note the ansible variable 'ldap_internal_base_dn' is set by the playbook that is bootstrapping the site/domain inventory.
 

@@ -617,7 +617,7 @@ function main() {
     fi
   fi
 
-  while getopts "L:r:vdph" opt; do
+  while getopts "L:vdph" opt; do
       case "${opt}" in
           L) setLogLevel "${OPTARG}" ;;
           v) echo "${VERSION}" && exit ;;

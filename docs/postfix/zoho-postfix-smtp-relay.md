@@ -57,7 +57,7 @@ Optionally, if you want to customize the name that the email is coming from, try
 ##/^From:.*/ REPLACE From: Dumbledore <email@address.com>
 ```
 
-**Update 1 Jan 2021** - After rebuilding my Proxmox server with the latest version (6.3), I couldn’t proceed to the next step until I repaired folder permissions, deleted a stuck `master.lock` file, installed `libsasl2-modules`, and restarted the postfix service - for other distros, ymmv:
+**Update 1 Jan 2021** - After rebuilding my Proxmox server with the latest version (6.3), I could not proceed to the next step until I repaired folder permissions, deleted a stuck `master.lock` file, installed `libsasl2-modules`, and restarted the postfix service - for other distros, ymmv:
 
 ```shell
 $ sudo postfix set-permissions
@@ -70,14 +70,21 @@ Finally, reload postfix and send a test message:
 
 ```shell
 $ sudo postfix reload
-$ echo "test message" | mail -s "test subject" another@email.com
+$ echo "test message" | mail -s "test subject" lee.james.johnson@gmail.com
+$ postmap -fq "From: root <root@media01>" pcre:/etc/postfix/smtp_header_checks 
+REPLACE From: admin@dettonville.com
+$ postmap -fq "From: root+jenkins@media01" pcre:/etc/postfix/smtp_header_checks 
+REPLACE From: admin+jenkins@dettonville.com
+
 ```
 
 Voila! If you have issues, check your logs in `/var/log/syslog` and `/var/log/mail.info`
 
 ## References
 
+- https://www.postfix.org/header_checks.5.html
+- https://www.plesk.com/kb/support/how-to-rewrite-headers-in-outgoing-mail-messages/
 - https://medium.com/@esantanche/configuring-postfix-to-relay-email-through-zoho-mail-890b54d5c445
 - https://bradford.la/2018/zoho-postfix-smtp-relay/
 - https://serverfault.com/questions/147921/forcing-the-from-address-when-postfix-relays-over-smtp
-- 
+- https://marcelog.github.io/articles/configure_postfix_forward_email_regex_subject_transport_relay.html

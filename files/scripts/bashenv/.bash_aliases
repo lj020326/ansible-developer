@@ -68,6 +68,9 @@ alias cdpyutils='cd ${PYUTILS_DIR}'
 alias .bash=". ~/.bashrc"
 alias .k8sh=". ~/.k8sh"
 
+#alias findzombies="ps aux | awk '$8 ~ /^[Zz]/'"
+alias findzombies="ps -A -ostat,ppid,pid,command | grep -e '^[Zz]'"
+
 ## ref: https://medium.com/@itsromiljain/the-best-way-to-install-node-js-npm-and-yarn-on-mac-osx-4d8a8544987a
 alias installyarn='npm install -g yarn'
 
@@ -138,6 +141,9 @@ alias dnsreset="ipconfig //flushdns"
 alias dot-turd-show="find . -type f \( -name '._*' -o -name '.DS_Store' -o -name 'SystemOut.log' \) -print"
 alias dot-turd-rm="find . -type f \( -name '._*' -o -name '.DS_Store' -o -name 'SystemOut.log' \) -print -delete"
 
+alias dot-file-show="find . -type f -name '.*' -print"
+alias dot-file-rm="find . -type f -name '.*' -print -delete"
+
 ## DNS alias wrappers around functions
 alias dnsresetcache="reset_local_dns"
 alias dnsreset="reset_local_dns"
@@ -160,11 +166,16 @@ alias sshplex='ssh administrator@plex.johnson.int'
 alias sshplex2='ssh administrator@plex2.johnson.int'
 alias sshopenshift='ssh administrator@openshift.johnson.int'
 
-alias sshadmin01='ssh administrator@admin01.johnson.int'
-alias sshadmin02='ssh administrator@admin02.johnson.int'
-alias sshadmin03='ssh administrator@admin03.johnson.int'
-alias sshadmin04='ssh administrator@admin04.johnson.int'
-alias sshadmin05='ssh administrator@admin05.johnson.int'
+alias sshadmin01='ssh administrator@admin01.dettonville.int'
+alias sshadmin02='ssh administrator@admin02.dettonville.int'
+alias sshadmin03='ssh administrator@admin03.dettonville.int'
+alias sshadmin04='ssh administrator@admin04.dettonville.int'
+alias sshadmin05='ssh administrator@admin05.dettonville.int'
+#alias sshadmin01='ssh administrator@admin01.johnson.int'
+#alias sshadmin02='ssh administrator@admin02.johnson.int'
+#alias sshadmin03='ssh administrator@admin03.johnson.int'
+#alias sshadmin04='ssh administrator@admin04.johnson.int'
+#alias sshadmin05='ssh administrator@admin05.johnson.int'
 alias sshmail='ssh administrator@mail.johnson.int'
 alias sshcgminer='ssh root@cgminer.johnson.int'
 alias sshminer='ssh root@cgminer.johnson.int'
@@ -463,3 +474,11 @@ alias bashenv-no-gnutools="export ADD_GNUTOOLS_BASH_PATH=0 && source ~/.bashrc"
 alias bashenv-gnutools="export ADD_GNUTOOLS_BASH_PATH=1 && source ~/.bashrc"
 
 alias dockerloginwork="docker login -u ${WORK_DOMAIN_USERNAME} -p \"${WORK_DOMAIN_REGISTRY_PASSWORD}\" ${WORK_DOMAIN_REGISTRY}"
+
+#### openstack
+## Alias to populate Openstack environment variables from ansible vault encrypted file
+## ref: https://wiki.geant.org/display/~federated-user-3/Encrypting+Openstack+environment+variables+with+ansible
+alias openstack-auth='$(ANSIBLE_LOAD_CALLBACK_PLUGINS=TRUE ANSIBLE_STDOUT_CALLBACK=json ansible all -m debug \
+  -i localhost, --extra-vars "@vault.yml" \
+  -a "msg=\"{% for k,v in openrc_vars.items() %}export {{ k }}={{ v }}\n{% endfor %}\"" \
+  | jq -r '\''.["plays"][0]["tasks"][0]["hosts"]["localhost"]["msg"]'\'')'

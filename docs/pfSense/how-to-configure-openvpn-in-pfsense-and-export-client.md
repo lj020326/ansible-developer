@@ -1,3 +1,4 @@
+
 # How to configure OpenVPN in PFSense and export clients?
 
 VPN is a private virtual network that allows you to create a secure connection network connect other networks over the internet or intranet using multi-layers encryption and certificates. This is a step by step guide to configure OpenVPN and export clients In PFSense.
@@ -188,5 +189,8 @@ Install OpenVPN client on your system. Provide the username and password. now it
 
 ## References
 
+* https://www.wundertech.net/how-to-set-up-openvpn-on-pfsense/
+* https://www.bleepingcomputer.com/vpn/guides/openvpn-server-pfsense/
+* https://www.comparitech.com/blog/vpn-privacy/openvpn-server-pfsense/
 * https://boredadmin.com/configure-opnevpnn-in-pfsense-and-export-client/
 * 

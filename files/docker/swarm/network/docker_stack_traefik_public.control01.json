@@ -1,0 +1,181 @@
+[
+    {
+        "Name": "docker_stack_traefik_public",
+        "Id": "ev6tayzeier43u8iuc8cxw3pa",
+        "Created": "2025-02-01T09:04:13.563212253-05:00",
+        "Scope": "swarm",
+        "Driver": "overlay",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "192.168.12.0/24",
+                    "Gateway": "192.168.12.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "1bc3b60376d99e6405a1922331eca63b98220ab8ff03d4026fb10872ab25a98d": {
+                "Name": "docker_stack_authelia.1.r7ionu3v6z4j5jqg3gs6scc9i",
+                "EndpointID": "593aa0656531c37082e15fbf2a67f3ee5656b61057440e729e7da7328670129e",
+                "MacAddress": "02:42:c0:a8:0c:29",
+                "IPv4Address": "192.168.12.41/24",
+                "IPv6Address": ""
+            },
+            "1eea025d65aa9fb6764e4c76b6c88d6f8de399fe7e3aa44b6940bb9525edf721": {
+                "Name": "docker_stack_jenkins-jcac.1.m45lllq9c94emfn9tqhc8wfd3",
+                "EndpointID": "606f5ac321c95f2df09df3971a976c36845971805e51ee0bddf166d7652f75a4",
+                "MacAddress": "02:42:c0:a8:0c:09",
+                "IPv4Address": "192.168.12.9/24",
+                "IPv6Address": ""
+            },
+            "1fec36ad77b3881d60d3885c4d1d90f4f193f72760904cf5f0d6f07486821c7f": {
+                "Name": "docker_stack_grafana.1.yolhw0c7y97ter4ar89to30d2",
+                "EndpointID": "82e6f91a4998b513aafc73daa9db9ac6551c127c5214ddb13bfa4c47a596abb7",
+                "MacAddress": "02:42:c0:a8:0c:2d",
+                "IPv4Address": "192.168.12.45/24",
+                "IPv6Address": ""
+            },
+            "2154acd168d29e4b1583c92bae0023222b046912df16f79faec67a2e66a0b970": {
+                "Name": "docker_stack_portainer.1.jn8girr599ghtwmz8w6ubcacs",
+                "EndpointID": "504c08a2ed6b9d28694ada7b18e5192067441fc8758d125b23b9a1ace4a2d93b",
+                "MacAddress": "02:42:c0:a8:0c:0f",
+                "IPv4Address": "192.168.12.15/24",
+                "IPv6Address": ""
+            },
+            "282fb7984282227976066e0bf68937febb7e96274f1174e6fe2cfccda62867fb": {
+                "Name": "docker_stack_rediscom.1.mnd0210c61rptpnnfxdtp2luv",
+                "EndpointID": "0bd9949a77a93ddd6e15269dbae0cec5f6760504cbff6caade785fcf36c7e25d",
+                "MacAddress": "02:42:c0:a8:0c:2f",
+                "IPv4Address": "192.168.12.47/24",
+                "IPv6Address": ""
+            },
+            "4392577a68edfa24f0dd0361f34c2611ac6458bdeda251eacd7f78431ffe73d9": {
+                "Name": "docker_stack_pgadmin.1.l2om1jcil9fubhnflvtv6kkit",
+                "EndpointID": "bc00b9de8160a94769462e25039764352e5187f0fdece0d03259aeed85bf68c0",
+                "MacAddress": "02:42:c0:a8:0c:25",
+                "IPv4Address": "192.168.12.37/24",
+                "IPv6Address": ""
+            },
+            "46c391fe8038ae1d3e415ef27154e922a97a0684b74ab92bbccb89a867d46b57": {
+                "Name": "docker_stack_keycloak.1.6zou8gduph4wcov8gp42s090e",
+                "EndpointID": "8a9f42540deb178b1159673eba5114ac8c2cdda83f7d4d9954a9e698659a9bcb",
+                "MacAddress": "02:42:c0:a8:0c:27",
+                "IPv4Address": "192.168.12.39/24",
+                "IPv6Address": ""
+            },
+            "511cefa2fc640baf83ee6ed135d5c47ad98265369d325fb74d839280741afa5d": {
+                "Name": "docker_stack_registry-frontend.1.zlt7mmxzynppw3hjvz3u6or6e",
+                "EndpointID": "976183cefbb915629e99f205f6ae6c4d472f94eafc252df6192bfd972b7bfd24",
+                "MacAddress": "02:42:c0:a8:0c:1b",
+                "IPv4Address": "192.168.12.27/24",
+                "IPv6Address": ""
+            },
+            "6a3895e42456cd800d13faa4674196e93c90a15a902da18e9c5bb54d0525c840": {
+                "Name": "docker_stack_archiva.1.23odyzjjpwry8i2o7a2z6og35",
+                "EndpointID": "a2631467cacb7294bd30f589427c6b9165544e58415c34cbc42fb4eb7684385a",
+                "MacAddress": "02:42:c0:a8:0c:23",
+                "IPv4Address": "192.168.12.35/24",
+                "IPv6Address": ""
+            },
+            "83133aa9bbd93f2ed1658971ec38194577441455bb2c69320c2fcd87a1f85631": {
+                "Name": "docker_stack_healthchecks.1.4m1iaejmly8bdntenreisrpcr",
+                "EndpointID": "cef68cf8201b1df710a6c256660404f3019ce0cd586496514afdf3d3581ea368",
+                "MacAddress": "02:42:c0:a8:0c:10",
+                "IPv4Address": "192.168.12.16/24",
+                "IPv6Address": ""
+            },
+            "8a26719a80baa8a84993671fa7df4f5bf1f1b895f64e11f363fb5c77107a0f36": {
+                "Name": "docker_stack_samba.1.4jbyb38kme0et9ynfuj1s1ovd",
+                "EndpointID": "3fe797db35c3c977995aefb3f6a1b51bca52b75b9dc5838e86952232fe9eae3c",
+                "MacAddress": "02:42:c0:a8:0c:2e",
+                "IPv4Address": "192.168.12.46/24",
+                "IPv6Address": ""
+            },
+            "96872c5365b8a59192633c8e0e462a59f3609cf1d150b97c58ec84a1230226e8": {
+                "Name": "docker_stack_traefik.1.vxibuxfvyd7fqcaea71qpyc5j",
+                "EndpointID": "e3b2bf3c868178e23aad4fac32fae7f929bd354df786345d4889079d8c73a979",
+                "MacAddress": "02:42:c0:a8:0c:0b",
+                "IPv4Address": "192.168.12.11/24",
+                "IPv6Address": ""
+            },
+            "a8f31cd08e573fca3de08d65b6ce6c77e02b2f4394cd426e9fbf10af1a2c2525": {
+                "Name": "docker_stack_phpldapadmin.1.htf0b6elwyvudejh10pdaqxiu",
+                "EndpointID": "f79e9f5acae0a1293443c9e46be972090c4d99f49662a06900e21ed11127bfb7",
+                "MacAddress": "02:42:c0:a8:0c:26",
+                "IPv4Address": "192.168.12.38/24",
+                "IPv6Address": ""
+            },
+            "bf19025cd20e5bb485c8787953876226ec9202cf4b52bdb8fd4a02cb290da44e": {
+                "Name": "docker_stack_ldapadmin.1.8tf88fgqa3bb4djwtc5dzrp0p",
+                "EndpointID": "798f14dd066849968673e4352811b400cad34f4911083a12fd0923893462f2b6",
+                "MacAddress": "02:42:c0:a8:0c:1d",
+                "IPv4Address": "192.168.12.29/24",
+                "IPv6Address": ""
+            },
+            "cb0a27ceb3fd415af28d7ccdd62d03b268b952cd97f11a35506691b435675c39": {
+                "Name": "docker_stack_step-ca.1.1mon37lr8h9eo2vgza7z2idtf",
+                "EndpointID": "94d204687d1264eaa8ce7959b20a8cce6297b48e794cc32cca29149d443a3389",
+                "MacAddress": "02:42:c0:a8:0c:08",
+                "IPv4Address": "192.168.12.8/24",
+                "IPv6Address": ""
+            },
+            "cdc16a1d639f56ceb34900c23f66e6e27fe502ebb16b6866832c1fb0cd8ac2b2": {
+                "Name": "docker_stack_oauth.1.lu4iccgumb1ioyjshdub91fb9",
+                "EndpointID": "4b8d04721038b182a467cbdc3c1f8dcdf7c9c2985c8040eed09897ad77b31c10",
+                "MacAddress": "02:42:c0:a8:0c:17",
+                "IPv4Address": "192.168.12.23/24",
+                "IPv6Address": ""
+            },
+            "da527c612b6ebe3fd366e187960994a1094115d6a4649e35e80d905787e2bcea": {
+                "Name": "docker_stack_dozzle.1.c81pj1s6veeakbqeq1o1dtajg",
+                "EndpointID": "36da4629184d02206569ceeedd44edb11c12e9b7dd8d9c638ad02f20a8cb708d",
+                "MacAddress": "02:42:c0:a8:0c:13",
+                "IPv4Address": "192.168.12.19/24",
+                "IPv6Address": ""
+            },
+            "e396de3fda84d5244ea087598063c6b4319b4d6ee94fa891e2743309687dc35c": {
+                "Name": "docker_stack_whoami.ygx8o9hv0wptin0b3ljw29v7h.4fadv1kfu169da7vtt8m5xr4c",
+                "EndpointID": "716e6c54a5724639a7321c17d43090423f1f9e28f4e744865e962fc3119cd994",
+                "MacAddress": "02:42:c0:a8:0c:03",
+                "IPv4Address": "192.168.12.3/24",
+                "IPv6Address": ""
+            },
+            "e40a31ccccb894fc52c8e480a43810f98bd9d81a2b1d26413e9d51e2f66655ff": {
+                "Name": "docker_stack_james.1.9vgynpizcl3h27kg4h10ws3ah",
+                "EndpointID": "c838c61dc93b5edb217e515f20638735586795304f96ea72ff122068d377e9e6",
+                "MacAddress": "02:42:c0:a8:0c:21",
+                "IPv4Address": "192.168.12.33/24",
+                "IPv6Address": ""
+            },
+            "lb-docker_stack_traefik_public": {
+                "Name": "docker_stack_traefik_public-endpoint",
+                "EndpointID": "a8a0ec5b740f50381d5dabdb16af1a109b9d0446fa910cacc31022ed764c0959",
+                "MacAddress": "02:42:c0:a8:0c:04",
+                "IPv4Address": "192.168.12.4/24",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.driver.overlay.vxlanid_list": "4096"
+        },
+        "Labels": {
+            "com.docker.stack.namespace": "docker_stack"
+        },
+        "Peers": [
+            {
+                "Name": "66099f446077",
+                "IP": "10.0.0.5"
+            }
+        ]
+    }
+]

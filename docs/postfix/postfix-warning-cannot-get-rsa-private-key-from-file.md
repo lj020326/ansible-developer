@@ -88,18 +88,22 @@ mailbox_command = /usr/lib/dovecot/deliver
 
 The \*.pem files were created like described in the tutorial above, using
 
-```
 Postfix
+
 To create a certificate to be used by Postfix use:
 
+```shell
 openssl req -new -x509 -days 3650 -nodes -out /etc/ssl/certs/postfix.pem -keyout /etc/ssl/private/postfix.pem
-
+```
 Do not forget to set the permissions on the private key so that no unauthorized people can read it:
 
+```shell
 chmod o= /etc/ssl/private/postfix.pem
+```
 
 You will have to tell Postfix where to find your certificate and private key because by default it will look for a dummy certificate file called "ssl-cert-snakeoil":
 
+```shell
 postconf -e smtpd_tls_cert_file=/etc/ssl/certs/postfix.pem
 postconf -e smtpd_tls_key_file=/etc/ssl/private/postfix.pem
 ```

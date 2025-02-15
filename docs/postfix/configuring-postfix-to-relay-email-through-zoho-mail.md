@@ -37,9 +37,9 @@ smtp.zoho.com:587 application@example.com:applicationpassword
 
 You need to do postmap password.
 
-## tls\_policy
+## tls_policy
 
-The file /etc/postfix/tls\_policy contains the policies to be used when sending encrypted emails by using the TLS protocol, the one I’m using in this case.
+The file /etc/postfix/tls_policy contains the policies to be used when sending encrypted emails by using the TLS protocol, the one I’m using in this case.
 
 The file contains just this line:
 
@@ -47,11 +47,11 @@ smtp.zoho.com:587 encrypt
 
 By doing so we force the use of TLS every time we send an email.
 
-You need to do postmap tls\_policy.
+You need to do postmap tls_policy.
 
-## smtp\_header\_checks
+## smtp_header_checks
 
-The file /etc/postfix/smtp\_header\_checks contains rules to be used to rewrite the headers of the emails about to be sent.
+The file /etc/postfix/smtp_header_checks contains rules to be used to rewrite the headers of the emails about to be sent.
 
 This is the most important file in our case.
 
@@ -75,29 +75,34 @@ This is the main configuration file postfix uses.
 
 Replace yourhostname with the hostname of your server, the one where postfix is installed on and that is sending emails through Zoho.
 
-1.  \# TLS parameters
-2.  smtp\_tls\_policy\_maps = hash:/etc/postfix/tls\_policy
-3.  smtpd\_tls\_cert\_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
-4.  smtpd\_tls\_key\_file=/etc/ssl/private/ssl-cert-snakeoil.key
-5.  smtpd\_use\_tls=yes
-6.  smtpd\_tls\_session\_cache\_database = btree:${data\_directory}/smtpd\_scache
-7.  smtp\_tls\_session\_cache\_database = btree:${data\_directory}/smtp\_scache
-8.  smtp\_header\_checks = pcre:/etc/postfix/smtp\_header\_checks
-9.  myhostname = yourhostname
-10.  alias\_maps = hash:/etc/aliases
-11.  alias\_database = hash:/etc/aliases
-12.  mydestination = yourhostname, localhost.com, localhost
-13.  relayhost = smtp.zoho.com:587
-14.  smtp\_sasl\_auth\_enable = yes
-15.  smtp\_sasl\_password\_maps = hash:/etc/postfix/password
-16.  smtp\_sasl\_security\_options =
-17.  smtp\_generic\_maps = hash:/etc/postfix/generic
+```ini
+# TLS parameters
+smtp_tls_policy_maps = hash:/etc/postfix/tls_policy
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+smtp_header_checks = pcre:/etc/postfix/smtp_header_checks
+myhostname = yourhostname
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+mydestination = yourhostname, localhost.com, localhost
+relayhost = smtp.zoho.com:587
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/password
+smtp_sasl_security_options =
+smtp_generic_maps = hash:/etc/postfix/generic
+
+```
 
 ## master.cf
 
 In the file /etc/postfix/master.cf I uncommented this line:
 
-1. smtps inet n — — — — smtpd
+```ini
+smtps inet n — — — — smtpd
+```
 
 
 ## References

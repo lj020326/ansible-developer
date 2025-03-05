@@ -160,6 +160,7 @@ alias sshesx11='ssh root@esx11.dettonville.int'
 
 ## this is a function instead
 #alias sshpacker="ssh -i ~/.ssh/${SSH_KEY}"
+alias sshosbuild="ssh osbuild@10.10.100.10"
 
 alias sshmedia='ssh administrator@media.johnson.int'
 alias sshplex='ssh administrator@plex.johnson.int'

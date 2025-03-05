@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-install-cacerts.sh -p
+echo "install python certs and skip system cacerts install"
+install-cacerts.sh -p -s

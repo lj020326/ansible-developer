@@ -68,6 +68,7 @@ echo "==> rsync env scripts"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/git/"*.sh "${HOME}/bin/"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/pfsense/"*.py "${HOME}/bin/"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/ansible/"*.sh "${HOME}/bin/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/utils/"*.sh "${HOME}/bin/"
 if [[ -d "${SCRIPT_BASE_DIR}/certs" ]]; then
   rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/certs/"*.sh "${HOME}/bin/"
 fi

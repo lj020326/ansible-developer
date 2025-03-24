@@ -212,7 +212,9 @@ This is used for all git ssh related aliases/functions
 
 ref: https://www.buildahomelab.com/2022/04/26/how-to-install-ansible-with-pipenv-pyenv/
 
-### Brief inventory of aliases / functions available to developer in bash environment
+### Brief inventory of aliases available to developer in bash environment
+
+Alias definitions in [files/scripts/bashenv/.bash_aliases](files/scripts/bashenv/.bash_aliases):
 
 ```shell
 ### ALIASES
@@ -284,6 +286,7 @@ sshawxp1s1
 sshawxp1s4
 sshawxp2s1
 sshawxp2s4
+sshpacker
 
 mountwork
 unmountwork
@@ -293,7 +296,14 @@ vaultencrypt
 
 venv ## create local venv in directory $pwd/.venv
 .venv ## source local venv in directory $pwd/.venv
+```
 
+
+### Brief inventory of functions available to developer in bash environment
+
+Function definitions in [files/scripts/bashenv/.bash_functions](files/scripts/bashenv/.bash_functions):
+
+```shell
 ### FUNCTIONS
 blastit  ## git pull && git add . && git commit -m "$(getgitcomment)" && git push
 cagetaccountpwd
@@ -320,9 +330,6 @@ gitremovecached
 gitsetupstream
 gitshowupstream
 gitupdatesub
-sshpacker
-sshpackerwork
-sshpackerwork
 
 ```
 

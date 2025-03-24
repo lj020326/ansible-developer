@@ -14,4 +14,3 @@ openssl s_client -showcerts \
     -servername ${host} \
     -connect ${site} </dev/null 2>/dev/null \
 	| openssl x509 -outform PEM > ${host}.pem
-

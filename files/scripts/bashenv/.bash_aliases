@@ -94,6 +94,10 @@ alias sortfilesize='ls -Slhr'
 ## ref: https://www.howtogeek.com/howto/30184/10-ways-to-generate-a-random-password-from-the-command-line/
 alias genpwd='openssl rand -base64 8 | md5sum | head -c8;echo'
 
+## ref: https://ioflood.com/blog/openssl-view-certificate/#:~:text=To%20view%20a%20certificate%20using,in%20a%20file%20named%20certificate.
+## openssl x509 -text -noout -in certificate.crt
+alias getcertinfo="openssl x509 -text -noout -in"
+
 ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
 ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
 alias rsync0='rsync -ar --info=progress2 --links --delete --update'
@@ -219,7 +223,7 @@ alias startheroku='heroku local'
 
 # alias syncbashenv='rsync1 ${ANSIBLE_DEVELOPER_REPO}/files/scripts/bashenv/msys2/.bash* ~/'
 alias syncbashenv="${ANSIBLE_DEVELOPER_REPO}/sync-bashenv.sh && source ${HOME}/.bashrc"
-alias getsitecertinfo="get_site_cert_info.sh"
+alias getsitecertinfo="get-site-cert-info.sh"
 
 ## see function for more dynamic/robust version of the same shortcut
 #alias blastit-="git pull origin && git add . && git commit -am 'updates from ${HOSTNAME}' && git push origin"
@@ -326,11 +330,12 @@ alias venvinit="pip install -r requirements.txt"
 alias demacs='emacs -q --load "$HOME/.demacs.d/init.el"'
 alias spacemacs='emacs -q --load "$HOME/.spacemacs.d/init.el"'
 
-alias fetchimagesfrommarkdown="~/bin/fetch_images_from_markdown.sh"
-alias fetchsitesslcert.sh="~/bin/fetch_site_ssl_cert.sh"
+alias fetchimagesfrommarkdown="~/bin/fetch-images-from-markdown.sh"
+alias fetchsitesslcert.sh="~/bin/fetch-site-ssl-cert.sh"
+alias fetchstepcarootcacert="~/bin/fetch-stepca-root-cacert.sh"
 
 ## use with host:port
-#alias fetch-and-import-site-cert="sudo ~/bin/fetch_and_import_site_cert_pem.sh"
+#alias fetch-and-import-site-cert="sudo ~/bin/fetch-and-import-site-cert-pem.sh"
 ## use with host:port
 alias importsitecerts="sudo ~/bin/install-cacerts.sh"
 alias installcacerts="sudo ~/bin/install-cacerts.sh"

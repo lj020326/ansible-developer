@@ -37,7 +37,8 @@ export PYTHON3_BIN_DIR=$PYTHON3_HOME
 
 export DOCKER_REGISTRY_INTERNAL="media.${NETWORK_INTERNAL_DOMAIN}:5000"
 
-export MOLECULE_IMAGE_NAMESPACE="media.${NETWORK_INTERNAL_DOMAIN}:5000"
+#export MOLECULE_IMAGE_NAMESPACE="media.${NETWORK_INTERNAL_DOMAIN}:5000"
+export MOLECULE_IMAGE_REGISTRY="media.${NETWORK_INTERNAL_DOMAIN}:5000"
 export EDITOR=/usr/local/bin/emacs
 
 export PYTHON_VERSION="3"
@@ -46,7 +47,8 @@ export TEST_PYTHON_VERSION="3.10"
 SSH_KEY_GITHUB=~/.ssh/id_rsa
 
 ## ref: https://pythonspeed.com/articles/docker-buildkit/
-export DOCKER_BUILDKIT=1
+#export DOCKER_BUILDKIT=1
+export DOCKER_BUILDKIT=0
 
 if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
   ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux

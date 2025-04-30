@@ -1,21 +1,13 @@
 #!/usr/bin/env bash
 
-BACKUP_SCRIPT=/opt/scripts/rsync-incremental-backup-local
+MEDIA_DIR_DEFAULT="~/data/media/pictures/"
+GIF_EXTENSION="gif"
+JPEG_EXTENSION="jpg"
+PNG_EXTENSION="png"
 
-BACKUP_LABEL="daily"
-SOURCE_DIR="/srv/records"
-DEST_DIR="/srv/backups/records/${BACKUP_LABEL}"
-#CONFIG_FILEPATH=${4:-"${HOME}/.backups.cfg"}
-CONFIG_FILEPATH=""
-
-## These defaults may be overridden by the file sourced from CONFIG_FILEPATH
-EMAIL_FROM="backups@example.int"
-EMAIL_TO="admin@example.int"
-LOG_DIR="/var/log/backups"
-
-MOUNT_NFS_SHARES=1
-
-BACKUP_LABEL_MSG=${BACKUP_LABEL^^}
+JPEG_MIMETYPE="image/jpeg"
+PNG_MIMETYPE="image/png"
+GIF_MIMETYPE="image/gif"
 
 #### LOGGING RELATED
 LOG_ERROR=0
@@ -26,11 +18,6 @@ LOG_DEBUG=4
 
 #LOG_LEVEL=${LOG_DEBUG}
 LOG_LEVEL=${LOG_INFO}
-
-function abort() {
-  logError "%s\n" "$@"
-  exit 1
-}
 
 function logError() {
   if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
@@ -61,6 +48,10 @@ function logDebug() {
 #  	echo -e "[DEBUG]: ==> ${1}"
   	logMessage "${LOG_DEBUG}" "${1}"
   fi
+}
+function abort() {
+  logError "%s\n" "$@"
+  exit 1
 }
 
 function logMessage() {
@@ -139,43 +130,68 @@ function setLogLevel() {
 
 }
 
+function rename_file_extension() {
+  MEDIA_DIR="${1}"
+  FROM_EXTENSION="${2}"
+  TO_EXTENSION="${3}"
+  TO_MIMETYPE="unknown"
+
+  case "${TO_EXTENSION}" in
+    ${JPEG_EXTENSION}*) TO_MIMETYPE="${JPEG_MIMETYPE}" ;;
+    ${PNG_EXTENSION}*) TO_MIMETYPE="${PNG_MIMETYPE}" ;;
+    ${GIF_EXTENSION}*) TO_MIMETYPE="${GIF_MIMETYPE}" ;;
+    *) abort "Unknown TO_EXTENSION of [${TO_EXTENSION}] specified" ;;
+  esac
+
+  logInfo "Repair incorrect ${FROM_EXTENSION} media file extensions for media type ${TO_MIMETYPE}"
+
+  logInfo "Renaming ${FROM_EXTENSION} files in ${MEDIA_DIR} with mime type => ${TO_MIMETYPE} to *.${TO_EXTENSION}"
+  ## ref: https://unix.stackexchange.com/questions/483871/how-to-find-files-by-file-type
+  ## ref: https://stackoverflow.com/questions/39421969/how-can-i-change-the-extension-of-files-of-a-type-using-find-with-bash
+  ## ref: https://stackoverflow.com/questions/23356779/how-can-i-store-the-find-command-results-as-an-array-in-bash
+#  FILES_WITH_INCORRECT_EXTENSION=$(find "${MEDIA_DIR}" -type f -iname "*.${FROM_EXTENSION}" -exec bash -c '[[ "$( file -bi "$1" )" == *${TO_MIMETYPE}* ]]' bash {} \; -print)
+#  FIND_CMD="find ${MEDIA_DIR} -type f -iname *."${FROM_EXTENSION}" -exec bash -c '[[ \$( file -bi \"\$1\" )\" == *"${TO_MIMETYPE}"* ]]' bash {} \; -print"
+  FIND_CMD="find ${MEDIA_DIR} -type f -iname \"*.${FROM_EXTENSION}\" -exec bash -c '[[ \"\$( file -bi \"\$1\" )\" == *${TO_MIMETYPE}* ]]' bash {} \; -print0"
+  logInfo "${FIND_CMD}"
+  readarray -d '' FILES_WITH_INCORRECT_EXTENSION < <(eval "${FIND_CMD}")
+  printf -v FILES_WITH_INCORRECT_EXTENSION_STR "%s\n" "${FILES_WITH_INCORRECT_EXTENSION[@]}"
+  logInfo "FILES_WITH_INCORRECT_EXTENSION => [${FILES_WITH_INCORRECT_EXTENSION_STR}]"
+
+  for FILE in "${FILES_WITH_INCORRECT_EXTENSION[@]}"; do
+    logDebug "FILE=${FILE}"
+    ## ref: https://stackoverflow.com/questions/12806987/unix-command-to-escape-spaces
+    FILENAME_WITH_ESCAPE=$(printf %q "$FILE")
+    MV_CMD="mv -- $FILENAME_WITH_ESCAPE ${FILENAME_WITH_ESCAPE%.*}.${TO_EXTENSION}"
+    logInfo "${MV_CMD}"
+#    eval "${MV_CMD}"
+  done
+
+}
+
+
 function usage() {
-  echo "Usage: ${0} [options]"
+  echo "Usage: ${0} [options] [media_directory]"
   echo ""
   echo "  Options:"
   echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
-  echo "       -c CONFIG_FILEPATH : default empty and not loaded (e.g. 'backups.cfg')"
-  echo "       -f EMAIL_FROM : default 'backups@example.int'"
-  echo "       -t EMAIL_TO : default 'admin@example.int'"
-  echo "       -b BACKUP_LABEL : default 'daily'"
-  echo "       -s SOURCE_DIR : default '/srv/data1/data/Records'"
-  echo "       -d DEST_DIR : default '/srv/backups/records/daily'"
-  echo "       -l LOG_DIR : default '/var/log/backups'"
   echo "       -v : show script version"
   echo "       -h : help"
   echo ""
-  echo ""
   echo "  Examples:"
 	echo "       ${0} "
-	echo "       ${0} -b daily -s /data/lee -d /srv/backups/lee/daily"
-	echo "       ${0} -L DEBUG -b monthly -s /data/lee -d /srv/backups/lee/monthly"
+	echo "       ${0} -L DEBUG"
   echo "       ${0} -v"
+	echo "       ${0} ~/data/media/pictures/2020/2020-selfies/"
+	echo "       ${0} -L DEBUG ~/data/media/pictures/2020/2020-selfies/"
 	[ -z "$1" ] || exit "$1"
 }
 
 function main() {
 
-  while getopts "L:c:f:t:b:s:d:l:vh" opt; do
+  while getopts "L:vh" opt; do
       case "${opt}" in
           L) setLogLevel "${OPTARG}" ;;
           v) echo "${VERSION}" && exit ;;
-          c) CONFIG_FILEPATH="${OPTARG}" ;;
-          f) EMAIL_FROM="${OPTARG}" ;;
-          t) EMAIL_TO="${OPTARG}" ;;
-          b) BACKUP_LABEL="${OPTARG}" ;;
-          s) SOURCE_DIR="${OPTARG}" ;;
-          d) DEST_DIR="${OPTARG}" ;;
-          l) LOG_DIR="${OPTARG}" ;;
           h) usage 1 ;;
           \?) usage 2 ;;
           *) usage ;;
@@ -183,66 +199,15 @@ function main() {
   done
   shift $((OPTIND-1))
 
-  if [ $# -gt 0 ]; then
-      logWarn "Additional unrecognized parameters will be ignored: [${@}]"
-  fi
+  MEDIA_DIR=${1:-"${MEDIA_DIR_DEFAULT}"}
+  logInfo "MEDIA_DIR => ${MEDIA_DIR}"
 
-  if [ -n "${CONFIG_FILEPATH}" ]; then
-    if [ ! -e $CONFIG_FILEPATH ]; then
-#      logWarn "Config file ${CONFIG_FILEPATH} not found, skipping!"
-      abort "Config file ${CONFIG_FILEPATH} not found, quitting now!"
-    else
-      logInfo "Reading configs from ${CONFIG_FILEPATH} ...."
-      source ${CONFIG_FILEPATH}
-    fi
-  fi
+  rename_file_extension "${MEDIA_DIR}" "${GIF_EXTENSION}" "${JPEG_EXTENSION}"
+  rename_file_extension "${MEDIA_DIR}" "${PNG_EXTENSION}" "${JPEG_EXTENSION}"
+  rename_file_extension "${MEDIA_DIR}" "${JPEG_EXTENSION}" "${GIF_EXTENSION}"
+  rename_file_extension "${MEDIA_DIR}" "${JPEG_EXTENSION}" "${PNG_EXTENSION}"
 
-  LOG_FILE=${LOG_DIR}/run-${BACKUP_LABEL}-backup.log
-
-  logDebug "BACKUP_LABEL=${BACKUP_LABEL}"
-  logDebug "SOURCE_DIR=${SOURCE_DIR}"
-  logDebug "DEST_DIR=${DEST_DIR}"
-  logDebug "CONFIG_FILEPATH=${CONFIG_FILEPATH}"
-  logDebug "EMAIL_FROM=${EMAIL_FROM}"
-  logDebug "EMAIL_TO=${EMAIL_TO}"
-  logDebug "LOG_DIR=${LOG_DIR}"
-  logDebug "LOG_FILE=${LOG_FILE}"
-
-  logInfo "make sure NFS backup share is mounted"
-  mount -a || { # catch
-    logError "*** Failed to mount NFS backup share, quitting!"
-    exit 1
-  }
-
-  logInfo "truncating log file ${LOG_FILE}"
-  mkdir -p "${LOG_DIR}"
-  touch "${LOG_FILE}"
-  cat /dev/null > "${LOG_FILE}"
-
-  # Run the backup
-  BACKUP_SCRIPT_COMMAND="${BACKUP_SCRIPT} ${SOURCE_DIR} ${DEST_DIR} 2>&1 | tee ${LOG_FILE}"
-  logInfo "${BACKUP_SCRIPT_COMMAND}"
-  #${BACKUP_SCRIPT} ${BACKUP_LABEL} ${SOURCE_DIR} ${DEST_DIR} 2>&1 | tee -a ${LOG_FILE}
-  eval "${BACKUP_SCRIPT_COMMAND}"
-
-  BACKUP_RETURN_CODE=${?}
-
-  BACKUP_STATUS_MSG=""
-
-  # Check backup job success
-  if [ "${BACKUP_RETURN_CODE}" -eq "0" ]
-  then
-    logInfo "[$(date -Is)] Backup completed successfully\n"
-    # Clear unneeded partials and lock file
-    BACKUP_STATUS_MSG=SUCCESS
-  else
-    logInfo "[$(date -Is)] Backup failed, try again later\n"
-    BACKUP_STATUS_MSG=FAILED
-  fi
-
-  cat "${LOG_FILE}" | mail -s "[$BACKUP_STATUS_MSG] ${BACKUP_LABEL_MSG} rsync backup : ${SOURCE_DIR}->${DEST_DIR}" -r "${EMAIL_FROM}" "${EMAIL_TO}"
-
-  exit ${BACKUP_RETURN_CODE}
+  logInfo "Finished repair of media file extensions"
 
 }
 

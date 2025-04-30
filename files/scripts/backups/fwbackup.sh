@@ -11,16 +11,17 @@ HOST=$1
 DESTPATH=${2:-/var/fwbackups}
 CFGPATH=${3:-~/.fwbackup.cfg}
 
-MAILTO=admin@dettonville.org
+MAILFROM=admin@dettonville.com
+MAILTO=admin@dettonville.com
 TIMESTAMP=`date +%Y%m%d%H%M%S`
 
 logName="fwbackup_$(date -Id)_$(date +%H-%M-%S).log"
 ownFolderName=".fwbackup"
-logFolderName="log"
+logFolderName="logs"
 
-# Combinate previously defined variables for use (don't touch this)
+# Combine previously defined variables for use (don't touch this)
 ownFolderPath="${HOME}/${ownFolderName}"
-tempLogPath="${ownFolderPath}/logs"
+tempLogPath="${ownFolderPath}/${logFolderName}"
 logFile="${tempLogPath}/${logName}"
 
 # Prepare own folder
@@ -99,13 +100,13 @@ if [ -e $BACKUPFILE ]; then
 
 	# Clear unneeded partials and lock file
 	fwbackupFail=0
-	cat "${logFile}" | mail -s "fwbackup: SUCCESS Backup for ${HOST}" -r admin@dettonville.org $MAILTO
-    #sendemail -u "Firewall Backup Successful for $1" -f admin@dettonville.org -t $MAILTO -m "Success - pfSense backup - $1"
+	cat "${logFile}" | mail -s "fwbackup: SUCCESS Backup for ${HOST}" -r $MAILFROM $MAILTO
+    #sendemail -u "Firewall Backup Successful for $1" -f admin@dettonville.com -t $MAILTO -m "Success - pfSense backup - $1"
 else
 	writeToLog "\n[$(date -Is)] FW Backup failed, try again later\n"
 	fwbackupFail=1
-	cat "${logFile}" | mail -s "fwbackup: FAILED for ${HOST}" -r admin@dettonville.org $MAILTO
-    #sendemail -u "Firewall Backup Failed for $1" -f admin@dettonville.org -t $MAILTO -m "Failure - pfSense backup - $1"
+	cat "${logFile}" | mail -s "fwbackup: FAILED for ${HOST}" -r $MAILFROM $MAILTO
+    #sendemail -u "Firewall Backup Failed for $1" -f admin@dettonville.com -t $MAILTO -m "Failure - pfSense backup - $1"
 fi
 
 exit "${fwbackupFail}"

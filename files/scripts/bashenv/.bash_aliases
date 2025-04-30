@@ -129,9 +129,13 @@ alias find_dupe_files="find . -not -empty -type f -printf '%s\n' | sort -rn | un
   xargs -I{} -n1 find . -type f -size {}c -print0 | xargs -0 md5sum |\
   sort | uniq -w32 --all-repeated=separate"
 
-alias find_old_dirs="find . -mtime +14 -type d"
-alias delete_old_dirs="find . -mtime +14 -type d | xargs rm -f -r;"
-alias clean_old_dirs="find . -mtime +14 -type d | xargs rm -f -r;"
+alias find_old_dirs="find . -maxdepth 1 -mtime +14 -type d"
+alias delete_old_dirs="find . -maxdepth 1 -mtime +14 -type d | xargs rm -f -r;"
+alias clean_old_dirs="find . -maxdepth 1 -mtime +14 -type d | xargs rm -f -r;"
+
+alias find_old_dirs_recursive="find . -mtime +14 -type d"
+alias delete_old_dirs_recursive="find . -mtime +14 -type d | xargs rm -f -r;"
+alias clean_old_dirs_recursive="find . -mtime +14 -type d | xargs rm -f -r;"
 
 alias find_git_dirs="find . -type d -name '.git' -print"
 alias remove_git_dirs="find . -type d -name '.git' | xargs rm -f -r;"
@@ -147,6 +151,8 @@ alias dot-turd-rm="find . -type f \( -name '._*' -o -name '.DS_Store' -o -name '
 
 alias dot-file-show="find . -type f -name '.*' -print"
 alias dot-file-rm="find . -type f -name '.*' -print -delete"
+
+alias convertpdf2imagepdf="convert-pdf-to-image-pdf.py"
 
 ## DNS alias wrappers around functions
 alias dnsresetcache="reset_local_dns"
@@ -167,6 +173,7 @@ alias sshesx11='ssh root@esx11.dettonville.int'
 alias sshosbuild="ssh osbuild@10.10.100.10"
 
 alias sshmedia='ssh administrator@media.johnson.int'
+alias sshmedia2='ssh administrator@media02.johnson.int'
 alias sshplex='ssh administrator@plex.johnson.int'
 alias sshplex2='ssh administrator@plex2.johnson.int'
 alias sshopenshift='ssh administrator@openshift.johnson.int'

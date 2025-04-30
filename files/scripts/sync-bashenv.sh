@@ -15,6 +15,7 @@ PROJECT_DIR=$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)
 SCRIPT_BASE_DIR="${PROJECT_DIR}/files/scripts"
 
 BASHENV_DIR="${SCRIPT_BASE_DIR}/bashenv"
+LOCAL_BIN_DIR="${HOME}/bin"
 
 PRIVATE_DIR="${PROJECT_DIR}/files/private"
 PRIVATE_ENV_DIR="${PRIVATE_DIR}/env"
@@ -30,6 +31,7 @@ echo "==> SCRIPT_DIR=${SCRIPT_DIR}"
 echo "==> SCRIPT_BASE_DIR=${SCRIPT_BASE_DIR}"
 echo "==> BASHENV_DIR=${BASHENV_DIR}"
 echo "==> HOME=${HOME}"
+echo "==> LOCAL_BIN_DIR=${LOCAL_BIN_DIR}"
 echo "==> PROJECT_DIR=${PROJECT_DIR}"
 echo "==> VAULT_DIR=${VAULT_DIR}"
 
@@ -65,22 +67,24 @@ echo "==> rsync ${RSYNC_OPTIONS_HOME[@]} ${BASHENV_DIR}/ ${HOME}/"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${BASHENV_DIR}/" "${HOME}/"
 
 echo "==> rsync env scripts"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/git/"*.sh "${HOME}/bin/"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/pfsense/"*.py "${HOME}/bin/"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/ansible/"*.sh "${HOME}/bin/"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/utils/"*.sh "${HOME}/bin/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/git/"*.sh "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/pfsense/"*.py "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/python/"*.py "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/ansible/"*.sh "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/utils/"*.sh "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/media/"*.sh "${LOCAL_BIN_DIR}/"
 if [[ -d "${SCRIPT_BASE_DIR}/certs" ]]; then
-  rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/certs/"*.sh "${HOME}/bin/"
+  rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/certs/"*.sh "${LOCAL_BIN_DIR}/"
 fi
-chmod +x "${HOME}/bin/"*.sh || true
-chmod +x "${HOME}/bin/"*.py || true
+chmod +x "${LOCAL_BIN_DIR}/"*.sh || true
+chmod +x "${LOCAL_BIN_DIR}/"*.py || true
 
 #chmod +x ${PRIVATE_ENV_DIR}/scripts/*.sh
 #chmod +x ${PRIVATE_ENV_DIR}/git/*.sh
 
 if [[ -d "${PRIVATE_ENV_DIR}/scripts" ]]; then
   echo "==> rsync private env scripts"
-  rsync "${RSYNC_OPTIONS_HOME[@]}" "${PRIVATE_ENV_DIR}/scripts/"*.sh "${HOME}/bin/"
+  rsync "${RSYNC_OPTIONS_HOME[@]}" "${PRIVATE_ENV_DIR}/scripts/"*.sh "${LOCAL_BIN_DIR}/"
 fi
 if [[ -d "${PRIVATE_ENV_DIR}/.config" ]]; then
   echo "==> rsync private env configs"
@@ -88,7 +92,7 @@ if [[ -d "${PRIVATE_ENV_DIR}/.config" ]]; then
 fi
 if [[ -d "${PRIVATE_ENV_DIR}/git" ]]; then
   echo "==> rsync private env git configs"
-  rsync "${RSYNC_OPTIONS_HOME[@]}" "${PRIVATE_ENV_DIR}/git/"*.sh "${HOME}/bin/"
+  rsync "${RSYNC_OPTIONS_HOME[@]}" "${PRIVATE_ENV_DIR}/git/"*.sh "${LOCAL_BIN_DIR}/"
 fi
 
 if [[ -e "${VAULT_BASHENV_DIR}/.bash_secrets" ]]; then
@@ -100,4 +104,3 @@ fi
 if [[ -e "${HOME}/.vault_pass" ]]; then
   chmod 600 "${HOME}/.vault_pass"
 fi
-

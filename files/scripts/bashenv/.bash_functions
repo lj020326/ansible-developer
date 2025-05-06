@@ -704,6 +704,12 @@ function dockerbash() {
   docker run -it --entrypoint /bin/bash "${CONTAINER_IMAGE_ID}"
 }
 
+unalias swarm-status 1>/dev/null 2>&1
+unset -f swarm-status || true
+function swarm-status() {
+  echo "STARTED  = $(docker service ls | grep -c '1/1')" && echo "STARTING = $(docker service ls | grep -c '0/1')"
+}
+
 ## ref: https://stackoverflow.com/questions/26423515/how-to-automatically-update-your-docker-containers-if-base-images-are-updated
 ##
 unalias docker_sync_image 1>/dev/null 2>&1

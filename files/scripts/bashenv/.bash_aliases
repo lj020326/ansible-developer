@@ -216,7 +216,7 @@ alias sshresetkeys="ssh-keygen -R ${TARGET_HOST} && ssh-keyscan -H ${TARGET_HOST
 
 alias create-crypt-passwd="openssl passwd -1 "
 
-alias swarmstatus="echo \"STARTED  = $(docker service ls | grep -c \"1/1\")\" && echo \"STARTING = $(docker service ls | grep -c \"0/1\")\""
+alias swarmstatus="swarm-status"
 
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'

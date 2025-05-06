@@ -89,6 +89,9 @@ function main() {
     setup_pyenv_linux
   fi
   if [[ -n "${INSTALL_ON_MACOS-}" ]]; then
+    ## ref: https://github.com/pyenv/pyenv-installer/issues/50#issuecomment-275295469
+    brew update
+    brew upgrade
     ## ref: https://github.com/pyenv/pyenv/issues/2143
     brew install gcc make
     brew install pyenv

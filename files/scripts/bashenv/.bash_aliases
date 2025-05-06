@@ -48,11 +48,14 @@ alias cdrepos='cd ~/repos'
 alias cddocs='cd ~/docs'
 alias cdtechdocs='cd ~/repos/docs/docs-tech/infrastructure'
 
-alias cddocker='cd ~/repos/docker'
-alias cdjenkins='cd ~/repos/jenkins'
-alias cdnode='cd ~/repos/nodejs'
-alias cdpython='cd ~/repos/python'
-alias cdansible='cd ~/repos/ansible'
+alias cddocker='cd ~/docker'
+
+alias cddockerrepo='cd ~/repos/docker'
+alias cdjenkinsrepo='cd ~/repos/jenkins'
+alias cdnoderepo='cd ~/repos/nodejs'
+alias cdpythonrepo='cd ~/repos/python'
+alias cdansiblerepo='cd ~/repos/ansible'
+
 alias cddc="cd ${ANSIBLE_DATACENTER_REPO}"
 alias cddev="cd ${ANSIBLE_DEVELOPER_REPO}"
 alias cdkube='cd ~/repos/ansible/ansible-kubespray'
@@ -173,6 +176,7 @@ alias sshesx11='ssh root@esx11.dettonville.int'
 alias sshosbuild="ssh osbuild@10.10.100.10"
 
 alias sshmedia='ssh administrator@media.johnson.int'
+alias sshmedia1='ssh administrator@media01.johnson.int'
 alias sshmedia2='ssh administrator@media02.johnson.int'
 alias sshplex='ssh administrator@plex.johnson.int'
 alias sshplex2='ssh administrator@plex2.johnson.int'
@@ -211,6 +215,8 @@ alias sshclearhostkey='ssh-keygen -R'
 alias sshresetkeys="ssh-keygen -R ${TARGET_HOST} && ssh-keyscan -H ${TARGET_HOST}"
 
 alias create-crypt-passwd="openssl passwd -1 "
+
+alias swarmstatus="echo \"STARTED  = $(docker service ls | grep -c \"1/1\")\" && echo \"STARTING = $(docker service ls | grep -c \"0/1\")\""
 
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'

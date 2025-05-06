@@ -1,21 +1,10 @@
 #!/usr/bin/env bash
 
-BACKUP_SCRIPT=/opt/scripts/rsync-incremental-backup-local
+VERSION="2025.5.5"
 
-BACKUP_LABEL="daily"
-SOURCE_DIR="/srv/records"
-DEST_DIR="/srv/backups/records/${BACKUP_LABEL}"
-#CONFIG_FILEPATH=${4:-"${HOME}/.backups.cfg"}
-CONFIG_FILEPATH=""
+MEDIA_DIR_DEFAULT="~/data/media/photos/"
 
-## These defaults may be overridden by the file sourced from CONFIG_FILEPATH
-EMAIL_FROM="backups@example.int"
-EMAIL_TO="admin@example.int"
-LOG_DIR="/var/log/backups"
-
-MOUNT_NFS_SHARES=1
-
-BACKUP_LABEL_MSG=${BACKUP_LABEL^^}
+DRYRUN_MODE=0
 
 #### LOGGING RELATED
 LOG_ERROR=0
@@ -135,43 +124,58 @@ function setLogLevel() {
 
 }
 
+function arrange_photos_by_month() {
+  local MEDIA_DIR="${1}"
+
+  ######
+  ## Sort a directory of pictures into monthwise subdirectories
+  ## reference: `rename --man`
+  ##
+  ## NOTE: requires version >= +2.0
+  ##       may not work on MAC since brew at this time only has v1.6
+  ######
+  local RENAME_CMD=()
+  RENAME_CMD+=("rename -p")
+  if [ $DRYRUN_MODE -eq 0 ]; then
+    RENAME_CMD+=("-n")
+  fi
+  RENAME_CMD+=("-MImage::EXIF '$_ = \"$1-$2/$_\" if Image::EXIF->new->file_name($_)->get_image_info->{\"Image Created\"} =~ /(\d\d\d\d):(\d\d)/' ${MEDIA_DIR}/**/*.jpeg")
+  ## or
+  #RENAME_CMD+=("-MImage::ExifTool=:Public '$_ = \"$1-$2/$_\" if ImageInfo($_)->{\"CreateDate\"} =~ /(\d\d\d\d):(\d\d)/' ${MEDIA_DIR}/*.jpeg")
+
+  logInfo "${RENAME_CMD[*]}"
+  if [ $DRYRUN_MODE -eq 0 ]; then
+    eval "${RENAME_CMD[*]}"
+  fi
+}
+
+
 function usage() {
-  echo "Usage: ${0} [options]"
+  echo "Usage: ${0} [options] [media_directory]"
   echo ""
   echo "  Options:"
   echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
-  echo "       -c CONFIG_FILEPATH : default empty and not loaded (e.g. 'backups.cfg')"
-  echo "       -f EMAIL_FROM : default 'backups@example.int'"
-  echo "       -t EMAIL_TO : default 'admin@example.int'"
-  echo "       -b BACKUP_LABEL : default 'daily'"
-  echo "       -s SOURCE_DIR : default '/srv/data1/data/Records'"
-  echo "       -d DEST_DIR : default '/srv/backups/records/daily'"
-  echo "       -l LOG_DIR : default '/var/log/backups'"
   echo "       -v : show script version"
+  echo "       -d : dry run - show expected results but do not apply"
   echo "       -h : help"
-  echo ""
   echo ""
   echo "  Examples:"
 	echo "       ${0} "
-	echo "       ${0} -b daily -s /data/lee -d /srv/backups/lee/daily"
-	echo "       ${0} -L DEBUG -b monthly -s /data/lee -d /srv/backups/lee/monthly"
+	echo "       ${0} -L DEBUG"
   echo "       ${0} -v"
+	echo "       ${0} ~/data/media/photos/2020/2020-selfies/"
+	echo "       ${0} -L DEBUG ~/data/media/photos/2020/2020-selfies/"
+	echo "       ${0} -d 2012/"
 	[ -z "$1" ] || exit "$1"
 }
 
 function main() {
 
-  while getopts "L:c:f:t:b:s:d:l:vh" opt; do
+  while getopts "L:vdh" opt; do
       case "${opt}" in
           L) setLogLevel "${OPTARG}" ;;
           v) echo "${VERSION}" && exit ;;
-          c) CONFIG_FILEPATH="${OPTARG}" ;;
-          f) EMAIL_FROM="${OPTARG}" ;;
-          t) EMAIL_TO="${OPTARG}" ;;
-          b) BACKUP_LABEL="${OPTARG}" ;;
-          s) SOURCE_DIR="${OPTARG}" ;;
-          d) DEST_DIR="${OPTARG}" ;;
-          l) LOG_DIR="${OPTARG}" ;;
+          d) DRYRUN_MODE=1 ;;
           h) usage 1 ;;
           \?) usage 2 ;;
           *) usage ;;
@@ -179,67 +183,18 @@ function main() {
   done
   shift $((OPTIND-1))
 
-  if [ $# -gt 0 ]; then
-      logWarn "Additional unrecognized parameters will be ignored: [${@}]"
-  fi
+  MEDIA_DIR=${1:-"${MEDIA_DIR_DEFAULT}"}
+  logInfo "MEDIA_DIR => ${MEDIA_DIR}"
 
-  if [ -n "${CONFIG_FILEPATH}" ]; then
-    if [ ! -e $CONFIG_FILEPATH ]; then
-#      logWarn "Config file ${CONFIG_FILEPATH} not found, skipping!"
-      abort "Config file ${CONFIG_FILEPATH} not found, quitting now!"
-    else
-      logInfo "Reading configs from ${CONFIG_FILEPATH} ...."
-      source ${CONFIG_FILEPATH}
-    fi
-  fi
+  checkRequiredCommands rename
 
-  LOG_FILE=${LOG_DIR}/run-${BACKUP_LABEL}-backup.log
+  for FILE_MIMETYPE in "${!MIMETYPE_TO_EXTENSION[@]}"; do
+    # Get the value associated with the current key
+    FILE_EXTENSION="${MIMETYPE_TO_EXTENSION[$FILE_MIMETYPE]}"
+    arrange_photos_by_month "${MEDIA_DIR}" "${FILE_EXTENSION}"
+  done
 
-  logDebug "BACKUP_LABEL=${BACKUP_LABEL}"
-  logDebug "SOURCE_DIR=${SOURCE_DIR}"
-  logDebug "DEST_DIR=${DEST_DIR}"
-  logDebug "CONFIG_FILEPATH=${CONFIG_FILEPATH}"
-  logDebug "EMAIL_FROM=${EMAIL_FROM}"
-  logDebug "EMAIL_TO=${EMAIL_TO}"
-  logDebug "LOG_DIR=${LOG_DIR}"
-  logDebug "LOG_FILE=${LOG_FILE}"
-
-  logInfo "make sure NFS backup share is mounted"
-  mount -a || { # catch
-    logError "*** Failed to mount NFS backup share, quitting!"
-    exit 1
-  }
-
-  logInfo "truncating log file ${LOG_FILE}"
-  mkdir -p "${LOG_DIR}"
-  touch "${LOG_FILE}"
-  cat /dev/null > "${LOG_FILE}"
-
-  # Run the backup
-  BACKUP_SCRIPT_COMMAND="${BACKUP_SCRIPT} ${SOURCE_DIR} ${DEST_DIR} 2>&1 | tee ${LOG_FILE}"
-  logInfo "${BACKUP_SCRIPT_COMMAND}"
-  #${BACKUP_SCRIPT} ${BACKUP_LABEL} ${SOURCE_DIR} ${DEST_DIR} 2>&1 | tee -a ${LOG_FILE}
-  eval "${BACKUP_SCRIPT_COMMAND}"
-
-  BACKUP_RETURN_CODE=${?}
-
-  BACKUP_STATUS_MSG=""
-
-  # Check backup job success
-  if [ "${BACKUP_RETURN_CODE}" -eq "0" ]
-  then
-    logInfo "[$(date -Is)] Backup completed successfully\n"
-    # Clear unneeded partials and lock file
-    BACKUP_STATUS_MSG=SUCCESS
-  else
-    logInfo "[$(date -Is)] Backup failed, try again later\n"
-    BACKUP_STATUS_MSG=FAILED
-  fi
-
-  cat "${LOG_FILE}" | mail -s "[$BACKUP_STATUS_MSG] ${BACKUP_LABEL_MSG} rsync backup : ${SOURCE_DIR}->${DEST_DIR}" -r "${EMAIL_FROM}" "${EMAIL_TO}"
-
-  exit ${BACKUP_RETURN_CODE}
-
+  logInfo "Finished repair of media file extensions"
 }
 
 main "$@"

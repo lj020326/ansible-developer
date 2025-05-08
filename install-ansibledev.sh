@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="2024.3.1"
+VERSION="2025.5.8"
 
 INSTALL_BASEDIR="${HOME}/repos/ansible"
 INSTALL_REPOSITORY="${INSTALL_BASEDIR}/ansible-developer"
@@ -24,6 +24,8 @@ REQUIRED_GIT_VERSION=1.8.3
 REQUIRED_VENV_PYTHON_VERSION="3.12.9"
 
 REQUIRED_PYTHON_LIBS="ansible certifi"
+
+SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 # We don't need return codes for "$(command)", only stdout is needed.
 # Allow `[[ -n "$(command)" ]]`, `func "$(command)"`, pipes, etc.
@@ -226,26 +228,18 @@ function setup_python_env() {
 #    bash -x "${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh" "${REQUIRED_VENV_PYTHON_VERSION}"
     execute "bash" "${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh" "${REQUIRED_VENV_PYTHON_VERSION}"
 
-    if [ -d "${HOME}/.pyenv/bin" ]; then
-      PYENV_ROOT="${HOME}/.pyenv"
-      PYTHON_VENV_DIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}"
-      PYTHON_VENV_BINDIR="${PYTHON_VENV_DIR}/bin"
-      PYTHON_BIN="${PYTHON_VENV_BINDIR}/python"
-    elif [ -d "${HOME}/.pyenv/pyenv-win/bin" ]; then
-      PYENV_ROOT="${HOME}/.pyenv/pyenv-win"
-      PYTHON_VENV_DIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}"
-      PYTHON_VENV_BINDIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}/Scripts"
-      PYTHON_BIN="${PYTHON_VENV_DIR}/python"
-    fi
-#    export PYENV_ROOT="${HOME}/.pyenv"
-
-    if [ -z "${PYENV_ROOT}" ]; then
+  	if ! command -v pyenv &> /dev/null; then
+#    if [[ -n "$(env PATH=${SYSTEM_PATH} command -v pyenv)" ]]; then
       fail "pyenv not found"
     fi
-    PYENV_BIN_DIR="${PYENV_ROOT}/bin"
-    export PATH="${PYENV_BIN_DIR}:${PATH}"
 
-    local PIP_BIN="${PYTHON_VENV_BINDIR}/pip"
+    export PATH="${HOME}/.pyenv/bin:${PATH}"
+    export PYENV_ROOT="${HOME}/.pyenv"
+    local PYENV_BIN="$(which pyenv)"
+
+    local PYTHON_VENV_BINDIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}/bin"
+    local PYTHON_BIN="${PYTHON_VENV_BINDIR}/python3"
+    local PIP_BIN="${PYTHON_VENV_BINDIR}/pip3"
     local ANSIBLE_BIN="${PYTHON_VENV_BINDIR}/ansible"
 
     ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
@@ -273,7 +267,7 @@ function setup_cacerts() {
 
   ohai "Setup CA certs..."
   (
-    eval "${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
+    eval "sudo ${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
   ) || exit 1
 
   echo

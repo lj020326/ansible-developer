@@ -50,13 +50,11 @@ SSH_KEY_GITHUB=~/.ssh/id_rsa
 #export DOCKER_BUILDKIT=1
 export DOCKER_BUILDKIT=0
 
-if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
-  ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
-  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
-fi
-
 if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     echo "${log_prefix_bashenv} setting env for MSYS/MINGW platform"
+
+    ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
+    export JAVA_HOME=$(/usr/libexec/java_home)
 
     export GIT_SSH=/usr/bin/ssh
 
@@ -178,6 +176,9 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
 elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     echo "${log_prefix_bashenv} setting path for DARWIN env"
 
+    ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
+    export JAVA_HOME=$(/usr/libexec/java_home)
+
     ## ref: https://apple.stackexchange.com/questions/371997/suppressing-the-default-interactive-shell-is-now-zsh-message-in-macos-catalina
     export BASH_SILENCE_DEPRECATION_WARNING=1
     export EDITOR=/usr/local/bin/emacs
@@ -250,9 +251,9 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     [[ -f "${HOME}/.bash_path" ]] && mv "${HOME}/.bash_path" "${HOME}/.bash_path.orig"
 
     # Build PATH variable script in "${HOME}/.bash_path"
-    for i in /usr/local/Cellar/*/*/bin; do
-      echo 'export PATH="'$i':$PATH"' >> "${HOME}/.bash_path"
-    done
+#    for i in /usr/local/Cellar/*/*/bin; do
+#      echo 'export PATH="'$i':$PATH"' >> "${HOME}/.bash_path"
+#    done
     for i in /usr/local/Cellar/*/*/libexec/gnubin; do
       echo 'export PATH="'$i':$PATH"' >> "${HOME}/.bash_path"
     done
@@ -270,6 +271,9 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
 
 else
     echo "${log_prefix_bashenv} setting environment vars for LINUX env"
+
+    ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
+    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
 
     if [[ $EUID -eq 0 ]]; then
         #export KUBECONFIG=/opt/openshift/openshift.int.config/master/admin.kubeconfig
@@ -293,6 +297,11 @@ else
     # setenv-python 3
 fi
 
+if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
+  ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
+  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+fi
+
 ## using rvm
 ## ref: https://nrogap.medium.com/install-rvm-in-macos-step-by-step-d3b3c236953b
 if [ -d "${HOME}/.rvm/scripts/rvm" ]; then
@@ -302,13 +311,18 @@ if [ -d "${HOME}/.rvm/scripts/rvm" ]; then
     source "${RVM_SCRIPTS_DIR}/rvm"
 fi
 
+unset PYENV_BIN_DIR
 if [ -d "${HOME}/.pyenv/bin" ]; then
-  PYENV_ROOT="${HOME}/.pyenv"
+  export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 elif [ -d "${HOME}/.pyenv/pyenv-win/bin" ]; then
-  PYENV_ROOT="${HOME}/.pyenv/pyenv-win"
+  export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
+#elif [ -d "${HOME}/.pyenv/shims" ]; then
+#  export PYENV_BIN_DIR="${HOME}/.pyenv/shims"
+#  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 fi
-if [ -n "${PYENV_ROOT}" ]; then
-  PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+if [ -n "${PYENV_BIN_DIR}" ]; then
   echo "${log_prefix_bashenv} adding ${PYENV_BIN_DIR} into PATH"
   export PATH="${PYENV_BIN_DIR}:$PATH"
 fi
@@ -317,22 +331,23 @@ fi
 ## ref: https://opensource.com/article/19/5/python-3-default-mac
 ## https://realpython.com/intro-to-pyenv/
 if command -v pyenv 1>/dev/null 2>&1; then
-    echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
-    export PATH="$(pyenv root)/shims:$PATH"
+  export PYENV_ROOT="$(pyenv root)"
+  echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
+  export PATH="$(pyenv root)/shims:$PATH"
 
-    ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
-    eval "$(pyenv init -)"
-    if command -v pyenv-virtualenv-init 1>/dev/null 2>&1; then
-      ## https://stackoverflow.com/questions/62532807/pyenv-no-such-command-virtualenv
-      ## brew install pyenv-virtualenv
-      eval "$(pyenv virtualenv-init -)";
-    fi
+  #    ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
+  #    eval "$(pyenv init -)"
+  #    if command -v pyenv-virtualenv-init 1>/dev/null 2>&1; then
+  #      ## https://stackoverflow.com/questions/62532807/pyenv-no-such-command-virtualenv
+  #      ## brew install pyenv-virtualenv
+  #      eval "$(pyenv virtualenv-init -)";
+  #    fi
 
-    ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-    CERT_PATH=$(python -m certifi)
-    export SSL_CERT_FILE=${CERT_PATH}
-    export SSL_CERT_DIR=$(dirname "${CERT_PATH}")
-    export REQUESTS_CA_BUNDLE=${CERT_PATH}
+  ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
+  CERT_PATH=$(python -m certifi)
+  export SSL_CERT_FILE=${CERT_PATH}
+  export SSL_CERT_DIR=$(dirname "${CERT_PATH}")
+  export REQUESTS_CA_BUNDLE=${CERT_PATH}
 fi
 
 if [ -d "${HOME}/bin" ]; then

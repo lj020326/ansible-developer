@@ -87,21 +87,23 @@ function main() {
   ## ref: https://stackoverflow.com/questions/27022373/python3-importerror-no-module-named-ctypes-when-using-value-from-module-mul#48045929
   if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
     setup_pyenv_linux
+    ## update pyenv to get most recent python dist info
+    pyenv update
   fi
   if [[ -n "${INSTALL_ON_MACOS-}" ]]; then
+    ## ref: https://webinstall.dev/pyenv/
+    xcode-select --install
     ## ref: https://github.com/pyenv/pyenv-installer/issues/50#issuecomment-275295469
     brew update
-    brew upgrade
-    ## ref: https://github.com/pyenv/pyenv/issues/2143
+    brew upgrade    ## ref: https://github.com/pyenv/pyenv/issues/2143
     brew install gcc make
     brew install pyenv
   fi
   if [[ -n "${INSTALL_ON_MSYS-}" ]]; then
     setup_pyenv_msys2
+    ## update pyenv to get most recent python dist info
+    pyenv update
   fi
-
-  ## update pyenv to get most recent python dist info
-  pyenv update
 
   PYENV_VERSION_EXISTS=$(pyenv version | grep -c "${PYTHON_VERSION}")
 
@@ -122,18 +124,23 @@ function main() {
 #    curl -Lo "$HOME/.pyenv/cache/Python-${PYTHON_VERSION}.tar.xz" \
 #        "https://registry.npmmirror.com/-/binary/python/$PYTHON_VERSION/Python-${PYTHON_VERSION}.tar.xz"
 #    #    "https://npm.taobao.org/mirrors/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz"
-    env CPPFLAGS="-I/usr/include/openssl" LDFLAGS="-L/usr/lib64/openssl -lssl -lcrypto" CFLAGS=-fPIC pyenv install "${PYTHON_VERSION}"
+    env CPPFLAGS="-I/usr/include/openssl" LDFLAGS="-L/usr/lib64/openssl -lssl -lcrypto" CFLAGS=-fPIC pyenv install -s "${PYTHON_VERSION}"
   elif [[ -n "${INSTALL_ON_MACOS-}" ]]; then
     ## ref: https://stackoverflow.com/questions/41430706/pyvenv-returns-non-zero-exit-status-1-during-the-installation-of-pip-stage#41430707
     ## ref: https://github.com/pyenv/pyenv/issues/2143#issuecomment-1069223994
     ## ref: https://stackoverflow.com/a/54142474/2791368
 #    env CC=/usr/local/bin/gcc-13 pyenv install "${PYTHON_VERSION}"
-    CFLAGS="-I$(brew --prefix readline)/include -I$(brew --prefix openssl)/include -I$(xcrun --show-sdk-path)/usr/include" \
+    ## NOTE: make sure to remove the gnu gcc env from the PATH by setting it to system PATH
+    ##       GNU Coreutils and Binutils on PATH are also known to break build in MacOS
+    ## ref: https://github.com/pyenv/pyenv/issues/2862#issuecomment-1849198741
+    ## ref: https://github.com/pyenv/pyenv/wiki/Common-build-problems#keg-only-homebrew-packages-are-forcibly-linked--added-to-path
+    env PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin \
+      CFLAGS="-I$(brew --prefix readline)/include -I$(brew --prefix openssl)/include -I$(xcrun --show-sdk-path)/usr/include" \
       LDFLAGS="-L$(brew --prefix readline)/lib -L$(brew --prefix openssl)/lib" \
       PYTHON_CONFIGURE_OPTS=--enable-unicode=ucs2 \
-      pyenv install "${PYTHON_VERSION}"
+      pyenv install -s "${PYTHON_VERSION}"
   else
-    pyenv install "${PYTHON_VERSION}"
+    pyenv install -s "${PYTHON_VERSION}"
   fi
 
   mkdir -p $HOME/.config/pip

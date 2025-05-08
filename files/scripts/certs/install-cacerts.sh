@@ -11,6 +11,8 @@ VERSION="2025.3.2"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "SCRIPT_DIR=[${SCRIPT_DIR}]"
 
+echo "** JAVA_HOME=[${JAVA_HOME}]"
+
 SCRIPT_NAME=$(basename "$0")
 SCRIPT_NAME="${SCRIPT_NAME%.*}"
 logFile="${SCRIPT_NAME}.log"
@@ -200,6 +202,9 @@ function get_java_keystore() {
       JAVA_HOME=$(/usr/libexec/java_home)
     elif [[ "$UNAME" == "cygwin" || "$UNAME" == "msys" ]]; then
       JAVA_HOME=$(/usr/libexec/java_home)
+    else
+      ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
+      JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
     fi
   fi
 
@@ -570,14 +575,6 @@ function setup_python_cacerts() {
 
 function init_cacert_vars() {
   local LOG_PREFIX="init_cacert_vars():"
-
-  if [[ -z "$(isInstalled java)" ]]; then
-    if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
-      ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
-      JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
-    fi
-    logInfo "JAVA_HOME=${JAVA_HOME}"
-  fi
 
   ## ref: https://askubuntu.com/questions/459402/how-to-know-if-the-running-platform-is-ubuntu-or-centos-with-help-of-a-bash-scri
   case "${UNAME}" in

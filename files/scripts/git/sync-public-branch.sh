@@ -110,6 +110,7 @@ tty_mkbold() { tty_escape "1;$1"; }
 tty_underline="$(tty_escape "4;39")"
 tty_blue="$(tty_mkbold 34)"
 tty_red="$(tty_mkbold 31)"
+tty_orange="$(tty_mkbold 33)"
 tty_bold="$(tty_mkbold 39)"
 tty_reset="$(tty_escape 0)"
 
@@ -186,7 +187,9 @@ function abort() {
 }
 
 function warn() {
-  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  logWarn "$@"
+#  logWarn "$(chomp "$1")"
+#  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
 }
 
 #function abort() {
@@ -247,7 +250,10 @@ function logMessage() {
   if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
     printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
-  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_WARN ]; then
+  elif [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_WARN ]; then
+    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_ERROR ]; then
     printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   else
@@ -267,6 +273,14 @@ function setLogLevel() {
 
 }
 
+function execute() {
+  logInfo "${*}"
+  if ! "$@"
+  then
+    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
+  fi
+}
+
 function isInstalled() {
   command -v "${1}" >/dev/null 2>&1 || return 1
 }
@@ -275,19 +289,11 @@ function checkRequiredCommands() {
   missingCommands=""
   for currentCommand in "$@"
   do
-      isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
+    isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
   done
 
-  if [[ ! -z "${missingCommands}" ]]; then
-      fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
-  fi
-}
-
-function execute() {
-  echo "$@"
-  if ! "$@"
-  then
-    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
+  if [[ -n "${missingCommands}" ]]; then
+    fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
   fi
 }
 

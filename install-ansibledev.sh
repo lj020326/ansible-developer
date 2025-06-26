@@ -67,6 +67,7 @@ tty_mkbold() { tty_escape "1;$1"; }
 tty_underline="$(tty_escape "4;39")"
 tty_blue="$(tty_mkbold 34)"
 tty_red="$(tty_mkbold 31)"
+tty_orange="$(tty_mkbold 33)"
 tty_bold="$(tty_mkbold 39)"
 tty_reset="$(tty_escape 0)"
 
@@ -143,7 +144,8 @@ function abort() {
 }
 
 function warn() {
-  logWarn "$(chomp "$1")"
+  logWarn "$@"
+#  logWarn "$(chomp "$1")"
 #  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
 }
 
@@ -203,8 +205,12 @@ function logMessage() {
   local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
 #  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
   if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
-    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
-  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_WARN ]; then
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
+  elif [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_WARN ]; then
+    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_ERROR ]; then
     printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   else
@@ -224,8 +230,35 @@ function setLogLevel() {
 
 }
 
+function execute() {
+  logInfo "${*}"
+  if ! "$@"
+  then
+    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
+  fi
+}
+
+function handle_cmd_return_code() {
+  local RUN_COMMAND=${*}
+
+  logInfo "${RUN_COMMAND}"
+  COMMAND_RESULT=$(eval "${RUN_COMMAND}")
+#  COMMAND_RESULT=$(eval "${RUN_COMMAND} > /dev/null 2>&1")
+  local RETURN_STATUS=$?
+
+  if [[ $RETURN_STATUS -eq 0 ]]; then
+    logDebug "${COMMAND_RESULT}"
+    logDebug "SUCCESS!"
+  else
+    logError "ERROR (${RETURN_STATUS})"
+    echo "${COMMAND_RESULT}"
+    exit 1
+  fi
+
+}
+
 function isInstalled() {
-    command -v "${1}" >/dev/null 2>&1 || return 1
+  command -v "${1}" >/dev/null 2>&1 || return 1
 }
 
 function checkRequiredCommands() {
@@ -235,16 +268,8 @@ function checkRequiredCommands() {
     isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
   done
 
-  if [[ ! -z "${missingCommands}" ]]; then
+  if [[ -n "${missingCommands}" ]]; then
     fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
-  fi
-}
-
-function execute() {
-  logInfo "${*}"
-  if ! "$@"
-  then
-    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
   fi
 }
 

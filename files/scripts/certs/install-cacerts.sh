@@ -6,11 +6,11 @@
 
 #set -x
 
-VERSION="2025.3.2"
+VERSION="2025.6.12"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo "SCRIPT_DIR=[${SCRIPT_DIR}]"
-SCRIPT_NAME=$(basename "$0")
+#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$0")"
+SCRIPT_NAME="$(basename "$0")"
 SCRIPT_NAME_PREFIX="${SCRIPT_NAME%.*}"
 
 echo "** JAVA_HOME=[${JAVA_HOME}]"
@@ -59,6 +59,21 @@ LOGLEVEL_TO_STR["${LOG_INFO}"]="INFO"
 LOGLEVEL_TO_STR["${LOG_TRACE}"]="TRACE"
 LOGLEVEL_TO_STR["${LOG_DEBUG}"]="DEBUG"
 
+# string formatters
+if [[ -t 1 ]]
+then
+  tty_escape() { printf "\033[%sm" "$1"; }
+else
+  tty_escape() { :; }
+fi
+tty_mkbold() { tty_escape "1;$1"; }
+tty_underline="$(tty_escape "4;39")"
+tty_blue="$(tty_mkbold 34)"
+tty_red="$(tty_mkbold 31)"
+tty_orange="$(tty_mkbold 33)"
+tty_bold="$(tty_mkbold 39)"
+tty_reset="$(tty_escape 0)"
+
 function reverse_array() {
   local -n ARRAY_SOURCE_REF=$1
   local -n REVERSED_ARRAY_REF=$2
@@ -82,32 +97,74 @@ function logError() {
   	logMessage "${LOG_ERROR}" "${1}"
   fi
 }
+
 function logWarn() {
   if [ $LOG_LEVEL -ge $LOG_WARN ]; then
   	logMessage "${LOG_WARN}" "${1}"
   fi
 }
+
 function logInfo() {
   if [ $LOG_LEVEL -ge $LOG_INFO ]; then
   	logMessage "${LOG_INFO}" "${1}"
   fi
 }
+
 function logTrace() {
   if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
   	logMessage "${LOG_TRACE}" "${1}"
   fi
 }
+
 function logDebug() {
   if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
   	logMessage "${LOG_DEBUG}" "${1}"
   fi
 }
+
+function shell_join() {
+  local arg
+  printf "%s" "$1"
+  shift
+  for arg in "$@"
+  do
+    printf " "
+    printf "%s" "${arg// /\ }"
+  done
+}
+
+function chomp() {
+  printf "%s" "${1/"$'\n'"/}"
+}
+
+function ohai() {
+  printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
+}
+
 function abort() {
   logError "$@"
   exit 1
 }
-function fail() {
+
+function warn() {
+  logWarn "$@"
+#  logWarn "$(chomp "$1")"
+#  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+}
+
+#function abort() {
+#  printf "%s\n" "$@" >&2
+#  exit 1
+#}
+
+function error() {
   logError "$@"
+#  printf "%s\n" "$@" >&2
+##  echo "$@" 1>&2;
+}
+
+function fail() {
+  error "$@"
   exit 1
 }
 
@@ -148,7 +205,20 @@ function logMessage() {
   PADDED_LOG_LEVEL=$(printf "%-${LOG_LEVEL_PADDING_LENGTH}s" "${LOG_LEVEL_STR}")
 
   local LOG_PREFIX="${CALLING_FUNCTION_STR}():"
-  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX} ${LOG_MESSAGE}"
+  local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
+#  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
+  if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
+  elif [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_WARN ]; then
+    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_ERROR ]; then
+    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  else
+    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
+  fi
 }
 
 function setLogLevel() {
@@ -163,8 +233,16 @@ function setLogLevel() {
 
 }
 
+function execute() {
+  logInfo "${*}"
+  if ! "$@"
+  then
+    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
+  fi
+}
+
 function handle_cmd_return_code() {
-  local RUN_COMMAND=$1
+  local RUN_COMMAND=${*}
 
   logInfo "${RUN_COMMAND}"
   COMMAND_RESULT=$(eval "${RUN_COMMAND}")
@@ -183,7 +261,7 @@ function handle_cmd_return_code() {
 }
 
 function isInstalled() {
-    command -v "${1}" >/dev/null 2>&1 || return 1
+  command -v "${1}" >/dev/null 2>&1 || return 1
 }
 
 function pip_install_certifi() {

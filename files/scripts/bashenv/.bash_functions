@@ -3,7 +3,7 @@ log_prefix_functions=".bash_functions"
 
 echo "${log_prefix_functions} configuring shell functions..."
 
-unalias ansible_debug_variable 1>/dev/null 2>&1
+unalias ansible_debug_variable 1>/dev/null 2>&1 || true
 unset -f ansible_debug_variable || true
 function ansible_debug_variable() {
   local ANSIBLE_INVENTORY_HOST=${1:-"control01"}
@@ -42,7 +42,8 @@ function ansible_debug_variable() {
 unset -f install-dev-env || true
 function install-dev-env() {
   echo "DEVENV_INSTALL_REMOTE_SCRIPT=${DEVENV_INSTALL_REMOTE_SCRIPT}"
-  bash -c "$(curl -fsSL "${DEVENV_INSTALL_REMOTE_SCRIPT}")"
+  curl -fsSL "${DEVENV_INSTALL_REMOTE_SCRIPT}" | bash -s -- "$@"
+#  bash -c "$(curl -fsSL "${DEVENV_INSTALL_REMOTE_SCRIPT}")"
 }
 
 ## ref: https://gist.github.com/vby/ef4d72e6ae51c64acbe7790ca7d89606#file-msys2-bashrc-sh
@@ -196,12 +197,12 @@ function reset_local_dns() {
     echo "${LOG_PREFIX} ${RESET_DNS_CACHE}"
     eval "${RESET_DNS_CACHE}"
 
-    echo "${LOG_PREFIX} Restart eaacloop"
-
-    ## ref: https://serverfault.com/questions/194832/how-to-start-stop-restart-launchd-services-from-the-command-line#194886
-    local RESTART_EAACLOOP="sudo launchctl kickstart -k system/net.eaacloop.wapptunneld"
-
-    echo "${LOG_PREFIX} ${RESTART_EAACLOOP}"
+#    echo "${LOG_PREFIX} Restart eaacloop"
+#
+#    ## ref: https://serverfault.com/questions/194832/how-to-start-stop-restart-launchd-services-from-the-command-line#194886
+#    local RESTART_EAACLOOP="sudo launchctl kickstart -k system/net.eaacloop.wapptunneld"
+#
+#    echo "${LOG_PREFIX} ${RESTART_EAACLOOP}"
     eval "${RESTART_EAACLOOP}"
   else
     echo "${LOG_PREFIX} function not implemented/defined for current system platform ${PLATFORM} ...yet"
@@ -237,7 +238,7 @@ function find-up () {
     echo "$path"
 }
 
-unalias search-repo-keywords 1>/dev/null 2>&1
+unalias search-repo-keywords 1>/dev/null 2>&1 || true
 unset -f search-repo-keywords || true
 function search-repo-keywords () {
   local LOG_PREFIX="searchrepokeywords():"
@@ -354,7 +355,7 @@ function cdnvm(){
 #alias gitsetupstream="git branch --set-upstream-to=origin/$(git symbolic-ref HEAD 2>/dev/null)"
 
 
-unalias gitresetpublicbranch 1>/dev/null 2>&1
+unalias gitresetpublicbranch 1>/dev/null 2>&1 || true
 unset -f gitresetpublicbranch || true
 function gitresetpublicbranch(){
   GIT_DEFAULT_BRANCH=main
@@ -415,7 +416,7 @@ function gitresetpublicbranch(){
 }
 
 
-unalias gitshowupstream 1>/dev/null 2>&1
+unalias gitshowupstream 1>/dev/null 2>&1 || true
 unset -f gitshowupstream || true
 function gitshowupstream(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -423,7 +424,7 @@ function gitshowupstream(){
   echo ${REMOTE_AND_BRANCH}
 }
 
-unalias gitsetupstream. 1>/dev/null 2>&1
+unalias gitsetupstream. 1>/dev/null 2>&1 || true
 unset -f gitsetupstream. || true
 function gitsetupstream.(){
   NEW_REMOTE={$1:"origin"}
@@ -434,7 +435,7 @@ function gitsetupstream.(){
   git branch --set-upstream-to=${NEW_REMOTE}/${LOCAL_BRANCH}
 }
 
-unalias gitpull 1>/dev/null 2>&1
+unalias gitpull 1>/dev/null 2>&1 || true
 unset -f gitpull || true
 function gitpull(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -446,7 +447,7 @@ function gitpull(){
 ## resolve issue "Fatal: Not possible to fast-forward, aborting"
 ## ref: https://stackoverflow.com/questions/13106179/fatal-not-possible-to-fast-forward-aborting
 #alias gitpullrebase="git pull origin <branch> --rebase"
-unalias gitpullrebase 1>/dev/null 2>&1
+unalias gitpullrebase 1>/dev/null 2>&1 || true
 unset -f gitpullrebase || true
 function gitpullrebase(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -455,7 +456,7 @@ function gitpullrebase(){
   git pull ${REMOTE} ${REMOTE_BRANCH} --rebase
 }
 
-unalias gitpush 1>/dev/null 2>&1
+unalias gitpush 1>/dev/null 2>&1 || true
 unset -f gitpush || true
 function gitpush(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -464,31 +465,31 @@ function gitpush(){
   git push ${REMOTE} ${REMOTE_BRANCH}
 }
 
-unalias gitpushwork 1>/dev/null 2>&1
+unalias gitpushwork 1>/dev/null 2>&1 || true
 unset -f gitpushwork || true
 function gitpushwork(){
   GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_WORK}" git push bitbucket $(git rev-parse --abbrev-ref HEAD)
 }
 
-unalias gitpullwork 1>/dev/null 2>&1
+unalias gitpullwork 1>/dev/null 2>&1 || true
 unset -f gitpullwork || true
 function gitpullwork(){
   GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_WORK}" git pull bitbucket $(git rev-parse --abbrev-ref HEAD)
 }
 
-unalias gitpushpublic 1>/dev/null 2>&1
+unalias gitpushpublic 1>/dev/null 2>&1 || true
 unset -f gitpushpublic || true
 function gitpushpublic(){
   GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_GITHUB}" git push github $(git rev-parse --abbrev-ref HEAD)
 }
 
-unalias gitpullpublic 1>/dev/null 2>&1
+unalias gitpullpublic 1>/dev/null 2>&1 || true
 unset -f gitpullpublic || true
 function gitpullpublic(){
   GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_GITHUB}" git pull github $(git rev-parse --abbrev-ref HEAD)
 }
 
-unalias gitbranchdelete 1>/dev/null 2>&1
+unalias gitbranchdelete 1>/dev/null 2>&1 || true
 unset -f gitbranchdelete || true
 function gitbranchdelete(){
   REPO_ORIGIN_URL="$(git config --get remote.origin.url)" && \
@@ -503,7 +504,7 @@ function gitbranchdelete(){
   git push -d "${REMOTE}" "${REMOTE_BRANCH}"
 }
 
-unalias gitbranchrecreate 1>/dev/null 2>&1
+unalias gitbranchrecreate 1>/dev/null 2>&1 || true
 unset -f gitbranchrecreate || true
 function gitbranchrecreate() {
   REPO_ORIGIN_URL="$(git config --get remote.origin.url)" && \
@@ -520,7 +521,7 @@ function gitbranchrecreate() {
   git push -u "${REMOTE}" "${LOCAL_BRANCH}"
 }
 
-unalias getbranchhist 1>/dev/null 2>&1
+unalias getbranchhist 1>/dev/null 2>&1 || true
 unset -f getbranchhist || true
 function getbranchhist(){
   ## How to get commit history for just one branch?
@@ -528,7 +529,7 @@ function getbranchhist(){
   git log $(git rev-parse --abbrev-ref HEAD)..
 }
 
-unalias getgitrequestid 1>/dev/null 2>&1
+unalias getgitrequestid 1>/dev/null 2>&1 || true
 unset -f getgitrequestid || true
 function getgitrequestid() {
   PROJECT_DIR="$(git rev-parse --show-toplevel)"
@@ -551,7 +552,7 @@ function getgitrequestid() {
 }
 
 ## https://stackoverflow.com/questions/35010953/how-to-automatically-generate-commit-message
-unalias getgitcomment 1>/dev/null 2>&1
+unalias getgitcomment 1>/dev/null 2>&1 || true
 unset -f getgitcomment || true
 function getgitcomment() {
   COMMENT_PREFIX=$(getgitrequestid)
@@ -566,7 +567,7 @@ function getgitcomment() {
   echo "${GIT_COMMENT}"
 }
 
-unalias gitcommitpush 1>/dev/null 2>&1
+unalias gitcommitpush 1>/dev/null 2>&1 || true
 unset -f gitcommitpush || true
 function gitcommitpush() {
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -581,7 +582,7 @@ function gitcommitpush() {
   git push ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH}
 }
 
-unalias gitremovecached 1>/dev/null 2>&1
+unalias gitremovecached 1>/dev/null 2>&1 || true
 unset -f gitremovecached || true
 function gitremovecached() {
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -595,7 +596,7 @@ function gitremovecached() {
   git push ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH}
 }
 
-unalias blastit 1>/dev/null 2>&1
+unalias blastit 1>/dev/null 2>&1 || true
 unset -f blastit || true
 function blastit() {
 
@@ -617,7 +618,7 @@ function blastit() {
 
 
 ## https://stackoverflow.com/questions/38892599/change-commit-message-for-specific-commit
-unalias change-commit-msg 1>/dev/null 2>&1
+unalias change-commit-msg 1>/dev/null 2>&1 || true
 unset -f change-commit-msg || true
 function change-commit-msg(){
 
@@ -639,7 +640,7 @@ function change-commit-msg(){
 
 ## https://stackoverflow.com/questions/24609146/stop-git-merge-from-opening-text-editor
 #git config --global alias.merge-no-edit '!env GIT_EDITOR=: git merge'
-unalias gitmergebranch 1>/dev/null 2>&1
+unalias gitmergebranch 1>/dev/null 2>&1 || true
 unset -f gitmergebranch || true
 function gitmergebranch(){
 
@@ -659,7 +660,7 @@ function gitmergebranch(){
   git merge-no-edit -X theirs ${MERGE_BRANCH}
 }
 
-unalias gitclonework2 1>/dev/null 2>&1
+unalias gitclonework2 1>/dev/null 2>&1 || true
 unset -f gitclonework2 || true
 function gitclonework2(){
   GIT_REPO="${1}" && \
@@ -671,14 +672,14 @@ function gitclonework2(){
   popd
 }
 
-unalias gitupdatesub 1>/dev/null 2>&1
+unalias gitupdatesub 1>/dev/null 2>&1 || true
 unset -f gitupdatesub || true
 function gitupdatesub(){
   git submodule deinit -f . && \
   git submodule update --init --recursive --remote
 }
 
-unalias gitreinitrepo 1>/dev/null 2>&1
+unalias gitreinitrepo 1>/dev/null 2>&1 || true
 unset -f gitreinitrepo || true
 function gitreinitrepo(){
   SAVE_DATE=$(date +%Y%m%d_%H%M) && \
@@ -696,7 +697,7 @@ function gitreinitrepo(){
   git push -u --force origin ${GIT_REMOTE_BRANCH}
 }
 
-unalias dockerbash 1>/dev/null 2>&1
+unalias dockerbash 1>/dev/null 2>&1 || true
 unset -f dockerbash || true
 function dockerbash() {
   CONTAINER_IMAGE_ID="${1}"
@@ -704,15 +705,25 @@ function dockerbash() {
   docker run -it --entrypoint /bin/bash "${CONTAINER_IMAGE_ID}"
 }
 
-unalias swarm-status 1>/dev/null 2>&1
-unset -f swarm-status || true
-function swarm-status() {
+unalias swarm_status 1>/dev/null 2>&1 || true
+unset -f swarm_status || true
+function swarm_status() {
   echo "STARTED  = $(docker service ls | grep -c '1/1')" && echo "STARTING = $(docker service ls | grep -c '0/1')"
+}
+
+unalias swarm_restart_service 1>/dev/null 2>&1 || true
+unset -f swarm_restart_service || true
+function swarm_restart_service() {
+  SERVICE_ID=${1:-docker_stack_keycloak}
+  echo "STOPPING SERVICE-ID ${SERVICE_ID}"
+  docker service scale "${SERVICE_ID}"=0
+  echo "STARTING SERVICE-ID ${SERVICE_ID}"
+  docker service scale "${SERVICE_ID}"=1
 }
 
 ## ref: https://stackoverflow.com/questions/26423515/how-to-automatically-update-your-docker-containers-if-base-images-are-updated
 ##
-unalias docker_sync_image 1>/dev/null 2>&1
+unalias docker_sync_image 1>/dev/null 2>&1 || true
 unset -f docker_sync_image || true
 function docker_sync_image() {
   BASE_IMAGE=${1:-registry}
@@ -742,7 +753,7 @@ function docker_sync_image() {
 
 ## source: https://fabianlee.org/2021/04/08/docker-determining-container-responsible-for-largest-overlay-directories/
 ##
-unalias get-largest-docker-image-sizes 1>/dev/null 2>&1
+unalias get-largest-docker-image-sizes 1>/dev/null 2>&1 || true
 unset -f get-largest-docker-image-sizes || true
 function get-largest-docker-image-sizes() {
 
@@ -769,7 +780,7 @@ function get-largest-docker-image-sizes() {
 
 }
 
-unalias explodeansibletest 1>/dev/null 2>&1
+unalias explodeansibletest 1>/dev/null 2>&1 || true
 unset -f explodeansibletest || true
 function explodeansibletest() {
   recent=$(find . -name AnsiballZ_\*.py | head -n1) && \
@@ -788,7 +799,7 @@ function explodeansibletest() {
 #
 #}
 
-unalias cagetaccountpwd 1>/dev/null 2>&1
+unalias cagetaccountpwd 1>/dev/null 2>&1 || true
 unset -f cagetaccountpwd || true
 function cagetaccountpwd() {
 
@@ -822,7 +833,7 @@ function cagetaccountpwd() {
 
 }
 
-unalias sshpacker 1>/dev/null 2>&1
+unalias sshpacker 1>/dev/null 2>&1 || true
 unset -f sshpacker || true
 function sshpacker() {
   SSH_TARGET=${1} && \
@@ -832,7 +843,7 @@ function sshpacker() {
   ssh -i "~/.ssh/${SSH_KEY}" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "${SSH_TARGET}"
 }
 
-unalias sshpackerwork 1>/dev/null 2>&1
+unalias sshpackerwork 1>/dev/null 2>&1 || true
 unset -f sshpackerwork || true
 function sshpackerwork() {
   SSH_TARGET=${1} && \

@@ -175,9 +175,14 @@ alias sshesx11='ssh root@esx11.dettonville.int'
 #alias sshpacker="ssh -i ~/.ssh/${SSH_KEY}"
 alias sshosbuild="ssh osbuild@10.10.100.10"
 
+alias sshgpu='ssh administrator@gpu.johnson.int'
+alias sshgpu1='ssh administrator@gpu01.johnson.int'
+alias sshgpu2='ssh administrator@gpu02.johnson.int'
+
 alias sshmedia='ssh administrator@media.johnson.int'
 alias sshmedia1='ssh administrator@media01.johnson.int'
 alias sshmedia2='ssh administrator@media02.johnson.int'
+
 alias sshplex='ssh administrator@plex.johnson.int'
 alias sshplex2='ssh administrator@plex2.johnson.int'
 alias sshopenshift='ssh administrator@openshift.johnson.int'
@@ -216,7 +221,13 @@ alias sshresetkeys="ssh-keygen -R ${TARGET_HOST} && ssh-keyscan -H ${TARGET_HOST
 
 alias create-crypt-passwd="openssl passwd -1 "
 
-alias swarmstatus="swarm-status"
+alias swarmstatus="swarm_status"
+alias swarmrestart="swarm_restart_service"
+## ref: https://stackoverflow.com/questions/44811886/restart-one-service-in-docker-swarm-stack/48776759
+alias swarmserviceupdate="docker service update --force "
+
+alias dockerserviceupdate="docker service update --force "
+alias dockerstackstat="docker stack ps --filter='desired-state=running' docker_stack"
 
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'
@@ -402,10 +413,10 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
 
   alias editvscodesettings="emacs ${VSCODE_SETTINGS_DIR}/settings.json"
 
-  alias java7='export JAVA_HOME=$JAVA_7_HOME'
   alias java8='export JAVA_HOME=$JAVA_8_HOME'
   alias java11='export JAVA_HOME=$JAVA_11_HOME'
-#  alias java13='export JAVA_HOME=$JAVA_13_HOME'
+  alias java17='export JAVA_HOME=$JAVA_17_HOME'
+  alias java24='export JAVA_HOME=$JAVA_24_HOME'
 
   ## ref: https://superuser.com/questions/1400250/how-to-query-macos-dns-resolver-from-terminal
   alias dnslookup='scutil -W -r '

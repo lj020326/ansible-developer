@@ -1,6 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-VERSION="2025.5.8"
+## ref: https://intoli.com/blog/exit-on-errors-in-bash-scripts/
+# exit when any command fails
+set -e
+
+VERSION="2025.6.12"
+
+#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$0")"
+SCRIPT_NAME="$(basename "$0")"
 
 INSTALL_BASEDIR="${HOME}/repos/ansible"
 INSTALL_REPOSITORY="${INSTALL_BASEDIR}/ansible-developer"
@@ -33,23 +41,81 @@ SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 #set -u
 
-function abort() {
-  printf "%s\n" "$@" >&2
-  exit 1
+
+#### LOGGING RELATED
+LOG_ERROR=0
+LOG_WARN=1
+LOG_INFO=2
+LOG_TRACE=3
+LOG_DEBUG=4
+
+declare -A LOGLEVEL_TO_STR
+LOGLEVEL_TO_STR["${LOG_ERROR}"]="ERROR"
+LOGLEVEL_TO_STR["${LOG_WARN}"]="WARN"
+LOGLEVEL_TO_STR["${LOG_INFO}"]="INFO"
+LOGLEVEL_TO_STR["${LOG_TRACE}"]="TRACE"
+LOGLEVEL_TO_STR["${LOG_DEBUG}"]="DEBUG"
+
+# string formatters
+if [[ -t 1 ]]
+then
+  tty_escape() { printf "\033[%sm" "$1"; }
+else
+  tty_escape() { :; }
+fi
+tty_mkbold() { tty_escape "1;$1"; }
+tty_underline="$(tty_escape "4;39")"
+tty_blue="$(tty_mkbold 34)"
+tty_red="$(tty_mkbold 31)"
+tty_bold="$(tty_mkbold 39)"
+tty_reset="$(tty_escape 0)"
+
+function reverse_array() {
+  local -n ARRAY_SOURCE_REF=$1
+  local -n REVERSED_ARRAY_REF=$2
+  # Iterate over the keys of the LOGLEVEL_TO_STR array
+  for KEY in "${!ARRAY_SOURCE_REF[@]}"; do
+    # Get the value associated with the current key
+    VALUE="${ARRAY_SOURCE_REF[$KEY]}"
+    # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
+    REVERSED_ARRAY_REF[$VALUE]="$KEY"
+  done
 }
 
-function usage() {
-  cat <<EOS
-Ansible Developer Environment Installer
-Usage: [NONINTERACTIVE=1] [CI=1] install.sh [options]
-    Options:
-    -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)
-    -r [GIT_REMOTE_URL] : use specified git remote url"
-    -h, --help       Display this message.
-    NONINTERACTIVE   Install without prompting for user input
-    CI               Install in CI mode (e.g. do not prompt for user input)
-EOS
-  exit "${1:-0}"
+declare -A LOGLEVELSTR_TO_LEVEL
+reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
+
+#LOG_LEVEL=${LOG_DEBUG}
+LOG_LEVEL=${LOG_INFO}
+
+function logError() {
+  if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
+  	logMessage "${LOG_ERROR}" "${1}"
+  fi
+}
+
+function logWarn() {
+  if [ $LOG_LEVEL -ge $LOG_WARN ]; then
+  	logMessage "${LOG_WARN}" "${1}"
+  fi
+}
+
+function logInfo() {
+  if [ $LOG_LEVEL -ge $LOG_INFO ]; then
+  	logMessage "${LOG_INFO}" "${1}"
+  fi
+}
+
+function logTrace() {
+  if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
+  	logMessage "${LOG_TRACE}" "${1}"
+  fi
+}
+
+function logDebug() {
+  if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
+  	logMessage "${LOG_DEBUG}" "${1}"
+  fi
 }
 
 function shell_join() {
@@ -71,8 +137,25 @@ function ohai() {
   printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
 }
 
+function abort() {
+  logError "$@"
+  exit 1
+}
+
 function warn() {
-  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  logWarn "$(chomp "$1")"
+#  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+}
+
+#function abort() {
+#  printf "%s\n" "$@" >&2
+#  exit 1
+#}
+
+function error() {
+  logError "$@"
+#  printf "%s\n" "$@" >&2
+##  echo "$@" 1>&2;
 }
 
 function fail() {
@@ -80,28 +163,85 @@ function fail() {
   exit 1
 }
 
-function error() {
-  printf "%s\n" "$@" >&2
-#  echo "$@" 1>&2;
+function logMessage() {
+  local LOG_MESSAGE_LEVEL="${1}"
+  local LOG_MESSAGE="${2}"
+  ## remove first item from FUNCNAME array
+#  local CALLING_FUNCTION_ARRAY=("${FUNCNAME[@]:2}")
+  ## Get the length of the array
+  local CALLING_FUNCTION_ARRAY_LENGTH=${#FUNCNAME[@]}
+  local CALLING_FUNCTION_ARRAY=("${FUNCNAME[@]:2:$((CALLING_FUNCTION_ARRAY_LENGTH - 3))}")
+#  echo "CALLING_FUNCTION_ARRAY[@]=${CALLING_FUNCTION_ARRAY[@]}"
+
+  local CALL_ARRAY_LENGTH=${#CALLING_FUNCTION_ARRAY[@]}
+  local REVERSED_CALL_ARRAY=()
+  for (( i = CALL_ARRAY_LENGTH - 1; i >= 0; i-- )); do
+    REVERSED_CALL_ARRAY+=( "${CALLING_FUNCTION_ARRAY[i]}" )
+  done
+#  echo "REVERSED_CALL_ARRAY[@]=${REVERSED_CALL_ARRAY[@]}"
+
+#  local CALLING_FUNCTION_STR="${CALLING_FUNCTION_ARRAY[*]}"
+  ## ref: https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-a-bash-array-into-a-delimited-string#17841619
+  local SEPARATOR=":"
+  local CALLING_FUNCTION_STR
+  CALLING_FUNCTION_STR=$(printf "${SEPARATOR}%s" "${REVERSED_CALL_ARRAY[@]}")
+  CALLING_FUNCTION_STR=${CALLING_FUNCTION_STR:${#SEPARATOR}}
+
+  ## ref: https://stackoverflow.com/a/13221491
+  if [ "${LOGLEVEL_TO_STR[${LOG_MESSAGE_LEVEL}]+abc}" ]; then
+    LOG_LEVEL_STR="${LOGLEVEL_TO_STR[${LOG_MESSAGE_LEVEL}]}"
+  else
+    abort "Unknown log level of [${LOG_MESSAGE_LEVEL}]"
+  fi
+
+  local LOG_LEVEL_PADDING_LENGTH=5
+
+  local PADDED_LOG_LEVEL
+  PADDED_LOG_LEVEL=$(printf "%-${LOG_LEVEL_PADDING_LENGTH}s" "${LOG_LEVEL_STR}")
+
+  local LOG_PREFIX="${CALLING_FUNCTION_STR}():"
+  local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
+#  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
+  if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
+  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_WARN ]; then
+    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  else
+    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
+  fi
 }
 
-function checkRequiredCommands() {
-    missingCommands=""
-    for currentCommand in "$@"
-    do
-        isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
-    done
+function setLogLevel() {
+  LOG_LEVEL_STR=$1
 
-    if [[ ! -z "${missingCommands}" ]]; then
-        fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
-    fi
+  ## ref: https://stackoverflow.com/a/13221491
+  if [ "${LOGLEVELSTR_TO_LEVEL[${LOG_LEVEL_STR}]+abc}" ]; then
+    LOG_LEVEL="${LOGLEVELSTR_TO_LEVEL[${LOG_LEVEL_STR}]}"
+  else
+    abort "Unknown log level of [${LOG_LEVEL_STR}]"
+  fi
+
 }
 
 function isInstalled() {
     command -v "${1}" >/dev/null 2>&1 || return 1
 }
 
+function checkRequiredCommands() {
+  missingCommands=""
+  for currentCommand in "$@"
+  do
+    isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
+  done
+
+  if [[ ! -z "${missingCommands}" ]]; then
+    fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
+  fi
+}
+
 function execute() {
+  logInfo "${*}"
   if ! "$@"
   then
     abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
@@ -184,7 +324,7 @@ function version_lt() {
 
 function install_git_repo() {
 
-  ohai "This script will install:"
+  logInfo "This script will install:"
   echo "${INSTALL_REPOSITORY}"
 
   if ! [[ -d "${INSTALL_REPOSITORY}" ]]
@@ -192,7 +332,7 @@ function install_git_repo() {
     execute "${MKDIR[@]}" "${INSTALL_REPOSITORY}"
   fi
 
-  ohai "Downloading and installing ansible-developer repo..."
+  logInfo "Downloading and installing ansible-developer repo..."
   (
     cd "${INSTALL_REPOSITORY}" >/dev/null || return
 
@@ -223,19 +363,38 @@ function install_git_repo() {
 
 function setup_python_env() {
 
-  ohai "Setup pyenv and user python environment..."
+  logInfo "Setup pyenv and user python environment..."
   (
-#    bash -x "${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh" "${REQUIRED_VENV_PYTHON_VERSION}"
-    execute "bash" "${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh" "${REQUIRED_VENV_PYTHON_VERSION}"
+    PYENV_INSTALL_CMD_ARRAY=("bash")
+    if [[ "${LOG_LEVEL-}" -ge $LOG_DEBUG ]]; then
+      PYENV_INSTALL_CMD_ARRAY+=("-x")
+    fi
+    PYENV_INSTALL_CMD_ARRAY+=("${INSTALL_REPOSITORY}/files/scripts/python/pyenv-install.sh")
+    PYENV_INSTALL_CMD_ARRAY+=("${REQUIRED_VENV_PYTHON_VERSION}")
 
-  	if ! command -v pyenv &> /dev/null; then
-#    if [[ -n "$(env PATH=${SYSTEM_PATH} command -v pyenv)" ]]; then
+    execute "${PYENV_INSTALL_CMD_ARRAY[@]}"
+
+    export PYENV_ROOT="${HOME}/.pyenv"
+    [ -d "${PYENV_ROOT}/bin" ] && PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+    [ -f "${PYENV_ROOT}/shims/pyenv" ] && PYENV_BIN_DIR="${PYENV_ROOT}/shims"
+
+    [[ -v PYENV_BIN_DIR ]] && export PATH="${PYENV_BIN_DIR}:${PATH}" \
+     && PYENV_BIN="${PYENV_BIN_DIR}/pyenv"
+#    local PYENV_BIN="$(which pyenv)"
+
+    logInfo "PYENV_BIN=${PYENV_BIN}"
+    if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
+      abort "PYENV_BIN => ${PYENV_BIN} not found"
+    fi
+    if ! command -v pyenv &> /dev/null; then
       fail "pyenv not found"
     fi
+    logInfo "pyenv setup correctly"
 
-    export PATH="${HOME}/.pyenv/bin:${PATH}"
-    export PYENV_ROOT="${HOME}/.pyenv"
-    local PYENV_BIN="$(which pyenv)"
+#  	if ! command -v pyenv &> /dev/null; then
+##    if [[ -n "$(env PATH=${SYSTEM_PATH} command -v pyenv)" ]]; then
+#      fail "pyenv not found"
+#    fi
 
     local PYTHON_VENV_BINDIR="${PYENV_ROOT}/versions/${REQUIRED_VENV_PYTHON_VERSION}/bin"
     local PYTHON_BIN="${PYTHON_VENV_BINDIR}/python3"
@@ -265,7 +424,7 @@ function setup_python_env() {
 
 function setup_cacerts() {
 
-  ohai "Setup CA certs..."
+  logInfo "Setup CA certs..."
   (
     eval "sudo ${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
   ) || exit 1
@@ -275,7 +434,7 @@ function setup_cacerts() {
 
 function setup_user_env() {
 
-  ohai "Setup user bash environment..."
+  logInfo "Setup user bash environment..."
   (
     eval "${INSTALL_REPOSITORY}/sync-bashenv.sh"
   ) || exit 1
@@ -285,7 +444,7 @@ function setup_user_env() {
 
 ## ref: https://medium.com/@michael.schladt/bringing-gnu-linux-tools-to-windows-w-msys2-f663f89d8d08
 function setup_windows() {
-  ohai "Setup windows environment..."
+  logInfo "Setup windows environment..."
   (
 #    yes | pacman -Syu && \
     pacman --noconfirm -Syu && \
@@ -342,6 +501,20 @@ function setup_linux_packages() {
 
 }
 
+function usage() {
+  cat <<EOS
+Ansible Developer Environment Installer
+Usage: [NONINTERACTIVE=1] [CI=1] ${SCRIPT_NAME} [options]
+    Options:
+    -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default: '${LOGLEVEL_TO_STR[${LOG_LEVEL}]}')
+    -r [GIT_REMOTE_URL] : use specified git remote url
+    -h, --help       Display this message.
+    NONINTERACTIVE   Install without prompting for user input
+    CI               Install in CI mode (e.g. do not prompt for user input)
+EOS
+  exit "${1:-0}"
+}
+
 function main() {
   # Fail fast with a concise message when not using bash
   # Single brackets are needed here for POSIX compatibility
@@ -386,20 +559,6 @@ function main() {
 
   INSTALL_GIT_REMOTE="${GIT_REMOTE_URL-$INSTALL_GIT_REMOTE_DEFAULT}"
 
-  # string formatters
-  if [[ -t 1 ]]
-  then
-    tty_escape() { printf "\033[%sm" "$1"; }
-  else
-    tty_escape() { :; }
-  fi
-  tty_mkbold() { tty_escape "1;$1"; }
-  tty_underline="$(tty_escape "4;39")"
-  tty_blue="$(tty_mkbold 34)"
-  tty_red="$(tty_mkbold 31)"
-  tty_bold="$(tty_mkbold 39)"
-  tty_reset="$(tty_escape 0)"
-
   checkRequiredCommands python3 rsync
 
   # Check if script is run non-interactively (e.g. CI)
@@ -424,6 +583,10 @@ function main() {
     fi
   else
     ohai 'Running in non-interactive mode because `$NONINTERACTIVE` is set.'
+  fi
+
+  if [[ "${LOG_LEVEL-}" -ge $LOG_INFO ]]; then
+    logInfo "LOG_LEVEL=${LOGLEVEL_TO_STR[${LOG_LEVEL}]}"
   fi
 
   # USER isn't always set so provide a fall back for the installer and subprocesses.
@@ -465,7 +628,7 @@ Please install Git ${REQUIRED_GIT_VERSION} or newer and add it to your PATH."
     if [[ "${USABLE_GIT}" != /usr/bin/git ]]
     then
       export GIT_PATH="${USABLE_GIT}"
-      ohai "Found Git: ${GIT_PATH}"
+      logInfo "Found Git: ${GIT_PATH}"
     fi
   fi
 
@@ -491,7 +654,7 @@ EOABORT
     if [[ "${USABLE_PYTHON3}" != /usr/bin/python3 ]]
     then
       export PYTHON3_PATH="${USABLE_PYTHON3}"
-      ohai "Found Git: ${PYTHON3_PATH}"
+      logInfo "Found Git: ${PYTHON3_PATH}"
     fi
   fi
 
@@ -515,7 +678,7 @@ EOABORT
 
   setup_user_env
 
-  ohai "Installation successful!"
+  logInfo "Installation successful!"
   echo
 }
 

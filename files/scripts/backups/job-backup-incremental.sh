@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+VERSION="2025.6.12"
+
+#SCRIPT_DIR="$(dirname "$0")"
+SCRIPT_NAME="$(basename "$0")"
+
 BACKUP_SCRIPT=/opt/scripts/rsync-incremental-backup-local
 
 BACKUP_LABEL="daily"
@@ -136,10 +141,10 @@ function setLogLevel() {
 }
 
 function usage() {
-  echo "Usage: ${0} [options]"
+  echo "Usage: ${SCRIPT_NAME} [options]"
   echo ""
   echo "  Options:"
-  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
+  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default: '${LOGLEVEL_TO_STR[${LOG_LEVEL}]}')"
   echo "       -c CONFIG_FILEPATH : default empty and not loaded (e.g. 'backups.cfg')"
   echo "       -f EMAIL_FROM : default 'backups@example.int'"
   echo "       -t EMAIL_TO : default 'admin@example.int'"
@@ -152,10 +157,10 @@ function usage() {
   echo ""
   echo ""
   echo "  Examples:"
-	echo "       ${0} "
-	echo "       ${0} -b daily -s /data/lee -d /srv/backups/lee/daily"
-	echo "       ${0} -L DEBUG -b monthly -s /data/lee -d /srv/backups/lee/monthly"
-  echo "       ${0} -v"
+	echo "       ${SCRIPT_NAME} "
+	echo "       ${SCRIPT_NAME} -b daily -s /data/lee -d /srv/backups/lee/daily"
+	echo "       ${SCRIPT_NAME} -L DEBUG -b monthly -s /data/lee -d /srv/backups/lee/monthly"
+  echo "       ${SCRIPT_NAME} -v"
 	[ -z "$1" ] || exit "$1"
 }
 

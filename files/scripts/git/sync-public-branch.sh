@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
-GIT_DEFAULT_BRANCH=main
-GIT_PUBLIC_BRANCH=public
-
 ## ref: https://intoli.com/blog/exit-on-errors-in-bash-scripts/
 # exit when any command fails
 set -e
+
+VERSION="2025.6.12"
+
+#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$0")"
+SCRIPT_NAME="$(basename "$0")"
+
+GIT_DEFAULT_BRANCH=main
+GIT_PUBLIC_BRANCH=public
 
 ## https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
 TMP_DIR=$(mktemp -d -p ~)
@@ -19,8 +25,6 @@ trap 'rm -fr "$TMP_DIR"' EXIT
 GIT_REMOVE_CACHED_FILES=0
 
 CONFIRM=0
-#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_DIR="$(dirname "$0")"
 
 ## PURPOSE RELATED VARS
 #PROJECT_DIR=$( git rev-parse --show-toplevel )
@@ -38,6 +42,7 @@ PUBLIC_GITIGNORE=files/git/pub.gitignore
 declare -a PRIVATE_CONTENT_ARRAY
 PRIVATE_CONTENT_ARRAY+=('**/private/***')
 PRIVATE_CONTENT_ARRAY+=('**/vault/***')
+PRIVATE_CONTENT_ARRAY+=('**/archive/***')
 PRIVATE_CONTENT_ARRAY+=('**/save/***')
 PRIVATE_CONTENT_ARRAY+=('**/vault.yml')
 PRIVATE_CONTENT_ARRAY+=('**/*vault.yml')
@@ -94,6 +99,20 @@ LOGLEVEL_TO_STR["${LOG_INFO}"]="INFO"
 LOGLEVEL_TO_STR["${LOG_TRACE}"]="TRACE"
 LOGLEVEL_TO_STR["${LOG_DEBUG}"]="DEBUG"
 
+# string formatters
+if [[ -t 1 ]]
+then
+  tty_escape() { printf "\033[%sm" "$1"; }
+else
+  tty_escape() { :; }
+fi
+tty_mkbold() { tty_escape "1;$1"; }
+tty_underline="$(tty_escape "4;39")"
+tty_blue="$(tty_mkbold 34)"
+tty_red="$(tty_mkbold 31)"
+tty_bold="$(tty_mkbold 39)"
+tty_reset="$(tty_escape 0)"
+
 function reverse_array() {
   local -n ARRAY_SOURCE_REF=$1
   local -n REVERSED_ARRAY_REF=$2
@@ -117,32 +136,72 @@ function logError() {
   	logMessage "${LOG_ERROR}" "${1}"
   fi
 }
+
 function logWarn() {
   if [ $LOG_LEVEL -ge $LOG_WARN ]; then
   	logMessage "${LOG_WARN}" "${1}"
   fi
 }
+
 function logInfo() {
   if [ $LOG_LEVEL -ge $LOG_INFO ]; then
   	logMessage "${LOG_INFO}" "${1}"
   fi
 }
+
 function logTrace() {
   if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
   	logMessage "${LOG_TRACE}" "${1}"
   fi
 }
+
 function logDebug() {
   if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
   	logMessage "${LOG_DEBUG}" "${1}"
   fi
 }
+
+function shell_join() {
+  local arg
+  printf "%s" "$1"
+  shift
+  for arg in "$@"
+  do
+    printf " "
+    printf "%s" "${arg// /\ }"
+  done
+}
+
+function chomp() {
+  printf "%s" "${1/"$'\n'"/}"
+}
+
+function ohai() {
+  printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
+}
+
 function abort() {
   logError "$@"
   exit 1
 }
-function fail() {
+
+function warn() {
+  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+}
+
+#function abort() {
+#  printf "%s\n" "$@" >&2
+#  exit 1
+#}
+
+function error() {
   logError "$@"
+#  printf "%s\n" "$@" >&2
+##  echo "$@" 1>&2;
+}
+
+function fail() {
+  error "$@"
   exit 1
 }
 
@@ -183,7 +242,17 @@ function logMessage() {
   PADDED_LOG_LEVEL=$(printf "%-${LOG_LEVEL_PADDING_LENGTH}s" "${LOG_LEVEL_STR}")
 
   local LOG_PREFIX="${CALLING_FUNCTION_STR}():"
-  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX} ${LOG_MESSAGE}"
+  local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
+#  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
+  if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
+  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_WARN ]; then
+    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  else
+    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
+  fi
 }
 
 function setLogLevel() {
@@ -199,19 +268,27 @@ function setLogLevel() {
 }
 
 function isInstalled() {
-    command -v "${1}" >/dev/null 2>&1 || return 1
+  command -v "${1}" >/dev/null 2>&1 || return 1
 }
 
 function checkRequiredCommands() {
-    missingCommands=""
-    for currentCommand in "$@"
-    do
-        isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
-    done
+  missingCommands=""
+  for currentCommand in "$@"
+  do
+      isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
+  done
 
-    if [[ ! -z "${missingCommands}" ]]; then
-        fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
-    fi
+  if [[ ! -z "${missingCommands}" ]]; then
+      fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
+  fi
+}
+
+function execute() {
+  echo "$@"
+  if ! "$@"
+  then
+    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
+  fi
 }
 
 function gitcommitpush() {
@@ -377,18 +454,18 @@ function sync_public_branch() {
 
 
 function usage() {
-  echo "Usage: ${0} [options]"
+  echo "Usage: ${SCRIPT_NAME} [options]"
   echo ""
   echo "  Options:"
-  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
+  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default: '${LOGLEVEL_TO_STR[${LOG_LEVEL}]}')"
   echo "       -v : show script version"
   echo "       -h : help"
   echo "     [TEST_CASES]"
   echo ""
   echo "  Examples:"
-	echo "       ${0} "
-	echo "       ${0} -L DEBUG"
-  echo "       ${0} -v"
+	echo "       ${SCRIPT_NAME} "
+	echo "       ${SCRIPT_NAME} -L DEBUG"
+  echo "       ${SCRIPT_NAME} -v"
 	[ -z "$1" ] || exit "$1"
 }
 

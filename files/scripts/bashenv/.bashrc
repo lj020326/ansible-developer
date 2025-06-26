@@ -40,17 +40,6 @@ if [ -f "${HOME}/.bash_env" ]; then
     source ~/.bash_env
 fi
 
-if [ -f "${HOME}/.bash_secrets" ]; then
-    if [ ! -f "${HOME}/.vault_pass" ]; then
-        echo "${log_bash} ~/.vault_pass not found, skip loading ${HOME}/.bash_secrets"
-    elif ! isInstalled ansible-vault; then
-        echo "${log_bash} ansible-vault not installed, skip loading ${HOME}/.bash_secrets"
-    else
-        echo "${log_bash} sourcing ~/.bash_secrets"
-        eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
-    fi
-fi
-
 #if [[ "$PLATFORM" =~ ^(MSYS|MINGW)$ ]]; then
 if [ -f "${HOME}/.bash_prompt" ]; then
     echo "${log_bash} setting prompt"
@@ -60,4 +49,15 @@ fi
 if [ -f "${HOME}/.bash_aliases" ]; then
     echo "${log_prefix} setting aliases"
     source "${HOME}/.bash_aliases"
+fi
+
+if [ -f "${HOME}/.bash_secrets" ]; then
+    if [ ! -f "${HOME}/.vault_pass" ]; then
+        echo "${log_bash} ~/.vault_pass not found, skip loading ${HOME}/.bash_secrets"
+    elif ! isInstalled ansible-vault; then
+        echo "${log_bash} ansible-vault not installed, skip loading ${HOME}/.bash_secrets"
+    else
+        echo "${log_bash} sourcing ~/.bash_secrets"
+        eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
+    fi
 fi

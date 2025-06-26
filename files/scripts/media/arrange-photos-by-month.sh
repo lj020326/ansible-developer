@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-VERSION="2025.5.5"
+VERSION="2025.6.12"
+
+SCRIPT_NAME="$(basename "$0")"
 
 MEDIA_DIR_DEFAULT="~/data/media/photos/"
 
@@ -151,21 +153,21 @@ function arrange_photos_by_month() {
 
 
 function usage() {
-  echo "Usage: ${0} [options] [media_directory]"
+  echo "Usage: ${SCRIPT_NAME} [options] [media_directory]"
   echo ""
   echo "  Options:"
-  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
+  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default: '${LOGLEVEL_TO_STR[${LOG_LEVEL}]}')"
   echo "       -v : show script version"
   echo "       -d : dry run - show expected results but do not apply"
   echo "       -h : help"
   echo ""
   echo "  Examples:"
-	echo "       ${0} "
-	echo "       ${0} -L DEBUG"
-  echo "       ${0} -v"
-	echo "       ${0} ~/data/media/photos/2020/2020-selfies/"
-	echo "       ${0} -L DEBUG ~/data/media/photos/2020/2020-selfies/"
-	echo "       ${0} -d 2012/"
+	echo "       ${SCRIPT_NAME} "
+	echo "       ${SCRIPT_NAME} -L DEBUG"
+  echo "       ${SCRIPT_NAME} -v"
+	echo "       ${SCRIPT_NAME} ~/data/media/photos/2020/2020-selfies/"
+	echo "       ${SCRIPT_NAME} -L DEBUG ~/data/media/photos/2020/2020-selfies/"
+	echo "       ${SCRIPT_NAME} -d 2012/"
 	[ -z "$1" ] || exit "$1"
 }
 

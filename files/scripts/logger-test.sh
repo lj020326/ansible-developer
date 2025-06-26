@@ -2,19 +2,19 @@
 
 ## ref: http://www.cubicrace.com/2016/03/log-tracing-mechnism-for-shell-scripts.html
 
-source ./bashlib/logger.sh
+source ./logger.sh
 
 SCRIPT_LOG="./log/demo.log"
 
 SCRIPTENTRY
 updateUserDetails(){
     ENTRY
-    DEBUG "Username: $1, Key: $2"
-    INFO "User details updated for $1"
+    logDebug "Username: $1, Key: $2"
+    logInfo "User details updated for $1"
     EXIT
 }
 
-INFO "Updating user details..."
+logInfo "Updating user details..."
 updateUserDetails "cubicrace" "3445"
 
 rc=2

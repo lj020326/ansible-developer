@@ -458,9 +458,9 @@ if __name__ == "__main__":
     }
 
     if "--help" in argv or "-h" in argv:
-        print("\033[1;33mDNSRezulf by Chubak Bidpaa\033[0m")
+        print("\033[1;33mDNSResolve\033[0m")
         print("Released under MIT License")
-        print(f"DNSRezulf ({scriptname}) is a very simple DNS Resolver. Think, a watered down version of dig.")
+        print(f"DNSResolve ({scriptname}) is a very simple DNS Resolver. Think, a watered down version of dig.")
         print(
             "You may request A, AAAA, CNAME and TXT records with it. You may specify whether the search is recursive or not.")
         print("The default resolver in 8.8.8.8, which is Google's resolver. But you may select a different one.")

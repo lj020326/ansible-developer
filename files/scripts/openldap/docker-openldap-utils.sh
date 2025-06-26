@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+VERSION="2025.5.5"
+
+#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+SCRIPT_NAME=$(basename "$0")
+
 debug_container=0
 
 #DOCKER_REGISTRY_LABEL=org-dettonville-labs
@@ -14,7 +20,7 @@ HTTPD_LOG_DIR="/var/log/httpd"
 
 usage() {
     echo "" 1>&2
-    echo "Usage: ${0} [options] command container_name" 1>&2
+    echo "Usage: ${SCRIPT_NAME} [options] command container_name" 1>&2
     echo "" 1>&2
     echo "  Options:" 1>&2
     echo "     -f dockerfile : set dockerfile used, defaults to 'Dockerfile'" 1>&2
@@ -35,14 +41,14 @@ usage() {
     echo "                 fetch-errorlog (fetches a copy of the apache error log from running container)" 1>&2
     echo "" 1>&2
     echo "  Examples:" 1>&2
-    echo "     ${0} build docker-openldap"
-    echo "     ${0} build localhost/ubuntu:bionic"
-    echo "     ${0} build docker-openldap-orig"
-    echo "     ${0} -f Dockerfile build docker-openldap"
-    echo "     ${0} restart docker-cobbler"
-    echo "     ${0} run docker-openldap"
-    echo "     ${0} attach docker-openldap"
-    echo "     ${0} debug docker-openldap"
+    echo "     ${SCRIPT_NAME} build docker-openldap"
+    echo "     ${SCRIPT_NAME} build localhost/ubuntu:bionic"
+    echo "     ${SCRIPT_NAME} build docker-openldap-orig"
+    echo "     ${SCRIPT_NAME} -f Dockerfile build docker-openldap"
+    echo "     ${SCRIPT_NAME} restart docker-cobbler"
+    echo "     ${SCRIPT_NAME} run docker-openldap"
+    echo "     ${SCRIPT_NAME} attach docker-openldap"
+    echo "     ${SCRIPT_NAME} debug docker-openldap"
     exit 1
 }
 

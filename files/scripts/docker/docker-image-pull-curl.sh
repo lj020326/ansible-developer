@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+VERSION="2025.6.12"
+
+SCRIPT_NAME="$(basename "$0")"
+
 ##################
 ## This script is a modified version of the publicly available script:
 ## https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh
@@ -212,7 +216,7 @@ function isInstalled() {
 
 
 usage() {
-  echo "Usage: $(basename "${0}") [options] image[:tag][@digest] ..."
+  echo "Usage: $(basename "${SCRIPT_NAME}") [options] image[:tag][@digest] ..."
   echo ""
   echo "  Options:"
   echo "     -f image_tar_file.tgz : Image tar (tgz) file to be created from downloaded image(s)."
@@ -222,11 +226,11 @@ usage() {
   echo "     image[:tag][@digest]"
   echo ""
   echo "  Examples:"
-	echo "       $(basename "${0}") alpine:latest"
-  echo "       $(basename "${0}") -f testimage.tgz build alpine:latest"
-	echo "       $(basename "${0}") nginx/nginx-ingress:latest"
-	echo "       $(basename "${0}") hello-world:latest"
-	echo "       $(basename "${0}") hello-world:latest@sha256:8be990ef2aeb16dbcb9271ddfe2610fa6658d13f6dfb8bc72074cc1ca36966a7"
+	echo "       $(basename "${SCRIPT_NAME}") alpine:latest"
+  echo "       $(basename "${SCRIPT_NAME}") -f testimage.tgz build alpine:latest"
+	echo "       $(basename "${SCRIPT_NAME}") nginx/nginx-ingress:latest"
+	echo "       $(basename "${SCRIPT_NAME}") hello-world:latest"
+	echo "       $(basename "${SCRIPT_NAME}") hello-world:latest@sha256:8be990ef2aeb16dbcb9271ddfe2610fa6658d13f6dfb8bc72074cc1ca36966a7"
 	[ -z "$1" ] || exit "$1"
 }
 

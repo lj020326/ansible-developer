@@ -177,7 +177,12 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     echo "${log_prefix_bashenv} setting path for DARWIN env"
 
     ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
-    export JAVA_HOME=$(/usr/libexec/java_home)
+    ## ref: https://dev.to/rithvik78/change-the-default-java-version-on-macos-3jee
+#    export JAVA_HOME=$(/usr/libexec/java_home)
+    JAVA_VERSION_DEFAULT="1.8"
+    export JAVA_HOME=$(/usr/libexec/java_home -v${JAVA_VERSION_DEFAULT})
+    ## ref: https://stackoverflow.com/a/41371938/2791368
+    export JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStoreType=KeychainStore -Djavax.net.ssl.trustStore=/Library/Keychains/System.keychain"
 
     ## ref: https://apple.stackexchange.com/questions/371997/suppressing-the-default-interactive-shell-is-now-zsh-message-in-macos-catalina
     export BASH_SILENCE_DEPRECATION_WARNING=1
@@ -213,12 +218,6 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
 
     export PYTHON3_HOME=/usr/local/bin
 
-    ## ref: https://www.jenv.be/
-    if command -v jenv 1>/dev/null 2>&1; then
-       export PATH="$HOME/.jenv/bin:$PATH"
-       eval "$(jenv init -)"
-    fi
-
     # enable programmable completion features (you don't need to enable
     # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
     # sources /etc/bash.bashrc).
@@ -232,10 +231,10 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     fi
 
     ## ref: https://devqa.io/brew-install-java/
-    export JAVA_7_HOME=$(/usr/libexec/java_home -v17)
-    export JAVA_8_HOME=$(/usr/libexec/java_home -v18)
+    export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
     export JAVA_11_HOME=$(/usr/libexec/java_home -v11)
-#    export JAVA_13_HOME=$(/usr/libexec/java_home -v13)
+    export JAVA_17_HOME=$(/usr/libexec/java_home -v17)
+    export JAVA_24_HOME=$(/usr/libexec/java_home -v24)
 
     ## ref: https://podman.io/docs/installation
     export PODMAN_HOME=/opt/podman
@@ -297,11 +296,6 @@ else
     # setenv-python 3
 fi
 
-if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
-  ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
-  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
-fi
-
 ## using rvm
 ## ref: https://nrogap.medium.com/install-rvm-in-macos-step-by-step-d3b3c236953b
 if [ -d "${HOME}/.rvm/scripts/rvm" ]; then
@@ -355,6 +349,24 @@ if [ -d "${HOME}/bin" ]; then
 fi
 if [ -d "${HOME}/.local/bin" ]; then
     export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
+if ! command -v jenv 1>/dev/null 2>&1; then
+  if [ -d "${HOME}/.jenv/bin" ]; then
+    export PATH="$HOME/.jenv/bin:$PATH"
+  elif [ -d "${HOME}/.jenv/shims" ]; then
+    export PATH="$HOME/.jenv/shims:$PATH"
+  fi
+fi
+
+## ref: https://www.jenv.be/
+if command -v jenv 1>/dev/null 2>&1; then
+   eval "$(jenv init -)"
+fi
+
+if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
+  ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
+  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 fi
 
 export PATH=".:${PATH}"

@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+VERSION="2025.6.12"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
@@ -20,8 +22,201 @@ PYTHON3_DEB_LIBS="libreadline-dev libbz2-dev libffi-dev libncurses-dev libsqlite
 
 PYTHON_VERSION=${1-"${PYTHON_VERSION_DEFAULT}"}
 
+PYENV_INSTALL_URL="https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer"
+
+#### LOGGING RELATED
+LOG_ERROR=0
+LOG_WARN=1
+LOG_INFO=2
+LOG_TRACE=3
+LOG_DEBUG=4
+
+declare -A LOGLEVEL_TO_STR
+LOGLEVEL_TO_STR["${LOG_ERROR}"]="ERROR"
+LOGLEVEL_TO_STR["${LOG_WARN}"]="WARN"
+LOGLEVEL_TO_STR["${LOG_INFO}"]="INFO"
+LOGLEVEL_TO_STR["${LOG_TRACE}"]="TRACE"
+LOGLEVEL_TO_STR["${LOG_DEBUG}"]="DEBUG"
+
+# string formatters
+if [[ -t 1 ]]
+then
+  tty_escape() { printf "\033[%sm" "$1"; }
+else
+  tty_escape() { :; }
+fi
+tty_mkbold() { tty_escape "1;$1"; }
+tty_underline="$(tty_escape "4;39")"
+tty_blue="$(tty_mkbold 34)"
+tty_red="$(tty_mkbold 31)"
+tty_bold="$(tty_mkbold 39)"
+tty_reset="$(tty_escape 0)"
+
+function reverse_array() {
+  local -n ARRAY_SOURCE_REF=$1
+  local -n REVERSED_ARRAY_REF=$2
+  # Iterate over the keys of the LOGLEVEL_TO_STR array
+  for KEY in "${!ARRAY_SOURCE_REF[@]}"; do
+    # Get the value associated with the current key
+    VALUE="${ARRAY_SOURCE_REF[$KEY]}"
+    # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
+    REVERSED_ARRAY_REF[$VALUE]="$KEY"
+  done
+}
+
+declare -A LOGLEVELSTR_TO_LEVEL
+reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
+
+#LOG_LEVEL=${LOG_DEBUG}
+LOG_LEVEL=${LOG_INFO}
+
+function logError() {
+  if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
+  	logMessage "${LOG_ERROR}" "${1}"
+  fi
+}
+
+function logWarn() {
+  if [ $LOG_LEVEL -ge $LOG_WARN ]; then
+  	logMessage "${LOG_WARN}" "${1}"
+  fi
+}
+
+function logInfo() {
+  if [ $LOG_LEVEL -ge $LOG_INFO ]; then
+  	logMessage "${LOG_INFO}" "${1}"
+  fi
+}
+
+function logTrace() {
+  if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
+  	logMessage "${LOG_TRACE}" "${1}"
+  fi
+}
+
+function logDebug() {
+  if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
+  	logMessage "${LOG_DEBUG}" "${1}"
+  fi
+}
+
+function shell_join() {
+  local arg
+  printf "%s" "$1"
+  shift
+  for arg in "$@"
+  do
+    printf " "
+    printf "%s" "${arg// /\ }"
+  done
+}
+
+function chomp() {
+  printf "%s" "${1/"$'\n'"/}"
+}
+
+function ohai() {
+  printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
+}
+
+function abort() {
+  logError "$@"
+  exit 1
+}
+
+function warn() {
+  logWarn "$(chomp "$1")"
+#  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+}
+
+#function abort() {
+#  printf "%s\n" "$@" >&2
+#  exit 1
+#}
+
+function error() {
+  logError "$@"
+#  printf "%s\n" "$@" >&2
+##  echo "$@" 1>&2;
+}
+
+function fail() {
+  error "$@"
+  exit 1
+}
+
+function logMessage() {
+  local LOG_MESSAGE_LEVEL="${1}"
+  local LOG_MESSAGE="${2}"
+  ## remove first item from FUNCNAME array
+#  local CALLING_FUNCTION_ARRAY=("${FUNCNAME[@]:2}")
+  ## Get the length of the array
+  local CALLING_FUNCTION_ARRAY_LENGTH=${#FUNCNAME[@]}
+  local CALLING_FUNCTION_ARRAY=("${FUNCNAME[@]:2:$((CALLING_FUNCTION_ARRAY_LENGTH - 3))}")
+#  echo "CALLING_FUNCTION_ARRAY[@]=${CALLING_FUNCTION_ARRAY[@]}"
+
+  local CALL_ARRAY_LENGTH=${#CALLING_FUNCTION_ARRAY[@]}
+  local REVERSED_CALL_ARRAY=()
+  for (( i = CALL_ARRAY_LENGTH - 1; i >= 0; i-- )); do
+    REVERSED_CALL_ARRAY+=( "${CALLING_FUNCTION_ARRAY[i]}" )
+  done
+#  echo "REVERSED_CALL_ARRAY[@]=${REVERSED_CALL_ARRAY[@]}"
+
+#  local CALLING_FUNCTION_STR="${CALLING_FUNCTION_ARRAY[*]}"
+  ## ref: https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-a-bash-array-into-a-delimited-string#17841619
+  local SEPARATOR=":"
+  local CALLING_FUNCTION_STR
+  CALLING_FUNCTION_STR=$(printf "${SEPARATOR}%s" "${REVERSED_CALL_ARRAY[@]}")
+  CALLING_FUNCTION_STR=${CALLING_FUNCTION_STR:${#SEPARATOR}}
+
+  ## ref: https://stackoverflow.com/a/13221491
+  if [ "${LOGLEVEL_TO_STR[${LOG_MESSAGE_LEVEL}]+abc}" ]; then
+    LOG_LEVEL_STR="${LOGLEVEL_TO_STR[${LOG_MESSAGE_LEVEL}]}"
+  else
+    abort "Unknown log level of [${LOG_MESSAGE_LEVEL}]"
+  fi
+
+  local LOG_LEVEL_PADDING_LENGTH=5
+
+  local PADDED_LOG_LEVEL
+  PADDED_LOG_LEVEL=$(printf "%-${LOG_LEVEL_PADDING_LENGTH}s" "${LOG_LEVEL_STR}")
+
+  local LOG_PREFIX="${CALLING_FUNCTION_STR}():"
+  local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
+#  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
+  if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
+  elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_WARN ]; then
+    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+#    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
+  else
+    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
+  fi
+}
+
+function setLogLevel() {
+  LOG_LEVEL_STR=$1
+
+  ## ref: https://stackoverflow.com/a/13221491
+  if [ "${LOGLEVELSTR_TO_LEVEL[${LOG_LEVEL_STR}]+abc}" ]; then
+    LOG_LEVEL="${LOGLEVELSTR_TO_LEVEL[${LOG_LEVEL_STR}]}"
+  else
+    abort "Unknown log level of [${LOG_LEVEL_STR}]"
+  fi
+
+}
+
+function execute() {
+  logInfo "${*}"
+  if ! "$@"
+  then
+    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
+  fi
+}
 
 function setup_pyenv_linux() {
+
+  logInfo "installing pyenv"
 
   if [[ -n "$(command -v dnf)" ]]; then
     sudo dnf install -y ${PYTHON3_RH_LIBS} && \
@@ -33,21 +228,28 @@ function setup_pyenv_linux() {
     sudo apt-get install -y ${PYTHON3_DEB_LIBS}
   fi
 
-  PYENV_ROOT="${HOME}/.pyenv"
+  export PYENV_ROOT="${HOME}/.pyenv"
   PYENV_BIN_DIR="${PYENV_ROOT}/bin"
   PYENV_BIN="${PYENV_BIN_DIR}/pyenv"
 
   if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
-    curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | /bin/bash
+    logInfo "installing pyenv using [${PYENV_INSTALL_URL}]"
+#    curl -L "${PYENV_INSTALL_URL}" | /bin/bash
+    curl -L "${PYENV_INSTALL_URL}" | bash -s --
   fi
 
-#  PYENV_IN_BASHENV=$(grep -c "pyenv init" ${HOME}/.bashrc)
-
   export PATH="${PYENV_BIN_DIR}:${PATH}"
-  eval "${PYENV_BIN} init -"
+  eval "${PYENV_BIN} init - bash"
   eval "${PYENV_BIN} virtualenv-init -"
-
   mkdir -p "${PYENV_ROOT}/cache"
+
+  if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
+    abort "PYENV_BIN => ${PYENV_BIN} not found"
+  fi
+  if ! command -v pyenv &> /dev/null; then
+    fail "pyenv not found"
+  fi
+  logInfo "pyenv setup correctly"
 
 }
 
@@ -63,6 +265,75 @@ function setup_pyenv_msys2() {
 #  PYENV_IN_BASHENV=$(grep -c "pyenv init" ${HOME}/.bashrc)
 
   export PATH="${PYENV_BIN_DIR}:${PATH}"
+
+}
+
+function install_python_version() {
+  logInfo "installing python version ${PYTHON_VERSION}"
+
+  logInfo "PYENV_BIN=${PYENV_BIN}"
+  if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
+    abort "PYENV_BIN => ${PYENV_BIN} not found"
+  fi
+  if ! command -v pyenv &> /dev/null; then
+    fail "pyenv not found"
+  fi
+  logInfo "pyenv setup correctly"
+
+  PYENV_VERSION_EXISTS="$(${PYENV_BIN} versions | grep -c "${PYTHON_VERSION}")"
+  logInfo "PYENV_VERSION_EXISTS=${PYENV_VERSION_EXISTS}"
+
+#  if [ -d "$(pyenv root)/versions/${PYTHON_VERSION}" ]; then
+#    logInfo "python version ${PYTHON_VERSION} already exists at [$(pyenv root)/versions/${PYTHON_VERSION}]"
+  if [ "${PYENV_VERSION_EXISTS}" -ne 0 ]; then
+    logInfo "python version ${PYTHON_VERSION} already exists"
+    exit 0
+  fi
+
+  ## ref: https://github.com/pyenv/pyenv/issues/2760#issuecomment-1868608898
+  ## ref: https://github.com/pyenv/pyenv/issues/2416
+  #env pyenv install "${PYTHON_VERSION}"
+  #env CFLAGS=-fPIC pyenv install $PYTHON_VERSION
+  #env CFLAGS="-I/usr/local/openssl/include" LDFLAGS="-L/usr/local/openssl/lib" pyenv install "${PYTHON_VERSION}"
+  #env CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib -lssl -lcrypto" CFLAGS=-fPIC pyenv install "${PYTHON_VERSION}"
+  if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
+#    curl -Lo "$HOME/.pyenv/cache/Python-${PYTHON_VERSION}.tar.xz" \
+#        "https://registry.npmmirror.com/-/binary/python/$PYTHON_VERSION/Python-${PYTHON_VERSION}.tar.xz"
+#    #    "https://npm.taobao.org/mirrors/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz"
+    INSTALL_PYTHON_CMD="env CPPFLAGS=\"-I/usr/include/openssl\" LDFLAGS=\"-L/usr/lib64/openssl -lssl -lcrypto\" CFLAGS=-fPIC ${PYENV_BIN} install -s ${PYTHON_VERSION}"
+  elif [[ -n "${INSTALL_ON_MACOS-}" ]]; then
+    ## ref: https://stackoverflow.com/questions/41430706/pyvenv-returns-non-zero-exit-status-1-during-the-installation-of-pip-stage#41430707
+    ## ref: https://github.com/pyenv/pyenv/issues/2143#issuecomment-1069223994
+    ## ref: https://stackoverflow.com/a/54142474/2791368
+#    env CC=/usr/local/bin/gcc-13 pyenv install "${PYTHON_VERSION}"
+    ## NOTE: make sure to remove the gnu gcc env from the PATH by setting it to system PATH
+    ##       GNU Coreutils and Binutils on PATH are also known to break build in MacOS
+    ## ref: https://github.com/pyenv/pyenv/issues/2862#issuecomment-1849198741
+    ## ref: https://github.com/pyenv/pyenv/wiki/Common-build-problems#keg-only-homebrew-packages-are-forcibly-linked--added-to-path
+    INSTALL_PYTHON_CMD="env PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin \
+      CFLAGS=\"-I$(brew --prefix readline)/include -I$(brew --prefix openssl)/include -I$(xcrun --show-sdk-path)/usr/include\" \
+      LDFLAGS=\"-L$(brew --prefix readline)/lib -L$(brew --prefix openssl)/lib\" \
+      PYTHON_CONFIGURE_OPTS=--enable-unicode=ucs2 \
+      ${PYENV_BIN} install -s ${PYTHON_VERSION}"
+  else
+    INSTALL_PYTHON_CMD="${PYENV_BIN} install -s ${PYTHON_VERSION}"
+  fi
+
+  execute "${INSTALL_PYTHON_CMD}"
+#  eval "${INSTALL_PYTHON_CMD}"
+
+  mkdir -p "$HOME/.config/pip"
+  [ -f "$HOME/.config/pip/pip.conf" ] && mv "$HOME/.config/pip/pip.conf" "$HOME/.config/pip/pip.conf.bak"
+
+  logInfo "Ensure pip.conf setup correctly"
+  cat <<EOF >> "${HOME}/.config/pip/pip.conf"
+# pip.ini (Windows)
+# pip.conf (Unix, macOS)
+
+[global]
+trusted-host = pypi.org
+               files.pythonhosted.org
+EOF
 
 }
 
@@ -87,7 +358,7 @@ function main() {
   ## ref: https://stackoverflow.com/questions/27022373/python3-importerror-no-module-named-ctypes-when-using-value-from-module-mul#48045929
   if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
     setup_pyenv_linux
-    ## update pyenv to get most recent python dist info
+    logInfo "update pyenv to get most recent python dist info"
     pyenv update
   fi
   if [[ -n "${INSTALL_ON_MACOS-}" ]]; then
@@ -101,59 +372,11 @@ function main() {
   fi
   if [[ -n "${INSTALL_ON_MSYS-}" ]]; then
     setup_pyenv_msys2
-    ## update pyenv to get most recent python dist info
+    logInfo "update pyenv to get most recent python dist info"
     pyenv update
   fi
 
-  PYENV_VERSION_EXISTS=$(pyenv version | grep -c "${PYTHON_VERSION}")
-
-#  if [ -d "$(pyenv root)/versions/${PYTHON_VERSION}" ]; then
-#    echo "python version ${PYTHON_VERSION} already exists at [$(pyenv root)/versions/${PYTHON_VERSION}]"
-  if [ "${PYENV_VERSION_EXISTS}" -ne 0 ]; then
-    echo "python version ${PYTHON_VERSION} already exists"
-    exit 0
-  fi
-
-  ## ref: https://github.com/pyenv/pyenv/issues/2760#issuecomment-1868608898
-  ## ref: https://github.com/pyenv/pyenv/issues/2416
-  #env pyenv install "${PYTHON_VERSION}"
-  #env CFLAGS=-fPIC pyenv install $PYTHON_VERSION
-  #env CFLAGS="-I/usr/local/openssl/include" LDFLAGS="-L/usr/local/openssl/lib" pyenv install "${PYTHON_VERSION}"
-  #env CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib -lssl -lcrypto" CFLAGS=-fPIC pyenv install "${PYTHON_VERSION}"
-  if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
-#    curl -Lo "$HOME/.pyenv/cache/Python-${PYTHON_VERSION}.tar.xz" \
-#        "https://registry.npmmirror.com/-/binary/python/$PYTHON_VERSION/Python-${PYTHON_VERSION}.tar.xz"
-#    #    "https://npm.taobao.org/mirrors/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz"
-    env CPPFLAGS="-I/usr/include/openssl" LDFLAGS="-L/usr/lib64/openssl -lssl -lcrypto" CFLAGS=-fPIC pyenv install -s "${PYTHON_VERSION}"
-  elif [[ -n "${INSTALL_ON_MACOS-}" ]]; then
-    ## ref: https://stackoverflow.com/questions/41430706/pyvenv-returns-non-zero-exit-status-1-during-the-installation-of-pip-stage#41430707
-    ## ref: https://github.com/pyenv/pyenv/issues/2143#issuecomment-1069223994
-    ## ref: https://stackoverflow.com/a/54142474/2791368
-#    env CC=/usr/local/bin/gcc-13 pyenv install "${PYTHON_VERSION}"
-    ## NOTE: make sure to remove the gnu gcc env from the PATH by setting it to system PATH
-    ##       GNU Coreutils and Binutils on PATH are also known to break build in MacOS
-    ## ref: https://github.com/pyenv/pyenv/issues/2862#issuecomment-1849198741
-    ## ref: https://github.com/pyenv/pyenv/wiki/Common-build-problems#keg-only-homebrew-packages-are-forcibly-linked--added-to-path
-    env PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin \
-      CFLAGS="-I$(brew --prefix readline)/include -I$(brew --prefix openssl)/include -I$(xcrun --show-sdk-path)/usr/include" \
-      LDFLAGS="-L$(brew --prefix readline)/lib -L$(brew --prefix openssl)/lib" \
-      PYTHON_CONFIGURE_OPTS=--enable-unicode=ucs2 \
-      pyenv install -s "${PYTHON_VERSION}"
-  else
-    pyenv install -s "${PYTHON_VERSION}"
-  fi
-
-  mkdir -p $HOME/.config/pip
-  [ -f $HOME/.config/pip/pip.conf ] && mv $HOME/.config/pip/pip.conf $HOME/.config/pip/pip.conf.bak
-
-  cat <<EOF >> "${HOME}/.config/pip/pip.conf"
-# pip.ini (Windows)
-# pip.conf (Unix, macOS)
-
-[global]
-trusted-host = pypi.org
-               files.pythonhosted.org
-EOF
+  install_python_version
 
 }
 

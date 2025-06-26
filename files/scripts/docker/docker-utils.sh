@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-debug_container=0
+VERSION="2025.6.12"
+
+SCRIPT_NAME="$(basename "$0")"
+
+DEBUG_CONTAINER=0
 
 #DOCKER_REGISTRY_LABEL=org-dettonville-labs
 DOCKER_REGISTRY_LABEL=localhost
@@ -14,7 +18,7 @@ HTTPD_LOG_DIR="/var/log/httpd"
 
 usage() {
     echo "" 1>&2
-    echo "Usage: ${0} [options] command container_name" 1>&2
+    echo "Usage: ${SCRIPT_NAME} [options] command container_name" 1>&2
     echo "" 1>&2
     echo "  Options:" 1>&2
     echo "     -f dockerfile : set dockerfile used, defaults to 'Dockerfile'" 1>&2
@@ -35,14 +39,14 @@ usage() {
     echo "                 fetch-errorlog (fetches a copy of the apache error log from running container)" 1>&2
     echo "" 1>&2
     echo "  Examples:" 1>&2
-    echo "     ${0} build docker-openldap"
-    echo "     ${0} build localhost/ubuntu:bionic"
-    echo "     ${0} build docker-openldap-orig"
-    echo "     ${0} -f Dockerfile build docker-openldap"
-    echo "     ${0} restart docker-cobbler"
-    echo "     ${0} run docker-openldap"
-    echo "     ${0} attach docker-openldap"
-    echo "     ${0} debug docker-openldap"
+    echo "     ${SCRIPT_NAME} build docker-openldap"
+    echo "     ${SCRIPT_NAME} build localhost/ubuntu:bionic"
+    echo "     ${SCRIPT_NAME} build docker-openldap-orig"
+    echo "     ${SCRIPT_NAME} -f Dockerfile build docker-openldap"
+    echo "     ${SCRIPT_NAME} restart docker-cobbler"
+    echo "     ${SCRIPT_NAME} run docker-openldap"
+    echo "     ${SCRIPT_NAME} attach docker-openldap"
+    echo "     ${SCRIPT_NAME} debug docker-openldap"
     exit 1
 }
 
@@ -202,7 +206,7 @@ fetch_log() {
 while getopts "f:hx" opt; do
     case "${opt}" in
         f) DOCKERFILE="${OPTARG}" ;;
-        x) debug_container=1 ;;
+        x) DEBUG_CONTAINER=1 ;;
         h) usage 1 ;;
         \?) usage 2 ;;
         :)
@@ -238,11 +242,11 @@ case "${command}" in
         deploy_image ${docker_image_name}
         ;;
     "restart"|"run")
-        restart_container ${docker_image_name} $debug_container "${additional_args}"
+        restart_container ${docker_image_name} $DEBUG_CONTAINER "${additional_args}"
         ;;
     "debug")
-        debug_container=1
-        restart_container ${docker_image_name} $debug_container
+        DEBUG_CONTAINER=1
+        restart_container ${docker_image_name} $DEBUG_CONTAINER
         ;;
     "attach")
         attach_container ${docker_image_name}

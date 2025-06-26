@@ -14,7 +14,7 @@ SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 echo "SCRIPT_DIR=${SCRIPT_DIR}"
 
 #${SCRIPT_DIR}/validate-ssl-endpoint.sh -c ${CREDS} -p ${CONTEXT_PATH} ${TARGET_HOST} ${TARGET_PORT}
-VALIDATE_CMD="${SCRIPT_DIR}/validate_ssl_endpoint.sh"
+VALIDATE_CMD="${SCRIPT_DIR}/validate-ssl-endpoint.sh"
 
 if [[ "${CREDENTIALS}" != "" ]]; then
   VALIDATE_CMD+=" -c ${CREDS}"

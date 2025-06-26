@@ -10,12 +10,10 @@ VERSION="2025.3.2"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "SCRIPT_DIR=[${SCRIPT_DIR}]"
+SCRIPT_NAME=$(basename "$0")
+SCRIPT_NAME_PREFIX="${SCRIPT_NAME%.*}"
 
 echo "** JAVA_HOME=[${JAVA_HOME}]"
-
-SCRIPT_NAME=$(basename "$0")
-SCRIPT_NAME="${SCRIPT_NAME%.*}"
-logFile="${SCRIPT_NAME}.log"
 
 INSTALL_JDK_CACERT=1
 INSTALL_SYSTEM_CACERTS=1
@@ -512,7 +510,7 @@ function install_site_cert() {
 #  logDebug "[${FIND_CERTS_CMD}]"
 #  eval "${FIND_CERTS_CMD}"
 
-  local TMP_OUT=/tmp/${SCRIPT_NAME}.output
+  local TMP_OUT=/tmp/${SCRIPT_NAME_PREFIX}.output
 
   logDebug "Get host cert for ${HOST}:${PORT}"
   get_host_cert "${HOST}" "${PORT}" "${CACERTS_SRC}"
@@ -647,12 +645,12 @@ function init_cacert_vars() {
 }
 
 function usage() {
-  echo "Usage: ${0} [options] [[ENDPOINT_CONFIG1] [ENDPOINT_CONFIG2] ...]"
+  echo "Usage: ${SCRIPT_NAME} [options] [[ENDPOINT_CONFIG1] [ENDPOINT_CONFIG2] ...]"
   echo ""
   echo "       ENDPOINT_CONFIG[n] is a colon delimited tuple with SITE_HOSTNAME:SITE_PORT"
   echo ""
   echo "  Options:"
-  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
+  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default: '${LOGLEVEL_TO_STR[${LOG_LEVEL}]}')"
   echo "       -v : show script version"
   echo "       -d : setup cacert in docker client config (/etc/docker/certs.d/) (default skip)"
   echo "       -p : setup python cacerts (default skip)"
@@ -660,13 +658,13 @@ function usage() {
   echo "       -h : help"
   echo ""
   echo "  Examples:"
-	echo "       ${0} "
-  echo "       ${0} -v"
-	echo "       ${0} -L DEBUG"
-	echo "       ${0} cacert.example.com,443"
-	echo "       ${0} -L DEBUG updates.jenkins.io:443"
-	echo "       ${0} cacert.example.com,443 ca.example.int:443 registry.example.int:5000"
-	echo "       ${0} bitbucket.example.org.org:8443 updates.jenkins.io:443"
+	echo "       ${SCRIPT_NAME} "
+  echo "       ${SCRIPT_NAME} -v"
+	echo "       ${SCRIPT_NAME} -L DEBUG"
+	echo "       ${SCRIPT_NAME} cacert.example.com,443"
+	echo "       ${SCRIPT_NAME} -L DEBUG updates.jenkins.io:443"
+	echo "       ${SCRIPT_NAME} cacert.example.com,443 ca.example.int:443 registry.example.int:5000"
+	echo "       ${SCRIPT_NAME} bitbucket.example.org.org:8443 updates.jenkins.io:443"
 	[ -z "$1" ] || exit "$1"
 }
 

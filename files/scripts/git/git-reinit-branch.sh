@@ -65,7 +65,7 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 echo "Check out current ${TARGET_BRANCH} branch:"
-git checkout ${TARGET_BRANCH}
+git checkout "${TARGET_BRANCH}"
 
 echo "Check out to a temporary branch:"
 git checkout --orphan TEMP_BRANCH
@@ -77,12 +77,12 @@ echo "Commit the changes:"
 git commit -am "Initial commit"
 
 echo "Delete the old ${TARGET_BRANCH} branch:"
-git branch -D ${TARGET_BRANCH}
+git branch -D "${TARGET_BRANCH}"
 
 echo "Rename the temporary branch to ${TARGET_BRANCH}:"
 ## ref: https://gist.github.com/heiswayi/350e2afda8cece810c0f6116dadbe651
-git branch -m ${TARGET_BRANCH}
+git branch -m "${TARGET_BRANCH}"
 
 echo "Force ${TARGET_BRANCH} branch update to origin repository:"
-git push -f origin ${TARGET_BRANCH}
+git push -f origin "${TARGET_BRANCH}"
 #git push -f --set-upstream origin ${TARGET_BRANCH}

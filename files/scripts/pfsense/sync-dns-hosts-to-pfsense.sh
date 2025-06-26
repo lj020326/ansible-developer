@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-VERSION="2024.2.1"
+VERSION="2025.5.5"
+
+#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+SCRIPT_NAME=$(basename "$0")
 
 INTERNAL_DNS_NAMESERVER=dns.example.int
 EXTERNAL_DNS_NAMESERVER=8.8.8.8
@@ -11,7 +15,6 @@ HOSTNAME_CONFIG_LIST_DEFAULT+=("git.example.int:${INTERNAL_DNS_NAMESERVER}")
 HOSTNAME_CONFIG_LIST_DEFAULT+=("jira.example.int:${INTERNAL_DNS_NAMESERVER}")
 HOSTNAME_CONFIG_LIST_DEFAULT+=("example.org:${EXTERNAL_DNS_NAMESERVER}")
 
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 API_CLIENT_REPO_DIR="~/repos/ansible/api-client"
 
@@ -199,20 +202,20 @@ function reset_local_dns() {
 }
 
 function usage() {
-  echo "Usage: ${0} [options] [[endpoint:dns_lookup_endpoint] [endpoint:dns_lookup_endpoint]...]"
+  echo "Usage: ${SCRIPT_NAME} [options] [[endpoint:dns_lookup_endpoint] [endpoint:dns_lookup_endpoint]...]"
   echo ""
   echo "  Options:"
-  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default INFO)"
+  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default: '${LOGLEVEL_TO_STR[${LOG_LEVEL}]}')"
   echo "       -v : show script version"
   echo "       -h : help"
   echo ""
   echo "  Examples:"
-	echo "       ${0} "
-	echo "       ${0} -l DEBUG"
-  echo "       ${0} -v"
-	echo "       ${0} apps.example.org:8.8.8.8"
-	echo "       ${0} apps.example.org:8.8.8.8 jira.example.org:1.1.1.1"
-	echo "       ${0} apps.example.int:10.0.0.1 jira.example.int:dns.example.int"
+	echo "       ${SCRIPT_NAME} "
+	echo "       ${SCRIPT_NAME} -l DEBUG"
+  echo "       ${SCRIPT_NAME} -v"
+	echo "       ${SCRIPT_NAME} apps.example.org:8.8.8.8"
+	echo "       ${SCRIPT_NAME} apps.example.org:8.8.8.8 jira.example.org:1.1.1.1"
+	echo "       ${SCRIPT_NAME} apps.example.int:10.0.0.1 jira.example.int:dns.example.int"
 	[ -z "$1" ] || exit "$1"
 }
 

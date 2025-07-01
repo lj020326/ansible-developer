@@ -89,33 +89,33 @@ reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 #LOG_LEVEL=${LOG_DEBUG}
 LOG_LEVEL=${LOG_INFO}
 
-function logError() {
+function log_error() {
   if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
-  	logMessage "${LOG_ERROR}" "${1}"
+  	log_message "${LOG_ERROR}" "${1}"
   fi
 }
 
-function logWarn() {
+function log_warn() {
   if [ $LOG_LEVEL -ge $LOG_WARN ]; then
-  	logMessage "${LOG_WARN}" "${1}"
+  	log_message "${LOG_WARN}" "${1}"
   fi
 }
 
-function logInfo() {
+function log_info() {
   if [ $LOG_LEVEL -ge $LOG_INFO ]; then
-  	logMessage "${LOG_INFO}" "${1}"
+  	log_message "${LOG_INFO}" "${1}"
   fi
 }
 
-function logTrace() {
+function log_trace() {
   if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
-  	logMessage "${LOG_TRACE}" "${1}"
+  	log_message "${LOG_TRACE}" "${1}"
   fi
 }
 
-function logDebug() {
+function log_debug() {
   if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
-  	logMessage "${LOG_DEBUG}" "${1}"
+  	log_message "${LOG_DEBUG}" "${1}"
   fi
 }
 
@@ -139,13 +139,13 @@ function ohai() {
 }
 
 function abort() {
-  logError "$@"
+  log_error "$@"
   exit 1
 }
 
 function warn() {
-  logWarn "$@"
-#  logWarn "$(chomp "$1")"
+  log_warn "$@"
+#  log_warn "$(chomp "$1")"
 #  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
 }
 
@@ -155,7 +155,7 @@ function warn() {
 #}
 
 function error() {
-  logError "$@"
+  log_error "$@"
 #  printf "%s\n" "$@" >&2
 ##  echo "$@" 1>&2;
 }
@@ -165,7 +165,7 @@ function fail() {
   exit 1
 }
 
-function logMessage() {
+function log_message() {
   local LOG_MESSAGE_LEVEL="${1}"
   local LOG_MESSAGE="${2}"
   ## remove first item from FUNCNAME array
@@ -205,20 +205,24 @@ function logMessage() {
   local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
 #  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
   if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
-    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_reset} %s\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
   elif [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_WARN ]; then
-    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_bold} %s${tty_reset}\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_ERROR ]; then
-    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_bold} %s${tty_reset}\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   else
-    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
+    printf "${tty_bold}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_reset} %s\n" "${LOG_MESSAGE}" >&2
+#    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
   fi
 }
 
-function setLogLevel() {
+function set_log_level() {
   LOG_LEVEL_STR=$1
 
   ## ref: https://stackoverflow.com/a/13221491
@@ -231,45 +235,45 @@ function setLogLevel() {
 }
 
 function execute() {
-  logInfo "${*}"
+  log_info "${*}"
   if ! "$@"
   then
     abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
   fi
 }
 
-function handle_cmd_return_code() {
+function execute_eval_command() {
   local RUN_COMMAND=${*}
 
-  logInfo "${RUN_COMMAND}"
+  log_debug "${RUN_COMMAND}"
   COMMAND_RESULT=$(eval "${RUN_COMMAND}")
 #  COMMAND_RESULT=$(eval "${RUN_COMMAND} > /dev/null 2>&1")
   local RETURN_STATUS=$?
 
   if [[ $RETURN_STATUS -eq 0 ]]; then
-    logDebug "${COMMAND_RESULT}"
-    logDebug "SUCCESS!"
+    log_debug "${COMMAND_RESULT}"
+    log_debug "SUCCESS!"
   else
-    logError "ERROR (${RETURN_STATUS})"
-    echo "${COMMAND_RESULT}"
-    exit 1
+    log_error "ERROR (${RETURN_STATUS})"
+#    echo "${COMMAND_RESULT}"
+    abort "$(printf "Failed during: %s" "${COMMAND_RESULT}")"
   fi
 
 }
 
-function isInstalled() {
+function is_installed() {
   command -v "${1}" >/dev/null 2>&1 || return 1
 }
 
-function checkRequiredCommands() {
+function check_required_commands() {
   missingCommands=""
   for currentCommand in "$@"
   do
-    isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
+    is_installed "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
   done
 
   if [[ -n "${missingCommands}" ]]; then
-    fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
+    fail "Please install the following commands required by this script:${missingCommands}"
   fi
 }
 
@@ -349,7 +353,7 @@ function version_lt() {
 
 function install_git_repo() {
 
-  logInfo "This script will install:"
+  log_info "This script will install:"
   echo "${INSTALL_REPOSITORY}"
 
   if ! [[ -d "${INSTALL_REPOSITORY}" ]]
@@ -357,7 +361,7 @@ function install_git_repo() {
     execute "${MKDIR[@]}" "${INSTALL_REPOSITORY}"
   fi
 
-  logInfo "Downloading and installing ansible-developer repo..."
+  log_info "Downloading and installing ansible-developer repo..."
   (
     cd "${INSTALL_REPOSITORY}" >/dev/null || return
 
@@ -388,7 +392,7 @@ function install_git_repo() {
 
 function setup_python_env() {
 
-  logInfo "Setup pyenv and user python environment..."
+  log_info "Setup pyenv and user python environment..."
   (
     PYENV_INSTALL_CMD_ARRAY=("bash")
     if [[ "${LOG_LEVEL-}" -ge $LOG_DEBUG ]]; then
@@ -407,14 +411,14 @@ function setup_python_env() {
      && PYENV_BIN="${PYENV_BIN_DIR}/pyenv"
 #    local PYENV_BIN="$(which pyenv)"
 
-    logInfo "PYENV_BIN=${PYENV_BIN}"
+    log_info "PYENV_BIN=${PYENV_BIN}"
     if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
       abort "PYENV_BIN => ${PYENV_BIN} not found"
     fi
     if ! command -v pyenv &> /dev/null; then
       fail "pyenv not found"
     fi
-    logInfo "pyenv setup correctly"
+    log_info "pyenv setup correctly"
 
 #  	if ! command -v pyenv &> /dev/null; then
 ##    if [[ -n "$(env PATH=${SYSTEM_PATH} command -v pyenv)" ]]; then
@@ -449,17 +453,24 @@ function setup_python_env() {
 
 function setup_cacerts() {
 
-  logInfo "Setup CA certs..."
-  (
-    eval "sudo ${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
-  ) || exit 1
+  log_info "Setup CA certs..."
+  local SETUP_CA_CERTS_CMD_ARRAY=("sudo ${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh")
+  if [[ "${LOG_LEVEL-}" -gt $LOG_INFO ]]; then
+    SETUP_CA_CERTS_CMD_ARRAY+=("-L ${LOGLEVEL_TO_STR[${LOG_LEVEL}]}")
+  fi
+  execute_eval_command "${SETUP_CA_CERTS_CMD_ARRAY[*]}"
+#  execute_eval_command "sudo ${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
+#  log_info "Setup CA certs..."
+#  (
+#    eval "sudo ${INSTALL_REPOSITORY}/files/scripts/certs/install-cacerts.sh"
+#  ) || exit 1
 
   echo
 }
 
 function setup_user_env() {
 
-  logInfo "Setup user bash environment..."
+  log_info "Setup user bash environment..."
   (
     eval "${INSTALL_REPOSITORY}/sync-bashenv.sh"
   ) || exit 1
@@ -469,7 +480,7 @@ function setup_user_env() {
 
 ## ref: https://medium.com/@michael.schladt/bringing-gnu-linux-tools-to-windows-w-msys2-f663f89d8d08
 function setup_windows() {
-  logInfo "Setup windows environment..."
+  log_info "Setup windows environment..."
   (
 #    yes | pacman -Syu && \
     pacman --noconfirm -Syu && \
@@ -571,7 +582,7 @@ function main() {
 
   while getopts "L:r:vh" opt; do
     case "${opt}" in
-      L) setLogLevel "${OPTARG}" ;;
+      L) set_log_level "${OPTARG}" ;;
       r) GIT_REMOTE_URL="${OPTARG}" ;;
       v) echo "${VERSION}" && exit ;;
       h | help | \?) usage ;;
@@ -584,7 +595,7 @@ function main() {
 
   INSTALL_GIT_REMOTE="${GIT_REMOTE_URL-$INSTALL_GIT_REMOTE_DEFAULT}"
 
-  checkRequiredCommands python3 rsync
+  check_required_commands python3 rsync
 
   # Check if script is run non-interactively (e.g. CI)
   # If it is run non-interactively we should not prompt for passwords.
@@ -611,7 +622,7 @@ function main() {
   fi
 
   if [[ "${LOG_LEVEL-}" -ge $LOG_INFO ]]; then
-    logInfo "LOG_LEVEL=${LOGLEVEL_TO_STR[${LOG_LEVEL}]}"
+    log_info "LOG_LEVEL=${LOGLEVEL_TO_STR[${LOG_LEVEL}]}"
   fi
 
   # USER isn't always set so provide a fall back for the installer and subprocesses.
@@ -653,7 +664,7 @@ Please install Git ${REQUIRED_GIT_VERSION} or newer and add it to your PATH."
     if [[ "${USABLE_GIT}" != /usr/bin/git ]]
     then
       export GIT_PATH="${USABLE_GIT}"
-      logInfo "Found Git: ${GIT_PATH}"
+      log_info "Found Git: ${GIT_PATH}"
     fi
   fi
 
@@ -679,7 +690,7 @@ EOABORT
     if [[ "${USABLE_PYTHON3}" != /usr/bin/python3 ]]
     then
       export PYTHON3_PATH="${USABLE_PYTHON3}"
-      logInfo "Found Git: ${PYTHON3_PATH}"
+      log_info "Found Git: ${PYTHON3_PATH}"
     fi
   fi
 
@@ -703,7 +714,7 @@ EOABORT
 
   setup_user_env
 
-  logInfo "Installation successful!"
+  log_info "Installation successful!"
   echo
 }
 

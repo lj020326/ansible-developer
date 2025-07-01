@@ -4,7 +4,7 @@
 # exit when any command fails
 set -e
 
-VERSION="2025.6.12"
+VERSION="2025.7.1"
 
 #SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_DIR="$(dirname "$0")"
@@ -14,13 +14,9 @@ GIT_DEFAULT_BRANCH=main
 GIT_PUBLIC_BRANCH=public
 
 ## https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
-TMP_DIR=$(mktemp -d -p ~)
+TEMP_DIR=$(mktemp -d -p ~)
 
-# keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-# echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
-trap 'rm -fr "$TMP_DIR"' EXIT
+trap 'rm -fr "$TEMP_DIR"' EXIT
 
 GIT_REMOVE_CACHED_FILES=0
 
@@ -73,17 +69,15 @@ EXCLUDES="${EXCLUDES%,}"
 
 ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
 ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
-RSYNC_OPTS_GIT_MIRROR=(
-    -dar
-    --links
-    --delete-excluded
-    --exclude={"${EXCLUDES},${EXCLUDE_AND_REMOVE}"}
-)
+RSYNC_OPTS_GIT_MIRROR=()
+RSYNC_OPTS_GIT_MIRROR+=("-dar")
+RSYNC_OPTS_GIT_MIRROR+=("--links")
+RSYNC_OPTS_GIT_MIRROR+=("--delete-excluded")
+RSYNC_OPTS_GIT_MIRROR+=("--exclude={${EXCLUDES},${EXCLUDE_AND_REMOVE}}")
 
-RSYNC_OPTS_GIT_UPDATE=(
-    -ari
-    --links
-)
+RSYNC_OPTS_GIT_UPDATE=()
+RSYNC_OPTS_GIT_UPDATE+=("-ari")
+RSYNC_OPTS_GIT_UPDATE+=("--links")
 
 #### LOGGING RELATED
 LOG_ERROR=0
@@ -122,7 +116,7 @@ function reverse_array() {
     # Get the value associated with the current key
     VALUE="${ARRAY_SOURCE_REF[$KEY]}"
     # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
-    REVERSED_ARRAY_REF[$VALUE]="$KEY"
+    REVERSED_ARRAY_REF["$VALUE"]="$KEY"
   done
 }
 
@@ -132,33 +126,33 @@ reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 #LOG_LEVEL=${LOG_DEBUG}
 LOG_LEVEL=${LOG_INFO}
 
-function logError() {
-  if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
-  	logMessage "${LOG_ERROR}" "${1}"
+function log_error() {
+  if [ "$LOG_LEVEL" -ge "$LOG_ERROR" ]; then
+  	log_message "${LOG_ERROR}" "${1}"
   fi
 }
 
-function logWarn() {
-  if [ $LOG_LEVEL -ge $LOG_WARN ]; then
-  	logMessage "${LOG_WARN}" "${1}"
+function log_warn() {
+  if [ "$LOG_LEVEL" -ge "$LOG_WARN" ]; then
+  	log_message "${LOG_WARN}" "${1}"
   fi
 }
 
-function logInfo() {
-  if [ $LOG_LEVEL -ge $LOG_INFO ]; then
-  	logMessage "${LOG_INFO}" "${1}"
+function log_info() {
+  if [ "$LOG_LEVEL" -ge "$LOG_INFO" ]; then
+  	log_message "${LOG_INFO}" "${1}"
   fi
 }
 
-function logTrace() {
-  if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
-  	logMessage "${LOG_TRACE}" "${1}"
+function log_trace() {
+  if [ "$LOG_LEVEL" -ge "$LOG_TRACE" ]; then
+  	log_message "${LOG_TRACE}" "${1}"
   fi
 }
 
-function logDebug() {
-  if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
-  	logMessage "${LOG_DEBUG}" "${1}"
+function log_debug() {
+  if [ "$LOG_LEVEL" -ge "$LOG_DEBUG" ]; then
+  	log_message "${LOG_DEBUG}" "${1}"
   fi
 }
 
@@ -182,13 +176,13 @@ function ohai() {
 }
 
 function abort() {
-  logError "$@"
+  log_error "$@"
   exit 1
 }
 
 function warn() {
-  logWarn "$@"
-#  logWarn "$(chomp "$1")"
+  log_warn "$@"
+#  log_warn "$(chomp "$1")"
 #  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
 }
 
@@ -198,7 +192,7 @@ function warn() {
 #}
 
 function error() {
-  logError "$@"
+  log_error "$@"
 #  printf "%s\n" "$@" >&2
 ##  echo "$@" 1>&2;
 }
@@ -208,7 +202,7 @@ function fail() {
   exit 1
 }
 
-function logMessage() {
+function log_message() {
   local LOG_MESSAGE_LEVEL="${1}"
   local LOG_MESSAGE="${2}"
   ## remove first item from FUNCNAME array
@@ -248,20 +242,24 @@ function logMessage() {
   local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
 #  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
   if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
-    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_reset} %s\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
   elif [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_WARN ]; then
-    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_bold} %s${tty_reset}\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_ERROR ]; then
-    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_bold} %s${tty_reset}\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   else
-    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
+    printf "${tty_bold}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_reset} %s\n" "${LOG_MESSAGE}" >&2
+#    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
   fi
 }
 
-function setLogLevel() {
+function set_log_level() {
   LOG_LEVEL_STR=$1
 
   ## ref: https://stackoverflow.com/a/13221491
@@ -274,39 +272,62 @@ function setLogLevel() {
 }
 
 function execute() {
-  logInfo "${*}"
+  log_info "${*}"
   if ! "$@"
   then
     abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
   fi
 }
 
-function isInstalled() {
+function execute_eval_command() {
+  local RUN_COMMAND="${*}"
+
+  log_debug "${RUN_COMMAND}"
+  COMMAND_RESULT=$(eval "${RUN_COMMAND}")
+#  COMMAND_RESULT=$(eval "${RUN_COMMAND} > /dev/null 2>&1")
+  local RETURN_STATUS=$?
+
+  if [[ $RETURN_STATUS -eq 0 ]]; then
+    if [[ $COMMAND_RESULT != "" ]]; then
+      log_debug "${COMMAND_RESULT}"
+    fi
+    log_debug "SUCCESS!"
+  else
+    log_error "ERROR (${RETURN_STATUS})"
+#    echo "${COMMAND_RESULT}"
+    abort "$(printf "Failed during: %s" "${COMMAND_RESULT}")"
+  fi
+
+}
+
+function is_installed() {
   command -v "${1}" >/dev/null 2>&1 || return 1
 }
 
-function checkRequiredCommands() {
-  missingCommands=""
-  for currentCommand in "$@"
+function check_required_commands() {
+  MISSING_COMMANDS=""
+  for CURRENT_COMMAND in "$@"
   do
-    isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
+    is_installed "${CURRENT_COMMAND}" || MISSING_COMMANDS="${MISSING_COMMANDS} ${CURRENT_COMMAND}"
   done
 
-  if [[ -n "${missingCommands}" ]]; then
-    fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
+  if [[ -n "${MISSING_COMMANDS}" ]]; then
+    fail "Please install the following commands required by this script: ${MISSING_COMMANDS}"
   fi
 }
 
-function gitcommitpush() {
-  local LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
-  local REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
-  IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
+function git_commit_push() {
+  local LOCAL_BRANCH
+  local REMOTE_AND_BRANCH
+  LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
+  REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${LOCAL_BRANCH}@{upstream}") && \
+  IFS=/ read -r REMOTE REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
   echo "Staging changes:" && \
-  git add -A || true && \
+  (git add -A || true) && \
   echo "Committing changes:" && \
-  git commit -am "group updates to public branch" || true && \
+  (git commit -am "group updates to public branch" || true) && \
   echo "Pushing branch '${LOCAL_BRANCH}' to remote '${REMOTE}' branch '${REMOTE_BRANCH}':" && \
-  git push -f -u ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH} || true
+  (git push -f -u "${REMOTE}" "${LOCAL_BRANCH}:${REMOTE_BRANCH}" || true)
 }
 
 function search_repo_keywords () {
@@ -322,11 +343,11 @@ function search_repo_keywords () {
     abort "REPO_EXCLUDE_KEYWORDS not set/defined"
   fi
 
-  logDebug "REPO_EXCLUDE_KEYWORDS=${REPO_EXCLUDE_KEYWORDS}"
+  log_debug "REPO_EXCLUDE_KEYWORDS=${REPO_EXCLUDE_KEYWORDS}"
 
   IFS=',' read -ra REPO_EXCLUDE_KEYWORDS_ARRAY <<< "$REPO_EXCLUDE_KEYWORDS"
 
-  logDebug "REPO_EXCLUDE_KEYWORDS_ARRAY=${REPO_EXCLUDE_KEYWORDS_ARRAY[*]}"
+  log_debug "REPO_EXCLUDE_KEYWORDS_ARRAY=${REPO_EXCLUDE_KEYWORDS_ARRAY[*]}"
 
   # ref: https://superuser.com/questions/1371834/escaping-hyphens-with-printf-in-bash
   #'-e' ==> '\055e'
@@ -338,17 +359,17 @@ function search_repo_keywords () {
   ## strip suffix
   #local GREP_PATTERN_SEARCH=${GREP_PATTERN_SEARCH%"$GREP_DELIM"}
 
-  logDebug "GREP_PATTERN_SEARCH=${GREP_PATTERN_SEARCH}"
+  log_debug "GREP_PATTERN_SEARCH=${GREP_PATTERN_SEARCH}"
 
   local GREP_COMMAND="grep ${GREP_PATTERN_SEARCH}"
-  logDebug "GREP_COMMAND=${GREP_COMMAND}"
+  log_debug "GREP_COMMAND=${GREP_COMMAND}"
 
   local FIND_DELIM=' -o '
 #  printf -v FIND_EXCLUDE_DIRS "\055path '*/%s/*' -prune${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
   printf -v FIND_EXCLUDE_DIRS "! -path '*/%s/*'${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
-  local FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS%$FIND_DELIM}
+  local FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS%"$FIND_DELIM"}
 
-  logDebug "FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS}"
+  log_debug "FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS}"
 
   ## this works:
   ## find . \( -path '*/.git/*' \) -prune -name '.*' -o -exec grep -i example {} 2>/dev/null +
@@ -357,17 +378,15 @@ function search_repo_keywords () {
   ## ref: https://stackoverflow.com/questions/6565471/how-can-i-exclude-directories-from-grep-r#8692318
   ## ref: https://unix.stackexchange.com/questions/342008/find-and-echo-file-names-only-with-pattern-found
   ## ref: https://www.baeldung.com/linux/find-exclude-paths
-#  local FIND_CMD="find ${PROJECT_DIR}/ -type f \( ${FIND_EXCLUDE_DIRS} \) -prune -o -exec ${GREP_COMMAND} {} 2>/dev/null \;"
-#  local FIND_CMD="find ${PROJECT_DIR}/ -name '.*' -type f \( ${FIND_EXCLUDE_DIRS} \) -prune -o -exec ${GREP_COMMAND} {} 2>/dev/null +"
-#  local FIND_CMD="find ${PROJECT_DIR}/ \( ${FIND_EXCLUDE_DIRS} \) -prune -name '.*'  -o -exec ${GREP_COMMAND} {} 2>/dev/null +"
   local FIND_CMD="find ${PROJECT_DIR}/ \( ${FIND_EXCLUDE_DIRS} \) -o -exec ${GREP_COMMAND} {} 2>/dev/null +"
-  logInfo "${FIND_CMD}"
+  log_info "${FIND_CMD}"
 
-  local EXCEPTION_COUNT=$(eval "${FIND_CMD} | wc -l")
+  local EXCEPTION_COUNT
+  EXCEPTION_COUNT=$(eval "${FIND_CMD} | wc -l")
   if [[ $EXCEPTION_COUNT -eq 0 ]]; then
-    logInfo "SUCCESS => No exclusion keyword matches found!!"
+    log_info "SUCCESS => No exclusion keyword matches found!!"
   else
-    logError "There are [${EXCEPTION_COUNT}] exclusion keyword matches found:"
+    log_error "There are [${EXCEPTION_COUNT}] exclusion keyword matches found:"
     eval "${FIND_CMD}"
     exit 1
   fi
@@ -375,58 +394,55 @@ function search_repo_keywords () {
 }
 
 function sync_public_branch() {
+  local RSYNC_MIRROR_OPTS="${RSYNC_OPTS_GIT_MIRROR[*]}"
+  local RSYNC_UPDATE_OPTS="${RSYNC_OPTS_GIT_UPDATE[*]}"
+
+  log_debug "RSYNC_MIRROR_OPTS=${RSYNC_MIRROR_OPTS}"
+  log_debug "RSYNC_UPDATE_OPTS=${RSYNC_UPDATE_OPTS}"
 
   git fetch --all
   git checkout ${GIT_DEFAULT_BRANCH}
   
   #RSYNC_OPTS=${RSYNC_OPTS_GIT_MIRROR[@]}
-  logDebug "EXCLUDE_AND_REMOVE=${EXCLUDE_AND_REMOVE}"
+  log_debug "EXCLUDE_AND_REMOVE=${EXCLUDE_AND_REMOVE}"
 
-  logDebug "copy project to temporary dir $TMP_DIR"
-  #local RSYNC_CMD="rsync ${RSYNC_OPTS} ${PROJECT_DIR}/ ${TMP_DIR}/"
-  local RSYNC_CMD="rsync ${RSYNC_OPTS_GIT_MIRROR[*]} ${PROJECT_DIR}/ ${TMP_DIR}/"
-  logDebug "${RSYNC_CMD}"
-  eval ${RSYNC_CMD}
+  log_debug "copy project to temporary dir $TEMP_DIR"
+  local RSYNC_CMD
+  RSYNC_CMD="rsync ${RSYNC_MIRROR_OPTS} ${PROJECT_DIR}/ ${TEMP_DIR}/"
+  execute_eval_command "${RSYNC_CMD}"
   
-  logInfo "Checkout public branch"
+  log_info "Checkout public branch"
   git checkout ${GIT_PUBLIC_BRANCH}
   
   if [ $GIT_REMOVE_CACHED_FILES -eq 1 ]; then
-    logInfo "Removing files cached in git"
+    log_info "Removing files cached in git"
     git rm -r --cached .
   fi
   
-  #logInfo "Removing existing non-dot files for clean sync"
-  #rm -fr *
-  
-  logInfo "Copy ${TMP_DIR} to project dir $PROJECT_DIR"
-  #logInfo "rsync ${RSYNC_OPTS_GIT_UPDATE[@]} ${TMP_DIR}/ ${PROJECT_DIR}/"
-  RSYNC_CMD="rsync ${RSYNC_OPTS_GIT_UPDATE[*]} ${TMP_DIR}/ ${PROJECT_DIR}/"
-  logInfo "${RSYNC_CMD}"
-  eval ${RSYNC_CMD}
+  log_info "Copy ${TEMP_DIR} to project dir $PROJECT_DIR"
+  RSYNC_CMD="rsync ${RSYNC_UPDATE_OPTS} ${TEMP_DIR}/ ${PROJECT_DIR}/"
+  execute_eval_command "${RSYNC_CMD}"
 
   IFS=$'\n'
-  for dir in ${MIRROR_DIR_LIST}
+  for TARGET_DIR in ${MIRROR_DIR_LIST}
   do
-    logInfo "Mirror ${TMP_DIR}/${dir}/ to project dir $PROJECT_DIR/${dir}/"
-    RSYNC_CMD="rsync ${RSYNC_OPTS_GIT_MIRROR[*]} ${TMP_DIR}/${dir}/ ${PROJECT_DIR}/${dir}/"
-    logInfo "${RSYNC_CMD}"
-    eval ${RSYNC_CMD}
+    log_info "Mirror ${TEMP_DIR}/${TARGET_DIR}/ to project dir ${PROJECT_DIR}/${TARGET_DIR}/"
+    RSYNC_CMD="rsync ${RSYNC_MIRROR_OPTS} ${TEMP_DIR}/${TARGET_DIR}/ ${PROJECT_DIR}/${TARGET_DIR}/"
+    execute_eval_command "${RSYNC_CMD}"
   done
 
   printf -v TO_REMOVE '%s ' "${PRIVATE_CONTENT_ARRAY[@]}"
   TO_REMOVE="${TO_REMOVE% }"
-  logInfo "TO_REMOVE=${TO_REMOVE}"
+  log_info "TO_REMOVE=${TO_REMOVE}"
   CLEANUP_CMD="rm -fr ${TO_REMOVE}"
-  logInfo "${CLEANUP_CMD}"
-  eval ${CLEANUP_CMD}
-  
+  execute_eval_command "${CLEANUP_CMD}"
+
   if [ -e $PUBLIC_GITIGNORE ]; then
-    logInfo "Update public files:"
+    log_info "Update public files:"
     cp -p $PUBLIC_GITIGNORE .gitignore
   fi
   
-  logInfo "Show changes before push:"
+  log_info "Show changes before push:"
   git status
   
   ## https://stackoverflow.com/questions/5989592/git-cannot-checkout-branch-error-pathspec-did-not-match-any-files-kn
@@ -443,16 +459,16 @@ function sync_public_branch() {
   fi
   
   ## https://stackoverflow.com/questions/5738797/how-can-i-push-a-local-git-branch-to-a-remote-with-a-different-name-easily
-  logInfo "Add all the files:"
-  gitcommitpush
-  logInfo "Checkout ${GIT_DEFAULT_BRANCH} branch:" && \
+  log_info "Add all the files:"
+  git_commit_push
+  log_info "Checkout ${GIT_DEFAULT_BRANCH} branch:" && \
   git checkout ${GIT_DEFAULT_BRANCH}
 
-  logInfo "chmod project admin/maintenance scripts"
+  log_info "chmod project admin/maintenance scripts"
   chmod +x files/scripts/*.sh
   chmod +x files/scripts/git/*.sh
   
-  logInfo "creating links for useful project scripts"
+  log_info "creating links for useful project scripts"
   cd ${PROJECT_DIR}
   chmod +x ./files/scripts/git/*.sh
   ln -sf ./files/scripts/git/sync-*.sh ./
@@ -478,11 +494,11 @@ function usage() {
 
 function main() {
 
-  checkRequiredCommands rsync
+  check_required_commands rsync
 
   while getopts "L:vh" opt; do
       case "${opt}" in
-          L) setLogLevel "${OPTARG}" ;;
+          L) set_log_level "${OPTARG}" ;;
           v) echo "${VERSION}" && exit ;;
           h) usage 1 ;;
           \?) usage 2 ;;
@@ -491,15 +507,15 @@ function main() {
   done
   shift $((OPTIND-1))
 
-  logDebug "EXCLUDES=${EXCLUDES}"
+  log_debug "EXCLUDES=${EXCLUDES}"
 
-  logDebug "PROJECT_DIR=${PROJECT_DIR}"
-  logDebug "TMP_DIR=${TMP_DIR}"
+  log_debug "PROJECT_DIR=${PROJECT_DIR}"
+  log_debug "TEMP_DIR=${TEMP_DIR}"
 
   search_repo_keywords
   local RETURN_STATUS=$?
   if [[ $RETURN_STATUS -ne 0 ]]; then
-    logError "search_repo_keywords: FAILED"
+    log_error "search_repo_keywords: FAILED"
     exit ${RETURN_STATUS}
   fi
 

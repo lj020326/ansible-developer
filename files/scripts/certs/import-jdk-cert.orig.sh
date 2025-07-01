@@ -1,36 +1,38 @@
 #!/usr/bin/env bash
 
-## ref: https://stackoverflow.com/questions/3685548/java-keytool-easy-way-to-add-server-cert-from-url-port
-## ref: https://superuser.com/questions/97201/how-to-save-a-remote-server-ssl-certificate-locally-as-a-file
-## ref: https://serverfault.com/questions/661978/displaying-a-remote-ssl-certificate-details-using-cli-tools
+scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "scriptDir=[${scriptDir}]"
 
 #set -x
-
-VERSION="2025.6.12"
-
-#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_DIR="$(dirname "$0")"
-SCRIPT_NAME="$(basename "$0")"
-SCRIPT_NAME_PREFIX="${SCRIPT_NAME%.*}"
 
 ## ref: https://stackoverflow.com/questions/3685548/java-keytool-easy-way-to-add-server-cert-from-url-port
 ##
 
-LOG_FILE="${SCRIPT_NAME_PREFIX}.log"
+scriptName=$(basename $0)
+#scriptName="${0%.*}"
+logFile="${scriptName}.log"
 
-SITE_LIST_DEFAULT=()
-#SITE_LIST_DEFAULT+=("artifactory.dettonville.int")
-SITE_LIST_DEFAULT+=("archiva.admin.dettonville.int")
-SITE_LIST_DEFAULT+=("www.jetbrains.com")
+if [[ "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
+  if [ "$EUID" -ne 0 ]; then
+    echo "Must run this script as root. run 'sudo $SCRIPT_NAME'"
+    exit
+  fi
+fi
 
-KEYTOOL=keytool
-USER_KEYSTORE="${HOME}/.keystore"
+#HOST=myhost.example.com
+#HOST=artifactory.dev.dettonville.int
+#HOST=www.jetbrains.com
+#HOST=${1:-"repository.dettonville.int"}
+#PORT=${2:-"443"}
 
+HOST=${1:-"archiva.admin.dettonville.int"}
+PORT=${2:-"8443"}
 KEYSTORE_PASS=${3:-"changeit"}
 
 #DATE=`date +&%%m%d%H%M%S`
 DATE=$(date +%Y%m%d)
 
+KEYTOOL=keytool
 
 ALIAS="${HOST}:${PORT}"
 
@@ -56,8 +58,8 @@ TMP_OUT=/tmp/${SCRIPT_NAME}.output
 ### functions followed by main
 
 writeToLog() {
-  echo -e "${1}" | tee -a "${LOG_FILE}"
-  #    echo -e "${1}" >> "${LOG_FILE}"
+  echo -e "${1}" | tee -a "${logFile}"
+  #    echo -e "${1}" >> "${logFile}"
 }
 
 function get_java_keystore() {

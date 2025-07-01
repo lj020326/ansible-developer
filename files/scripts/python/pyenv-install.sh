@@ -187,16 +187,20 @@ function logMessage() {
   local __LOG_MESSAGE="${LOG_PREFIX} ${LOG_MESSAGE}"
 #  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${__LOG_MESSAGE}"
   if [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_INFO ]; then
-    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_reset} %s\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_reset} %s\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_blue}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}"
   elif [ "${LOG_MESSAGE_LEVEL}" -eq $LOG_WARN ]; then
-    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_bold} %s${tty_reset}\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_orange}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   elif [ "${LOG_MESSAGE_LEVEL}" -le $LOG_ERROR ]; then
-    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
+    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_bold} %s${tty_reset}\n" "${LOG_MESSAGE}" >&2
+#    printf "${tty_red}[${PADDED_LOG_LEVEL}]: ==>${tty_bold} %s${tty_reset}\n" "${__LOG_MESSAGE}" >&2
 #    printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
   else
-    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
+    printf "${tty_bold}[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX}${tty_reset} %s\n" "${LOG_MESSAGE}" >&2
+#    printf "[${PADDED_LOG_LEVEL}]: ==> %s\n" "${LOG_PREFIX} ${LOG_MESSAGE}"
   fi
 }
 
@@ -218,6 +222,25 @@ function execute() {
   then
     abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
   fi
+}
+
+function execute_eval_command() {
+  local RUN_COMMAND=${*}
+
+  logInfo "${RUN_COMMAND}"
+  COMMAND_RESULT=$(eval "${RUN_COMMAND}")
+#  COMMAND_RESULT=$(eval "${RUN_COMMAND} > /dev/null 2>&1")
+  local RETURN_STATUS=$?
+
+  if [[ $RETURN_STATUS -eq 0 ]]; then
+    logDebug "${COMMAND_RESULT}"
+    logDebug "SUCCESS!"
+  else
+    logError "ERROR (${RETURN_STATUS})"
+#    echo "${COMMAND_RESULT}"
+    abort "$(printf "Failed during: %s" "${COMMAND_RESULT}")"
+  fi
+
 }
 
 function setup_pyenv_linux() {
@@ -296,37 +319,42 @@ function install_python_version() {
     exit 0
   fi
 
+  local INSTALL_PYTHON_CMD_ARRAY=()
+
   ## ref: https://github.com/pyenv/pyenv/issues/2760#issuecomment-1868608898
   ## ref: https://github.com/pyenv/pyenv/issues/2416
+  #    curl -Lo "$HOME/.pyenv/cache/Python-${PYTHON_VERSION}.tar.xz" \
+  #        "https://registry.npmmirror.com/-/binary/python/$PYTHON_VERSION/Python-${PYTHON_VERSION}.tar.xz"
+  #    #    "https://npm.taobao.org/mirrors/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz"
   #env pyenv install "${PYTHON_VERSION}"
   #env CFLAGS=-fPIC pyenv install $PYTHON_VERSION
   #env CFLAGS="-I/usr/local/openssl/include" LDFLAGS="-L/usr/local/openssl/lib" pyenv install "${PYTHON_VERSION}"
   #env CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib -lssl -lcrypto" CFLAGS=-fPIC pyenv install "${PYTHON_VERSION}"
   if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
-#    curl -Lo "$HOME/.pyenv/cache/Python-${PYTHON_VERSION}.tar.xz" \
-#        "https://registry.npmmirror.com/-/binary/python/$PYTHON_VERSION/Python-${PYTHON_VERSION}.tar.xz"
-#    #    "https://npm.taobao.org/mirrors/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz"
-    INSTALL_PYTHON_CMD="env CPPFLAGS=\"-I/usr/include/openssl\" LDFLAGS=\"-L/usr/lib64/openssl -lssl -lcrypto\" CFLAGS=-fPIC ${PYENV_BIN} install -s ${PYTHON_VERSION}"
+    INSTALL_PYTHON_CMD_ARRAY+=("env CPPFLAGS=\"-I/usr/include/openssl\"")
+    INSTALL_PYTHON_CMD_ARRAY+=("LDFLAGS=\"-L/usr/lib64/openssl -lssl -lcrypto\"")
+    INSTALL_PYTHON_CMD_ARRAY+=("CFLAGS=-fPIC ${PYENV_BIN} install -s ${PYTHON_VERSION}")
   elif [[ -n "${INSTALL_ON_MACOS-}" ]]; then
     ## ref: https://stackoverflow.com/questions/41430706/pyvenv-returns-non-zero-exit-status-1-during-the-installation-of-pip-stage#41430707
     ## ref: https://github.com/pyenv/pyenv/issues/2143#issuecomment-1069223994
     ## ref: https://stackoverflow.com/a/54142474/2791368
-#    env CC=/usr/local/bin/gcc-13 pyenv install "${PYTHON_VERSION}"
+#    INSTALL_PYTHON_CMD_ARRAY+=("env CC=/usr/local/bin/gcc-13 pyenv install ${PYTHON_VERSION}")
     ## NOTE: make sure to remove the gnu gcc env from the PATH by setting it to system PATH
     ##       GNU Coreutils and Binutils on PATH are also known to break build in MacOS
     ## ref: https://github.com/pyenv/pyenv/issues/2862#issuecomment-1849198741
     ## ref: https://github.com/pyenv/pyenv/wiki/Common-build-problems#keg-only-homebrew-packages-are-forcibly-linked--added-to-path
-    INSTALL_PYTHON_CMD="env PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin \
-      CFLAGS=\"-I$(brew --prefix readline)/include -I$(brew --prefix openssl)/include -I$(xcrun --show-sdk-path)/usr/include\" \
-      LDFLAGS=\"-L$(brew --prefix readline)/lib -L$(brew --prefix openssl)/lib\" \
-      PYTHON_CONFIGURE_OPTS=--enable-unicode=ucs2 \
-      ${PYENV_BIN} install -s ${PYTHON_VERSION}"
+    INSTALL_PYTHON_CMD_ARRAY+=("env PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin")
+    INSTALL_PYTHON_CMD_ARRAY+=("CFLAGS=\"-I$(brew --prefix readline)/include -I$(brew --prefix openssl)/include -I$(xcrun --show-sdk-path)/usr/include\"")
+    INSTALL_PYTHON_CMD_ARRAY+=("LDFLAGS=\"-L$(brew --prefix readline)/lib -L$(brew --prefix openssl)/lib\"")
+    INSTALL_PYTHON_CMD_ARRAY+=("PYTHON_CONFIGURE_OPTS=--enable-unicode=ucs2")
+    INSTALL_PYTHON_CMD_ARRAY+=("${PYENV_BIN} install -s ${PYTHON_VERSION}")
   else
-    INSTALL_PYTHON_CMD="${PYENV_BIN} install -s ${PYTHON_VERSION}"
+    INSTALL_PYTHON_CMD_ARRAY+=("${PYENV_BIN} install -s ${PYTHON_VERSION}")
   fi
 
-  execute "${INSTALL_PYTHON_CMD}"
-#  eval "${INSTALL_PYTHON_CMD}"
+  execute_eval_command "${INSTALL_PYTHON_CMD_ARRAY[*]}"
+#  execute "${INSTALL_PYTHON_CMD_ARRAY[*]}"
+#  eval "${INSTALL_PYTHON_CMD_ARRAY[*]}"
 
   mkdir -p "$HOME/.config/pip"
   [ -f "$HOME/.config/pip/pip.conf" ] && mv "$HOME/.config/pip/pip.conf" "$HOME/.config/pip/pip.conf.bak"

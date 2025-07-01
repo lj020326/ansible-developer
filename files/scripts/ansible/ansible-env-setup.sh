@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
 # usage: source hacking/env-setup [-q]
 #    modifies environment for running Ansible from checkout
 

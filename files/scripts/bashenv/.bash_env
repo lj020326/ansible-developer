@@ -312,7 +312,7 @@ if [ -d "${HOME}/.pyenv/bin" ]; then
 elif [ -d "${HOME}/.pyenv/pyenv-win/bin" ]; then
   export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
   echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
-#elif [ -d "${HOME}/.pyenv/shims" ]; then
+#elif [ -f "${HOME}/.pyenv/shims/python3" ]; then
 #  export PYENV_BIN_DIR="${HOME}/.pyenv/shims"
 #  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 fi
@@ -352,6 +352,7 @@ if [ -d "${HOME}/.local/bin" ]; then
 fi
 
 if ! command -v jenv 1>/dev/null 2>&1; then
+  echo "${log_prefix_bashenv} adding jenv to PATH"
   if [ -d "${HOME}/.jenv/bin" ]; then
     export PATH="$HOME/.jenv/bin:$PATH"
   elif [ -d "${HOME}/.jenv/shims" ]; then
@@ -361,7 +362,8 @@ fi
 
 ## ref: https://www.jenv.be/
 if command -v jenv 1>/dev/null 2>&1; then
-   eval "$(jenv init -)"
+  echo "${log_prefix_bashenv} init jenv"
+  eval "$(jenv init -)"
 fi
 
 if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then

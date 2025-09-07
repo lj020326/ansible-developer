@@ -127,7 +127,7 @@ Running on admin02 in /workspace/dettonville/infra/ansible-datacenter/dev/bootst
 [Pipeline] script (hide)
 [Pipeline] { (hide)
 [Pipeline] echo (hide)
-11:46:59  [INFO] runAnsiblePlaybook : config={
+11:46:59  [INFO] runAnsiblePipeline : config={
 11:46:59      "ansible": {
 11:46:59          "installation": "ansible-local",
 11:46:59          "playbook": "site.yml",

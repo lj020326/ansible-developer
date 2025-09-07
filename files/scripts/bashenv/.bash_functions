@@ -37,6 +37,164 @@ function ansible_debug_variable() {
 #    -a "var=${ANSIBLE_VARIABLE_NAME}"
 }
 
+# Function to create an Ansible role from a single combined file
+#
+# Arguments:
+#   $1: Path to the downloaded role file (e.g., ~/the_role_file_you_provided.txt)
+#       This file is expected to contain content for tasks/main.yml,
+#       defaults/main.yml, meta/main.yml, and handlers/main.yml,
+#       delimited by lines like '^# FILE: <path>'.
+#   $2: Path to the specified role target location (e.g., roles/prepare_kubernetes)
+#       This is the directory where the new role will be created.
+#
+# Usage Example:
+#   explode_ansible_role /path/to/my_combined_role_file.txt /path/to/ansible/roles/prepare_kubernetes
+unalias explode_ansible_role 1>/dev/null 2>&1 || true
+unset -f explode_ansible_role || true
+explode_ansible_role() {
+    local input_file="$1"
+    local full_role_path="$2" # This is the full path including the role name
+
+    # Validate arguments
+    if [ -z "$input_file" ] || [ -z "$full_role_path" ]; then
+        echo "Usage: explode_ansible_role <path_to_combined_role_file> <path_to_role_target_location>"
+        echo "Example: explode_ansible_role ~/bootstrap_kubernetes.yml roles/bootstrap_kubernetes"
+        return 1
+    fi
+
+    if [ ! -f "$input_file" ]; then
+        echo "Error: Input file '$input_file' not found."
+        return 1
+    fi
+
+    # Determine role name from the full_role_path
+    local role_name=$(basename "$full_role_path")
+
+    # Define paths for the new role's components
+    local tasks_dir="${full_role_path}/tasks"
+    local defaults_dir="${full_role_path}/defaults"
+    local meta_dir="${full_role_path}/meta"
+    local handlers_dir="${full_role_path}/handlers"
+
+    echo "Creating Ansible role '${role_name}' structure at: ${full_role_path}"
+
+    # Create directories
+    mkdir -p "$tasks_dir" || { echo "Failed to create ${tasks_dir}"; return 1; }
+    mkdir -p "$defaults_dir" || { echo "Failed to create ${defaults_dir}"; return 1; }
+    mkdir -p "$meta_dir" || { echo "Failed to create ${meta_dir}"; return 1; }
+    mkdir -p "$handlers_dir" || { echo "Failed to create ${handlers_dir}"; return 1; }
+
+    echo "Extracting content from '$input_file' and writing to role files..."
+
+    local current_output_file=""
+    local current_file_descriptor=""
+
+    # Read the input file line by line
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        # Check for start markers
+        if [[ "$line" =~ ^#\ FILE:\ (.*)$ ]]; then
+            # Close previous file if open
+            if [ -n "$current_file_descriptor" ]; then
+                exec {current_file_descriptor}>&-
+                current_file_descriptor=""
+            fi
+
+            local relative_path="${BASH_REMATCH[1]}"
+            # Determine the full path for the current output file
+            case "$relative_path" in
+                "prepare_kubernetes/tasks/main.yml")
+                    current_output_file="${tasks_dir}/main.yml"
+                    ;;
+                "prepare_kubernetes/defaults/main.yml")
+                    current_output_file="${defaults_dir}/main.yml"
+                    ;;
+                "prepare_kubernetes/meta/main.yml")
+                    current_output_file="${meta_dir}/main.yml"
+                    ;;
+                "prepare_kubernetes/handlers/main.yml")
+                    current_output_file="${handlers_dir}/main.yml"
+                    ;;
+                *)
+                    echo "Warning: Unrecognized file path marker: '$relative_path'. Skipping content."
+                    current_output_file="" # Reset to ignore content until next recognized marker
+                    continue
+                    ;;
+            esac
+            # Open new file for writing (redirect stdout for subsequent echoes)
+            exec {current_file_descriptor}>"$current_output_file"
+            echo "  --> Writing to: ${current_output_file}"
+            continue # Skip the marker line itself
+        fi
+
+        # If we have an open file descriptor, write the line to it
+        if [ -n "$current_file_descriptor" ]; then
+            echo "$line" >&"$current_file_descriptor"
+        fi
+    done < "$input_file"
+
+    # Close the last file if it was open
+    if [ -n "$current_file_descriptor" ]; then
+        exec {current_file_descriptor}>&-
+    fi
+
+    echo "Ansible role '${role_name}' created successfully at ${full_role_path}."
+}
+
+
+#
+# Function to concatenate all files of an Ansible role into a single text file.
+# The output file is named after the role.
+#
+unalias package_ansible_role 1>/dev/null 2>&1 || true
+unset -f package_ansible_role || true
+package_ansible_role() {
+    # Check if a role path is provided
+    if [ -z "$1" ]; then
+        echo "Usage: package_ansible_role <role_path>"
+        echo "Example: package_ansible_role ~/ansible/roles/my_role"
+        return 1
+    fi
+
+    ROLE_PATH="$1"
+
+    # Check if the role path exists and is a directory
+    if [ ! -d "$ROLE_PATH" ]; then
+        echo "Error: Role path '$ROLE_PATH' does not exist or is not a directory."
+        return 1
+    fi
+
+    # Derive the role name and output file name
+    ROLE_NAME=$(basename "$ROLE_PATH")
+    OUTPUT_FILE_DEFAULT="${ROLE_NAME}.txt"
+    OUTPUT_FILE="${2:-${OUTPUT_FILE_DEFAULT}}"
+
+    # Create or clear the output file
+    > "$OUTPUT_FILE"
+
+    echo "Packaging role: $ROLE_NAME"
+    echo "Output will be saved to: $OUTPUT_FILE"
+    echo ""
+
+    # Find all regular files in the role path and its subdirectories, then process them
+    find "$ROLE_PATH" -type f | while read -r FILE_PATH; do
+        # Get the relative path of the file from the role_path
+        RELATIVE_PATH="${FILE_PATH#$ROLE_PATH/}"
+
+        # Add a header comment to the output file
+        echo "### FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
+        echo "" >> "$OUTPUT_FILE"
+
+        # Concatenate the file's content
+        cat "$FILE_PATH" >> "$OUTPUT_FILE"
+
+        echo "" >> "$OUTPUT_FILE"
+        echo "### END FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
+        echo "" >> "$OUTPUT_FILE"
+    done
+
+    echo "Packaging complete! All files from '$ROLE_PATH' are saved in '$OUTPUT_FILE'."
+}
+
 ##
 ##
 unset -f install-dev-env || true
@@ -347,17 +505,36 @@ function cdnvm(){
     fi
 }
 
+## ref: https://gist.github.com/stephenhardy/5470814?permalink_comment_id=3671126#gistcomment-3671126
+unalias git_reset_branch_history 1>/dev/null 2>&1 || true
+unset -f git_reset_branch_history || true
+function git_reset_branch_history(){
+  LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
+  REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
+  IFS=/ read REMOTE_NAME REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
+  git checkout --orphan newBranch && \
+  echo "==> Add all files and commit them" && \
+  (git add -A || true) && \
+  git commit -am "Initial commit" && \
+  echo "==> Delete the "${LOCAL_BRANCH}" branch" && \
+  git branch -D "${LOCAL_BRANCH}" && \
+  echo "==> Rename the current branch to "${LOCAL_BRANCH} && \
+  git branch -m "${LOCAL_BRANCH}" && \
+  echo "==> Force push ${REMOTE_BRANCH} branch to ${REMOTE_NAME}" && \
+  git push -f "${REMOTE_NAME}" "${REMOTE_BRANCH}" && \
+  echo "==> remove the old files" && \
+  git gc --aggressive --prune=all
+}
+
 ## make these function so they evaluate at time of exec and not upon shell startup
 ## Prevent bash alias from evaluating statement at shell start
 ## ref: https://stackoverflow.com/questions/13260969/prevent-bash-alias-from-evaluating-statement-at-shell-start
-#alias gitpull.="git pull origin $(git rev-parse --abbrev-ref HEAD)"
 #alias gitpush.="git push origin $(git rev-parse --abbrev-ref HEAD)"
 #alias gitsetupstream="git branch --set-upstream-to=origin/$(git symbolic-ref HEAD 2>/dev/null)"
 
-
-unalias gitresetpublicbranch 1>/dev/null 2>&1 || true
-unset -f gitresetpublicbranch || true
-function gitresetpublicbranch(){
+unalias git_reset_public_branch 1>/dev/null 2>&1 || true
+unset -f git_reset_public_branch || true
+function git_reset_public_branch(){
   GIT_DEFAULT_BRANCH=main
 
   ## ref: https://intoli.com/blog/exit-on-errors-in-bash-scripts/
@@ -416,17 +593,17 @@ function gitresetpublicbranch(){
 }
 
 
-unalias gitshowupstream 1>/dev/null 2>&1 || true
-unset -f gitshowupstream || true
-function gitshowupstream(){
+unalias git_show_upstream 1>/dev/null 2>&1 || true
+unset -f git_show_upstream || true
+function git_show_upstream(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   echo ${REMOTE_AND_BRANCH}
 }
 
-unalias gitsetupstream. 1>/dev/null 2>&1 || true
-unset -f gitsetupstream. || true
-function gitsetupstream.(){
+unalias git_set_upstream 1>/dev/null 2>&1 || true
+unset -f git_set_upstream || true
+function git_set_upstream(){
   NEW_REMOTE={$1:"origin"}
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   echo LOCAL_BRANCH=${LOCAL_BRANCH} && \
@@ -435,9 +612,9 @@ function gitsetupstream.(){
   git branch --set-upstream-to=${NEW_REMOTE}/${LOCAL_BRANCH}
 }
 
-unalias gitpull 1>/dev/null 2>&1 || true
-unset -f gitpull || true
-function gitpull(){
+unalias git_pull 1>/dev/null 2>&1 || true
+unset -f git_pull || true
+function git_pull(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
@@ -447,51 +624,51 @@ function gitpull(){
 ## resolve issue "Fatal: Not possible to fast-forward, aborting"
 ## ref: https://stackoverflow.com/questions/13106179/fatal-not-possible-to-fast-forward-aborting
 #alias gitpullrebase="git pull origin <branch> --rebase"
-unalias gitpullrebase 1>/dev/null 2>&1 || true
-unset -f gitpullrebase || true
-function gitpullrebase(){
+unalias git_pull_rebase 1>/dev/null 2>&1 || true
+unset -f git_pull_rebase || true
+function git_pull_rebase(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
   git pull ${REMOTE} ${REMOTE_BRANCH} --rebase
 }
 
-unalias gitpush 1>/dev/null 2>&1 || true
-unset -f gitpush || true
-function gitpush(){
+unalias git_push 1>/dev/null 2>&1 || true
+unset -f git_push || true
+function git_push(){
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
   git push ${REMOTE} ${REMOTE_BRANCH}
 }
 
-unalias gitpushwork 1>/dev/null 2>&1 || true
-unset -f gitpushwork || true
-function gitpushwork(){
-  GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_WORK}" git push bitbucket $(git rev-parse --abbrev-ref HEAD)
-}
-
-unalias gitpullwork 1>/dev/null 2>&1 || true
-unset -f gitpullwork || true
-function gitpullwork(){
+unalias git_pull_work 1>/dev/null 2>&1 || true
+unset -f git_pull_work || true
+function git_pull_work(){
   GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_WORK}" git pull bitbucket $(git rev-parse --abbrev-ref HEAD)
 }
 
-unalias gitpushpublic 1>/dev/null 2>&1 || true
-unset -f gitpushpublic || true
-function gitpushpublic(){
-  GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_GITHUB}" git push github $(git rev-parse --abbrev-ref HEAD)
+unalias git_push_work 1>/dev/null 2>&1 || true
+unset -f git_push_work || true
+function git_push_work(){
+  GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_WORK}" git push bitbucket $(git rev-parse --abbrev-ref HEAD)
 }
 
-unalias gitpullpublic 1>/dev/null 2>&1 || true
-unset -f gitpullpublic || true
-function gitpullpublic(){
+unalias git_pull_github 1>/dev/null 2>&1 || true
+unset -f git_pull_github || true
+function git_pull_github(){
   GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_GITHUB}" git pull github $(git rev-parse --abbrev-ref HEAD)
 }
 
-unalias gitbranchdelete 1>/dev/null 2>&1 || true
-unset -f gitbranchdelete || true
-function gitbranchdelete(){
+unalias git_push_github 1>/dev/null 2>&1 || true
+unset -f git_push_github || true
+function git_push_github(){
+  GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_GITHUB}" git push github $(git rev-parse --abbrev-ref HEAD)
+}
+
+unalias git_branch_delete 1>/dev/null 2>&1 || true
+unset -f git_branch_delete || true
+function git_branch_delete(){
   REPO_ORIGIN_URL="$(git config --get remote.origin.url)" && \
   REPO_DEFAULT_BRANCH="$(git ls-remote --symref "${REPO_ORIGIN_URL}" HEAD | sed -nE 's|^ref: refs/heads/(\S+)\s+HEAD|\1|p')" && \
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -504,9 +681,9 @@ function gitbranchdelete(){
   git push -d "${REMOTE}" "${REMOTE_BRANCH}"
 }
 
-unalias gitbranchrecreate 1>/dev/null 2>&1 || true
-unset -f gitbranchrecreate || true
-function gitbranchrecreate() {
+unalias git_branch_recreate 1>/dev/null 2>&1 || true
+unset -f git_branch_recreate || true
+function git_branch_recreate() {
   REPO_ORIGIN_URL="$(git config --get remote.origin.url)" && \
   REPO_DEFAULT_BRANCH="$(git ls-remote --symref "${REPO_ORIGIN_URL}" HEAD | sed -nE 's|^ref: refs/heads/(\S+)\s+HEAD|\1|p')" && \
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -514,24 +691,24 @@ function gitbranchrecreate() {
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
   git fetch origin "${REPO_DEFAULT_BRANCH}":"${REPO_DEFAULT_BRANCH}" && \
   echo "==> Deleting existing branch ${LOCAL_BRANCH}" && \
-  gitbranchdelete && \
+  git_branch_delete && \
   echo "==> Creating new branch ${LOCAL_BRANCH}" && \
   git checkout -b "${LOCAL_BRANCH}" && \
   echo "==> Pushing new branch ${LOCAL_BRANCH}" && \
   git push -u "${REMOTE}" "${LOCAL_BRANCH}"
 }
 
-unalias getbranchhist 1>/dev/null 2>&1 || true
-unset -f getbranchhist || true
-function getbranchhist(){
+unalias git_branch_hist 1>/dev/null 2>&1 || true
+unset -f git_branch_hist || true
+function git_branch_hist(){
   ## How to get commit history for just one branch?
   ## ref: https://stackoverflow.com/questions/16974204/how-to-get-commit-history-for-just-one-branch
   git log $(git rev-parse --abbrev-ref HEAD)..
 }
 
-unalias getgitrequestid 1>/dev/null 2>&1 || true
-unset -f getgitrequestid || true
-function getgitrequestid() {
+unalias git_request_id 1>/dev/null 2>&1 || true
+unset -f git_request_id || true
+function git_request_id() {
   PROJECT_DIR="$(git rev-parse --show-toplevel)"
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)"
   COMMENT_PREFIX=$(echo "${LOCAL_BRANCH}" | cut -d- -f1-2)
@@ -552,10 +729,10 @@ function getgitrequestid() {
 }
 
 ## https://stackoverflow.com/questions/35010953/how-to-automatically-generate-commit-message
-unalias getgitcomment 1>/dev/null 2>&1 || true
-unset -f getgitcomment || true
-function getgitcomment() {
-  COMMENT_PREFIX=$(getgitrequestid)
+unalias git_comment 1>/dev/null 2>&1 || true
+unset -f git_comment || true
+function git_comment() {
+  COMMENT_PREFIX=$(git_request_id)
   COMMENT_BODY="$(LANG=C git -c color.status=false status \
       | sed -n -r -e '1,/Changes to be committed:/ d' \
             -e '1,1 d' \
@@ -567,82 +744,84 @@ function getgitcomment() {
   echo "${GIT_COMMENT}"
 }
 
-unalias gitcommitpush 1>/dev/null 2>&1 || true
-unset -f gitcommitpush || true
-function gitcommitpush() {
+unalias git_commit_push 1>/dev/null 2>&1 || true
+unset -f git_commit_push || true
+function git_commit_push() {
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
-  echo "Staging changes:" && \
-  git add . || true && \
-  GIT_COMMENT=$(getgitcomment) && \
+  GIT_COMMENT=$(git_comment) && \
   echo "Committing changes:" && \
   git commit -am "${GIT_COMMENT}" || true && \
   echo "Pushing local branch ${LOCAL_BRANCH} to remote ${REMOTE} branch ${REMOTE_BRANCH}:" && \
   git push ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH}
 }
 
-unalias gitremovecached 1>/dev/null 2>&1 || true
-unset -f gitremovecached || true
-function gitremovecached() {
+
+unalias git_add_commit_push 1>/dev/null 2>&1 || true
+unset -f git_add_commit_push || true
+function git_add_commit_push() {
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
-  git rm -r --cached . && \
-  git add . && \
-  GIT_COMMENT=$(getgitcomment) && \
+  echo "Staging changes:" && \
+  git add . || true && \
+  GIT_COMMENT=$(git_comment) && \
   echo "Committing changes:" && \
   git commit -am "${GIT_COMMENT}" || true && \
+  echo "Pushing local branch ${LOCAL_BRANCH} to remote ${REMOTE} branch ${REMOTE_BRANCH}:" && \
   git push ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH}
 }
 
-unalias blastit 1>/dev/null 2>&1 || true
-unset -f blastit || true
-function blastit() {
-
+unalias git_pacp 1>/dev/null 2>&1 || true
+unset -f git_pacp || true
+function git_pacp() {
   ## https://stackoverflow.com/questions/5738797/how-can-i-push-a-local-git-branch-to-a-remote-with-a-different-name-easily
   ## https://stackoverflow.com/questions/46514831/how-read-the-current-upstream-for-a-git-branch
-
   # LANG=C.UTF-8 or any UTF-8 English locale supported by your OS may be used
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
   IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
   git pull ${REMOTE} ${REMOTE_BRANCH} && \
-  echo "Staging changes:" && \
-  git add . && \
-  GIT_COMMENT=$(getgitcomment) && \
-  echo "Committing changes:" && \
-  git commit -am "${GIT_COMMENT}" || true && \
-  git push ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH}
+  git_add_commit_push
 }
 
+unalias git_remove_cached 1>/dev/null 2>&1 || true
+unset -f git_remove_cached || true
+function git_remove_cached() {
+  LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
+  REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
+  IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
+  git rm -r --cached . && \
+  git_add_commit_push
+}
 
 ## https://stackoverflow.com/questions/38892599/change-commit-message-for-specific-commit
-unalias change-commit-msg 1>/dev/null 2>&1 || true
-unset -f change-commit-msg || true
-function change-commit-msg(){
+unalias git_change_commit_msg 1>/dev/null 2>&1 || true
+unset -f git_change_commit_msg || true
+function git_change_commit_msg(){
 
-  commit="$1"
-  newmsg="$2"
-  branch=${3-$(git rev-parse --abbrev-ref HEAD)}
+  COMMIT_ID="$1"
+  NEW_MSG="$2"
+  BRANCH=${3-$(git rev-parse --abbrev-ref HEAD)}
 
-  git checkout $commit && \
-  echo "commit new msg $newmsg" && \
-  git commit --amend -m "$newmsg" && \
-  echo "git cherry-pick $commit..$branch" && \
-  git cherry-pick $commit..$branch && \
-  echo "git branch -f $branch" && \
-  git branch -f $branch && \
-  echo "git checkout $branch" && \
-  git checkout $branch
+  git checkout $COMMIT_ID && \
+  echo "commit new msg $NEW_MSG" && \
+  git commit --amend -m "$NEW_MSG" && \
+  echo "git cherry-pick $COMMIT_ID..$BRANCH" && \
+  git cherry-pick $COMMIT_ID..$BRANCH && \
+  echo "git branch -f $BRANCH" && \
+  git branch -f $BRANCH && \
+  echo "git checkout $BRANCH" && \
+  git checkout $BRANCH
 
 }
 
 ## https://stackoverflow.com/questions/24609146/stop-git-merge-from-opening-text-editor
 #git config --global alias.merge-no-edit '!env GIT_EDITOR=: git merge'
-unalias gitmergebranch 1>/dev/null 2>&1 || true
-unset -f gitmergebranch || true
-function gitmergebranch(){
+unalias git_merge_branch 1>/dev/null 2>&1 || true
+unset -f git_merge_branch || true
+function git_merge_branch(){
 
   MERGE_BRANCH="${1-public}" && \
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -660,28 +839,28 @@ function gitmergebranch(){
   git merge-no-edit -X theirs ${MERGE_BRANCH}
 }
 
-unalias gitclonework2 1>/dev/null 2>&1 || true
-unset -f gitclonework2 || true
-function gitclonework2(){
+unalias git_clone_work 1>/dev/null 2>&1 || true
+unset -f git_clone_work || true
+function git_clone_work(){
   GIT_REPO="${1}" && \
   REPO_DIR=$(basename ${GIT_REPO%.*}) && \
-  GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_WORK2}" git clone ${GIT_REPO} && \
+  GIT_SSH_COMMAND="ssh -i ~/.ssh/${SSH_KEY_WORK}" git clone ${GIT_REPO} && \
   pushd . && \
   cd $REPO_DIR && \
-  git config core.sshCommand "ssh -i ~/.ssh/${SSH_KEY_WORK2}" && \
+  git config core.sshCommand "ssh -i ~/.ssh/${SSH_KEY_WORK}" && \
   popd
 }
 
-unalias gitupdatesub 1>/dev/null 2>&1 || true
-unset -f gitupdatesub || true
-function gitupdatesub(){
+unalias git_update_sub 1>/dev/null 2>&1 || true
+unset -f git_update_sub || true
+function git_update_sub(){
   git submodule deinit -f . && \
   git submodule update --init --recursive --remote
 }
 
-unalias gitreinitrepo 1>/dev/null 2>&1 || true
-unset -f gitreinitrepo || true
-function gitreinitrepo(){
+unalias git_reinit_repo 1>/dev/null 2>&1 || true
+unset -f git_reinit_repo || true
+function git_reinit_repo(){
   SAVE_DATE=$(date +%Y%m%d_%H%M) && \
   GIT_ORIGIN_REPO=$(git config --get remote.origin.url) && \
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
@@ -697,14 +876,6 @@ function gitreinitrepo(){
   git push -u --force origin ${GIT_REMOTE_BRANCH}
 }
 
-unalias dockerbash 1>/dev/null 2>&1 || true
-unset -f dockerbash || true
-function dockerbash() {
-  CONTAINER_IMAGE_ID="${1}"
-  #docker run -p 8443:8443 -v `pwd`/stepca/home:/home/step -it --entrypoint /bin/bash media.johnson.int:5000/docker-stepca:latest
-  docker run -it --entrypoint /bin/bash "${CONTAINER_IMAGE_ID}"
-}
-
 unalias swarm_status 1>/dev/null 2>&1 || true
 unset -f swarm_status || true
 function swarm_status() {
@@ -714,11 +885,20 @@ function swarm_status() {
 unalias swarm_restart_service 1>/dev/null 2>&1 || true
 unset -f swarm_restart_service || true
 function swarm_restart_service() {
-  SERVICE_ID=${1:-docker_stack_keycloak}
-  echo "STOPPING SERVICE-ID ${SERVICE_ID}"
-  docker service scale "${SERVICE_ID}"=0
-  echo "STARTING SERVICE-ID ${SERVICE_ID}"
-  docker service scale "${SERVICE_ID}"=1
+  SERVICE_ID=${1:-docker_stack_keycloak} && \
+  echo "STOPPING SERVICE-ID ${SERVICE_ID}" && \
+  docker service scale "${SERVICE_ID}"=0 > /dev/null && \
+  echo "STARTING SERVICE-ID ${SERVICE_ID}" && \
+  docker service scale "${SERVICE_ID}"=1 > /dev/null && \
+  echo "STARTED SERVICE-ID ${SERVICE_ID}"
+}
+
+unalias docker_bash 1>/dev/null 2>&1 || true
+unset -f docker_bash || true
+function docker_bash() {
+  CONTAINER_IMAGE_ID="${1}"
+  #docker run -p 8443:8443 -v `pwd`/stepca/home:/home/step -it --entrypoint /bin/bash media.johnson.int:5000/docker-stepca:latest
+  docker run -it --entrypoint /bin/bash "${CONTAINER_IMAGE_ID}"
 }
 
 ## ref: https://stackoverflow.com/questions/26423515/how-to-automatically-update-your-docker-containers-if-base-images-are-updated
@@ -780,28 +960,28 @@ function get-largest-docker-image-sizes() {
 
 }
 
-unalias explodeansibletest 1>/dev/null 2>&1 || true
-unset -f explodeansibletest || true
-function explodeansibletest() {
-  recent=$(find . -name AnsiballZ_\*.py | head -n1) && \
-  python3 ${recent} explode && \
+unalias explode_ansible_test 1>/dev/null 2>&1 || true
+unset -f explode_ansible_test || true
+function explode_ansible_test() {
+  RECENT=$(find . -name AnsiballZ_\*.py | head -n1) && \
+  python3 ${RECENT} explode && \
   cat debug_dir/args | jq '.ANSIBLE_MODULE_ARGS.logging_level = "DEBUG"' > debug_dir/args.json && \
   cp debug_dir/args.json debug_dir/args && \
   cp debug_dir/args.json debug_dir/args.orig.json
 }
-#function explodeansibletest() {
+#function explode_ansible_test() {
 #
-#  recent=$(find . -name \*.py | head -n1) && \
-#  python3 ${recent} explode && \
+#  RECENT=$(find . -name \*.py | head -n1) && \
+#  python3 ${RECENT} explode && \
 #  cat debug_dir/args | jq > debug_dir/args.json && \
 #  cp debug_dir/args.json debug_dir/args && \
 #  cp debug_dir/args.json debug_dir/args.orig.json
 #
 #}
 
-unalias cagetaccountpwd 1>/dev/null 2>&1 || true
-unset -f cagetaccountpwd || true
-function cagetaccountpwd() {
+unalias ca_get_account_pwd 1>/dev/null 2>&1 || true
+unset -f ca_get_account_pwd || true
+function ca_get_account_pwd() {
 
   CYBERARK_API_BASE_URL=${1:-https://cyberark.example.int}
   CA_USERNAME=${2:-casvcacct}
@@ -852,4 +1032,35 @@ function sshpackerwork() {
   echo "SSH_TARGET_HOST=${SSH_TARGET_HOST}" && \
   ssh-keygen -R "${SSH_TARGET_HOST}" && \
   ssh -i "~/.ssh/${SSH_ANSIBLE_KEY_WORK}" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "${SSH_TARGET}"
+}
+
+
+unalias find_chown_nonmatching 1>/dev/null 2>&1 || true
+unset -f find_chown_nonmatching || true
+function find_chown_nonmatching() {
+  local OWNER=${1:-"foobar"}
+  local GROUP=${2:-"${OWNER}"}
+
+  if [ "${PWD}" == "/" ]; then
+    echo "Do not run this at the root directory for more reasons than can be enumerated here"
+    exit
+  fi
+
+  echo "Show files that will be changed before changing:"
+  FIND_CMD="find . \! -user ${OWNER}"
+  echo "$FIND_CMD"
+  eval "$FIND_CMD"
+
+  read -p "Are you sure you want to change these files above to owner:group ${OWNER}:${GROUP}? " -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ ! $REPLY =~ ^[Yy]$ ]]
+  then
+    exit 1
+  fi
+
+  FIND_AND_CHOWN_CMD="find . \! -user "${OWNER}" -exec chown "${OWNER}:${GROUP}" {} \;"
+  echo "$FIND_AND_CHOWN_CMD"
+  eval "$FIND_AND_CHOWN_CMD"
+
+  echo "finished"
 }

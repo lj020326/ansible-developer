@@ -52,12 +52,12 @@ if [ -f "${HOME}/.bash_aliases" ]; then
 fi
 
 if [ -f "${HOME}/.bash_secrets" ]; then
-    if [ ! -f "${HOME}/.vault_pass" ]; then
-        echo "${log_bash} ~/.vault_pass not found, skip loading ${HOME}/.bash_secrets"
-    elif ! isInstalled ansible-vault; then
-        echo "${log_bash} ansible-vault not installed, skip loading ${HOME}/.bash_secrets"
-    else
-        echo "${log_bash} sourcing ~/.bash_secrets"
-        eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
+    if [ -f "${HOME}/.vault_pass" ]; then
+        if ! isInstalled ansible-vault; then
+            echo "${log_bash} ansible-vault not installed, skip loading ${HOME}/.bash_secrets"
+        else
+            echo "${log_bash} sourcing ~/.bash_secrets"
+            eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
+        fi
     fi
 fi

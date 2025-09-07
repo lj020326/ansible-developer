@@ -1,83 +1,50 @@
 #!/usr/bin/env bash
 
+VERSION="2025.9.5"
+
+GIT_DEFAULT_BRANCH=main
+GIT_PUBLIC_BRANCH=public
+GIT_REMOVE_CACHED_FILES=0
+
 ## ref: https://intoli.com/blog/exit-on-errors-in-bash-scripts/
 # exit when any command fails
 set -e
-
-VERSION="2025.7.1"
 
 #SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_DIR="$(dirname "$0")"
 SCRIPT_NAME="$(basename "$0")"
 
-GIT_DEFAULT_BRANCH=main
-GIT_PUBLIC_BRANCH=public
-
-## https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
-TEMP_DIR=$(mktemp -d -p ~)
-
-trap 'rm -fr "$TEMP_DIR"' EXIT
-
-GIT_REMOVE_CACHED_FILES=0
-
 CONFIRM=0
 
 ## PURPOSE RELATED VARS
-#PROJECT_DIR=$( git rev-parse --show-toplevel )
-PROJECT_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
-
-MIRROR_DIR_LIST="
-.github
-docs
-files
-"
+#REPO_DIR=$( git rev-parse --show-toplevel )
+REPO_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
 
 PUBLIC_GITIGNORE=files/git/pub.gitignore
-
-## ref: https://stackoverflow.com/questions/53839253/how-can-i-convert-an-array-into-a-comma-separated-string
-declare -a PRIVATE_CONTENT_ARRAY
-PRIVATE_CONTENT_ARRAY+=('**/private/***')
-PRIVATE_CONTENT_ARRAY+=('**/vault/***')
-PRIVATE_CONTENT_ARRAY+=('**/archive/***')
-PRIVATE_CONTENT_ARRAY+=('**/save/***')
-PRIVATE_CONTENT_ARRAY+=('**/vault.yml')
-PRIVATE_CONTENT_ARRAY+=('**/*vault.yml')
-PRIVATE_CONTENT_ARRAY+=('**/secrets.yml')
-PRIVATE_CONTENT_ARRAY+=('**/*secrets.yml')
-PRIVATE_CONTENT_ARRAY+=('.vault_pass')
-#PRIVATE_CONTENT_ARRAY+=('***/*vault*')
-PRIVATE_CONTENT_ARRAY+=('***/vault.yml')
-PRIVATE_CONTENT_ARRAY+=('**/integration_config.yml')
-PRIVATE_CONTENT_ARRAY+=('**/integration_config.vault.yml')
-PRIVATE_CONTENT_ARRAY+=('*.log')
-
-printf -v EXCLUDE_AND_REMOVE '%s,' "${PRIVATE_CONTENT_ARRAY[@]}"
-EXCLUDE_AND_REMOVE="${EXCLUDE_AND_REMOVE%,}"
 
 ## ref: https://stackoverflow.com/questions/53839253/how-can-i-convert-an-array-into-a-comma-separated-string
 declare -a EXCLUDES_ARRAY
 EXCLUDES_ARRAY+=('.git')
 EXCLUDES_ARRAY+=('.gitmodule')
-EXCLUDES_ARRAY+=('.idea')
-EXCLUDES_ARRAY+=('.vscode')
-EXCLUDES_ARRAY+=('**/.DS_Store')
-EXCLUDES_ARRAY+=('venv')
-EXCLUDES_ARRAY+=('*.log')
 
-printf -v EXCLUDES '%s,' "${EXCLUDES_ARRAY[@]}"
-EXCLUDES="${EXCLUDES%,}"
+# Read .gitignore and populate excludes array
+while read -r line; do
+    line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    [[ -z "$line" || "$line" =~ ^#.* ]] && continue
+    EXCLUDES_ARRAY+=("$line")
+done < "${REPO_DIR}/.gitignore"
 
-## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
-## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
-RSYNC_OPTS_GIT_MIRROR=()
-RSYNC_OPTS_GIT_MIRROR+=("-dar")
-RSYNC_OPTS_GIT_MIRROR+=("--links")
-RSYNC_OPTS_GIT_MIRROR+=("--delete-excluded")
-RSYNC_OPTS_GIT_MIRROR+=("--exclude={${EXCLUDES},${EXCLUDE_AND_REMOVE}}")
+# Read .rsync-ignore and populate excludes array
+while read -r line; do
+    line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    [[ -z "$line" || "$line" =~ ^#.* ]] && continue
+    EXCLUDES_ARRAY+=("$line")
+done < "${REPO_DIR}/.rsync-ignore"
 
-RSYNC_OPTS_GIT_UPDATE=()
-RSYNC_OPTS_GIT_UPDATE+=("-ari")
-RSYNC_OPTS_GIT_UPDATE+=("--links")
+printf -v EXCLUDES_LIST '%s,' "${EXCLUDES_ARRAY[@]}"
+EXCLUDES_LIST="${EXCLUDES_LIST%,}"
+
+TEMP_DIR=$(mktemp -d -p ~)
 
 #### LOGGING RELATED
 LOG_ERROR=0
@@ -125,6 +92,8 @@ reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 
 #LOG_LEVEL=${LOG_DEBUG}
 LOG_LEVEL=${LOG_INFO}
+
+# --- Logging Functions ---
 
 function log_error() {
   if [ "$LOG_LEVEL" -ge "$LOG_ERROR" ]; then
@@ -271,6 +240,8 @@ function set_log_level() {
 
 }
 
+# --- Helper Functions ---
+
 function execute() {
   log_info "${*}"
   if ! "$@"
@@ -321,22 +292,16 @@ function git_commit_push() {
   local REMOTE_AND_BRANCH
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${LOCAL_BRANCH}@{upstream}") && \
-  IFS=/ read -r REMOTE REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
+  IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
   echo "Staging changes:" && \
   (git add -A || true) && \
   echo "Committing changes:" && \
-  (git commit -am "group updates to public branch" || true) && \
-  echo "Pushing branch '${LOCAL_BRANCH}' to remote '${REMOTE}' branch '${REMOTE_BRANCH}':" && \
-  (git push -f -u "${REMOTE}" "${LOCAL_BRANCH}:${REMOTE_BRANCH}" || true)
+  (git commit -am "Sync: Automated sync from main to public branch." || true) && \
+  echo "Pushing branch '${LOCAL_BRANCH}' to remote '${REMOTE_NAME}' branch '${REMOTE_BRANCH}':" && \
+  (git push -f -u "${REMOTE_NAME}" "${LOCAL_BRANCH}:${REMOTE_BRANCH}" || true)
 }
 
 function search_repo_keywords () {
-
-  local REPO_EXCLUDE_DIR_LIST=(".git")
-  REPO_EXCLUDE_DIR_LIST+=(".idea")
-  REPO_EXCLUDE_DIR_LIST+=("venv")
-  REPO_EXCLUDE_DIR_LIST+=("private")
-  REPO_EXCLUDE_DIR_LIST+=("save")
 
   #export -p | sed 's/declare -x //' | sed 's/export //'
   if [ -z ${REPO_EXCLUDE_KEYWORDS+x} ]; then
@@ -365,8 +330,8 @@ function search_repo_keywords () {
   log_debug "GREP_COMMAND=${GREP_COMMAND}"
 
   local FIND_DELIM=' -o '
-#  printf -v FIND_EXCLUDE_DIRS "\055path '*/%s/*' -prune${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
-  printf -v FIND_EXCLUDE_DIRS "! -path '*/%s/*'${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
+#  printf -v FIND_EXCLUDE_DIRS "\055path '*/%s/*' -prune${FIND_DELIM}" "${EXCLUDES_ARRAY[@]}"
+  printf -v FIND_EXCLUDE_DIRS "! -path '*/%s/*'${FIND_DELIM}" "${EXCLUDES_ARRAY[@]}"
   local FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS%"$FIND_DELIM"}
 
   log_debug "FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS}"
@@ -378,7 +343,7 @@ function search_repo_keywords () {
   ## ref: https://stackoverflow.com/questions/6565471/how-can-i-exclude-directories-from-grep-r#8692318
   ## ref: https://unix.stackexchange.com/questions/342008/find-and-echo-file-names-only-with-pattern-found
   ## ref: https://www.baeldung.com/linux/find-exclude-paths
-  local FIND_CMD="find ${PROJECT_DIR}/ \( ${FIND_EXCLUDE_DIRS} \) -o -exec ${GREP_COMMAND} {} 2>/dev/null +"
+  local FIND_CMD="find ${REPO_DIR}/ \( ${FIND_EXCLUDE_DIRS} \) -o -exec ${GREP_COMMAND} {} 2>/dev/null +"
   log_info "${FIND_CMD}"
 
   local EXCEPTION_COUNT
@@ -393,85 +358,148 @@ function search_repo_keywords () {
   return "${EXCEPTION_COUNT}"
 }
 
-function sync_public_branch() {
-  local RSYNC_MIRROR_OPTS="${RSYNC_OPTS_GIT_MIRROR[*]}"
-  local RSYNC_UPDATE_OPTS="${RSYNC_OPTS_GIT_UPDATE[*]}"
+# --- Core Functions ---
 
-  log_debug "RSYNC_MIRROR_OPTS=${RSYNC_MIRROR_OPTS}"
-  log_debug "RSYNC_UPDATE_OPTS=${RSYNC_UPDATE_OPTS}"
-
-  git fetch --all
-  git checkout ${GIT_DEFAULT_BRANCH}
-  
-  #RSYNC_OPTS=${RSYNC_OPTS_GIT_MIRROR[@]}
-  log_debug "EXCLUDE_AND_REMOVE=${EXCLUDE_AND_REMOVE}"
-
-  log_debug "copy project to temporary dir $TEMP_DIR"
-  local RSYNC_CMD
-  RSYNC_CMD="rsync ${RSYNC_MIRROR_OPTS} ${PROJECT_DIR}/ ${TEMP_DIR}/"
-  execute_eval_command "${RSYNC_CMD}"
-  
-  log_info "Checkout public branch"
-  git checkout ${GIT_PUBLIC_BRANCH}
-  
-  if [ $GIT_REMOVE_CACHED_FILES -eq 1 ]; then
-    log_info "Removing files cached in git"
-    git rm -r --cached .
-  fi
-  
-  log_info "Copy ${TEMP_DIR} to project dir $PROJECT_DIR"
-  RSYNC_CMD="rsync ${RSYNC_UPDATE_OPTS} ${TEMP_DIR}/ ${PROJECT_DIR}/"
-  execute_eval_command "${RSYNC_CMD}"
-
-  IFS=$'\n'
-  for TARGET_DIR in ${MIRROR_DIR_LIST}
-  do
-    log_info "Mirror ${TEMP_DIR}/${TARGET_DIR}/ to project dir ${PROJECT_DIR}/${TARGET_DIR}/"
-    RSYNC_CMD="rsync ${RSYNC_MIRROR_OPTS} ${TEMP_DIR}/${TARGET_DIR}/ ${PROJECT_DIR}/${TARGET_DIR}/"
-    execute_eval_command "${RSYNC_CMD}"
-  done
-
-  printf -v TO_REMOVE '%s ' "${PRIVATE_CONTENT_ARRAY[@]}"
-  TO_REMOVE="${TO_REMOVE% }"
-  log_info "TO_REMOVE=${TO_REMOVE}"
-  CLEANUP_CMD="rm -fr ${TO_REMOVE}"
-  execute_eval_command "${CLEANUP_CMD}"
-
-  if [ -e $PUBLIC_GITIGNORE ]; then
-    log_info "Update public files:"
-    cp -p $PUBLIC_GITIGNORE .gitignore
-  fi
-  
-  log_info "Show changes before push:"
-  git status
-  
-  ## https://stackoverflow.com/questions/5989592/git-cannot-checkout-branch-error-pathspec-did-not-match-any-files-kn
-  ## git diff --name-only ${GIT_PUBLIC_BRANCH} ${GIT_DEFAULT_BRANCH} --
-  
-  if [ $CONFIRM -eq 0 ]; then
-    ## https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
-    read -p "Are you sure you want to merge the changes above to public branch ${TARGET_BRANCH}? " -n 1 -r
-    echo    # (optional) move to a new line
-    if [[ ! $REPLY =~ ^[Yy]$ ]]
-    then
-        exit 1
+# Function to clean up the temporary directory
+cleanup() {
+    if [[ -d "${TEMP_DIR}" ]]; then
+        log_info "Cleaning up temporary directory: ${TEMP_DIR}"
+        rm -rf "${TEMP_DIR}"
     fi
-  fi
-  
-  ## https://stackoverflow.com/questions/5738797/how-can-i-push-a-local-git-branch-to-a-remote-with-a-different-name-easily
-  log_info "Add all the files:"
-  git_commit_push
-  log_info "Checkout ${GIT_DEFAULT_BRANCH} branch:" && \
-  git checkout ${GIT_DEFAULT_BRANCH}
+}
 
-  log_info "chmod project admin/maintenance scripts"
-  chmod +x files/scripts/*.sh
-  chmod +x files/scripts/git/*.sh
-  
-  log_info "creating links for useful project scripts"
-  cd ${PROJECT_DIR}
-  chmod +x ./files/scripts/git/*.sh
-  ln -sf ./files/scripts/git/sync-*.sh ./
+# Function to handle errors
+on_error() {
+    local exit_code="$?"
+    if [[ "$exit_code" -ne 0 ]]; then
+        log_error "Script failed with error code $exit_code."
+        cleanup
+    fi
+}
+
+# Function to copy the project to a temporary directory
+copy_project_to_temp_dir() {
+    local REPO_DIR="$1"
+    TEMP_DIR=$(mktemp -d /tmp/sync-repo.XXXXXXXXXX)
+    log_info "Copying project to temporary directory: ${TEMP_DIR}"
+
+    #local RSYNC_CMD="rsync -av --exclude={'${EXCLUDES_LIST}'} --exclude='.git/' '${REPO_DIR}/' '${TEMP_DIR}/'"
+    local RSYNC_CMD="rsync -dar --links --exclude={${EXCLUDES_LIST}} '${REPO_DIR}/' '${TEMP_DIR}/'"
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "Dry run: Would have executed: ${RSYNC_CMD}"
+        # Since it's a dry run, we don't actually execute the rsync
+    else
+        log_debug "Executing: ${RSYNC_CMD}"
+        execute_eval_command "${RSYNC_CMD}"
+    fi
+}
+
+# Function to update the public branch
+sync_public_branch() {
+    local REPO_DIR="$1"
+    local PUBLIC_BRANCH="$2"
+
+    log_info "Stashing any local changes on the current branch."
+    if ! git -C "${REPO_DIR}" stash push -u -m "Stash before sync to ${PUBLIC_BRANCH}"; then
+        log_error "Failed to stash local changes."
+    fi
+
+    git fetch --all
+
+    log_info "Checking out public branch: ${PUBLIC_BRANCH}"
+    if ! git -C "${REPO_DIR}" checkout "${PUBLIC_BRANCH}"; then
+        log_error "Failed to checkout branch: ${PUBLIC_BRANCH}"
+    fi
+
+    log_info "Pulling latest changes from the public branch."
+#    local REMOTE_BRANCH=$(git -C "${REPO_DIR}" rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
+    local REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}") && \
+    IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
+
+    if [[ -z "${REMOTE_BRANCH}" ]]; then
+        log_warn "No upstream branch found for ${PUBLIC_BRANCH}. Skipping pull."
+    else
+        log_info "Pulling from REMOTE_BRANCH remote: ${REMOTE_NAME}"
+        if ! git -C "${REPO_DIR}" pull "${REMOTE_NAME}" "${REMOTE_BRANCH}:${PUBLIC_BRANCH}"; then
+            log_warn "Failed to pull from ${REMOTE_NAME}/${REMOTE_BRANCH}:${PUBLIC_BRANCH}. Continuing anyway."
+        fi
+    fi
+
+    log_info "Syncing temporary directory to public branch."
+
+    if [ "${GIT_REMOVE_CACHED_FILES}" -eq 1 ]; then
+      log_info "Removing files cached in git"
+      git rm -r --cached .
+    fi
+
+    log_info "Copy ${TEMP_DIR} to project dir ${REPO_DIR}"
+    # Added --delete and --exclude '.git/'
+    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
+#    local RSYNC_CMD="rsync -av --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
+#    local RSYNC_CMD="rsync ${RSYNC_UPDATE_OPTS} ${TEMP_DIR}/ ${REPO_DIR}/"
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "Dry run: Would have executed: ${RSYNC_CMD}"
+    else
+        log_debug "Executing: ${RSYNC_CMD}"
+        if ! eval "${RSYNC_CMD}"; then
+            log_error "rsync failed during sync to public branch."
+        fi
+    fi
+
+    if [ -n "${PUBLIC_GITIGNORE}" ]; then
+      if [ -e "${PUBLIC_GITIGNORE}" ]; then
+        log_info "Update public files:"
+        cp -p "${PUBLIC_GITIGNORE}" .gitignore
+      fi
+    fi
+
+    log_info "Show changes before push:"
+    git status
+
+    ## https://stackoverflow.com/questions/5989592/git-cannot-checkout-branch-error-pathspec-did-not-match-any-files-kn
+    ## git diff --name-only ${GIT_PUBLIC_BRANCH} ${GIT_DEFAULT_BRANCH} --
+
+    if [ $CONFIRM -eq 0 ]; then
+      ## https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
+      read -p "Are you sure you want to merge the changes above to public branch ${TARGET_BRANCH}? " -n 1 -r
+      echo    # (optional) move to a new line
+      if [[ ! $REPLY =~ ^[Yy]$ ]]
+      then
+          exit 1
+      fi
+    fi
+
+    ## https://stackoverflow.com/questions/5738797/how-can-i-push-a-local-git-branch-to-a-remote-with-a-different-name-easily
+    log_info "Add all the files:"
+    git_commit_push
+
+#    log_info "Checkout ${GIT_DEFAULT_BRANCH} branch:" && \
+#    git checkout ${GIT_DEFAULT_BRANCH}
+
+    log_info "Returning to the original branch and applying stashed changes."
+    if ! git -C "${REPO_DIR}" checkout -; then
+        log_error "Failed to checkout original branch."
+    fi
+
+    log_info "Returning to the original branch and applying stashed changes."
+    if git -C "${REPO_DIR}" stash list | grep -q 'stash'; then
+        if ! git -C "${REPO_DIR}" stash pop; then
+            log_warn "Failed to apply stashed changes. You may have uncommitted changes. Please handle manually."
+        fi
+    else
+        log_info "No stashed changes to apply."
+    fi
+
+    log_info "chmod project admin/maintenance scripts"
+    chmod +x files/scripts/*.sh
+    chmod +x files/scripts/git/*.sh
+
+    log_info "creating links for useful project scripts"
+    cd ${REPO_DIR}
+    chmod +x ./files/scripts/git/*.sh
+    ln -sf ./files/scripts/git/sync-*.sh ./
 }
 
 
@@ -507,9 +535,7 @@ function main() {
   done
   shift $((OPTIND-1))
 
-  log_debug "EXCLUDES=${EXCLUDES}"
-
-  log_debug "PROJECT_DIR=${PROJECT_DIR}"
+  log_debug "REPO_DIR=${REPO_DIR}"
   log_debug "TEMP_DIR=${TEMP_DIR}"
 
   search_repo_keywords
@@ -519,7 +545,15 @@ function main() {
     exit ${RETURN_STATUS}
   fi
 
-  sync_public_branch
+  trap on_error ERR
+
+  copy_project_to_temp_dir "${REPO_DIR}"
+  sync_public_branch "${REPO_DIR}" "${GIT_PUBLIC_BRANCH}"
+
+  log_info "Sync completed successfully."
+  cleanup
+
+  trap - ERR
 
 }
 

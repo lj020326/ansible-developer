@@ -41,6 +41,7 @@ alias lld='ll | grep ^d'
 alias lll='ll | grep ^l'
 ## ref: https://stackoverflow.com/questions/8513133/how-do-i-find-all-of-the-symlinks-in-a-directory-tree#8513194
 alias findlinks="find . -type l"
+alias findchown="find_chown_nonmatching"
 
 alias installdevenv="install-dev-env"
 
@@ -175,6 +176,7 @@ alias sshesx11='ssh root@esx11.dettonville.int'
 #alias sshpacker="ssh -i ~/.ssh/${SSH_KEY}"
 alias sshosbuild="ssh osbuild@10.10.100.10"
 
+alias sshpfsense='ssh admin@pfsense.johnson.int'
 alias sshgpu='ssh administrator@gpu.johnson.int'
 alias sshgpu1='ssh administrator@gpu01.johnson.int'
 alias sshgpu2='ssh administrator@gpu02.johnson.int'
@@ -198,6 +200,7 @@ alias sshadmin05='ssh administrator@admin05.dettonville.int'
 #alias sshadmin04='ssh administrator@admin04.johnson.int'
 #alias sshadmin05='ssh administrator@admin05.johnson.int'
 alias sshmail='ssh administrator@mail.johnson.int'
+
 alias sshcgminer='ssh root@cgminer.johnson.int'
 alias sshminer='ssh root@cgminer.johnson.int'
 
@@ -214,6 +217,11 @@ alias sshvcontrol='ssh administrator@vcontrol01.johnson.int'
 alias getansiblelog="scp administrator@admin01.johnson.int:/home/administrator/repos/ansible/ansible-datacenter/ansible.log ."
 alias ansibletestintegration="ansible-test-integration.sh"
 alias ansibledebugvar="ansible_debug_variable"
+alias explodeansibletest="explode_ansible_test"
+alias packageansiblerole="package_ansible_role"
+alias explodeansiblerole="explode_ansible_role"
+
+alias cagetaccountpwd="ca_get_account_pwd"
 
 ## ref: https://askubuntu.com/questions/20865/is-it-possible-to-remove-a-particular-host-key-from-sshs-known-hosts-file
 alias sshclearhostkey='ssh-keygen -R'
@@ -222,12 +230,13 @@ alias sshresetkeys="ssh-keygen -R ${TARGET_HOST} && ssh-keyscan -H ${TARGET_HOST
 alias create-crypt-passwd="openssl passwd -1 "
 
 alias swarmstatus="swarm_status"
-alias swarmrestart="swarm_restart_service"
+alias swarmrestartsvc="swarm_restart_service"
 ## ref: https://stackoverflow.com/questions/44811886/restart-one-service-in-docker-swarm-stack/48776759
 alias swarmserviceupdate="docker service update --force "
 
 alias dockerserviceupdate="docker service update --force "
 alias dockerstackstat="docker stack ps --filter='desired-state=running' docker_stack"
+alias dockerbash="docker_bash"
 
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'
@@ -255,6 +264,11 @@ alias getsitecertinfo="get-site-cert-info.sh"
 alias blastgithub="git push github"
 alias blasthugo="hugo && blastit. && pushd . && cd public && blastit. && popd"
 
+## where appropriate make git aliases utilize bash functions
+## to evaluate references at time of exec and not upon shell startup
+## Prevent bash aliases from evaluating references at shell start
+## ref: https://stackoverflow.com/questions/13260969/prevent-bash-alias-from-evaluating-statement-at-shell-start
+
 ## ref: https://stackoverflow.com/questions/6052005/how-can-you-git-pull-only-the-current-branch
 alias gitpullsub="git submodule update --recursive --remote"
 alias gitmergesub="git submodule update --remote --merge && blastit"
@@ -265,10 +279,36 @@ alias gitdeletebranch="gitbranchdelete"
 alias gitfetchmaindev="git fetch origin main:main && git fetch origin development:development"
 alias gitfetchdev="git fetch origin development:development"
 alias gitfetchmain="git fetch origin main:main"
+alias gitshortlog="git shortlog --summary --numbered --email"
+alias gitlogauthors="git log --pretty=format:'[%h] %cd - Committer: %cn (%ce), Author: %an (%ae)'"
+alias gitresetbranchhistory="git_reset_branch_history"
+alias gitresetpublicbranch="git_reset_public_branch"
+alias gitshowupstream="git_show_upstream"
+alias gitsetupstream="git_set_upstream"
+alias gitpull="git_pull"
+alias gitpullwork="git_pull_work"
+alias gitpullgithub="git_pull_github"
+alias gitpush="git_push"
+alias gitpushwork="git_push_work"
+alias gitpushgithub="git_push_github"
+alias gitbranchdelete="git_branch_delete"
+alias gitbranchrecreate="git_branch_recreate"
+alias gitbranchhist="git_branch_hist"
+alias gitrequestid="git_request_id"
+alias gitcomment="git_comment"
+alias gitcommitpush="git_commit_push"
+alias gitremovecached="git_remove_cached"
+alias blastit="git_pacp"
+alias gitchangecommitmsg="git_change_commit_msg"
+alias gitmergebranch="git_merge_branch"
+alias gitclonework="git_clone_work"
+alias gitupdatesub="git_update_sub"
+alias gitreinitrepo="git_reinit_repo"
 
-## resolve issue "Fatal: Not possible to fast-forward, aborting"
+## resolves issue "Fatal: Not possible to fast-forward, aborting"
 #alias gitpullrebase="git pull origin <branch> --rebase"
-alias gitpullrebase="git pull origin --rebase"
+#alias gitpullrebase="git pull origin --rebase"
+alias gitpullrebase="git_pull_rebase"
 
 ## https://stackoverflow.com/questions/24609146/stop-git-merge-from-opening-text-editor
 #git config --global alias.merge-no-edit '!env GIT_EDITOR=: git merge'
@@ -277,9 +317,6 @@ alias gitmergemain="git fetch --all && git checkout main && gitpull && git check
 
 ## ref: https://stackoverflow.com/questions/40585959/git-pull-x-theirs-doesnt-work
 alias gitpulltheirs='git pull -X theirs'
-#alias gitpull-='git pull origin'
-#alias gitpush-='git push origin'
-#alias gitcommitpush-="git add . && git commit -a -m 'updates from ${HOSTNAME}' && git push origin"
 #alias gitremovecached-="git rm -r --cached . && git add . && git commit -am 'Remove ignored files' && git push origin"
 alias gitremovecached-="gitremovecached"
 
@@ -302,19 +339,9 @@ alias gitcleanupoldlocal="git branch -vv | grep 'origin/.*: gone]' | awk '{print
 #alias gitaddorigin="git remote add origin ssh://git@gitea.admin.johnson.int:2222/gitadmin/${PWD##*/}.git && git push -u origin master"
 alias gitaddorigin="git remote add origin ssh://git@gitea.admin.dettonville.int:2222/infra/${PWD##*/}.git && git push -u origin master"
 
-#alias gitsetupstream="git branch --set-upstream-to=origin/master"
-alias gitsetupstream="git branch --set-upstream-to=origin/$(git symbolic-ref HEAD 2>/dev/null)"
-
 ## ref: https://stackoverflow.com/questions/9662249/how-to-overwrite-local-tags-with-git-fetch
 alias gitfetchtags="git fetch origin --tags --force"
 alias gitsynctags="git fetch origin --tags --force --prune"
-
-## make these function so they evaluate at time of exec and not upon shell startup
-## Prevent bash alias from evaluating statement at shell start
-## ref: https://stackoverflow.com/questions/13260969/prevent-bash-alias-from-evaluating-statement-at-shell-start
-#alias gitpull.="git pull origin $(git rev-parse --abbrev-ref HEAD)"
-#alias gitpush.="git push origin $(git rev-parse --abbrev-ref HEAD)"
-#alias gitsetupstream="git branch --set-upstream-to=origin/$(git symbolic-ref HEAD 2>/dev/null)"
 
 alias gitfold="bash folder.sh fold"
 alias gitunfold="bash folder.sh unfold"

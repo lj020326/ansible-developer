@@ -51,7 +51,7 @@ SSH_KEY_GITHUB=~/.ssh/id_rsa
 export DOCKER_BUILDKIT=0
 
 if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
-    echo "${log_prefix_bashenv} setting env for MSYS/MINGW platform"
+    echo "${log_prefix_bashenv} setting environment for MSYS/MINGW platform"
 
     ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
     export JAVA_HOME=$(/usr/libexec/java_home)
@@ -174,7 +174,9 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
 #    export PATH+=:/c/apps/Kubernetes/Minikube
 
 elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
-    echo "${log_prefix_bashenv} setting path for DARWIN env"
+    echo "${log_prefix_bashenv} setting environment for DARWIN platform"
+
+    export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
     ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
     ## ref: https://dev.to/rithvik78/change-the-default-java-version-on-macos-3jee
@@ -269,7 +271,7 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     fi
 
 else
-    echo "${log_prefix_bashenv} setting environment vars for LINUX env"
+    echo "${log_prefix_bashenv} setting environment for LINUX platform"
 
     ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
     export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")

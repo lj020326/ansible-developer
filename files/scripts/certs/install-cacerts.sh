@@ -16,20 +16,14 @@ SCRIPT_NAME_PREFIX="${SCRIPT_NAME%.*}"
 INSTALL_JDK_CACERTS=1
 INSTALL_SYSTEM_CACERTS=1
 INSTALL_DOCKER_CACERTS=0
-INSTALL_PYTHON_CACERTS=0
+INSTALL_PYTHON_CACERTS=1
 
+USE_TEMP_DIR=0
 KEEP_TEMP_DIR=1
 
 ## ref: https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
 ## ref: https://stackoverflow.com/questions/4632028/how-to-create-a-temporary-directory
-TEMP_DIR=$(mktemp -d -t "${SCRIPT_NAME_PREFIX}_XXXXXX" -p "/tmp")
-#TEMP_DIR=$(mktemp -d -t "${SCRIPT_NAME_PREFIX}_XXXXXX" -p "${HOME}/tmp")
-
-function cleanup_tmpdir() {
-  test "${KEEP_TEMP_DIR:-0}" = 1 || rm -rf "${TEMP_DIR}"
-}
-
-trap cleanup_tmpdir INT TERM EXIT
+#TEMP_DIR=$(mktemp -d "${SCRIPT_NAME_PREFIX}_XXXXXX" -p "/tmp")
 
 ## keep track of the last executed command
 #trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -39,7 +33,10 @@ trap cleanup_tmpdir INT TERM EXIT
 
 SITE_LIST_DEFAULT=()
 SITE_LIST_DEFAULT+=("pfsense.johnson.int")
-SITE_LIST_DEFAULT+=("gitea.admin.dettonville.int")
+SITE_LIST_DEFAULT+=("stepca.admin.johnson.int")
+SITE_LIST_DEFAULT+=("stepca.admin.dettonville.int")
+SITE_LIST_DEFAULT+=("vcsa.dettonville.int")
+#SITE_LIST_DEFAULT+=("gitea.admin.dettonville.int")
 SITE_LIST_DEFAULT+=("admin.dettonville.int")
 SITE_LIST_DEFAULT+=("media.johnson.int")
 SITE_LIST_DEFAULT+=("media.johnson.int:5000")
@@ -764,13 +761,28 @@ function install_site_certs() {
     local ENDPOINT="${HOST}:${PORT}"
     local ALIAS="${HOST}_${PORT}"
 
-    log_debug "TEMP_DIR=$TEMP_DIR"
+    local CA_CERTS_BASE_DIR="${HOME}/tmp/cacerts"
 
-#    local CA_CERTS_SRC="/tmp/.cacerts/${ALIAS}"
-    local CA_CERTS_SRC="${TEMP_DIR}/${ALIAS}"
+    if [ "${USE_TEMP_DIR}" -eq 1 ]; then
+      #TEMP_DIR=$(mktemp -d "${SCRIPT_NAME_PREFIX}_XXXXXX" -p "${HOME}/tmp")
+      TEMP_DIR=$(mktemp -d -p "${HOME}/tmp" "${SCRIPT_NAME_PREFIX}_XXXXXX")
 
-    log_debug "CA_CERTS_SRC=${CA_CERTS_SRC}"
-    log_debug "ALIAS=${ALIAS}"
+      function cleanup_tmpdir() {
+        test "${KEEP_TEMP_DIR:-0}" = 1 || rm -rf "${TEMP_DIR}"
+      }
+
+      trap cleanup_tmpdir INT TERM EXIT
+
+      log_debug "TEMP_DIR=$TEMP_DIR"
+
+      CA_CERTS_BASE_DIR="${TEMP_DIR}"
+    fi
+
+    mkdir -p "${CA_CERTS_BASE_DIR}"
+    local CA_CERTS_SRC="${CA_CERTS_BASE_DIR}/${ALIAS}"
+
+    log_info "CA_CERTS_SRC=${CA_CERTS_SRC}"
+    log_info "ALIAS=${ALIAS}"
     log_info "ENDPOINT=${ENDPOINT}"
 
     fetch_site_cert_chain "${HOST}" "${PORT}" "${CA_CERTS_SRC}"

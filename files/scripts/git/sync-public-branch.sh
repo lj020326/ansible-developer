@@ -34,12 +34,20 @@ while read -r line; do
     EXCLUDES_ARRAY+=("$line")
 done < "${REPO_DIR}/.gitignore"
 
-# Read .rsync-ignore and populate excludes array
+declare -a IGNORE_ARRAY
+IGNORE_ARRAY+=('.git')
+
+# Read .rsync-ignore and populate IGNORE_ARRAY array
 while read -r line; do
     line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     [[ -z "$line" || "$line" =~ ^#.* ]] && continue
-    EXCLUDES_ARRAY+=("$line")
+    IGNORE_ARRAY+=("$line")
 done < "${REPO_DIR}/.rsync-ignore"
+
+printf -v IGNORE_LIST '%s,' "${IGNORE_ARRAY[@]}"
+IGNORE_LIST="${IGNORE_LIST%,}"
+
+EXCLUDES_ARRAY+=("${IGNORE_ARRAY[@]}")
 
 printf -v EXCLUDES_LIST '%s,' "${EXCLUDES_ARRAY[@]}"
 EXCLUDES_LIST="${EXCLUDES_LIST%,}"
@@ -383,8 +391,8 @@ copy_project_to_temp_dir() {
     TEMP_DIR=$(mktemp -d /tmp/sync-repo.XXXXXXXXXX)
     log_info "Copying project to temporary directory: ${TEMP_DIR}"
 
-    #local RSYNC_CMD="rsync -av --exclude={'${EXCLUDES_LIST}'} --exclude='.git/' '${REPO_DIR}/' '${TEMP_DIR}/'"
     local RSYNC_CMD="rsync -dar --links --exclude={${EXCLUDES_LIST}} '${REPO_DIR}/' '${TEMP_DIR}/'"
+    #local RSYNC_CMD="rsync -av --exclude={'${EXCLUDES_LIST}'} --exclude='.git/' '${REPO_DIR}/' '${TEMP_DIR}/'"
 
     if [[ "${DRY_RUN}" == "true" ]]; then
         log_info "Dry run: Would have executed: ${RSYNC_CMD}"
@@ -413,7 +421,6 @@ sync_public_branch() {
     fi
 
     log_info "Pulling latest changes from the public branch."
-#    local REMOTE_BRANCH=$(git -C "${REPO_DIR}" rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
     local REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}") && \
     IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
 
@@ -435,7 +442,8 @@ sync_public_branch() {
 
     log_info "Copy ${TEMP_DIR} to project dir ${REPO_DIR}"
     # Added --delete and --exclude '.git/'
-    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' --exclude 'save/' '${TEMP_DIR}/' '${REPO_DIR}/'"
+    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' --exclude={${IGNORE_LIST}} '${TEMP_DIR}/' '${REPO_DIR}/'"
+#    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
 #    local RSYNC_CMD="rsync -av --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
 #    local RSYNC_CMD="rsync ${RSYNC_UPDATE_OPTS} ${TEMP_DIR}/ ${REPO_DIR}/"
 

@@ -435,7 +435,7 @@ sync_public_branch() {
 
     log_info "Copy ${TEMP_DIR} to project dir ${REPO_DIR}"
     # Added --delete and --exclude '.git/'
-    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
+    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' --exclude 'save/' '${TEMP_DIR}/' '${REPO_DIR}/'"
 #    local RSYNC_CMD="rsync -av --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
 #    local RSYNC_CMD="rsync ${RSYNC_UPDATE_OPTS} ${TEMP_DIR}/ ${REPO_DIR}/"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2025.9.5"
+VERSION="2025.10.16"
 
 GIT_DEFAULT_BRANCH=main
 GIT_PUBLIC_BRANCH=public
@@ -18,9 +18,11 @@ CONFIRM=0
 
 ## PURPOSE RELATED VARS
 #REPO_DIR=$( git rev-parse --show-toplevel )
-REPO_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
+#REPO_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
+REPO_DIR="$(git rev-parse --show-toplevel)"
 
-PUBLIC_GITIGNORE=files/git/pub.gitignore
+PUBLIC_GITIGNORE=.gitignore.pub
+PUBLIC_GITMODULES=.gitmodules.pub
 
 ## ref: https://stackoverflow.com/questions/53839253/how-can-i-convert-an-array-into-a-comma-separated-string
 declare -a EXCLUDES_ARRAY
@@ -421,7 +423,8 @@ sync_public_branch() {
     fi
 
     log_info "Pulling latest changes from the public branch."
-    local REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}") && \
+    local REMOTE_AND_BRANCH
+    REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}") && \
     IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
 
     if [[ -z "${REMOTE_BRANCH}" ]]; then
@@ -463,6 +466,15 @@ sync_public_branch() {
       fi
     fi
 
+    if [ -n "${PUBLIC_GITMODULES}" ]; then
+      if [ -e "${PUBLIC_GITMODULES}" ]; then
+        echo "Update public submodules:"
+        cp -p $PUBLIC_GITMODULES .gitmodules
+        git submodule deinit -f . && \
+        git submodule update --init --recursive --remote
+      fi
+    fi
+
     log_info "Show changes before push:"
     git status
 
@@ -491,6 +503,13 @@ sync_public_branch() {
         log_error "Failed to checkout original branch."
     fi
 
+    if [ -e .gitmodules ]; then
+      echo "Resetting ansible submodule for private"
+      git submodule deinit -f . && \
+      git submodule update --init --recursive --remote && \
+      git_commit_push
+    fi
+
     log_info "Returning to the original branch and applying stashed changes."
     if git -C "${REPO_DIR}" stash list | grep -q 'stash'; then
         if ! git -C "${REPO_DIR}" stash pop; then
@@ -499,15 +518,6 @@ sync_public_branch() {
     else
         log_info "No stashed changes to apply."
     fi
-
-    log_info "chmod project admin/maintenance scripts"
-    chmod +x files/scripts/*.sh
-    chmod +x files/scripts/git/*.sh
-
-    log_info "creating links for useful project scripts"
-    cd ${REPO_DIR}
-    chmod +x ./files/scripts/git/*.sh
-    ln -sf ./files/scripts/git/sync-*.sh ./
 }
 
 

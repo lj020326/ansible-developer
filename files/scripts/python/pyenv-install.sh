@@ -7,9 +7,10 @@ PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
 
 # Python 3
 #PYTHON_VERSION_DEFAULT="3.9.7"
-#PYTHON_VERSION_DEFAULT=3.10.9
-#PYTHON_VERSION_DEFAULT=3.11.9
-PYTHON_VERSION_DEFAULT=3.12.9
+#PYTHON_VERSION_DEFAULT="3.10.9"
+#PYTHON_VERSION_DEFAULT="3.11.9"
+#PYTHON_VERSION_DEFAULT="3.12.9"
+PYTHON_VERSION_DEFAULT="3.13.5"
 
 ## source: https://gist.github.com/simonkuang/14abf618f631ba3f0c7fee7b4ea3f214
 #PYTHON3_RH_LIBS=epel-release
@@ -403,6 +404,9 @@ function main() {
     brew upgrade    ## ref: https://github.com/pyenv/pyenv/issues/2143
     brew install gcc make
     brew install pyenv
+    export PYENV_ROOT="${HOME}/.pyenv"
+    PYENV_BIN_DIR="/usr/local/bin"
+    PYENV_BIN="${PYENV_BIN_DIR}/pyenv"
   fi
   if [[ -n "${INSTALL_ON_MSYS-}" ]]; then
     setup_pyenv_msys2

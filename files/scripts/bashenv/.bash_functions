@@ -140,6 +140,63 @@ explode_ansible_role() {
     echo "Ansible role '${role_name}' created successfully at ${full_role_path}."
 }
 
+#
+# Function to concatenate all files of a directory into a single text file.
+# The output file is named after the specified directory.
+#
+unalias package_directory 1>/dev/null 2>&1 || true
+unset -f package_directory || true
+package_directory() {
+    # Check if a directory path is provided
+    if [ -z "$1" ]; then
+        echo "Usage: package_directory <directory_path>"
+        echo "Example: package_directory ~/repos/repo_example_dir"
+        return 1
+    fi
+
+    DIR_PATH="$1"
+
+    # Check if the directory path exists and is a directory
+    if [ ! -d "$DIR_PATH" ]; then
+        echo "Error: Directory path '$DIR_PATH' does not exist or is not a directory."
+        return 1
+    fi
+
+    # Derive the directory name and output file name
+    DIRECTORY_NAME=$(basename "${DIR_PATH}")
+    OUTPUT_FILE_DEFAULT="${DIR_PATH}/save/directory.${DIRECTORY_NAME}.txt"
+    OUTPUT_FILE="${2:-${OUTPUT_FILE_DEFAULT}}"
+    OUTPUT_DIR=$(dirname ${OUTPUT_FILE})
+
+    echo "Ensure output dir exists: ${OUTPUT_DIR}"
+    mkdir -p "${OUTPUT_DIR}"
+
+    # Create or clear the output file
+    > "${OUTPUT_FILE}"
+
+    echo "Packaging directory: ${DIRECTORY_NAME}"
+    echo "Output will be saved to: ${OUTPUT_FILE}"
+    echo ""
+
+    # Find all regular files in the directory path and its subdirectories excluding certain specified dirs, then process them
+    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.test|save|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
+        # Get the relative path of the file from the dir_path
+        RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
+
+        # Add a header comment to the output file
+        echo "### FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
+        echo "" >> "$OUTPUT_FILE"
+
+        # Concatenate the file's content
+        cat "$FILE_PATH" >> "$OUTPUT_FILE"
+
+        echo "" >> "$OUTPUT_FILE"
+        echo "### END FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
+        echo "" >> "$OUTPUT_FILE"
+    done
+
+    echo "Packaging complete! All files from '$DIR_PATH' are saved in '$OUTPUT_FILE'."
+}
 
 #
 # Function to concatenate all files of an Ansible role into a single text file.
@@ -165,8 +222,12 @@ package_ansible_role() {
 
     # Derive the role name and output file name
     ROLE_NAME=$(basename "$ROLE_PATH")
-    OUTPUT_FILE_DEFAULT="${ROLE_NAME}.txt"
+    OUTPUT_FILE_DEFAULT="save/role.${ROLE_NAME}.txt"
     OUTPUT_FILE="${2:-${OUTPUT_FILE_DEFAULT}}"
+    OUTPUT_DIR=$(dirname ${OUTPUT_FILE})
+
+    echo "Ensure output dir exists: ${OUTPUT_DIR}"
+    mkdir -p "${OUTPUT_DIR}"
 
     # Create or clear the output file
     > "$OUTPUT_FILE"
@@ -175,8 +236,8 @@ package_ansible_role() {
     echo "Output will be saved to: $OUTPUT_FILE"
     echo ""
 
-    # Find all regular files in the role path and its subdirectories, then process them
-    find "$ROLE_PATH" -type f | while read -r FILE_PATH; do
+    # Find all regular files in the role path and its subdirectories excluding certain specified dirs, then process them
+    find "$ROLE_PATH" -type d \( -regextype posix-extended -regex '^.*/(save|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
         # Get the relative path of the file from the role_path
         RELATIVE_PATH="${FILE_PATH#$ROLE_PATH/}"
 
@@ -763,14 +824,14 @@ unset -f git_add_commit_push || true
 function git_add_commit_push() {
   LOCAL_BRANCH="$(git symbolic-ref --short HEAD)" && \
   REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref ${LOCAL_BRANCH}@{upstream}) && \
-  IFS=/ read REMOTE REMOTE_BRANCH <<< ${REMOTE_AND_BRANCH} && \
+  IFS=/ read REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
   echo "Staging changes:" && \
   git add . || true && \
   GIT_COMMENT=$(git_comment) && \
   echo "Committing changes:" && \
   git commit -am "${GIT_COMMENT}" || true && \
-  echo "Pushing local branch ${LOCAL_BRANCH} to remote ${REMOTE} branch ${REMOTE_BRANCH}:" && \
-  git push ${REMOTE} ${LOCAL_BRANCH}:${REMOTE_BRANCH}
+  echo "Pushing local branch ${LOCAL_BRANCH} to remote ${REMOTE_NAME} branch ${REMOTE_BRANCH}:" && \
+  git push -f -u "${REMOTE_NAME}" "${LOCAL_BRANCH}:${REMOTE_BRANCH}"
 }
 
 unalias git_pacp 1>/dev/null 2>&1 || true
@@ -899,6 +960,20 @@ function docker_bash() {
   CONTAINER_IMAGE_ID="${1}"
   #docker run -p 8443:8443 -v `pwd`/stepca/home:/home/step -it --entrypoint /bin/bash media.johnson.int:5000/docker-stepca:latest
   docker run -it --entrypoint /bin/bash "${CONTAINER_IMAGE_ID}"
+}
+
+unalias docker_exec_sh 1>/dev/null 2>&1 || true
+unset -f docker_exec_sh || true
+function docker_exec_sh() {
+  CONTAINER_IMAGE_ID="${1}"
+  docker exec -it "${CONTAINER_IMAGE_ID}" sh
+}
+
+unalias docker_exec_bash 1>/dev/null 2>&1 || true
+unset -f docker_exec_bash || true
+function docker_exec_bash() {
+  CONTAINER_IMAGE_ID="${1}"
+  docker exec -it "${CONTAINER_IMAGE_ID}" bash
 }
 
 ## ref: https://stackoverflow.com/questions/26423515/how-to-automatically-update-your-docker-containers-if-base-images-are-updated
@@ -1034,6 +1109,15 @@ function sshpackerwork() {
   ssh -i "~/.ssh/${SSH_ANSIBLE_KEY_WORK}" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "${SSH_TARGET}"
 }
 
+unalias find_certs_by_serial_number 1>/dev/null 2>&1 || true
+unset -f find_certs_by_serial_number || true
+function find_certs_by_serial_number() {
+  local CERT_SERIAL_NUMBER="${1//:/}"
+  local SEARCH_DIR=${2:-"/usr/share/ca-certs/"}
+  find "${SEARCH_DIR}" -regextype egrep -regex ".*\.(crt|pem|cer|der)" -not -name "*-key.*" -print0 \
+    | xargs -0 -I {} sh -c \
+    "openssl x509 -in '{}' -noout -serial | grep -q -i 'serial=${CERT_SERIAL_NUMBER}' && echo '{}'"
+}
 
 unalias find_chown_nonmatching 1>/dev/null 2>&1 || true
 unset -f find_chown_nonmatching || true

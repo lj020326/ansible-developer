@@ -45,6 +45,7 @@ SITE_LIST_DEFAULT+=("pypi.python.org")
 SITE_LIST_DEFAULT+=("files.pythonhosted.org")
 SITE_LIST_DEFAULT+=("bootstrap.pypa.io")
 SITE_LIST_DEFAULT+=("galaxy.ansible.com")
+SITE_LIST_DEFAULT+=("repo.maven.apache.org")
 
 KEYTOOL=keytool
 JDK_USER_KEYSTORE="${HOME}/.keystore"
@@ -632,7 +633,7 @@ function setup_python_cacerts() {
     if [ -f "${PYTHON_SSL_CERT_FILE}" ]; then
       mv "${PYTHON_SSL_CERT_FILE}" "${PYTHON_SSL_CERT_FILE}.bak"
     else
-      cp -p "${CACERT_BUNDLE}" "${PYTHON_SSL_CERT_FILE}.bak"
+      cp -p "${CACERT_BUNDLE}" "${PYTHON_SSL_CERT_FILE}"
     fi
     if [[ "$UNAME" == "darwin"* ]]; then
       ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore

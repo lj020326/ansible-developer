@@ -4,7 +4,7 @@
 # exit when any command fails
 set -e
 
-VERSION="2025.6.12"
+VERSION="2025.10.2"
 
 #SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_DIR="$(dirname "$0")"
@@ -29,7 +29,8 @@ REQUIRED_GIT_VERSION=1.8.3
 #REQUIRED_VENV_PYTHON_VERSION="3.10.9"
 #REQUIRED_VENV_PYTHON_VERSION="3.11.9"
 #REQUIRED_VENV_PYTHON_VERSION="3.12.3"
-REQUIRED_VENV_PYTHON_VERSION="3.12.9"
+#REQUIRED_VENV_PYTHON_VERSION="3.12.9"
+REQUIRED_VENV_PYTHON_VERSION="3.13.5"
 
 REQUIRED_PYTHON_LIBS="ansible certifi"
 
@@ -403,7 +404,7 @@ function setup_python_env() {
 
     execute "${PYENV_INSTALL_CMD_ARRAY[@]}"
 
-    export PYENV_ROOT="${HOME}/.pyenv"
+    [ -f "/usr/local/bin/pyenv" ] && PYENV_BIN_DIR="/usr/local/bin"
     [ -d "${PYENV_ROOT}/bin" ] && PYENV_BIN_DIR="${PYENV_ROOT}/bin"
     [ -f "${PYENV_ROOT}/shims/pyenv" ] && PYENV_BIN_DIR="${PYENV_ROOT}/shims"
 
@@ -500,7 +501,7 @@ function setup_macos() {
   ## ref: https://brew.sh/
   ## ref: https://docs.brew.sh/Installation#unattended-installation
   ## ref: https://github.com/Homebrew/install/issues/714
-  yes "" | NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#  yes "" | NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
   ## homebrew/dupes deprecated
   ## ref: https://github.com/Homebrew/brew/issues/7628

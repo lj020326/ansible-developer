@@ -96,7 +96,20 @@ alias bigspace='space| grep ^[0-9]*[MG]'
 alias sortfilesize='ls -Slhr'
 
 ## ref: https://www.howtogeek.com/howto/30184/10-ways-to-generate-a-random-password-from-the-command-line/
-alias genpwd='openssl rand -base64 8 | md5sum | head -c8;echo'
+alias genpwd='openssl rand -hex 32'
+alias genpwd8='openssl rand -base64 8 | md5sum | head -c8;echo'
+## 256 bits of entropy
+alias genpwdhex32='openssl rand -hex 32'
+alias genpwd32='openssl rand -base64 32 | md5sum | head -c32;echo'
+
+## ref: https://ioflood.com/blog/openssl-view-certificate/#:~:text=To%20view%20a%20certificate%20using,in%20a%20file%20named%20certificate.
+## openssl x509 -text -noout -in certificate.crt
+alias getcertinfo="openssl x509 -text -noout -in"
+alias findcertsbyserialnumber="find_certs_by_serial_number"
+
+## ref: https://ioflood.com/blog/openssl-view-certificate/#:~:text=To%20view%20a%20certificate%20using,in%20a%20file%20named%20certificate.
+## openssl x509 -text -noout -in certificate.crt
+alias getcertinfo="openssl x509 -text -noout -in"
 
 ## ref: https://ioflood.com/blog/openssl-view-certificate/#:~:text=To%20view%20a%20certificate%20using,in%20a%20file%20named%20certificate.
 ## openssl x509 -text -noout -in certificate.crt
@@ -212,12 +225,15 @@ alias sshwp='ssh administrator@wordpress.johnson.int'
 alias sshk8s='ssh administrator@k8s.johnson.int'
 
 alias sshcontrol='ssh administrator@control01.johnson.int'
+alias sshcontrol1='ssh administrator@control01.johnson.int'
+alias sshcontrol2='ssh administrator@control02.johnson.int'
 alias sshvcontrol='ssh administrator@vcontrol01.johnson.int'
 
 alias getansiblelog="scp administrator@admin01.johnson.int:/home/administrator/repos/ansible/ansible-datacenter/ansible.log ."
 alias ansibletestintegration="ansible-test-integration.sh"
 alias ansibledebugvar="ansible_debug_variable"
 alias explodeansibletest="explode_ansible_test"
+alias packagedir="package_directory"
 alias packageansiblerole="package_ansible_role"
 alias explodeansiblerole="explode_ansible_role"
 
@@ -237,6 +253,8 @@ alias swarmserviceupdate="docker service update --force "
 alias dockerserviceupdate="docker service update --force "
 alias dockerstackstat="docker stack ps --filter='desired-state=running' docker_stack"
 alias dockerbash="docker_bash"
+alias dockerexecsh="docker_exec_sh"
+alias dockerexecbash="docker_exec_bash"
 
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'
@@ -347,6 +365,8 @@ alias gitfold="bash folder.sh fold"
 alias gitunfold="bash folder.sh unfold"
 alias gitfetchmain="git fetch origin main:main"
 alias gitfetchdevelopment="git fetch origin development:development"
+
+alias syncpublicbranch="~/bin/sync-public-branch.sh"
 
 alias searchrepokeywords="search-repo-keywords"
 

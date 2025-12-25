@@ -248,13 +248,19 @@ alias create-crypt-passwd="openssl passwd -1 "
 alias swarmstatus="swarm_status"
 alias swarmrestartsvc="swarm_restart_service"
 ## ref: https://stackoverflow.com/questions/44811886/restart-one-service-in-docker-swarm-stack/48776759
-alias swarmserviceupdate="docker service update --force "
+alias swarmserviceupdate="docker service update --force"
+alias dockerservicerestart="docker service update --force"
+alias dockerserviceupdate="docker service update --force"
 
-alias dockerserviceupdate="docker service update --force "
 alias dockerstackstat="docker stack ps --filter='desired-state=running' docker_stack"
+alias dockerstackps="docker stack ps --filter='desired-state=running' docker_stack"
+
 alias dockerbash="docker_bash"
 alias dockerexecsh="docker_exec_sh"
 alias dockerexecbash="docker_exec_bash"
+
+## test endpoint connectivity
+alias curltest="curl -s -L -o /dev/null -w '%{http_code}\n' --max-time 5"
 
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'
@@ -274,6 +280,7 @@ alias startheroku='heroku local'
 
 # alias syncbashenv='rsync1 ${ANSIBLE_DEVELOPER_REPO}/files/scripts/bashenv/msys2/.bash* ~/'
 alias syncbashenv="${ANSIBLE_DEVELOPER_REPO}/sync-bashenv.sh && source ${HOME}/.bashrc"
+alias syncpublicbranch="sync-public-branch.sh"
 alias getsitecertinfo="get-site-cert-info.sh"
 
 ## see function for more dynamic/robust version of the same shortcut

@@ -11,7 +11,7 @@ GIT_REMOVE_CACHED_FILES=0
 set -e
 
 #SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_DIR="$(dirname "$0")"
+#SCRIPT_DIR="$(dirname "$0")"
 SCRIPT_NAME="$(basename "$0")"
 
 CONFIRM=0
@@ -29,22 +29,8 @@ declare -a EXCLUDES_ARRAY
 EXCLUDES_ARRAY+=('.git')
 EXCLUDES_ARRAY+=('.gitmodule')
 
-# Read .gitignore and populate excludes array
-while read -r line; do
-    line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-    [[ -z "$line" || "$line" =~ ^#.* ]] && continue
-    EXCLUDES_ARRAY+=("$line")
-done < "${REPO_DIR}/.gitignore"
-
 declare -a IGNORE_ARRAY
 IGNORE_ARRAY+=('.git')
-
-# Read .rsync-ignore and populate IGNORE_ARRAY array
-while read -r line; do
-    line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-    [[ -z "$line" || "$line" =~ ^#.* ]] && continue
-    IGNORE_ARRAY+=("$line")
-done < "${REPO_DIR}/.rsync-ignore"
 
 printf -v IGNORE_LIST '%s,' "${IGNORE_ARRAY[@]}"
 IGNORE_LIST="${IGNORE_LIST%,}"
@@ -54,7 +40,8 @@ EXCLUDES_ARRAY+=("${IGNORE_ARRAY[@]}")
 printf -v EXCLUDES_LIST '%s,' "${EXCLUDES_ARRAY[@]}"
 EXCLUDES_LIST="${EXCLUDES_LIST%,}"
 
-TEMP_DIR=$(mktemp -d -p ~)
+#TEMP_DIR=$(mktemp -d -p ~)
+TEMP_DIR=$(mktemp -d /tmp/sync-repo.XXXXXXXXXX)
 
 #### LOGGING RELATED
 LOG_ERROR=0
@@ -390,7 +377,6 @@ on_error() {
 # Function to copy the project to a temporary directory
 copy_project_to_temp_dir() {
     local REPO_DIR="$1"
-    TEMP_DIR=$(mktemp -d /tmp/sync-repo.XXXXXXXXXX)
     log_info "Copying project to temporary directory: ${TEMP_DIR}"
 
     local RSYNC_CMD="rsync -dar --links --exclude={${EXCLUDES_LIST}} '${REPO_DIR}/' '${TEMP_DIR}/'"
@@ -409,6 +395,24 @@ copy_project_to_temp_dir() {
 sync_public_branch() {
     local REPO_DIR="$1"
     local PUBLIC_BRANCH="$2"
+
+    if [ -e "${REPO_DIR}/.gitignore" ]; then
+        log_info "Read .gitignore and populate excludes array"
+        while read -r line; do
+            line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            [[ -z "$line" || "$line" =~ ^#.* ]] && continue
+            EXCLUDES_ARRAY+=("$line")
+        done < "${REPO_DIR}/.gitignore"
+    fi
+
+    if [ -e "${REPO_DIR}/.rsync-ignore" ]; then
+        log_info "Read .rsync-ignore and populate IGNORE_ARRAY array"
+        while read -r line; do
+            line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            [[ -z "$line" || "$line" =~ ^#.* ]] && continue
+            IGNORE_ARRAY+=("$line")
+        done < "${REPO_DIR}/.rsync-ignore"
+    fi
 
     log_info "Stashing any local changes on the current branch."
     if ! git -C "${REPO_DIR}" stash push -u -m "Stash before sync to ${PUBLIC_BRANCH}"; then
@@ -518,6 +522,21 @@ sync_public_branch() {
     else
         log_info "No stashed changes to apply."
     fi
+
+    if [ -e "${REPO_DIR}/.rsync-post-sync" ]; then
+        log_info "Sourcing .rsync-post-sync"
+
+        # Use the source command (shorthand '.')
+        . "${REPO_DIR}/.rsync-post-sync"
+
+        # Check the exit code of the sourced commands
+        EXIT_CODE=$?
+
+        if [ $EXIT_CODE -ne 0 ]; then
+            # Use stderr for warnings/errors
+            log_warn "Warning: Sourced script failed with exit code $EXIT_CODE" >&2
+        fi
+    fi
 }
 
 
@@ -540,6 +559,7 @@ function usage() {
 
 function main() {
 
+  trap on_error ERR
   check_required_commands rsync
 
   while getopts "L:vh" opt; do
@@ -562,8 +582,6 @@ function main() {
     log_error "search_repo_keywords: FAILED"
     exit ${RETURN_STATUS}
   fi
-
-  trap on_error ERR
 
   copy_project_to_temp_dir "${REPO_DIR}"
   sync_public_branch "${REPO_DIR}" "${GIT_PUBLIC_BRANCH}"

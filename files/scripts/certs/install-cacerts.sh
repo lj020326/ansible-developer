@@ -6,7 +6,7 @@
 
 #set -x
 
-VERSION="2025.6.12"
+VERSION="2025.11.23"
 
 #SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_DIR="$(dirname "$0")"
@@ -461,11 +461,13 @@ function import_jdk_cert() {
 
   log_info "Adding certs to keystore at [${KEYSTORE}]"
 
-  if $KEYTOOL -cacerts -list -storepass "${KEYSTORE_PASS}" -alias "${ALIAS}" >/dev/null; then
+#  if $KEYTOOL -cacerts -list -storepass "${KEYSTORE_PASS}" -alias "${ALIAS}" >/dev/null; then
+  if $KEYTOOL -list -storepass "${KEYSTORE_PASS}" -alias "${ALIAS}" >/dev/null; then
     log_info "Key with alias ${ALIAS} already found, removing old one..."
 
 #   KEYTOOL_COMMAND="${KEYTOOL} -delete -alias ${ALIAS} -keystore ${KEYSTORE} -storepass ${KEYSTORE_PASS}"
-    KEYTOOL_COMMAND="${KEYTOOL} -delete -alias ${ALIAS} -cacerts -storepass ${KEYSTORE_PASS}"
+#    KEYTOOL_COMMAND="${KEYTOOL} -delete -alias ${ALIAS} -cacerts -storepass ${KEYSTORE_PASS}"
+    KEYTOOL_COMMAND="${KEYTOOL} -delete -alias ${ALIAS} -storepass ${KEYSTORE_PASS}"
     execute_eval_command "${KEYTOOL_COMMAND}"
   fi
 
@@ -478,7 +480,8 @@ function import_jdk_cert() {
 #    -alias ${ALIAS} \
 #    -file ${CA_CERTS_SRC}/full_chain_sanitized.${CACERT_TRUST_FORMAT}"
 
-  KEYTOOL_COMMAND="${KEYTOOL} -import -noprompt -cacerts -trustcacerts \
+#  KEYTOOL_COMMAND="${KEYTOOL} -import -noprompt -cacerts -trustcacerts \
+  KEYTOOL_COMMAND="${KEYTOOL} -import -noprompt -trustcacerts \
     -storepass ${KEYSTORE_PASS} \
     -alias ${ALIAS} \
     -file ${CA_CERTS_SRC}/full_chain.${CACERT_TRUST_FORMAT}"
@@ -618,37 +621,80 @@ function install_cert_to_truststore() {
 
 function setup_python_cacerts() {
 
-#  ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-#  pip_install_certifi
-#
-  local PYTHON_SSL_CERT_FILE=$(python3 -m certifi)
-  # ref: https://askubuntu.com/a/1296373/1157235
-#  local PYTHON_SSL_CERT_FILE=$(python3 -c 'import ssl; print(ssl.get_default_verify_paths().openssl_cafile)')
-  local PYTHON_SSL_CERT_DIR=$(dirname "${PYTHON_SSL_CERT_FILE}")
+  TIMESTAMP=$(date +%s)
+  TEMP_PUBLIC="/tmp/public_roots.pem"
+  TEMP_TRUSTED="/tmp/trusted_certs.pem"
+  TEMP_COMBINED="/tmp/combined_ca.pem"
 
-  log_info "PYTHON_SSL_CERT_DIR=${PYTHON_SSL_CERT_DIR}"
-  if [[ -n "${PYTHON_SSL_CERT_DIR}" && -n "${PYTHON_SSL_CERT_FILE}" ]]; then
+  OPENSSL_CAFILE=$(python3 -c 'import ssl; print(ssl.get_default_verify_paths().openssl_cafile)' 2>/dev/null || echo "")
+  CERTIFI_CAFILE=$(python3 -m certifi 2>/dev/null || echo "")
 
-    log_info "Backing up ${PYTHON_SSL_CERT_FILE}"
-    if [ -f "${PYTHON_SSL_CERT_FILE}" ]; then
-      mv "${PYTHON_SSL_CERT_FILE}" "${PYTHON_SSL_CERT_FILE}.bak"
-    else
-      cp -p "${CACERT_BUNDLE}" "${PYTHON_SSL_CERT_FILE}"
-    fi
-    if [[ "$UNAME" == "darwin"* ]]; then
-      ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-      MACOS_CACERT_EXPORT_COMMAND="sudo security export -t certs -f pemseq -k /Library/Keychains/System.keychain -o ${PYTHON_SSL_CERT_DIR}/systemBundleCA.pem"
-#      log_info "Running [${MACOS_CACERT_EXPORT_COMMAND}]"
-#      eval "${MACOS_CACERT_EXPORT_COMMAND}"
-      execute_eval_command "${MACOS_CACERT_EXPORT_COMMAND}"
-    fi
-    log_info "Appending system cacerts to python cacerts"
-    if [[ "$UNAME" == "darwin"* ]]; then
-      cat "${PYTHON_SSL_CERT_FILE}.bak" "${PYTHON_SSL_CERT_DIR}/systemBundleCA.pem" > "${PYTHON_SSL_CERT_FILE}"
-    else
-      cat "${PYTHON_SSL_CERT_FILE}.bak" "${CACERT_BUNDLE}" > "${PYTHON_SSL_CERT_FILE}"
-    fi
+  log_info "Paths: OpenSSL=${OPENSSL_CAFILE}, certifi=${CERTIFI_CAFILE}"
+
+  # Step 1: Fetch fresh public roots
+  log_info "Fetching fresh public roots from curl.se..."
+  curl -s https://curl.se/ca/cacert.pem > "$TEMP_PUBLIC"
+  cert_count=$(grep -c '^-----BEGIN CERTIFICATE-----' "$TEMP_PUBLIC" || echo "0")
+  log_info "Fetched public roots: $cert_count certs."
+
+  if [[ $cert_count -lt 100 ]]; then
+    log_error "Fetched too few public certs ($cert_count)—network issue?"
+    exit 1
   fi
+
+  # Step 2: Export trusted certs from System Keychain
+  log_info "Exporting trusted certs from Keychain..."
+  if [[ "$UNAME" == "darwin"* ]]; then
+    sudo security export -k /Library/Keychains/System.keychain -t certs -f pemseq -o "$TEMP_TRUSTED"
+    if [[ ! -s "$TEMP_TRUSTED" ]]; then
+      log_error "Export failed—check sudo/Keychain access."
+      exit 1
+    fi
+  else
+    cp -p "${CACERT_BUNDLE}" "${TEMP_TRUSTED}"
+  fi
+
+  trusted_count=$(grep -c '^-----BEGIN CERTIFICATE-----' "$TEMP_TRUSTED" || echo "0")
+  log_info "Exported Keychain trusted certs: $trusted_count certs."
+
+  # Step 3: Combine (simple cat; duplicates harmless for OpenSSL)
+  log_info "Combining (no dedupe)..."
+  cat "$TEMP_PUBLIC" "$TEMP_TRUSTED" > "$TEMP_COMBINED"
+  total_count=$(grep -c '^-----BEGIN CERTIFICATE-----' "$TEMP_COMBINED" || echo "0")
+  log_info "Combined total certs: $total_count."
+
+  if [[ $total_count -lt 100 ]]; then
+    log_error "Too few total certs ($total_count)—check exports."
+    exit 1
+  fi
+
+  # Step 4: Backup & Update
+  log_info "Updating bundles..."
+  for BUNDLE in "$OPENSSL_CAFILE" "$CERTIFI_CAFILE"; do
+    ## if any of the python bundles are using the system ca certs, then skip
+    if [[ "$BUNDLE" == "${CACERT_BUNDLE}" ]]; then
+      log_info "skipping - specified python bundle already uses system certs at ${CACERT_BUNDLE}"
+    else
+      if [[ -n "$BUNDLE" ]]; then
+        cp -p "$BUNDLE" "${BUNDLE}.bak.${TIMESTAMP}" 2>/dev/null || true
+        cp "$TEMP_COMBINED" "$BUNDLE"
+        log_info "Updated $BUNDLE (backup: ${BUNDLE}.bak.${TIMESTAMP})."
+      fi
+    fi
+  done
+
+  # Step 5: Validation
+  log_info "Validating bundle..."
+  if openssl crl2pkcs7 -nocrl -certfile "$OPENSSL_CAFILE" >/dev/null 2>&1; then
+    log_info "Bundle parses OK with OpenSSL."
+  else
+    log_error "Bundle parse failed—check for malformed PEM."
+    exit 1
+  fi
+
+  # Cleanup
+  rm -f "$TEMP_PUBLIC" "$TEMP_TRUSTED" "$TEMP_COMBINED"
+
 }
 
 function init_cacert_vars() {
@@ -824,9 +870,9 @@ function usage() {
 	echo "       ${SCRIPT_NAME} "
   echo "       ${SCRIPT_NAME} -v"
 	echo "       ${SCRIPT_NAME} -L DEBUG"
-	echo "       ${SCRIPT_NAME} cacert.example.com,443"
+	echo "       ${SCRIPT_NAME} cacert.example.com:443"
 	echo "       ${SCRIPT_NAME} -L DEBUG updates.jenkins.io:443"
-	echo "       ${SCRIPT_NAME} cacert.example.com,443 ca.example.int:443 registry.example.int:5000"
+	echo "       ${SCRIPT_NAME} cacert.example.com:443 ca.example.int:443 registry.example.int:5000"
 	echo "       ${SCRIPT_NAME} bitbucket.example.org.org:8443 updates.jenkins.io:443"
 	echo "       ${SCRIPT_NAME} -s www.jetbrains.com"
 	echo "       ${SCRIPT_NAME} -s -j /Applications/IntelliJ\ IDEA\ CE.app/Contents/jbr/Contents/Home/ www.jetbrains.com"

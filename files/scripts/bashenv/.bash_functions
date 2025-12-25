@@ -147,55 +147,48 @@ explode_ansible_role() {
 unalias package_directory 1>/dev/null 2>&1 || true
 unset -f package_directory || true
 package_directory() {
-    # Check if a directory path is provided
     if [ -z "$1" ]; then
         echo "Usage: package_directory <directory_path>"
-        echo "Example: package_directory ~/repos/repo_example_dir"
         return 1
     fi
 
     DIR_PATH="$1"
 
-    # Check if the directory path exists and is a directory
     if [ ! -d "$DIR_PATH" ]; then
-        echo "Error: Directory path '$DIR_PATH' does not exist or is not a directory."
+        echo "Error: Directory path '$DIR_PATH' does not exist."
         return 1
     fi
 
-    # Derive the directory name and output file name
-    DIRECTORY_NAME=$(basename "${DIR_PATH}")
+    DIR_PATH="${1%/}"
+    # Resolve absolute path so "." becomes the actual folder name
+    ABS_DIR_PATH=$(cd "$DIR_PATH" && pwd)
+    DIRECTORY_NAME=$(basename "${ABS_DIR_PATH}")
+
     OUTPUT_FILE_DEFAULT="${DIR_PATH}/save/directory.${DIRECTORY_NAME}.txt"
     OUTPUT_FILE="${2:-${OUTPUT_FILE_DEFAULT}}"
-    OUTPUT_DIR=$(dirname ${OUTPUT_FILE})
+    OUTPUT_DIR=$(dirname "${OUTPUT_FILE}")
 
     echo "Ensure output dir exists: ${OUTPUT_DIR}"
     mkdir -p "${OUTPUT_DIR}"
-
-    # Create or clear the output file
     > "${OUTPUT_FILE}"
 
     echo "Packaging directory: ${DIRECTORY_NAME}"
     echo "Output will be saved to: ${OUTPUT_FILE}"
     echo ""
 
-    # Find all regular files in the directory path and its subdirectories excluding certain specified dirs, then process them
-    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.test|save|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
-        # Get the relative path of the file from the dir_path
+    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.test|.tmp|__pycache__|output|save|releases|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
+        # Use the relative path for the header
         RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
 
-        # Add a header comment to the output file
         echo "### FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
         echo "" >> "$OUTPUT_FILE"
-
-        # Concatenate the file's content
         cat "$FILE_PATH" >> "$OUTPUT_FILE"
-
         echo "" >> "$OUTPUT_FILE"
         echo "### END FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
         echo "" >> "$OUTPUT_FILE"
     done
 
-    echo "Packaging complete! All files from '$DIR_PATH' are saved in '$OUTPUT_FILE'."
+    echo "Packaging complete! Saved in '$OUTPUT_FILE'."
 }
 
 #
@@ -212,17 +205,20 @@ package_ansible_role() {
         return 1
     fi
 
-    ROLE_PATH="$1"
+    DIR_PATH="$1"
 
     # Check if the role path exists and is a directory
-    if [ ! -d "$ROLE_PATH" ]; then
-        echo "Error: Role path '$ROLE_PATH' does not exist or is not a directory."
+    if [ ! -d "$DIR_PATH" ]; then
+        echo "Error: Role path '$DIR_PATH' does not exist or is not a directory."
         return 1
     fi
 
-    # Derive the role name and output file name
-    ROLE_NAME=$(basename "$ROLE_PATH")
-    OUTPUT_FILE_DEFAULT="save/role.${ROLE_NAME}.txt"
+    DIR_PATH="${1%/}"
+    # Resolve absolute path so "." becomes the actual folder name
+    ABS_DIR_PATH=$(cd "$DIR_PATH" && pwd)
+    DIRECTORY_NAME=$(basename "${ABS_DIR_PATH}")
+
+    OUTPUT_FILE_DEFAULT="${DIR_PATH}/save/directory.${DIRECTORY_NAME}.txt"
     OUTPUT_FILE="${2:-${OUTPUT_FILE_DEFAULT}}"
     OUTPUT_DIR=$(dirname ${OUTPUT_FILE})
 
@@ -232,14 +228,14 @@ package_ansible_role() {
     # Create or clear the output file
     > "$OUTPUT_FILE"
 
-    echo "Packaging role: $ROLE_NAME"
+    echo "Packaging role: $DIRECTORY_NAME"
     echo "Output will be saved to: $OUTPUT_FILE"
     echo ""
 
     # Find all regular files in the role path and its subdirectories excluding certain specified dirs, then process them
-    find "$ROLE_PATH" -type d \( -regextype posix-extended -regex '^.*/(save|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
-        # Get the relative path of the file from the role_path
-        RELATIVE_PATH="${FILE_PATH#$ROLE_PATH/}"
+    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(save|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
+        # Get the relative path of the file from the dir_path
+        RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
 
         # Add a header comment to the output file
         echo "### FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
@@ -253,7 +249,7 @@ package_ansible_role() {
         echo "" >> "$OUTPUT_FILE"
     done
 
-    echo "Packaging complete! All files from '$ROLE_PATH' are saved in '$OUTPUT_FILE'."
+    echo "Packaging complete! All files from '$DIR_PATH' are saved in '$OUTPUT_FILE'."
 }
 
 ##

@@ -404,9 +404,13 @@ function setup_python_env() {
 
     execute "${PYENV_INSTALL_CMD_ARRAY[@]}"
 
+    [ -d "${HOME}/.pyenv" ] && PYENV_ROOT="${HOME}/.pyenv"
+    log_info "PYENV_ROOT=${PYENV_ROOT}"
+
     [ -f "/usr/local/bin/pyenv" ] && PYENV_BIN_DIR="/usr/local/bin"
     [ -d "${PYENV_ROOT}/bin" ] && PYENV_BIN_DIR="${PYENV_ROOT}/bin"
     [ -f "${PYENV_ROOT}/shims/pyenv" ] && PYENV_BIN_DIR="${PYENV_ROOT}/shims"
+    log_info "PYENV_BIN_DIR=${PYENV_BIN_DIR}"
 
     [[ -v PYENV_BIN_DIR ]] && export PATH="${PYENV_BIN_DIR}:${PATH}" \
      && PYENV_BIN="${PYENV_BIN_DIR}/pyenv"

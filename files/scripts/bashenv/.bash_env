@@ -282,10 +282,6 @@ else
         # sudo -H cp ~/repos/pyutils/k8s/conf/admin.conf $HOME/.kube/config
         export KUBECONFIG=$HOME/.kube/config
     fi
-#    if [ "${HOSTNAME}" == "openshift.${NETWORK_INTERNAL_DOMAIN}" ]; then
-#        export OPENSHIFT_INSTALL=/opt/openshift
-#        export CURL_CA_BUNDLE=/opt/openshift/openshift.int.config/master/ca.crt
-#    fi
 
     export ANSIBLE_ROLES_PATH=/etc/ansible/roles:~/.ansible/roles
 
@@ -293,7 +289,16 @@ else
 
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-    export PATH+=:$OPENSHIFT_INSTALL
+    if [ -d "/snap/bin" ]; then
+      echo "snap is enabled (see defaults in ansible role bootstrap_linux_package)"
+      export PATH+=:/snap/bin
+    fi
+
+    #if [ "${HOSTNAME}" == "openshift.${NETWORK_INTERNAL_DOMAIN}" ]; then
+    #    export OPENSHIFT_INSTALL=/opt/openshift
+    #    export CURL_CA_BUNDLE=/opt/openshift/openshift.int.config/controller/ca.crt
+    #    export PATH+=:$OPENSHIFT_INSTALL
+    #fi
 
     # setenv-python 3
 fi

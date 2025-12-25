@@ -68,7 +68,7 @@ echo "ENDPOINT=${ENDPOINT}"
 
 
 echo "Setting env related CACERT variables"
-source ${SCRIPT_DIR}/get_curl_ca_opts.sh
+source "${SCRIPT_DIR}/get_curl_ca_opts.sh"
 
 echo "*******************"
 echo "getting cert info from endpoint ${ENDPOINT}"

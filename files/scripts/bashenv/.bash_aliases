@@ -174,6 +174,11 @@ alias convertpdf2imagepdf="convert-pdf-to-image-pdf.py"
 ## DNS alias wrappers around functions
 alias dnsresetcache="reset_local_dns"
 alias dnsreset="reset_local_dns"
+## for ping dns resolution:
+##   nslookup and ping use different methods to resolve names.
+##   While nslookup talks directly to your DNS server, ping uses the system's standard resolver library (glibc),
+##   which checks several local sources before ever asking a DNS server
+alias resetnscdcache="nscd -i hosts"
 
 alias sshsetupkeyaliases="setup-ssh-key-identities.sh"
 alias sshvcenter='ssh root@vcenter7.dettonville.int'
@@ -182,6 +187,7 @@ alias sshvcenter6='ssh ansible@vcenter.dettonville.int'
 alias sshesx00='ssh root@esx00.dettonville.int'
 alias sshesx01='ssh root@esx01.dettonville.int'
 alias sshesx02='ssh root@esx02.dettonville.int'
+alias sshesx03='ssh root@esx03.dettonville.int'
 alias sshesx10='ssh root@esx10.dettonville.int'
 alias sshesx11='ssh root@esx11.dettonville.int'
 
@@ -190,6 +196,8 @@ alias sshesx11='ssh root@esx11.dettonville.int'
 alias sshosbuild="ssh osbuild@10.10.100.10"
 
 alias sshpfsense='ssh admin@pfsense.johnson.int'
+alias sshdiskstation='ssh administrator@diskstation01.johnson.int'
+
 alias sshgpu='ssh administrator@gpu.johnson.int'
 alias sshgpu1='ssh administrator@gpu01.johnson.int'
 alias sshgpu2='ssh administrator@gpu02.johnson.int'

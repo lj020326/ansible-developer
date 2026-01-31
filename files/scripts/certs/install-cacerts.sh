@@ -270,13 +270,13 @@ function execute_eval_command() {
 
   if [[ $RETURN_STATUS -eq 0 ]]; then
     if [[ $COMMAND_RESULT != "" ]]; then
-      log_debug "${COMMAND_RESULT}"
+      log_debug $'\n'"${COMMAND_RESULT}"
     fi
     log_debug "SUCCESS!"
   else
     log_error "ERROR (${RETURN_STATUS})"
 #    echo "${COMMAND_RESULT}"
-    abort "$(printf "Failed during: %s" "${COMMAND_RESULT}")"
+    abort "$(printf "Failed during: %s" "${RUN_COMMAND}")"
   fi
 
 }
@@ -697,8 +697,8 @@ function setup_python_cacerts() {
 
 }
 
-function init_cacert_vars() {
-  local LOG_PREFIX="init_cacert_vars():"
+function init_ca_vars() {
+  local LOG_PREFIX="init_ca_vars():"
 
   ## ref: https://askubuntu.com/questions/459402/how-to-know-if-the-running-platform-is-ubuntu-or-centos-with-help-of-a-bash-scri
   case "${UNAME}" in
@@ -911,7 +911,7 @@ function main() {
 
   log_info "__SITE_LIST=${__SITE_LIST[*]}"
 
-  init_cacert_vars
+  init_ca_vars
 
   log_info "UNAME=${UNAME}"
   log_debug "LINUX_OS_DIST=${LINUX_OS_DIST}"

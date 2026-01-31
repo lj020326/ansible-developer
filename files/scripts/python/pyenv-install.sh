@@ -234,12 +234,12 @@ function execute_eval_command() {
   local RETURN_STATUS=$?
 
   if [[ $RETURN_STATUS -eq 0 ]]; then
-    logDebug "${COMMAND_RESULT}"
+    logDebug $'\n'"${COMMAND_RESULT}"
     logDebug "SUCCESS!"
   else
     logError "ERROR (${RETURN_STATUS})"
 #    echo "${COMMAND_RESULT}"
-    abort "$(printf "Failed during: %s" "${COMMAND_RESULT}")"
+    abort "$(printf "Failed during: %s" "${RUN_COMMAND}")"
   fi
 
 }

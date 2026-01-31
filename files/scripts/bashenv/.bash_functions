@@ -22,7 +22,7 @@ function ansible_debug_variable() {
   fi
   RUN_ANSIBLE_COMMAND_ARRAY+=("-i ${ANSIBLE_INVENTORY_DIR}")
   RUN_ANSIBLE_COMMAND_ARRAY+=("-m debug")
-  RUN_ANSIBLE_COMMAND_ARRAY+=("-a var=${ANSIBLE_VARIABLE_NAME}")
+  RUN_ANSIBLE_COMMAND_ARRAY+=("-a var=\"${ANSIBLE_VARIABLE_NAME}\"")
   RUN_ANSIBLE_COMMAND_ARRAY+=("${ANSIBLE_INVENTORY_HOST}")
 
   local RUN_ANSIBLE_COMMAND="${RUN_ANSIBLE_COMMAND_ARRAY[*]}"
@@ -176,7 +176,7 @@ package_directory() {
     echo "Output will be saved to: ${OUTPUT_FILE}"
     echo ""
 
-    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.test|.tmp|__pycache__|output|save|releases|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
+    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.DS_Store|.test|.tmp|__pycache__|output|save|releases|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
         # Use the relative path for the header
         RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
 
@@ -233,7 +233,7 @@ package_ansible_role() {
     echo ""
 
     # Find all regular files in the role path and its subdirectories excluding certain specified dirs, then process them
-    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(save|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
+    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.DS_Store|.test|.tmp|__pycache__|output|save|releases|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
         # Get the relative path of the file from the dir_path
         RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
 

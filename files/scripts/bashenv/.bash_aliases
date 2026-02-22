@@ -241,7 +241,9 @@ alias getansiblelog="scp administrator@admin01.johnson.int:/home/administrator/r
 alias ansibletestintegration="ansible-test-integration.sh"
 alias ansibledebugvar="ansible_debug_variable"
 alias explodeansibletest="explode_ansible_test"
+alias gitbranchdiffs="git_branch_diffs"
 alias packagedir="package_directory"
+alias packagegitdir="package_git_directory"
 alias packageansiblerole="package_ansible_role"
 alias explodeansiblerole="explode_ansible_role"
 

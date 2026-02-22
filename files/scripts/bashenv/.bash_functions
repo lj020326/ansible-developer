@@ -146,20 +146,18 @@ explode_ansible_role() {
 #
 unalias package_directory 1>/dev/null 2>&1 || true
 unset -f package_directory || true
-package_directory() {
+function package_directory() {
     if [ -z "$1" ]; then
         echo "Usage: package_directory <directory_path>"
         return 1
     fi
 
-    DIR_PATH="$1"
-
+    DIR_PATH="${1%/}"
     if [ ! -d "$DIR_PATH" ]; then
         echo "Error: Directory path '$DIR_PATH' does not exist."
         return 1
     fi
 
-    DIR_PATH="${1%/}"
     # Resolve absolute path so "." becomes the actual folder name
     ABS_DIR_PATH=$(cd "$DIR_PATH" && pwd)
     DIRECTORY_NAME=$(basename "${ABS_DIR_PATH}")
@@ -175,20 +173,102 @@ package_directory() {
     echo "Packaging directory: ${DIRECTORY_NAME}"
     echo "Output will be saved to: ${OUTPUT_FILE}"
     echo ""
+    echo "Filtering out non-text files..."
 
-    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.DS_Store|.test|.tmp|__pycache__|output|save|releases|archive|old)$' -prune \) -o -type f -print | while read -r FILE_PATH; do
-        # Use the relative path for the header
-        RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
+    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.idea|.DS_Store|.test|.tmp|__pycache__|output|save|releases|archive|old)$' -prune \) \
+      -o -type f -print | while read -r FILE_PATH; do
 
-        echo "### FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
-        echo "" >> "$OUTPUT_FILE"
-        cat "$FILE_PATH" >> "$OUTPUT_FILE"
-        echo "" >> "$OUTPUT_FILE"
-        echo "### END FILE: $RELATIVE_PATH ###" >> "$OUTPUT_FILE"
-        echo "" >> "$OUTPUT_FILE"
+        # Check for binary content
+        # -I (capital i) tells 'file' to look at the mime-type/encoding
+        # We look for "binary" to exclude it.
+        IS_BINARY=$(file -b --mime "$FILE_PATH" | grep "charset=binary")
+
+        if [ -z "$IS_BINARY" ]; then
+            RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
+
+            # SC2129: Grouping redirects for efficiency and readability
+            {
+                echo "### FILE: $RELATIVE_PATH ###"
+                echo ""
+                cat "$FILE_PATH"
+                echo ""
+                echo "### END FILE: $RELATIVE_PATH ###"
+                echo ""
+            } >> "$OUTPUT_FILE"
+        else
+            echo "Skipping binary: $FILE_PATH" >&2
+        fi
     done
 
     echo "Packaging complete! Saved in '$OUTPUT_FILE'."
+}
+
+#
+# Function to concatenate all files of a directory into a single text file.
+# The output file is named after the specified directory.
+#
+unalias package_git_directory 1>/dev/null 2>&1 || true
+unset -f package_git_directory || true
+function package_git_directory() {
+    if [ -z "$1" ]; then
+        echo "Usage: package_git_directory <directory_path>"
+        return 1
+    fi
+
+    # 1. Normalize and Resolve Paths
+    DIR_PATH="${1%/}"
+    if [ ! -d "$DIR_PATH" ]; then
+        echo "Error: Directory path '$DIR_PATH' does not exist."
+        return 1
+    fi
+
+    ABS_DIR_PATH=$(cd "$DIR_PATH" && pwd)
+    DIRECTORY_NAME=$(basename "${ABS_DIR_PATH}")
+    OUTPUT_FILE_DEFAULT="${DIR_PATH}/save/directory.${DIRECTORY_NAME}.txt"
+    OUTPUT_FILE="${2:-${OUTPUT_FILE_DEFAULT}}"
+    OUTPUT_DIR=$(dirname "${OUTPUT_FILE}")
+
+    mkdir -p "${OUTPUT_DIR}"
+    > "${OUTPUT_FILE}"
+
+    echo "Packaging directory: ${DIRECTORY_NAME}"
+    echo "Output: ${OUTPUT_FILE}"
+
+    # 2. Use 'git -C' to execute within the target directory context
+    # This ensures paths returned are relative to DIR_PATH, not the Git root
+    git -C "$DIR_PATH" ls-files --cached --others --exclude-standard | while read -r RELATIVE_PATH; do
+
+        # In this context, FILE_PATH is correctly constructed
+        FILE_PATH="${DIR_PATH}/${RELATIVE_PATH}"
+
+        # 3. Enhanced Text-Check
+        # We check for "binary" BUT we specifically allow common text/config types
+        # that sometimes trip up the 'file' command's binary detection.
+        MIME_INFO=$(file -b --mime "$FILE_PATH")
+
+        IS_TEXT=false
+        if [[ "$MIME_INFO" != *"charset=binary"* ]]; then
+            IS_TEXT=true
+#        # Fallback: Force include specific text-based extensions even if 'file' is unsure
+#        elif [[ "$FILE_PATH" =~ \.(yml|yaml|md|txt|cfg|conf|sh|py|ini|json|gitignore)$ ]]; then
+#            IS_TEXT=true
+        fi
+
+        if [ "$IS_TEXT" = true ]; then
+            {
+                echo "### FILE: $RELATIVE_PATH ###"
+                echo ""
+                cat "$FILE_PATH"
+                echo ""
+                echo "### END FILE: $RELATIVE_PATH ###"
+                echo ""
+            } >> "$OUTPUT_FILE"
+        else
+            echo "Skipping binary: $RELATIVE_PATH" >&2
+        fi
+    done
+
+    echo "Packaging complete!"
 }
 
 #
@@ -250,6 +330,54 @@ package_ansible_role() {
     done
 
     echo "Packaging complete! All files from '$DIR_PATH' are saved in '$OUTPUT_FILE'."
+}
+
+# Compare current branch to another and save to a file
+unalias git_branch_diffs 1>/dev/null 2>&1 || true
+unset -f git_branch_diffs || true
+function git_branch_diffs() {
+    # 1. Configuration & Variables
+    local target_branch="$1"
+    local out_dir="${2:-save/}"
+
+    # Validation: Ensure a branch was provided
+    if [ -z "$target_branch" ]; then
+        echo "Usage: git-branch-diffs <compare-branch> [output-directory]"
+        return 1
+    fi
+
+    # Validation: Ensure branch exists
+    if ! git rev-parse --verify "$target_branch" >/dev/null 2>&1; then
+        echo "Error: Branch '$target_branch' does not exist."
+        return 1
+    fi
+
+    # 2. Dynamic Naming
+    # Format: YYYYMMDD_HHMMSS (e.g., 20260201_143015)
+    local timestamp=$(date +"%Y%m%d_%H%M%S")
+    # Clean the branch name (replace slashes with dashes for filename safety)
+    local safe_branch_name=$(echo "$target_branch" | sed 's/\//-/g')
+    local file_name="git-branch-diffs.${safe_branch_name}.${timestamp}.txt"
+    local full_path="${out_dir%/}/$file_name"
+
+    # 3. Execution
+    mkdir -p "$out_dir"
+    echo "Comparing current branch to: $target_branch"
+
+    # Generate the diff (Unified format, respects .gitignore)
+    # Using 'target..HEAD' shows what has changed in YOUR branch relative to target
+    git diff "$target_branch"..HEAD > "$full_path"
+
+    # 4. Results & Summary
+    if [ -s "$full_path" ]; then
+        echo "Success! Difference file created at: $full_path"
+        echo "--- Summary ---"
+        git diff "$target_branch"..HEAD --stat
+    else
+        echo "No differences found between current branch and $target_branch."
+        # Clean up empty file if no diff exists
+        [ -f "$full_path" ] && rm "$full_path"
+    fi
 }
 
 ##

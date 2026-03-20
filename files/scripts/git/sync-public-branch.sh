@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2026.2.4"
+VERSION="2026.3.20"
 
 GIT_DEFAULT_BRANCH=main
 GIT_PUBLIC_BRANCH=public
@@ -278,6 +278,93 @@ function git_commit_push() {
   (git push -f -u "${REMOTE_NAME}" "${LOCAL_BRANCH}:${REMOTE_BRANCH}" || true)
 }
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Squash all commits authored today into one commit
+# ──────────────────────────────────────────────────────────────────────────────
+function squash_today_commits() {
+    local branch="$1"
+    local squash_msg="${2:-"chore(sync): daily sync from main ($(date +%Y-%m-%d))"}"
+
+    # Make sure we're on the correct branch
+    git checkout "${branch}" || abort "Cannot checkout ${branch}"
+
+    # Find the oldest commit *from today* on this branch
+    #   --since=midnight today     (00:00:00 today)
+    #   --until=now                 (but usually not needed)
+    local first_commit_today
+    first_commit_today=$(git log --since=midnight --pretty=format:%H --reverse | head -n 1)
+
+    if [[ -z "$first_commit_today" ]]; then
+        log_info "No commits found today on ${branch} → creating normal commit"
+        # Fall back to normal add + commit
+        git add -A
+        if git diff --cached --quiet; then
+            log_info "No changes to commit after sync."
+            return 0
+        fi
+        git commit -m "${squash_msg}" || true
+        return $?
+    fi
+
+    log_info "Squashing all commits from today (${first_commit_today}^..HEAD) into one commit"
+
+    # ── Soft reset to the commit *before* the first one today ────────────────
+    git reset --soft "${first_commit_today}^" || abort "Failed to soft-reset to before today's commits"
+
+    # Stage everything (should already be staged, but just in case)
+    git add -A
+
+    # Get authorship from the latest commit (most natural)
+    local author_name=$(git log -1 --pretty=%an)
+    local author_email=$(git log -1 --pretty=%ae)
+    local author_date=$(git log -1 --pretty=%aD)
+
+    # Create squashed commit
+    GIT_AUTHOR_NAME="${author_name}" \
+    GIT_AUTHOR_EMAIL="${author_email}" \
+    GIT_AUTHOR_DATE="${author_date}" \
+        git commit -m "${squash_msg}" || abort "Squash commit failed"
+
+    log_success "Created squashed commit for today's changes"
+    return 0
+}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Improved git commit + push logic with daily squash
+# ──────────────────────────────────────────────────────────────────────────────
+function git_commit_push_daily_squash() {
+    local branch="$1"
+    local remote_name="$2"
+    local remote_branch="$3"
+
+    # ── Decide commit message ────────────────────────────────────────────────
+#    local commit_msg="Sync: daily sync from main ($(date +%Y-%m-%d))"
+    local commit_msg="Sync: Automated sync from main to public branch."
+
+    # Optional: include short summary of changes
+    # local changes_summary=$(git diff --stat HEAD^ HEAD | tail -n1 || echo "")
+    # [[ -n "$changes_summary" ]] && commit_msg+="\n\n${changes_summary}"
+
+    # ── Squash commits made today ────────────────────────────────────────────
+    squash_today_commits "${branch}" "${commit_msg}"
+
+    # If squash_today_commits returned non-zero → no commit was made (clean tree)
+    if [[ $? -ne 0 ]]; then
+        log_info "No new commit created (already clean)."
+        return 0
+    fi
+
+    log_info "Force-pushing squashed result to ${remote_name}/${remote_branch}"
+
+    git push --force-with-lease \
+        "${remote_name}" \
+        "${branch}:${remote_branch}" \
+        || abort "Force push failed"
+
+    log_success "Successfully pushed squashed daily changes to ${remote_name}/${remote_branch}"
+}
+
 function search_repo_keywords () {
 
   #export -p | sed 's/declare -x //' | sed 's/export //'
@@ -415,7 +502,7 @@ sync_public_branch() {
     if [[ -z "${REMOTE_BRANCH}" ]]; then
         log_warn "No upstream branch found for ${PUBLIC_BRANCH}. Skipping pull."
     else
-        log_info "Pulling from REMOTE_BRANCH remote: ${REMOTE_NAME}"
+        log_info "Pulling from remote: ${REMOTE_NAME}"
         if ! git -C "${REPO_DIR}" pull "${REMOTE_NAME}" "${REMOTE_BRANCH}:${PUBLIC_BRANCH}"; then
             log_warn "Failed to pull from ${REMOTE_NAME}/${REMOTE_BRANCH}:${PUBLIC_BRANCH}. Continuing anyway."
         fi
@@ -425,7 +512,7 @@ sync_public_branch() {
 
     if [ "${GIT_REMOVE_CACHED_FILES}" -eq 1 ]; then
       log_info "Removing files cached in git"
-      git rm -r --cached .
+      git rm -r --cached . || true
     fi
 
     log_info "Copy ${TEMP_DIR} to project dir ${REPO_DIR}"
@@ -444,58 +531,74 @@ sync_public_branch() {
         fi
     fi
 
-    if [ -n "${PUBLIC_GITIGNORE}" ]; then
-      if [ -e "${PUBLIC_GITIGNORE}" ]; then
-        log_info "Update public files:"
-        cp -p "${PUBLIC_GITIGNORE}" .gitignore
-      fi
+    # Update public-specific files
+    if [ -n "${PUBLIC_GITIGNORE}" ] && [ -e "${PUBLIC_GITIGNORE}" ]; then
+      log_info "Update public files:"
+      cp -p "${PUBLIC_GITIGNORE}" .gitignore
     fi
 
-    if [ -n "${PUBLIC_GITMODULES}" ]; then
-      if [ -e "${PUBLIC_GITMODULES}" ]; then
-        echo "Update public submodules:"
-        cp -p $PUBLIC_GITMODULES .gitmodules
-        git submodule deinit -f . && \
-        git submodule update --init --recursive --remote
-      fi
+    if [ -n "${PUBLIC_GITMODULES}" ] && [ -e "${PUBLIC_GITMODULES}" ]; then
+      log_info "Update public submodules:"
+      cp -p "${PUBLIC_GITMODULES}" .gitmodules
+      git submodule deinit -f . && \
+      git submodule update --init --recursive --remote || true
     fi
 
-    log_info "Show changes before push:"
-    git status
+    # ────────────────────────────────────────────────────────────────
+    # Check if there are actually any changes after rsync + updates
+    # ────────────────────────────────────────────────────────────────
+    git add -A >/dev/null 2>&1 || true
 
-    ## https://stackoverflow.com/questions/5989592/git-cannot-checkout-branch-error-pathspec-did-not-match-any-files-kn
-    ## git diff --name-only ${GIT_PUBLIC_BRANCH} ${GIT_DEFAULT_BRANCH} --
+    if git diff --cached --quiet; then
+        log_success "No changes detected after sync (working tree & index clean)."
+        log_info "Nothing to commit or push — skipping confirmation and push steps."
+    else
+        log_info "Changes detected — proceeding to review & push."
 
-    if [ $CONFIRM -eq 0 ]; then
-      ## https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
-      read -p "Are you sure you want to merge the changes above to public branch ${TARGET_BRANCH}? " -n 1 -r
-      echo    # (optional) move to a new line
-      if [[ ! $REPLY =~ ^[Yy]$ ]]
-      then
-          exit 1
-      fi
+        log_info "Show changes before push:"
+        #git status
+        git status --short
+
+        local proceed=true
+        if [ $CONFIRM -eq 0 ]; then
+            read -p "Continue and squash today's commits + force-push to public branch? [y/N] " -n 1 -r </dev/tty
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                log_warn "Sync aborted by user."
+                proceed=false
+            fi
+        fi
+
+        if [[ $proceed == true ]]; then
+            # Get remote info
+            local REMOTE_AND_BRANCH
+            REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}" 2>/dev/null) \
+                || REMOTE_AND_BRANCH="origin/${PUBLIC_BRANCH}"
+
+            IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}"
+
+            # Perform squash + force push
+            git_commit_push_daily_squash "${PUBLIC_BRANCH}" "${REMOTE_NAME}" "${REMOTE_BRANCH}"
+        fi
     fi
 
-    ## https://stackoverflow.com/questions/5738797/how-can-i-push-a-local-git-branch-to-a-remote-with-a-different-name-easily
-    log_info "Add all the files:"
-    git_commit_push
-
-#    log_info "Checkout ${GIT_DEFAULT_BRANCH} branch:" && \
-#    git checkout ${GIT_DEFAULT_BRANCH}
-
-    log_info "Returning to the original branch and applying stashed changes."
-    if ! git -C "${REPO_DIR}" checkout -; then
-        log_error "Failed to checkout original branch."
+    # ────────────────────────────────────────────────────────────────
+    # Always return to the default branch (main)
+    # ────────────────────────────────────────────────────────────────
+    log_info "Returning to original branch ${GIT_DEFAULT_BRANCH}"
+    if ! git -C "${REPO_DIR}" checkout "${GIT_DEFAULT_BRANCH}"; then
+        log_error "Failed to return to ${GIT_DEFAULT_BRANCH}"
     fi
 
+    # Handle private submodules if needed
     if [ -e .gitmodules ]; then
-      echo "Resetting ansible submodule for private"
+      echo "Resetting submodules for private"
       git submodule deinit -f . && \
       git submodule update --init --recursive --remote && \
       git_commit_push
     fi
 
-    log_info "Returning to the original branch and applying stashed changes."
+    log_info "Applying any stashed changes if present."
     if git -C "${REPO_DIR}" stash list | grep -q 'stash'; then
         if ! git -C "${REPO_DIR}" stash pop; then
             log_warn "Failed to apply stashed changes. You may have uncommitted changes. Please handle manually."
@@ -506,35 +609,55 @@ sync_public_branch() {
 
     if [ -e "${REPO_DIR}/.rsync-post-sync" ]; then
         log_info "Sourcing .rsync-post-sync"
-
-        # Use the source command (shorthand '.')
         . "${REPO_DIR}/.rsync-post-sync"
-
-        # Check the exit code of the sourced commands
-        EXIT_CODE=$?
-
+        local EXIT_CODE=$?
         if [ $EXIT_CODE -ne 0 ]; then
-            # Use stderr for warnings/errors
-            log_warn "Warning: Sourced script failed with exit code $EXIT_CODE" >&2
+            log_warn "Warning: .rsync-post-sync failed with exit code $EXIT_CODE" >&2
         fi
     fi
 }
 
-
 function usage() {
-  echo "Usage: ${SCRIPT_NAME} [options]"
-  echo ""
-  echo "  Options:"
-  echo "       -L [ERROR|WARN|INFO|TRACE|DEBUG] : run with specified log level (default: '${LOGLEVEL_TO_STR[${LOG_LEVEL_IDX}]}')"
-  echo "       -v : show script version"
-  echo "       -h : help"
-  echo "     [TEST_CASES]"
-  echo ""
-  echo "  Examples:"
-	echo "       ${SCRIPT_NAME} "
-	echo "       ${SCRIPT_NAME} -L DEBUG"
-  echo "       ${SCRIPT_NAME} -v"
-	[ -z "$1" ] || exit "$1"
+  cat <<EOF
+${SCRIPT_NAME} v${VERSION}
+
+Purpose:
+  One-way sync from private/internal ${GIT_DEFAULT_BRANCH} branch → public ${GIT_PUBLIC_BRANCH} branch.
+
+  Typical use case:
+  • You develop on '${GIT_DEFAULT_BRANCH}' (private repo or internal server)
+  • You want selected/cleaned content to appear on GitHub under '${GIT_PUBLIC_BRANCH}' (often mapped to main)
+
+  What the script does:
+  1. Stashes any uncommitted changes on current branch
+  2. Checks out '${GIT_PUBLIC_BRANCH}'
+  3. Pulls latest from remote (usually GitHub)
+  4. Rsyncs filtered content from main (using .gitignore + .rsync-ignore + excludes)
+  5. Applies public-specific .gitignore and .gitmodules if present (*.pub files)
+  6. If there are changes:
+     - Shows diff/status
+     - Asks for confirmation (unless -n / non-interactive mode)
+     - Squashes all commits authored today into one commit
+     - Force-pushes with lease to remote
+  7. Returns to ${GIT_DEFAULT_BRANCH}
+  8. Pops stash if any
+  9. Runs .rsync-post-sync hook if present
+
+Usage: ${SCRIPT_NAME} [options]
+
+Options:
+  -L LEVEL     Set log level: ERROR WARN INFO TRACE DEBUG  (default: INFO)
+  -v           Show version (${VERSION})
+  -h           Show this help
+
+Examples:
+  ${SCRIPT_NAME}
+  ${SCRIPT_NAME} -L DEBUG
+  ${SCRIPT_NAME} -v
+
+EOF
+
+  [ -z "$1" ] || exit "$1"
 }
 
 

@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Usage: ./add_root_certs.sh "example.com,google.com:8443,another.site"
 # Fetches root/CA certificates from the SSL chain for each site,
-# deduplicates them, and adds to macOS System Keychain and Firefox trust store.
+# de-duplicates them, and adds to macOS System Keychain and Firefox trust store.
 # Requires: openssl (built-in), brew install nss for Firefox support.
 # Run with one sudo prompt for system keychain.
 

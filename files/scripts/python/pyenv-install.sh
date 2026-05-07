@@ -244,6 +244,24 @@ function execute_eval_command() {
 
 }
 
+function check_tmp_noexec() {
+  local test_file="/tmp/pyenv_exec_test_$$.sh"
+  local is_noexec=0
+
+  # Create a small dummy script in /tmp
+  echo "exit 0" > "$test_file" 2>/dev/null
+  chmod +x "$test_file" 2>/dev/null
+
+  # Try to execute it. If it fails, we likely have noexec set.
+  if ! "$test_file" 2>/dev/null; then
+    logWarn "/tmp appears to be mounted with noexec. Falling back to /var/tmp for build."
+    is_noexec=1
+  fi
+
+  rm -f "$test_file"
+  return $is_noexec
+}
+
 function setup_pyenv_linux() {
 
   logInfo "installing pyenv"
@@ -332,7 +350,13 @@ function install_python_version() {
   #env CFLAGS="-I/usr/local/openssl/include" LDFLAGS="-L/usr/local/openssl/lib" pyenv install "${PYTHON_VERSION}"
   #env CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib -lssl -lcrypto" CFLAGS=-fPIC pyenv install "${PYTHON_VERSION}"
   if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
-    INSTALL_PYTHON_CMD_ARRAY+=("env CPPFLAGS=\"-I/usr/include/openssl\"")
+    # --- Check for noexec on /tmp ---
+    local TMP_PREFIX=""
+    if ! check_tmp_noexec; then
+      TMP_PREFIX="TMPDIR=/var/tmp "
+    fi
+    INSTALL_PYTHON_CMD_ARRAY+=("env ${TMP_PREFIX}")
+    INSTALL_PYTHON_CMD_ARRAY+=("CPPFLAGS=\"-I/usr/include/openssl\"")
     INSTALL_PYTHON_CMD_ARRAY+=("LDFLAGS=\"-L/usr/lib64/openssl -lssl -lcrypto\"")
     INSTALL_PYTHON_CMD_ARRAY+=("CFLAGS=-fPIC ${PYENV_BIN} install -s ${PYTHON_VERSION}")
   elif [[ -n "${INSTALL_ON_MACOS-}" ]]; then

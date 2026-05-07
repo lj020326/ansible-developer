@@ -1,0 +1,37 @@
+name: Ansible Developer Repo Config
+version: 1.0.0
+schema: v1
+
+context:
+  - provider: file
+  - provider: code
+  - provider: codebase
+  - provider: terminal
+  - provider: diff
+
+rules:
+  - "This is the ansible-developer repository — focus on developer productivity, consistency, and maintainable automation scripts"
+  - "Prioritize clear, well-commented, portable bash and Python scripts"
+  - "Follow best practices for cross-platform compatibility (macOS, Linux, msys2)"
+  - "Make install/sync scripts idempotent and robust"
+  - "Document all aliases, functions, and setup steps clearly"
+  - "Prefer readability and maintainability — especially for shared developer tooling"
+  - "Use open source tools and encourage community contribution patterns"
+  - "Keep configuration and secrets properly separated (use vaulting where needed)"
+
+prompts:
+  - name: bash-script
+    description: Improve bash script
+    prompt: "Review and improve this bash script for readability, robustness, portability (macOS/Linux/msys2), error handling, and best practices."
+
+  - name: python-tool
+    description: Improve Python script
+    prompt: "Review and improve this Python script following PEP 8, using type hints where helpful, clear error handling, and modern practices (pathlib, etc.)."
+
+  - name: installer-script
+    description: Review installer/sync script
+    prompt: "Review this installation or sync script. Suggest improvements for idempotency, user feedback, error handling, and cross-platform compatibility."
+
+  - name: developer-tool
+    description: Developer tooling improvement
+    prompt: "This is part of a developer environment setup tool. Suggest improvements for usability, consistency, documentation, and long-term maintainability."

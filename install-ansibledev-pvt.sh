@@ -1,6 +1,7 @@
 #!/bin/bash
 
-INSTALL_REPO_URL="git@bitbucket.org:lj020326/ansible-developer.git"
+#INSTALL_REPO_URL="git@bitbucket.org:lj020326/ansible-developer.git"
+INSTALL_REPO_URL="ssh://git@gitea.admin.dettonville.int:2222/infra/ansible-developer.git"
 INSTALL_REPO_BRANCH="main"
 
 #INSTALL_SCRIPT="https://bitbucket.org/lj020326/ansible-developer/raw/main/files/private/install-ansibledev.sh"

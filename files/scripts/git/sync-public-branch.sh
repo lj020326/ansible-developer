@@ -23,6 +23,7 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 
 PUBLIC_GITIGNORE=.gitignore.pub
 PUBLIC_GITMODULES=.gitmodules.pub
+INTERNAL_GITMODULES=.gitmodules.int
 
 ## ref: https://stackoverflow.com/questions/53839253/how-can-i-convert-an-array-into-a-comma-separated-string
 declare -a EXCLUDES_ARRAY
@@ -288,81 +289,119 @@ function squash_today_commits() {
     # Make sure we're on the correct branch
     git checkout "${branch}" || abort "Cannot checkout ${branch}"
 
-    # Find the oldest commit *from today* on this branch
-    #   --since=midnight today     (00:00:00 today)
-    #   --until=now                 (but usually not needed)
-    local first_commit_today
-    first_commit_today=$(git log --since=midnight --pretty=format:%H --reverse | head -n 1)
+    # 1. Check if the HEAD commit itself was made today
+    local head_is_today
+    head_is_today=$(git log -1 --since=midnight --pretty=format:%H)
 
-    if [[ -z "$first_commit_today" ]]; then
-        log_info "No commits found today on ${branch} → creating normal commit"
-        # Fall back to normal add + commit
+    if [[ -z "$head_is_today" ]]; then
+        log_info "No commits found today on ${branch} → creating first daily commit"
         git add -A
         if git diff --cached --quiet; then
-            log_info "No changes to commit after sync."
+            log_info "No changes to commit."
             return 0
         fi
-        git commit -m "${squash_msg}" || true
+        git commit -m "${squash_msg}"
         return $?
     fi
 
-    log_info "Squashing all commits from today (${first_commit_today}^..HEAD) into one commit"
+    # 2. If HEAD is today, find the oldest commit from today to squash everything into one
+    local first_commit_today
+    first_commit_today=$(git log --since=midnight --pretty=format:%H --reverse | head -n 1)
 
-    # ── Soft reset to the commit *before* the first one today ────────────────
-    git reset --soft "${first_commit_today}^" || abort "Failed to soft-reset to before today's commits"
+    log_info "Squashing existing daily commits into one..."
 
-    # Stage everything (should already be staged, but just in case)
+    # Reset to the parent of the first commit of the day
+    git reset --soft "${first_commit_today}^"
     git add -A
 
-    # Get authorship from the latest commit (most natural)
-    local author_name=$(git log -1 --pretty=%an)
-    local author_email=$(git log -1 --pretty=%ae)
-    local author_date=$(git log -1 --pretty=%aD)
+    # Commit with today's message
+    git commit -m "${squash_msg}" || abort "Squash commit failed"
 
-    # Create squashed commit
-    GIT_AUTHOR_NAME="${author_name}" \
-    GIT_AUTHOR_EMAIL="${author_email}" \
-    GIT_AUTHOR_DATE="${author_date}" \
-        git commit -m "${squash_msg}" || abort "Squash commit failed"
-
-    log_success "Created squashed commit for today's changes"
+    log_success "Re-squashed all today's changes into a single commit"
     return 0
 }
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Improved git commit + push logic with daily squash
+# Enhanced Squash Logic
 # ──────────────────────────────────────────────────────────────────────────────
-function git_commit_push_daily_squash() {
+function squash_commits() {
+    local branch="$1"
+    local squash_msg="${2:-"Sync: Automated sync from main to public branch."}"
+
+    # Make sure we're on the correct branch
+    git checkout "${branch}" || abort "Cannot checkout ${branch}"
+
+    if [ "$SQUASH_TODAY_ONLY" -eq 1 ]; then
+        # --- MODE: SQUASH TODAY ONLY (-t) ---
+        local head_is_today
+        head_is_today=$(git log -1 --since=midnight --pretty=format:%H)
+
+        if [[ -z "$head_is_today" ]]; then
+            log_info "No commits found today on ${branch} → creating first daily commit"
+            git add -A
+            git diff --cached --quiet || git commit -m "${squash_msg}"
+            return 0
+        fi
+
+        local first_commit_today
+        first_commit_today=$(git log --since=midnight --pretty=format:%H --reverse | head -n 1)
+        log_info "Squashing existing daily commits into one..."
+        git reset --soft "${first_commit_today}^"
+    else
+        # --- MODE: DEFAULT (Squash into last existing commit) ---
+        if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+            log_info "No history found on ${branch} → creating initial commit"
+            git add -A
+            git diff --cached --quiet || git commit -m "${squash_msg}"
+            return 0
+        fi
+
+        log_info "Squashing all new changes into the last existing commit..."
+        git reset --soft HEAD^
+    fi
+
+    git add -A
+    git commit -m "${squash_msg}" || abort "Squash commit failed"
+    log_success "Sync changes consolidated."
+    return 0
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Improved git commit + push logic
+# ──────────────────────────────────────────────────────────────────────────────
+function git_commit_push_squash() {
     local branch="$1"
     local remote_name="$2"
     local remote_branch="$3"
-
-    # ── Decide commit message ────────────────────────────────────────────────
-#    local commit_msg="Sync: daily sync from main ($(date +%Y-%m-%d))"
     local commit_msg="Sync: Automated sync from main to public branch."
 
-    # Optional: include short summary of changes
-    # local changes_summary=$(git diff --stat HEAD^ HEAD | tail -n1 || echo "")
-    # [[ -n "$changes_summary" ]] && commit_msg+="\n\n${changes_summary}"
+    squash_commits "${branch}" "${commit_msg}"
 
-    # ── Squash commits made today ────────────────────────────────────────────
-    squash_today_commits "${branch}" "${commit_msg}"
-
-    # If squash_today_commits returned non-zero → no commit was made (clean tree)
     if [[ $? -ne 0 ]]; then
-        log_info "No new commit created (already clean)."
+        log_info "No new changes to push."
         return 0
     fi
 
-    log_info "Force-pushing squashed result to ${remote_name}/${remote_branch}"
+#    log_info "Force-pushing squashed result to ${remote_name}/${remote_branch}"
+#
+#    git push --force-with-lease \
+#        "${remote_name}" \
+#        "${branch}:${remote_branch}" \
+#        || abort "Force push failed"
 
-    git push --force-with-lease \
-        "${remote_name}" \
-        "${branch}:${remote_branch}" \
-        || abort "Force push failed"
+    # --- 3. Safer Force Push ---
+    # --force-with-lease: Ensures we don't overwrite work on the remote that
+    # we haven't fetched yet (someone else pushed to public).
+    log_info "Pushing to ${remote_name}/${remote_branch} using force-with-lease..."
 
-    log_success "Successfully pushed squashed daily changes to ${remote_name}/${remote_branch}"
+    if git push --force-with-lease="${remote_branch}" "${remote_name}" "${branch}:${remote_branch}"; then
+        log_success "Successfully pushed sync changes to ${remote_name}/${remote_branch}"
+    else
+        log_error "Push failed! The remote branch has changes you don't have locally."
+        log_failed "Please 'git fetch ${remote_name}' and inspect the differences before retrying."
+        exit 1
+    fi
 }
 
 function search_repo_keywords () {
@@ -578,7 +617,7 @@ sync_public_branch() {
             IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}"
 
             # Perform squash + force push
-            git_commit_push_daily_squash "${PUBLIC_BRANCH}" "${REMOTE_NAME}" "${REMOTE_BRANCH}"
+            git_commit_push_squash "${PUBLIC_BRANCH}" "${REMOTE_NAME}" "${REMOTE_BRANCH}"
         fi
     fi
 
@@ -591,8 +630,10 @@ sync_public_branch() {
     fi
 
     # Handle private submodules if needed
-    if [ -e .gitmodules ]; then
+#    if [ -e .gitmodules ]; then
+    if [ -n "${INTERNAL_GITMODULES}" ] && [ -e "${INTERNAL_GITMODULES}" ]; then
       echo "Resetting submodules for private"
+      cp -p "${INTERNAL_GITMODULES}" .gitmodules
       git submodule deinit -f . && \
       git submodule update --init --recursive --remote && \
       git_commit_push
@@ -637,7 +678,8 @@ Purpose:
   6. If there are changes:
      - Shows diff/status
      - Asks for confirmation (unless -n / non-interactive mode)
-     - Squashes all commits authored today into one commit
+     - Squashes all commits into last commit
+     - Optionally (-t) squashes all commits authored today into one commit
      - Force-pushes with lease to remote
   7. Returns to ${GIT_DEFAULT_BRANCH}
   8. Pops stash if any
@@ -646,8 +688,9 @@ Purpose:
 Usage: ${SCRIPT_NAME} [options]
 
 Options:
-  -L LEVEL     Set log level: ERROR WARN INFO TRACE DEBUG  (default: INFO)
-  -v           Show version (${VERSION})
+  -L LEVEL     Set log level: ERROR WARN INFO TRACE DEBUG (default: INFO)
+  -t           Squash only today's commits (default: squash into last existing commit)
+  -v           Show version
   -h           Show this help
 
 Examples:
@@ -662,12 +705,12 @@ EOF
 
 
 function main() {
-
   trap on_error ERR
   check_required_commands rsync
 
-  while getopts "L:vh" opt; do
+  while getopts "L:vht" opt; do
       case "${opt}" in
+          t) SQUASH_TODAY_ONLY=1 ;;
           L) set_log_level "${OPTARG}" ;;
           v) echo "${VERSION}" && exit ;;
           h) usage 1 ;;

@@ -314,15 +314,18 @@ fi
 
 unset PYENV_BIN_DIR
 if [ -d "${HOME}/.pyenv/bin" ]; then
+  export PYENV_ROOT="${HOME}/.pyenv"
   export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
   echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 elif [ -d "${HOME}/.pyenv/pyenv-win/bin" ]; then
+  export PYENV_ROOT="${HOME}/.pyenv"
   export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
   echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 #elif [ -f "${HOME}/.pyenv/shims/python3" ]; then
 #  export PYENV_BIN_DIR="${HOME}/.pyenv/shims"
 #  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 fi
+
 if [ -n "${PYENV_BIN_DIR}" ]; then
   echo "${log_prefix_bashenv} adding ${PYENV_BIN_DIR} into PATH"
   export PATH="${PYENV_BIN_DIR}:$PATH"

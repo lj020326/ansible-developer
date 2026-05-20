@@ -39,7 +39,8 @@ handler = logging.StreamHandler()
 # handler.setLevel(logging.DEBUG)
 log.addHandler(handler)
 
-## ref: https://stackoverflow.com/a/66553407/2791368
+# Update this path as needed for your environment
+# ref: https://stackoverflow.com/a/66553407/2791368
 poppler_path = "/usr/local/Cellar/poppler/25.06.0/bin"
 
 
@@ -52,7 +53,13 @@ def convert_pdf_to_image_pdf(pdf_path, output_path, dpi=400):
         output_path (str): Path to save the output image-based PDF file.
         dpi (int, optional): Resolution for converting PDF pages to images. Defaults to 300.
     """
+    # Ensure DPI is an integer if passed from CLI
+    if dpi:
+        dpi = int(dpi)
+    else:
+        dpi = 400
 
+    log.info(f"Converting: {pdf_path} -> {output_path} (DPI: {dpi})")
     page_count = pdfinfo_from_path(pdf_path)["Pages"]
     log.debug("page_count: "+str(page_count))
     if log.level == logging.DEBUG:
@@ -67,19 +74,24 @@ def convert_pdf_to_image_pdf(pdf_path, output_path, dpi=400):
         except Exception as e:
             print(f"Error getting PDF information: {e}")
 
-    # images = convert_from_path(pdf_path, dpi=dpi, poppler_path=poppler_path)
-    # images = convert_from_path(pdf_path, dpi=dpi, fmt="jpeg")
-    # images = convert_from_path(pdf_path, dpi=dpi)
-    images = convert_from_path(pdf_path)
-    if images:
-        images[0].save(output_path,
-                       poppler_path=poppler_path,
-                       format="PDF",
-                       resolution=100.0,
-                       save_all=True,
-                       append_images=images[1:])
-    else:
-        log.error("Error: No pages found in PDF or conversion failed.")
+    try:
+        # images = convert_from_path(pdf_path, dpi=dpi, poppler_path=poppler_path)
+        # images = convert_from_path(pdf_path, dpi=dpi, fmt="jpeg")
+        # images = convert_from_path(pdf_path, dpi=dpi)
+        images = convert_from_path(pdf_path, dpi=dpi)
+        if images:
+            images[0].save(
+                output_path,
+                format="PDF",
+                resolution=100.0,
+                save_all=True,
+                append_images=images[1:]
+            )
+            log.info("Success: File saved.")
+        else:
+            log.error("Error: No pages found in PDF or conversion failed.")
+    except Exception as e:
+        log.error(f"Failed to convert: {e}")
 
 
 # ------------------------------------------------------
@@ -88,30 +100,31 @@ def convert_pdf_to_image_pdf(pdf_path, output_path, dpi=400):
 # ------------------------------------------------------
 
 def main(argv):
-
     prog_usage = '''
 requires the python library 'pdf2image' and 'poppler' to be installed
 ref: https://pdf2image.readthedocs.io/en/latest/installation.html
 
 Examples of use:
-
-{0} input.pdf output.pdf
-{0} -l DEBUG input.pdf output.pdf
-
+{0} input.pdf 
+{0} input.pdf custom_output.pdf
+{0} -l DEBUG input.pdf
 '''.format(__scriptName__)
 
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter,
-                                     description="Use this script convert pdf to image based pdf",
+                                     description="Convert PDF to image-based PDF",
                                      epilog=prog_usage)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-l", "--loglevel", choices=['DEBUG', 'INFO', 'WARN', 'ERROR'], help="log level")
-    group.add_argument("-d", "--dpi", help="dpi (e.g., 300, 600)")
+    group.add_argument("-d", "--dpi", type=int, help="dpi (e.g., 300, 600)")
 
     parser.add_argument('input_pdf_file_path',
-                        help="Specify input pdf file path to convert to image based pdf")
+                        help="Input pdf file path")
+
+    # Changed nargs to '?' to make this optional
     parser.add_argument('output_pdf_file_path',
-                        help="Specify output pdf file path")
+                        nargs='?',
+                        help="Optional: Output pdf file path (defaults to input path with suffix)")
 
     # parser.add_argument('args', nargs=argparse.REMAINDER)
     # parser.add_argument('args', nargs='?')
@@ -128,24 +141,19 @@ Examples of use:
     if additional_args:
         log.debug("additional args=%s" % additional_args)
 
-    log.debug("args.input_pdf_file_path [%s]" % args.input_pdf_file_path)
-    log.debug("args.output_pdf_file_path [%s]" % args.output_pdf_file_path)
-    convert_pdf_to_image_pdf(args.input_pdf_file_path, args.output_pdf_file_path, args.dpi)
+    # Logic to handle default output path
+    input_path = args.input_pdf_file_path
+    output_path = args.output_pdf_file_path
 
-    # if args.dpi:
-    #     convert_pdf_to_image_pdf(args.input_pdf_file_path, args.output_pdf_file_path, args.dpi)
-    # else:
-    #     convert_pdf_to_image_pdf(args.input_pdf_file_path, args.output_pdf_file_path)
+    if not output_path:
+        # Splits 'path/to/file.pdf' into ('path/to/file', '.pdf')
+        base, ext = os.path.splitext(input_path)
+        output_path = f"{base}.image-based{ext}"
+
+    convert_pdf_to_image_pdf(input_path, output_path, args.dpi)
 
     log.debug("finished")
 
 
-# ------------------------------------------
-# Code Execution begins
-# ------------------------------------------
 if (__name__ == '__main__') or (__name__ == 'main'):
-    # main(sys.argv[1:])
     main(sys.argv)
-else:
-    log.error("This script should be executed, not imported.")
-

@@ -293,6 +293,8 @@ alias syncbashenv="${ANSIBLE_DEVELOPER_REPO}/sync-bashenv.sh && source ${HOME}/.
 alias syncpublicbranch="sync-public-branch.sh"
 alias getsitecertinfo="get-site-cert-info.sh"
 
+alias redactkeyvalues="redact-key-values.sh"
+
 ## see function for more dynamic/robust version of the same shortcut
 #alias blastit-="git pull origin && git add . && git commit -am 'updates from ${HOSTNAME}' && git push origin"
 #alias blastmain="git pull main && git add . && git commit -am 'updates from ${HOSTNAME}' && git push origin main"
@@ -316,6 +318,8 @@ alias gitfetchdev="git fetch origin development:development"
 alias gitfetchmain="git fetch origin main:main"
 alias gitshortlog="git shortlog --summary --numbered --email"
 alias gitlogauthors="git log --pretty=format:'[%h] %cd - Committer: %cn (%ce), Author: %an (%ae)'"
+alias gitshowlog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'"
+alias gitshowlogall="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
 alias gitresetbranchhistory="git_reset_branch_history"
 alias gitresetpublicbranch="git_reset_public_branch"
 alias gitshowupstream="git_show_upstream"

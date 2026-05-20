@@ -1,0 +1,145 @@
+name: Local Config
+version: 1.0.0
+schema: v1
+
+# ==================== MODELS ====================
+models:
+  - name: Qwen2.5-Coder 32B (Main)
+    provider: ollama
+    apiBase: http://gpu02.johnson.int:11434
+    model: qwen2.5-coder:32b
+    roles:
+      - chat
+      - edit
+      - apply
+
+  # Fast & capable autocomplete
+  - name: Qwen2.5-Coder 1.5B
+    provider: ollama
+    apiBase: http://gpu02.johnson.int:11434
+    model: qwen2.5-coder:1.5b
+    roles:
+      - autocomplete
+
+  # Heavy reasoning model when needed
+  - name: Gemma 4 31B
+    provider: llama.cpp
+    apiBase: http://gpu02.johnson.int:11432
+    model: gemma-4-31B-it-Q5_K_M
+    contextLength: 32768
+    roles:
+      - chat
+      - edit
+      - apply
+
+  # Fast & capable autocomplete
+  - name: Gemma 4 E2B (Fast Draft)
+    provider: llama.cpp
+    apiBase: http://gpu02.johnson.int:11432
+    model: gemma-4-E2B-it-Q5_K_M
+    contextLength: 4096
+    roles:
+      - autocomplete
+
+  # Lightweight fallback
+  - name: Llama 3.1 8B
+    provider: ollama
+    apiBase: http://gpu02.johnson.int:11434
+    model: llama3.1:8b
+    roles:
+      - chat
+      - edit
+
+  - name: Nomic Embed Text
+    provider: ollama
+    apiBase: http://gpu02.johnson.int:11434
+    model: nomic-embed-text
+    roles:
+      - embed
+
+  - name: BGE Reranker
+    provider: ollama
+    apiBase: http://gpu02.johnson.int:11434
+    model: bona/bge-reranker:v2-m3
+    roles:
+      - rerank
+
+tabAutocompleteModel:
+  name: Gemma 4 E2B (Fast Draft)
+  provider: llama.cpp
+  apiBase: http://gpu02.johnson.int:11432
+  model: gemma-4-E2B-it-Q5_K_M
+#  name: Qwen2.5-Coder 1.5B
+#  provider: ollama
+#  apiBase: http://gpu02.johnson.int:11434
+#  model: qwen2.5-coder:1.5b
+
+tabAutocompleteOptions:
+  # This prevents suggestions from popping up immediately as you type
+  debounceDelay: 500
+  # Explicitly define which characters SHOULD trigger it (exclude the period)
+  triggerCharacters: ["{", "[", "("]
+  # Alternatively, disable automatic triggering entirely if you prefer manual
+  # disable: true
+
+context:
+  - provider: file
+  - provider: code
+  - provider: codebase
+  - provider: terminal
+  - provider: diff
+
+rules:
+  - "Always follow DRY principles and write self-documenting code."
+  - "Prioritize clarity, maintainability, and test coverage"
+  - "For Ansible: Use FQCNs, prefer official collections, ensure full idempotency."
+  - "For Python: Follow PEP 8/Google style, use type hints where helpful."
+  - "Write defensive code with clear error handling and logging."
+  - "In automation: Safety and idempotency are more important than brevity."
+  - "Use existing patterns and conventions from the codebase whenever possible."
+  - "Favor open source tools and contribute back to the community when feasible."
+
+prompts:
+  - name: explain
+    description: Explain this code
+    prompt: "Explain this code in detail: what it does, why it was written this way, potential edge cases, and suggestions for improvement."
+
+  - name: refactor
+    description: Refactor for quality
+    prompt: "Refactor this code to be cleaner, more maintainable, and follow best practices while preserving exact functionality."
+
+  - name: test
+    description: Generate tests
+    prompt: "Write comprehensive unit and integration tests for this code, including edge cases."
+
+  - name: ansible-role
+    description: Review Ansible role
+    prompt: "Review this Ansible role or task. Suggest improvements for structure, idempotency, variable organization, documentation, and testing."
+
+  - name: groovylib
+    description: Jenkins Shared Library review
+    prompt: "Review this Groovy code for a Jenkins shared library. Suggest improvements for reusability, error handling, maintainability, and Pipeline compatibility."
+
+systemMessage: |
+  You are Gemma-4-31B, an expert DevOps, Platform Engineering, and Software Automation Architect.
+
+  Your core strengths include Ansible (collections, roles, modules, plugins), Python, Groovy/Jenkins Shared Libraries, Docker, Kubernetes, CI/CD, and GitOps.
+
+  Core principles you ALWAYS follow:
+  - Prioritize clarity, readability, and long-term maintainability over cleverness
+  - Emphasize idempotency, safety, reproducibility, and observability in all automation
+  - Follow DRY principles without premature abstraction
+  - Write self-documenting code with excellent naming conventions
+  - Prefer explicit over implicit
+  - Always consider security, observability, error handling, and operational concerns
+  - Favor open source tools and contribute back to the community whenever possible
+
+  When responding:
+  - Be concise but thorough — explain reasoning when it adds value
+  - Suggest incremental, safe, and reversible improvements
+  - Highlight potential edge cases, failure modes, and security implications
+  - Recommend appropriate testing strategies (unit, integration, molecule, etc.)
+  - Respect and build upon the existing code style and patterns in the codebase
+  - For Ansible: strongly prefer FQCNs and official collections
+
+  Current date is {{current_date}}. You are assisting a senior DevOps engineer who values quality, reliability, and sustainable automation.

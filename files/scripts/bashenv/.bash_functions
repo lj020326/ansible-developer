@@ -152,13 +152,18 @@ function package_directory() {
         return 1
     fi
 
+    # --- Configuration ---
     DIR_PATH="${1%/}"
+    # Define the regex for directories/files to prune/exclude
+    # This matches the folder names exactly within the path
+    EXCLUDE_REGEX='.*/(\.git|\.idea|\.DS_Store|\.test|\.tmp|__pycache__|output|save|releases|archive|old)$'
+
     if [ ! -d "$DIR_PATH" ]; then
         echo "Error: Directory path '$DIR_PATH' does not exist."
         return 1
     fi
 
-    # Resolve absolute path so "." becomes the actual folder name
+    # Resolve absolute path
     ABS_DIR_PATH=$(cd "$DIR_PATH" && pwd)
     DIRECTORY_NAME=$(basename "${ABS_DIR_PATH}")
 
@@ -166,24 +171,30 @@ function package_directory() {
     OUTPUT_FILE="${2:-${OUTPUT_FILE_DEFAULT}}"
     OUTPUT_DIR=$(dirname "${OUTPUT_FILE}")
 
-    echo "Ensure output dir exists: ${OUTPUT_DIR}"
+    echo "Ensuring output dir exists: ${OUTPUT_DIR}"
     mkdir -p "${OUTPUT_DIR}"
+    # shellcheck disable=SC2188
     > "${OUTPUT_FILE}"
 
     echo "Packaging directory: ${DIRECTORY_NAME}"
-    echo "Output will be saved to: ${OUTPUT_FILE}"
-    echo ""
+    echo "Excluding patterns matching: ${EXCLUDE_REGEX}"
     echo "Filtering out non-text files..."
+    echo "---"
 
-    find "$DIR_PATH" -type d \( -regextype posix-extended -regex '^.*/(.git|.idea|.DS_Store|.test|.tmp|__pycache__|output|save|releases|archive|old)$' -prune \) \
-      -o -type f -print | while read -r FILE_PATH; do
+    # Use the EXCLUDE_REGEX variable in the find command
+    # -L: Follow symlinks
+    # -regextype posix-extended: Ensures the variable is interpreted correctly
+    find -L "$DIR_PATH" \
+      -regextype posix-extended -regex "$EXCLUDE_REGEX" -prune \
+      -o \( -type f -o -type l \) -print | while read -r FILE_PATH; do
 
-        # Check for binary content
-        # -I (capital i) tells 'file' to look at the mime-type/encoding
-        # We look for "binary" to exclude it.
-        IS_BINARY=$(file -b --mime "$FILE_PATH" | grep "charset=binary")
+        # Prevent the script from reading its own output file
+        [[ "$FILE_PATH" == "$OUTPUT_FILE" ]] && continue
 
-        if [ -z "$IS_BINARY" ]; then
+        # Check for binary content (dereferencing symlinks with -L)
+        IS_BINARY=$(file -L -b --mime "$FILE_PATH" | grep "charset=binary")
+
+        if [ -z "$IS_BINARY" ] && [ -f "$FILE_PATH" ]; then
             RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
 
             # SC2129: Grouping redirects for efficiency and readability
@@ -195,11 +206,12 @@ function package_directory() {
                 echo "### END FILE: $RELATIVE_PATH ###"
                 echo ""
             } >> "$OUTPUT_FILE"
-        else
+        elif [ -n "$IS_BINARY" ]; then
             echo "Skipping binary: $FILE_PATH" >&2
         fi
     done
 
+    echo "---"
     echo "Packaging complete! Saved in '$OUTPUT_FILE'."
 }
 
@@ -229,6 +241,7 @@ function package_git_directory() {
     OUTPUT_DIR=$(dirname "${OUTPUT_FILE}")
 
     mkdir -p "${OUTPUT_DIR}"
+    # shellcheck disable=SC2188
     > "${OUTPUT_FILE}"
 
     echo "Packaging directory: ${DIRECTORY_NAME}"

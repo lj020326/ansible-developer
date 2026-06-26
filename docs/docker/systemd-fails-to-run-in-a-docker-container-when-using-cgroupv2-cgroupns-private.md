@@ -116,11 +116,11 @@ First of all, you need to create a [**systemd slice**](https://www.freedesktop.o
 
 > **Note:** Not all of these options are necessary. The most important one is `cgroup-parent`. The `cgroupdriver` should already be switched to "systemd' by default.
 
-Each slice gets its own nested cgroup. There is one caveat though: Each group might only be a "leaf" or "intermediary". Once a process takes ownershop of a cgroup no other can manage it. This means that the actual container process needs and will get its own _private_ group attached below the configured one in the form of a [**systemd scope**](https://www.freedesktop.org/software/systemd/man/systemd.scope.html).
+Each slice gets its own nested cgroup. There is one caveat though: Each group might only be a "leaf" or "intermediary". Once a process takes ownership of a cgroup no other can manage it. This means that the actual container process needs and will get its own _private_ group attached below the configured one in the form of a [**systemd scope**](https://www.freedesktop.org/software/systemd/man/systemd.scope.html).
 
 > **Reference:** Please find more about [systemd resource control](https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html#), handling of [cgroup namespaces](https://man7.org/linux/man-pages/man7/cgroup_namespaces.7.html) and [delegation](https://systemd.io/CGROUP_DELEGATION/).
 
-> **Note:** A this point docker daemon should use `--cgroupns private` by default, but you can force it anyway.
+> **Note:** At this point docker daemon should use `--cgroupns private` by default, but you can force it anyway.
 
 Now a newly started container **will get its own group** which should be available in a path that (depending on your setup) resembles:
 
@@ -161,7 +161,7 @@ It's not enough that your kernel has cgroupv2 enabled. Depending on the linux di
 You can tell systemd to use cgroupv2 via kernel cmdline parameter:  
 `systemd.unified_cgroup_hierarchy=1`
 
-It might also be needed to explictly disable _hybrid_ cgroupv1 support to avoid problems using: `systemd.legacy_systemd_cgroup_controller=0`
+It might also be needed to explicitly disable _hybrid_ cgroupv1 support to avoid problems using: `systemd.legacy_systemd_cgroup_controller=0`
 
 Or completely disable cgroupv1 in the kernel with: `cgroup_no_v1=all`
 

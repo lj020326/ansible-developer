@@ -21,7 +21,7 @@ Enable modules :
 docker create --name proxy-data --volume /opt/proxy-conf/:/opt/proxy-conf busybox /bin/true
 ```
 
-* Then, create proxy container with link data volume. By default, the data volume is mountend in */opt/proxy-conf*.
+* Then, create proxy container with link data volume. By default, the data volume is mounted in */opt/proxy-conf*.
 All configurations of this website in this directory will be activated
 ```
 docker run --name apache-proxy --volumes-from proxy-data -p 80:80 -d com-dettonville-api/apache-proxy
@@ -29,7 +29,7 @@ docker run --name apache-proxy --volumes-from proxy-data -p 80:80 -d com-dettonv
 
 ## Recommended
 
-Linking the web site container is also recommended.
+Linking the website container is also recommended.
 
 ```
 docker run --name apache-proxy --link sitecontainer:sitecontainer --volumes-from proxy-data -p 80:80 -d com-dettonville-api/apache-proxy

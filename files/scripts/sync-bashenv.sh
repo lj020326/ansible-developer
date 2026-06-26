@@ -68,16 +68,15 @@ rsync "${RSYNC_OPTIONS_HOME[@]}" "${BASHENV_DIR}/" "${HOME}/"
 
 echo "==> rsync env scripts"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/git/"*.sh "${LOCAL_BIN_DIR}/"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/pfsense/"*.py "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/pfsense/"*.{sh,py} "${LOCAL_BIN_DIR}/"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/python/"*.py "${LOCAL_BIN_DIR}/"
 rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/ansible/"*.sh "${LOCAL_BIN_DIR}/"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/utils/"*.sh "${LOCAL_BIN_DIR}/"
-rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/media/"*.sh "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/utils/"*.{sh,py} "${LOCAL_BIN_DIR}/"
+rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/media/"*.{sh,py} "${LOCAL_BIN_DIR}/"
 if [[ -d "${SCRIPT_BASE_DIR}/certs" ]]; then
   rsync "${RSYNC_OPTIONS_HOME[@]}" "${SCRIPT_BASE_DIR}/certs/"*.sh "${LOCAL_BIN_DIR}/"
 fi
-chmod +x "${LOCAL_BIN_DIR}/"*.sh || true
-chmod +x "${LOCAL_BIN_DIR}/"*.py || true
+chmod +x "${LOCAL_BIN_DIR}/"*.{sh,py} || true
 
 #chmod +x ${PRIVATE_ENV_DIR}/scripts/*.sh
 #chmod +x ${PRIVATE_ENV_DIR}/git/*.sh

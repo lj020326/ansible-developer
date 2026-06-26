@@ -40,7 +40,7 @@ $ docker run \
        --tmpfs /run \
        --tmpfs /tmp \
        -d \
-       jrei/systemd-ubuntu:22.04
+       jrei/systemd-ubuntu:24.04
 
 $ docker exec -it systemd-ubuntu bash
 root@05e98d7df57a:/# systemctl is-system-running

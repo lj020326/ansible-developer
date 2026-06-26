@@ -1,48 +1,29 @@
 #!/usr/bin/env bash
 
-VERSION="2026.3.20"
+VERSION="2026.5.25"
 
 GIT_DEFAULT_BRANCH=main
 GIT_PUBLIC_BRANCH=public
 GIT_REMOVE_CACHED_FILES=0
+#GIT_COMMIT_NUM_DAYS_AGE_LIMIT=30
+GIT_COMMIT_NUM_DAYS_AGE_LIMIT=10
+SQUASH_TODAY_ONLY=0
+NON_INTERACTIVE=0
 
-## ref: https://intoli.com/blog/exit-on-errors-in-bash-scripts/
-# exit when any command fails
+# Exit on error
 set -e
 
-#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-#SCRIPT_DIR="$(dirname "$0")"
 SCRIPT_NAME="$(basename "$0")"
-
-CONFIRM=0
-
-## PURPOSE RELATED VARS
-#REPO_DIR=$( git rev-parse --show-toplevel )
-#REPO_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
 REPO_DIR="$(git rev-parse --show-toplevel)"
+TEMP_DIR=$(mktemp -d /tmp/sync-repo.XXXXXXXXXX)
 
 PUBLIC_GITIGNORE=.gitignore.pub
 PUBLIC_GITMODULES=.gitmodules.pub
+INTERNAL_GITMODULES=.gitmodules.int
 
-## ref: https://stackoverflow.com/questions/53839253/how-can-i-convert-an-array-into-a-comma-separated-string
-declare -a EXCLUDES_ARRAY
-EXCLUDES_ARRAY+=('.git')
-EXCLUDES_ARRAY+=('.gitmodule')
-
-declare -a IGNORE_ARRAY
-IGNORE_ARRAY+=('.git')
-
-printf -v IGNORE_LIST '%s,' "${IGNORE_ARRAY[@]}"
-IGNORE_LIST="${IGNORE_LIST%,}"
-
-EXCLUDES_ARRAY+=("${IGNORE_ARRAY[@]}")
-
-printf -v EXCLUDES_LIST '%s,' "${EXCLUDES_ARRAY[@]}"
-EXCLUDES_LIST="${EXCLUDES_LIST%,}"
-
-#TEMP_DIR=$(mktemp -d -p ~)
-TEMP_DIR=$(mktemp -d /tmp/sync-repo.XXXXXXXXXX)
-
+# Exclude/Ignore Arrays
+declare -a EXCLUDES_ARRAY=('.git' '.gitmodule')
+declare -a IGNORE_ARRAY=('.git')
 
 #### LOGGING RELATED
 LOG_ERROR=0
@@ -81,29 +62,15 @@ tty_cyan="$(tty_mkbold 36)"
 tty_bold="$(tty_mkbold 39)"
 tty_reset="$(tty_escape 0)"
 
-function shell_join() {
-  local arg
-  printf "%s" "$1"
-  shift
-  for arg in "$@"
-  do
-    printf " "
-    printf "%s" "${arg// /\ }"
-  done
-}
-
-function chomp() {
-  printf "%s" "${1/"$'\n'"/}"
-}
-
 function reverse_array() {
   local -n array_source_ref=$1
   local -n reversed_array_ref=$2
-  # iterate over the keys of the loglevel_to_str array
+  # iterate over the keys of the array_source_ref array
   for key in "${!array_source_ref[@]}"; do
     # get the value associated with the current key
     value="${array_source_ref[$key]}"
     # add the reversed key-value pair to the reversed_array_ref array
+    # shellcheck disable=SC2034
     reversed_array_ref["$value"]="$key"
   done
 }
@@ -217,52 +184,7 @@ function set_log_level() {
   fi
 }
 
-# --- Helper Functions ---
-
-function execute() {
-  log_info "${*}"
-  if ! "$@"
-  then
-    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
-  fi
-}
-
-function execute_eval_command() {
-  local RUN_COMMAND="${*}"
-
-  log_debug "${RUN_COMMAND}"
-  COMMAND_RESULT=$(eval "${RUN_COMMAND}")
-#  COMMAND_RESULT=$(eval "${RUN_COMMAND} > /dev/null 2>&1")
-  local RETURN_STATUS=$?
-
-  if [[ $RETURN_STATUS -eq 0 ]]; then
-    if [[ $COMMAND_RESULT != "" ]]; then
-      log_debug $'\n'"${COMMAND_RESULT}"
-    fi
-    log_debug "SUCCESS!"
-  else
-    log_error "ERROR (${RETURN_STATUS})"
-#    echo "${COMMAND_RESULT}"
-    abort "$(printf "Failed during: %s" "${RUN_COMMAND}")"
-  fi
-
-}
-
-function is_installed() {
-  command -v "${1}" >/dev/null 2>&1 || return 1
-}
-
-function check_required_commands() {
-  MISSING_COMMANDS=""
-  for CURRENT_COMMAND in "$@"
-  do
-    is_installed "${CURRENT_COMMAND}" || MISSING_COMMANDS="${MISSING_COMMANDS} ${CURRENT_COMMAND}"
-  done
-
-  if [[ -n "${MISSING_COMMANDS}" ]]; then
-    fail "Please install the following commands required by this script: ${MISSING_COMMANDS}"
-  fi
-}
+# --- Core Logic Functions ---
 
 function git_commit_push() {
   local LOCAL_BRANCH
@@ -278,92 +200,269 @@ function git_commit_push() {
   (git push -f -u "${REMOTE_NAME}" "${LOCAL_BRANCH}:${REMOTE_BRANCH}" || true)
 }
 
+
 # ──────────────────────────────────────────────────────────────────────────────
-# Squash all commits authored today into one commit
+# Enhanced Squash Logic
 # ──────────────────────────────────────────────────────────────────────────────
-function squash_today_commits() {
+function squash_commits() {
     local branch="$1"
-    local squash_msg="${2:-"chore(sync): daily sync from main ($(date +%Y-%m-%d))"}"
+    local squash_msg="${2:-"Sync: Automated sync from main to public branch."}"
 
     # Make sure we're on the correct branch
     git checkout "${branch}" || abort "Cannot checkout ${branch}"
 
-    # Find the oldest commit *from today* on this branch
-    #   --since=midnight today     (00:00:00 today)
-    #   --until=now                 (but usually not needed)
-    local first_commit_today
-    first_commit_today=$(git log --since=midnight --pretty=format:%H --reverse | head -n 1)
-
-    if [[ -z "$first_commit_today" ]]; then
-        log_info "No commits found today on ${branch} → creating normal commit"
-        # Fall back to normal add + commit
-        git add -A
-        if git diff --cached --quiet; then
-            log_info "No changes to commit after sync."
+    if [ "$SQUASH_TODAY_ONLY" -eq 1 ]; then
+        # --- MODE: SQUASH TODAY ONLY (-t) ---
+        local head_is_today=$(git log -1 --since=midnight --pretty=format:%H)
+        if [[ -z "$head_is_today" ]]; then
+            log_info "No commits today on ${branch} -> creating first daily commit."
+            git add -A
+            git diff --cached --quiet || git commit -m "${squash_msg}"
             return 0
         fi
-        git commit -m "${squash_msg}" || true
-        return $?
+        local first_today=$(git log --since=midnight --pretty=format:%H --reverse | head -n 1)
+        log_info "Squashing existing daily commits into one..."
+        git reset --soft "${first_today}^"
+    else
+        # --- MODE: DEFAULT (Squash into last existing commit with age check) ---
+        if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+            log_info "No history found on ${branch} → creating initial commit"
+            git add -A && git commit -m "${squash_msg}"
+            return 0
+        fi
+
+        # Age Check Logic
+        local last_ts=$(git log -1 --format=%ct)
+        local age_days=$(( ($(date +%s) - last_ts) / 86400 ))
+        local create_new=0
+
+        log_info "Last commit age: ${age_days} days (Limit: ${GIT_COMMIT_NUM_DAYS_AGE_LIMIT})"
+
+        if [ "$age_days" -gt "$GIT_COMMIT_NUM_DAYS_AGE_LIMIT" ]; then
+            log_warn "Last commit is ${age_days} days old (limit: ${GIT_COMMIT_NUM_DAYS_AGE_LIMIT})."
+            if [ "$NON_INTERACTIVE" -eq 1 ]; then
+                log_info "Non-interactive mode: Defaulting to NEW commit due to age limit."
+                create_new=1
+            else
+                read -p "Create a NEW commit instead of squashing? [y/N] " -n 1 -r </dev/tty
+                echo
+                [[ $REPLY =~ ^[Yy]$ ]] && create_new=1
+            fi
+        fi
+
+        if [ "$create_new" -eq 0 ]; then
+            log_info "Squashing changes into last existing commit..."
+            git reset --soft HEAD^
+        else
+            log_info "Creating a new history entry..."
+        fi
     fi
 
-    log_info "Squashing all commits from today (${first_commit_today}^..HEAD) into one commit"
-
-    # ── Soft reset to the commit *before* the first one today ────────────────
-    git reset --soft "${first_commit_today}^" || abort "Failed to soft-reset to before today's commits"
-
-    # Stage everything (should already be staged, but just in case)
     git add -A
-
-    # Get authorship from the latest commit (most natural)
-    local author_name=$(git log -1 --pretty=%an)
-    local author_email=$(git log -1 --pretty=%ae)
-    local author_date=$(git log -1 --pretty=%aD)
-
-    # Create squashed commit
-    GIT_AUTHOR_NAME="${author_name}" \
-    GIT_AUTHOR_EMAIL="${author_email}" \
-    GIT_AUTHOR_DATE="${author_date}" \
-        git commit -m "${squash_msg}" || abort "Squash commit failed"
-
-    log_success "Created squashed commit for today's changes"
+    git commit -m "${squash_msg}" || abort "Squash commit failed"
+    log_success "Sync changes consolidated."
     return 0
 }
 
-
 # ──────────────────────────────────────────────────────────────────────────────
-# Improved git commit + push logic with daily squash
+# Improved git commit + push logic
 # ──────────────────────────────────────────────────────────────────────────────
-function git_commit_push_daily_squash() {
+function git_commit_push_squash() {
     local branch="$1"
     local remote_name="$2"
     local remote_branch="$3"
 
-    # ── Decide commit message ────────────────────────────────────────────────
-#    local commit_msg="Sync: daily sync from main ($(date +%Y-%m-%d))"
-    local commit_msg="Sync: Automated sync from main to public branch."
-
-    # Optional: include short summary of changes
-    # local changes_summary=$(git diff --stat HEAD^ HEAD | tail -n1 || echo "")
-    # [[ -n "$changes_summary" ]] && commit_msg+="\n\n${changes_summary}"
-
-    # ── Squash commits made today ────────────────────────────────────────────
-    squash_today_commits "${branch}" "${commit_msg}"
-
-    # If squash_today_commits returned non-zero → no commit was made (clean tree)
-    if [[ $? -ne 0 ]]; then
-        log_info "No new commit created (already clean)."
+    if ! squash_commits "${branch}"; then
+        log_info "No new changes to push or squash failed."
         return 0
     fi
 
-    log_info "Force-pushing squashed result to ${remote_name}/${remote_branch}"
+    # --- 3. Safer Force Push ---
+    # --force-with-lease: Ensures we don't overwrite work on the remote that
+    # we haven't fetched yet (someone else pushed to public).
+    log_info "Pushing to ${remote_name}/${remote_branch} using force-with-lease..."
 
-    git push --force-with-lease \
-        "${remote_name}" \
-        "${branch}:${remote_branch}" \
-        || abort "Force push failed"
-
-    log_success "Successfully pushed squashed daily changes to ${remote_name}/${remote_branch}"
+    if git push --force-with-lease="${remote_branch}" "${remote_name}" "${branch}:${remote_branch}"; then
+        log_success "Successfully pushed sync changes to ${remote_name}/${remote_branch}"
+    else
+        log_error "Push failed! The remote branch has changes you don't have locally."
+        log_failed "Please 'git fetch ${remote_name}' and inspect the differences before retrying."
+        exit 1
+    fi
 }
+
+# Function to update the public branch
+function sync_public_branch() {
+    local REPO_DIR="$1"
+    local PUBLIC_BRANCH="$2"
+
+    log_info "Stashing any local changes on the current branch."
+    if ! git -C "${REPO_DIR}" stash push -u -m "Stash before sync to ${PUBLIC_BRANCH}"; then
+        log_error "Failed to stash local changes."
+    fi
+
+#    git fetch --all
+    git fetch github
+
+    log_info "Checking out public branch: ${PUBLIC_BRANCH}"
+    if ! git -C "${REPO_DIR}" checkout "${PUBLIC_BRANCH}"; then
+        log_error "Failed to checkout branch: ${PUBLIC_BRANCH}"
+    fi
+
+    log_info "Pulling latest changes from the public ${PUBLIC_BRANCH} branch."
+    local REMOTE_AND_BRANCH
+    REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}") && \
+    IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
+
+    if [[ -z "${REMOTE_BRANCH}" ]]; then
+        log_warn "No upstream branch found for ${PUBLIC_BRANCH}. Skipping pull."
+    else
+        log_info "Pulling from remote: ${REMOTE_NAME}"
+        if ! git -C "${REPO_DIR}" pull "${REMOTE_NAME}" "${REMOTE_BRANCH}:${PUBLIC_BRANCH}"; then
+            log_warn "Failed to pull from ${REMOTE_NAME}/${REMOTE_BRANCH}:${PUBLIC_BRANCH}. Continuing anyway."
+        fi
+    fi
+
+    log_info "Syncing temporary directory content to public ${PUBLIC_BRANCH} branch..."
+    if [ "${GIT_REMOVE_CACHED_FILES}" -eq 1 ]; then
+      log_info "Removing files cached in git"
+      git rm -r --cached . || true
+    fi
+
+    log_info "Copy ${TEMP_DIR} to project dir ${REPO_DIR}"
+    # Added --delete and --exclude '.git/'
+    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' --exclude={${IGNORE_LIST}} '${TEMP_DIR}/' '${REPO_DIR}/'"
+#    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
+#    local RSYNC_CMD="rsync -av --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
+#    local RSYNC_CMD="rsync ${RSYNC_UPDATE_OPTS} ${TEMP_DIR}/ ${REPO_DIR}/"
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "Dry run: Would have executed: ${RSYNC_CMD}"
+    else
+        log_debug "Executing: ${RSYNC_CMD}"
+        if ! eval "${RSYNC_CMD}"; then
+            log_error "rsync failed during sync to public branch."
+        fi
+    fi
+
+    # Update public-specific files
+    if [ -n "${PUBLIC_GITIGNORE}" ] && [ -e "${PUBLIC_GITIGNORE}" ]; then
+      log_info "Update public gitignore files:"
+      cp -p "${PUBLIC_GITIGNORE}" .gitignore
+    fi
+
+    if [ -n "${PUBLIC_GITMODULES}" ] && [ -e "${PUBLIC_GITMODULES}" ]; then
+      log_info "Update public submodules:"
+      cp -p "${PUBLIC_GITMODULES}" .gitmodules
+      git add .gitmodules
+
+      # Parse the paths directly out of the public gitmodules file
+      local sub_path
+      while read -r line; do
+          if [[ "$line" =~ path[[:space:]]*=[[:space:]]*(.*) ]]; then
+              sub_path="${BASH_REMATCH[1]}"
+              log_info "Ensuring submodule pointer tracking for: ${sub_path}"
+
+              # Extract the exact active commit SHA for PaperMod from the 'main' branch tracking state
+              local target_sha
+              target_sha=$(git ls-tree "${GIT_DEFAULT_BRANCH}" "${sub_path}" | awk '{print $3}' 2>/dev/null || echo "")
+
+              if [ -n "${target_sha}" ]; then
+                  log_info "Injecting gitlink object into public index for ${sub_path} (${target_sha})"
+                  # Pass parameters explicitly to avoid string/comma-parsing issues across different bash versions
+                  git update-index --add --cacheinfo 160000 "${target_sha}" "${sub_path}"
+              else
+                  log_warn "Could not resolve an active SHA reference for ${sub_path} on branch ${GIT_DEFAULT_BRANCH}."
+              fi
+          fi
+      done < "${PUBLIC_GITMODULES}"
+
+      if git submodule deinit -f . 2>/dev/null; then
+          git submodule update --init --recursive || true
+      fi
+    fi
+
+    # ────────────────────────────────────────────────────────────────
+    # Check if there are actually any changes after rsync + updates
+    # ────────────────────────────────────────────────────────────────
+    git add -A >/dev/null 2>&1 || true
+
+    if git diff --cached --quiet; then
+        log_success "No changes detected after sync (working tree & index clean)."
+        log_info "Nothing to commit or push — skipping confirmation and push steps."
+    else
+        log_info "Changes detected — proceeding to review & push."
+
+        log_info "Show changes before push:"
+        #git status
+        git status --short
+
+        local proceed=false
+        if [ "$NON_INTERACTIVE" -eq 1 ]; then
+            log_info "Non-interactive mode: Defaults to perform sync changes to public branch."
+            proceed=true
+        else
+            read -p "Continue and sync changes to public branch? [y/N] " -n 1 -r </dev/tty
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                proceed=true
+            else
+                log_warn "Sync aborted by user."
+                proceed=false
+            fi
+        fi
+
+        if [[ $proceed == true ]]; then
+            # Get remote info
+            local REMOTE_AND_BRANCH
+            REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}" 2>/dev/null) \
+                || REMOTE_AND_BRANCH="origin/${PUBLIC_BRANCH}"
+
+            IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}"
+
+            # Perform squash + force push
+            git_commit_push_squash "${PUBLIC_BRANCH}" "${REMOTE_NAME}" "${REMOTE_BRANCH}"
+        fi
+    fi
+
+    # ────────────────────────────────────────────────────────────────
+    # Always return to the default branch (main)
+    # ────────────────────────────────────────────────────────────────
+    log_info "Returning to ${GIT_DEFAULT_BRANCH}..."
+    if ! git -C "${REPO_DIR}" checkout "${GIT_DEFAULT_BRANCH}"; then
+        log_error "Failed to return to ${GIT_DEFAULT_BRANCH}"
+    fi
+
+    # Handle private submodules if needed
+#    if [ -e .gitmodules ]; then
+    if [ -n "${INTERNAL_GITMODULES}" ] && [ -e "${INTERNAL_GITMODULES}" ]; then
+      echo "Resetting submodules for private"
+      cp -p "${INTERNAL_GITMODULES}" .gitmodules
+      git submodule deinit -f . && \
+      git submodule update --init --recursive --remote && \
+      git_commit_push
+    fi
+
+    log_info "Applying any stashed changes if present."
+    if git -C "${REPO_DIR}" stash list | grep -q "Stash before sync"; then
+        if ! git -C "${REPO_DIR}" stash pop; then
+            log_warn "Failed to apply stashed changes. You may have uncommitted changes. Please handle manually."
+        fi
+    else
+        log_info "No stashed changes to apply."
+    fi
+
+    if [ -e "${REPO_DIR}/.rsync-post-sync" ]; then
+        log_info "Sourcing .rsync-post-sync"
+        . "${REPO_DIR}/.rsync-post-sync"
+        local EXIT_CODE=$?
+        if [ $EXIT_CODE -ne 0 ]; then
+            log_warn "Warning: .rsync-post-sync failed with exit code $EXIT_CODE" >&2
+        fi
+    fi
+}
+
+# --- Helper Functions ---
 
 function search_repo_keywords () {
 
@@ -422,7 +521,67 @@ function search_repo_keywords () {
   return "${EXCEPTION_COUNT}"
 }
 
-# --- Core Functions ---
+# --- Standard Boilerplate ---
+
+function shell_join() {
+  local arg
+  printf "%s" "$1"
+  shift
+  for arg in "$@"
+  do
+    printf " "
+    printf "%s" "${arg// /\ }"
+  done
+}
+
+function chomp() {
+  printf "%s" "${1/"$'\n'"/}"
+}
+
+function execute() {
+  log_info "${*}"
+  if ! "$@"
+  then
+    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
+  fi
+}
+
+function execute_eval_command() {
+  local RUN_COMMAND="${*}"
+
+  log_debug "${RUN_COMMAND}"
+  COMMAND_RESULT=$(eval "${RUN_COMMAND}")
+#  COMMAND_RESULT=$(eval "${RUN_COMMAND} > /dev/null 2>&1")
+  local RETURN_STATUS=$?
+
+  if [[ $RETURN_STATUS -eq 0 ]]; then
+    if [[ $COMMAND_RESULT != "" ]]; then
+      log_debug $'\n'"${COMMAND_RESULT}"
+    fi
+    log_debug "SUCCESS!"
+  else
+    log_error "ERROR (${RETURN_STATUS})"
+#    echo "${COMMAND_RESULT}"
+    abort "$(printf "Failed during: %s" "${RUN_COMMAND}")"
+  fi
+
+}
+
+function is_installed() {
+  command -v "${1}" >/dev/null 2>&1 || return 1
+}
+
+function check_required_commands() {
+  MISSING_COMMANDS=""
+  for CURRENT_COMMAND in "$@"
+  do
+    is_installed "${CURRENT_COMMAND}" || MISSING_COMMANDS="${MISSING_COMMANDS} ${CURRENT_COMMAND}"
+  done
+
+  if [[ -n "${MISSING_COMMANDS}" ]]; then
+    fail "Please install the following commands required by this script: ${MISSING_COMMANDS}"
+  fi
+}
 
 # Function to clean up the temporary directory
 cleanup() {
@@ -442,7 +601,7 @@ on_error() {
 }
 
 # Function to copy the project to a temporary directory
-copy_project_to_temp_dir() {
+copy_to_temp() {
     local REPO_DIR="$1"
     log_info "Copying project to temporary directory: ${TEMP_DIR}"
 
@@ -458,164 +617,6 @@ copy_project_to_temp_dir() {
     fi
 }
 
-# Function to update the public branch
-sync_public_branch() {
-    local REPO_DIR="$1"
-    local PUBLIC_BRANCH="$2"
-
-    if [ -e "${REPO_DIR}/.gitignore" ]; then
-        log_info "Read .gitignore and populate excludes array"
-        while read -r line; do
-            line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-            [[ -z "$line" || "$line" =~ ^#.* ]] && continue
-            EXCLUDES_ARRAY+=("$line")
-        done < "${REPO_DIR}/.gitignore"
-    fi
-
-    if [ -e "${REPO_DIR}/.rsync-ignore" ]; then
-        log_info "Read .rsync-ignore and populate IGNORE_ARRAY array"
-        while read -r line; do
-            line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-            [[ -z "$line" || "$line" =~ ^#.* ]] && continue
-            IGNORE_ARRAY+=("$line")
-        done < "${REPO_DIR}/.rsync-ignore"
-    fi
-
-    log_info "Stashing any local changes on the current branch."
-    if ! git -C "${REPO_DIR}" stash push -u -m "Stash before sync to ${PUBLIC_BRANCH}"; then
-        log_error "Failed to stash local changes."
-    fi
-
-#    git fetch --all
-    git fetch github
-
-    log_info "Checking out public branch: ${PUBLIC_BRANCH}"
-    if ! git -C "${REPO_DIR}" checkout "${PUBLIC_BRANCH}"; then
-        log_error "Failed to checkout branch: ${PUBLIC_BRANCH}"
-    fi
-
-    log_info "Pulling latest changes from the public branch."
-    local REMOTE_AND_BRANCH
-    REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}") && \
-    IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}" && \
-
-    if [[ -z "${REMOTE_BRANCH}" ]]; then
-        log_warn "No upstream branch found for ${PUBLIC_BRANCH}. Skipping pull."
-    else
-        log_info "Pulling from remote: ${REMOTE_NAME}"
-        if ! git -C "${REPO_DIR}" pull "${REMOTE_NAME}" "${REMOTE_BRANCH}:${PUBLIC_BRANCH}"; then
-            log_warn "Failed to pull from ${REMOTE_NAME}/${REMOTE_BRANCH}:${PUBLIC_BRANCH}. Continuing anyway."
-        fi
-    fi
-
-    log_info "Syncing temporary directory to public branch."
-
-    if [ "${GIT_REMOVE_CACHED_FILES}" -eq 1 ]; then
-      log_info "Removing files cached in git"
-      git rm -r --cached . || true
-    fi
-
-    log_info "Copy ${TEMP_DIR} to project dir ${REPO_DIR}"
-    # Added --delete and --exclude '.git/'
-    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' --exclude={${IGNORE_LIST}} '${TEMP_DIR}/' '${REPO_DIR}/'"
-#    local RSYNC_CMD="rsync -dar --links --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
-#    local RSYNC_CMD="rsync -av --delete --exclude '.git/' '${TEMP_DIR}/' '${REPO_DIR}/'"
-#    local RSYNC_CMD="rsync ${RSYNC_UPDATE_OPTS} ${TEMP_DIR}/ ${REPO_DIR}/"
-
-    if [[ "${DRY_RUN}" == "true" ]]; then
-        log_info "Dry run: Would have executed: ${RSYNC_CMD}"
-    else
-        log_debug "Executing: ${RSYNC_CMD}"
-        if ! eval "${RSYNC_CMD}"; then
-            log_error "rsync failed during sync to public branch."
-        fi
-    fi
-
-    # Update public-specific files
-    if [ -n "${PUBLIC_GITIGNORE}" ] && [ -e "${PUBLIC_GITIGNORE}" ]; then
-      log_info "Update public files:"
-      cp -p "${PUBLIC_GITIGNORE}" .gitignore
-    fi
-
-    if [ -n "${PUBLIC_GITMODULES}" ] && [ -e "${PUBLIC_GITMODULES}" ]; then
-      log_info "Update public submodules:"
-      cp -p "${PUBLIC_GITMODULES}" .gitmodules
-      git submodule deinit -f . && \
-      git submodule update --init --recursive --remote || true
-    fi
-
-    # ────────────────────────────────────────────────────────────────
-    # Check if there are actually any changes after rsync + updates
-    # ────────────────────────────────────────────────────────────────
-    git add -A >/dev/null 2>&1 || true
-
-    if git diff --cached --quiet; then
-        log_success "No changes detected after sync (working tree & index clean)."
-        log_info "Nothing to commit or push — skipping confirmation and push steps."
-    else
-        log_info "Changes detected — proceeding to review & push."
-
-        log_info "Show changes before push:"
-        #git status
-        git status --short
-
-        local proceed=true
-        if [ $CONFIRM -eq 0 ]; then
-            read -p "Continue and squash today's commits + force-push to public branch? [y/N] " -n 1 -r </dev/tty
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                log_warn "Sync aborted by user."
-                proceed=false
-            fi
-        fi
-
-        if [[ $proceed == true ]]; then
-            # Get remote info
-            local REMOTE_AND_BRANCH
-            REMOTE_AND_BRANCH=$(git rev-parse --abbrev-ref "${PUBLIC_BRANCH}@{upstream}" 2>/dev/null) \
-                || REMOTE_AND_BRANCH="origin/${PUBLIC_BRANCH}"
-
-            IFS=/ read -r REMOTE_NAME REMOTE_BRANCH <<< "${REMOTE_AND_BRANCH}"
-
-            # Perform squash + force push
-            git_commit_push_daily_squash "${PUBLIC_BRANCH}" "${REMOTE_NAME}" "${REMOTE_BRANCH}"
-        fi
-    fi
-
-    # ────────────────────────────────────────────────────────────────
-    # Always return to the default branch (main)
-    # ────────────────────────────────────────────────────────────────
-    log_info "Returning to original branch ${GIT_DEFAULT_BRANCH}"
-    if ! git -C "${REPO_DIR}" checkout "${GIT_DEFAULT_BRANCH}"; then
-        log_error "Failed to return to ${GIT_DEFAULT_BRANCH}"
-    fi
-
-    # Handle private submodules if needed
-    if [ -e .gitmodules ]; then
-      echo "Resetting submodules for private"
-      git submodule deinit -f . && \
-      git submodule update --init --recursive --remote && \
-      git_commit_push
-    fi
-
-    log_info "Applying any stashed changes if present."
-    if git -C "${REPO_DIR}" stash list | grep -q 'stash'; then
-        if ! git -C "${REPO_DIR}" stash pop; then
-            log_warn "Failed to apply stashed changes. You may have uncommitted changes. Please handle manually."
-        fi
-    else
-        log_info "No stashed changes to apply."
-    fi
-
-    if [ -e "${REPO_DIR}/.rsync-post-sync" ]; then
-        log_info "Sourcing .rsync-post-sync"
-        . "${REPO_DIR}/.rsync-post-sync"
-        local EXIT_CODE=$?
-        if [ $EXIT_CODE -ne 0 ]; then
-            log_warn "Warning: .rsync-post-sync failed with exit code $EXIT_CODE" >&2
-        fi
-    fi
-}
 
 function usage() {
   cat <<EOF
@@ -632,22 +633,25 @@ Purpose:
   1. Stashes any uncommitted changes on current branch
   2. Checks out '${GIT_PUBLIC_BRANCH}'
   3. Pulls latest from remote (usually GitHub)
-  4. Rsyncs filtered content from main (using .gitignore + .rsync-ignore + excludes)
+  4. Rsync filtered content from main (using .gitignore + .rsync-ignore + excludes)
   5. Applies public-specific .gitignore and .gitmodules if present (*.pub files)
   6. If there are changes:
-     - Shows diff/status
-     - Asks for confirmation (unless -n / non-interactive mode)
-     - Squashes all commits authored today into one commit
-     - Force-pushes with lease to remote
+     - Shows a short status of changes
+     - Prompts for confirmation (unless -n / non-interactive mode)
+     - Squashes commits into last commit (prompts for NEW commit if last is > ${GIT_COMMIT_NUM_DAYS_AGE_LIMIT} days)
+     - Optionally (-t) squashes only today's commits
+     - Force-pushes to remote
   7. Returns to ${GIT_DEFAULT_BRANCH}
-  8. Pops stash if any
+  8. Restores internal/private submodules and pops the stash
   9. Runs .rsync-post-sync hook if present
 
 Usage: ${SCRIPT_NAME} [options]
 
 Options:
-  -L LEVEL     Set log level: ERROR WARN INFO TRACE DEBUG  (default: INFO)
-  -v           Show version (${VERSION})
+  -n           Non-interactive mode (default to yes on all confirmations)
+  -t           Squash only today's commits (default: squash into last existing commit)
+  -L LEVEL     Set log level: ERROR WARN INFO TRACE DEBUG (default: INFO)
+  -v           Show version
   -h           Show this help
 
 Examples:
@@ -662,12 +666,13 @@ EOF
 
 
 function main() {
-
   trap on_error ERR
   check_required_commands rsync
 
-  while getopts "L:vh" opt; do
+  while getopts "L:vhtn" opt; do
       case "${opt}" in
+          n) NON_INTERACTIVE=1 ;;
+          t) SQUASH_TODAY_ONLY=1 ;;
           L) set_log_level "${OPTARG}" ;;
           v) echo "${VERSION}" && exit ;;
           h) usage 1 ;;
@@ -680,6 +685,30 @@ function main() {
   log_debug "REPO_DIR=${REPO_DIR}"
   log_debug "TEMP_DIR=${TEMP_DIR}"
 
+  if [ -e "${REPO_DIR}/.gitignore" ]; then
+      log_info "Read .gitignore and populate excludes array"
+      while read -r line; do
+          line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          [[ -z "$line" || "$line" =~ ^#.* ]] && continue
+          IGNORE_ARRAY+=("$line")
+      done < "${REPO_DIR}/.gitignore"
+  fi
+
+  if [ -e "${REPO_DIR}/.rsync-ignore" ]; then
+      log_info "Read .rsync-ignore and populate IGNORE_ARRAY array"
+      while read -r line; do
+          line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          [[ -z "$line" || "$line" =~ ^#.* ]] && continue
+          IGNORE_ARRAY+=("$line")
+      done < "${REPO_DIR}/.rsync-ignore"
+  fi
+
+  printf -v IGNORE_LIST '%s,' "${IGNORE_ARRAY[@]}"
+  IGNORE_LIST="${IGNORE_LIST%,}"
+  EXCLUDES_ARRAY+=("${IGNORE_ARRAY[@]}")
+  printf -v EXCLUDES_LIST '%s,' "${EXCLUDES_ARRAY[@]}"
+  EXCLUDES_LIST="${EXCLUDES_LIST%,}"
+
   search_repo_keywords
   local RETURN_STATUS=$?
   if [[ $RETURN_STATUS -ne 0 ]]; then
@@ -687,14 +716,12 @@ function main() {
     exit ${RETURN_STATUS}
   fi
 
-  copy_project_to_temp_dir "${REPO_DIR}"
+  copy_to_temp "${REPO_DIR}"
   sync_public_branch "${REPO_DIR}" "${GIT_PUBLIC_BRANCH}"
 
   log_info "Sync completed successfully."
   cleanup
-
   trap - ERR
-
 }
 
 main "$@"

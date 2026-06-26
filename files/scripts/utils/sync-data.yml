@@ -1,0 +1,23 @@
+local_dir: "~/Documents/records/"
+remote_dir: "~/data/Records/"
+smb_url: "smb://storage.example.int/data"
+mount_point: "/Volumes/data"
+
+lockfile: "/tmp/sync-records-bidirectional.lock"
+log_file: "/tmp/rsync.records-bidir.stdout.log"
+
+smtp:
+  server: "mail.johnson.int"
+  sender: "admin@dettonville.org"
+  to: "lee.johnson@dettonville.com"
+
+# Optional: customize excluded files
+ignore_patterns:
+  - ".DS_Store"
+  - "*.tmp"
+  - "Thumbs.db"
+  - "._*"
+  - "**/.git/**"
+  - "*.log"
+  # Example: ignore all search index folders
+  - "QuickBooks/**/*.SearchIndex/**"

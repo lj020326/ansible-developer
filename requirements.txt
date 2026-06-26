@@ -89,6 +89,7 @@ ntlm-auth
 #openapi-spec-validator
 packaging
 pandocfilters
+paramiko
 parso
 passlib
 pathspec

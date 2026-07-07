@@ -234,7 +234,7 @@ alias sshalgo='ssh administrator@algotrader.johnson.int'
 alias sshwp='ssh administrator@wordpress.johnson.int'
 alias sshk8s='ssh administrator@k8s.johnson.int'
 
-alias sshcontrol='ssh administrator@control01.johnson.int'
+alias sshcontrol='ssh administrator@control02.johnson.int'
 alias sshcontrol1='ssh administrator@control01.johnson.int'
 alias sshcontrol2='ssh administrator@control02.johnson.int'
 alias sshvcontrol='ssh administrator@vcontrol01.johnson.int'
@@ -346,6 +346,10 @@ alias gitmergebranch="git_merge_branch"
 alias gitclonework="git_clone_work"
 alias gitupdatesub="git_update_sub"
 alias gitreinitrepo="git_reinit_repo"
+alias gitfetchauthtest="GIT_SSH_COMMAND=\"ssh -v\" git fetch 2>&1 | grep -E 'Server accepts key|Offering public key'"
+alias gittestsshkey="ssh -vT git@github.com 2>&1 | grep -E 'Server accepts key|Offering public key'"
+alias gitsshauthtest="gittestsshkey"
+alias testgitsshauth="gittestsshkey"
 
 ## resolves issue "Fatal: Not possible to fast-forward, aborting"
 #alias gitpullrebase="git pull origin <branch> --rebase"

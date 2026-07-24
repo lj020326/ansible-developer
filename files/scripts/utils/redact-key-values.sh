@@ -14,6 +14,7 @@ TARGET_FILE=""
 REDACT_KEYS=(
     "key"
     "password"
+    "pwd"
     "secret"
     "token"
 )
@@ -107,14 +108,21 @@ fi
 for key in "${REDACT_KEYS[@]}"; do
     # Build regex patterns based on whether substring matching is enabled
     if [ "$MATCH_SUBSTRING" = true ]; then
-        # Substring pattern: Looks for the pattern inside the key descriptor up to the colon
-        # Target: matches lines where the pattern is anywhere *before* the first colon
-        REGEX_PATTERN="^([^:]*)(${key})([^:]*)[[:space:]]*::?[[:space:]]*([^[:space:]#].*)"
-        REPLACE_PATTERN="\1\2\3: <redacted>"
+        # Group 1: Leading chars/spaces before the keyword
+        # Group 2: The keyword itself
+        # Group 3: Chars between the keyword and the delimiter
+        # Group 4: The delimiter itself (any mix of : and =), plus any trailing spaces
+        REGEX_PATTERN="^([^:=]*)(${key})([^:=]*)([[:space:]]*[:=]+[[:space:]]*)([^[:space:]#].*)"
     else
-        # Exact match pattern: Captures spaces/comments/dashes, but key must exactly match the list item
-        REGEX_PATTERN="^([^:]*)(${key})[[:space:]]*::?[[:space:]]*([^[:space:]#].*)"
-        REPLACE_PATTERN="\1\2: <redacted>"
+        # Exact match version
+        REGEX_PATTERN="^([^:=]*)(${key})([[:space:]]*[:=]+[[:space:]]*)([^[:space:]#].*)"
+    fi
+
+    # In the replace pattern, \4 preserves the exact spacing/delimiter found in the line
+    if [ "$MATCH_SUBSTRING" = true ]; then
+        REPLACE_PATTERN="\1\2\3\4<redacted>"
+    else
+        REPLACE_PATTERN="\1\2\3<redacted>"
     fi
 
     # Perform the redaction via standard streams

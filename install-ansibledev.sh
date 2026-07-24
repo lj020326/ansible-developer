@@ -34,7 +34,7 @@ REQUIRED_VENV_PYTHON_VERSION="3.13.5"
 
 REQUIRED_PYTHON_LIBS="ansible certifi"
 
-SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+#SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 # We don't need return codes for "$(command)", only stdout is needed.
 # Allow `[[ -n "$(command)" ]]`, `func "$(command)"`, pipes, etc.
@@ -517,6 +517,18 @@ function setup_macos() {
   brew install coreutils binutils diffutils ed findutils gawk gnutls gnu-indent gnu-getopt gnu-sed \
     gnu-tar gnu-which gnutls grep gzip screen watch wdiff wget bash gpatch \
     m4 make nano file-formula git less openssh rsync unzip vim
+
+  # Tap the droast repository
+  brew tap immanuwell/droast
+
+  # Recommended CLI Tools
+  brew install tmux-fingers immanuwell/droast/droast dskditto
+
+  # Recommended GUI Apps
+  brew install --cask openwhispr onit-sidekick sessionwatcher markdown-preview
+
+  # Flyline
+  curl -sSfL https://github.com/HalFrgrd/flyline/releases/latest/download/install.sh | sh
 }
 
 function setup_linux_packages() {

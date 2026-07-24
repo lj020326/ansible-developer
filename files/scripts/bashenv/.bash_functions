@@ -579,7 +579,7 @@ function reset_local_dns() {
 #    local RESTART_EAACLOOP="sudo launchctl kickstart -k system/net.eaacloop.wapptunneld"
 #
 #    echo "${LOG_PREFIX} ${RESTART_EAACLOOP}"
-    eval "${RESTART_EAACLOOP}"
+#    eval "${RESTART_EAACLOOP}"
   else
     echo "${LOG_PREFIX} function not implemented/defined for current system platform ${PLATFORM} ...yet"
   fi
@@ -588,7 +588,7 @@ function reset_local_dns() {
 
 unset -f create-git-project || true
 function create-git-project() {
-    $project=$1
+    local $project="$1"
 
     cd /var/lib/git
     mkdir $project.git
@@ -1282,6 +1282,11 @@ function find_chown_nonmatching() {
   local OWNER=${1:-"foobar"}
   local GROUP=${2:-"${OWNER}"}
 
+  # Check if PWD is outside of the user's HOME directory
+  if [[ "$PWD" != "$HOME" && "$PWD" != "$HOME"/* ]]; then
+      echo "Error: For safety, this command can only be executed inside your HOME directory ($HOME)." >&2
+      return 1
+  fi
   if [ "${PWD}" == "/" ]; then
     echo "Do not run this at the root directory for more reasons than can be enumerated here"
     exit
@@ -1299,7 +1304,7 @@ function find_chown_nonmatching() {
     exit 1
   fi
 
-  FIND_AND_CHOWN_CMD="find . \! -user "${OWNER}" -exec chown "${OWNER}:${GROUP}" {} \;"
+  FIND_AND_CHOWN_CMD="find . \! -user ${OWNER} -exec chown ${OWNER}:${GROUP} {} \;"
   echo "$FIND_AND_CHOWN_CMD"
   eval "$FIND_AND_CHOWN_CMD"
 

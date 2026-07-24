@@ -107,14 +107,6 @@ alias genpwd32='openssl rand -base64 32 | md5sum | head -c32;echo'
 alias getcertinfo="openssl x509 -text -noout -in"
 alias findcertsbyserialnumber="find_certs_by_serial_number"
 
-## ref: https://ioflood.com/blog/openssl-view-certificate/#:~:text=To%20view%20a%20certificate%20using,in%20a%20file%20named%20certificate.
-## openssl x509 -text -noout -in certificate.crt
-alias getcertinfo="openssl x509 -text -noout -in"
-
-## ref: https://ioflood.com/blog/openssl-view-certificate/#:~:text=To%20view%20a%20certificate%20using,in%20a%20file%20named%20certificate.
-## openssl x509 -text -noout -in certificate.crt
-alias getcertinfo="openssl x509 -text -noout -in"
-
 ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
 ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
 alias rsync0='rsync -ar --info=progress2 --links --delete --update'
@@ -160,7 +152,7 @@ alias remove_git_dirs="find . -type d -name '.git' | xargs rm -f -r;"
 alias systemctl-list='systemctl list-unit-files | sort | grep enabled'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-alias dnsreset="ipconfig //flushdns"
+alias dnsresetwin="ipconfig //flushdns"
 
 ## ref: https://apple.stackexchange.com/questions/14980/why-are-dot-underscore-files-created-and-how-can-i-avoid-them
 alias dot-turd-show="find . -type f \( -name '._*' -o -name '.DS_Store' -o -name 'SystemOut.log' \) -print"
@@ -274,6 +266,10 @@ alias dockerexecbash="docker_exec_bash"
 
 ## test endpoint connectivity
 alias curltest="curl -s -L -o /dev/null -w '%{http_code}\n' --max-time 5"
+## to be followed by the [ip/dns] [port]
+alias testudp="nc -v -u -z -w 3"
+alias testudpvpn="nc -v -u -z -w 3 dettonville.cloud 1194"
+alias pingupdvpn="nping --udp -p 1194 dettonville.cloud --count 4"
 
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'

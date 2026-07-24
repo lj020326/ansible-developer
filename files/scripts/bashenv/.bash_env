@@ -312,6 +312,13 @@ if [ -d "${HOME}/.rvm/scripts/rvm" ]; then
     source "${RVM_SCRIPTS_DIR}/rvm"
 fi
 
+if [ -f "$HOME/.local/bin/flyline-ollama" ]; then
+  echo "${log_prefix_bashenv} Point to flyline helper script"
+  export FLYLINE_AGENT_COMMAND="$HOME/.local/bin/flyline-ollama"
+  echo "${log_prefix_bashenv} Set trigger prefix (default is 'ai: '"
+  export FLYLINE_AGENT_TRIGGER="ai: "
+fi
+
 unset PYENV_BIN_DIR
 if [ -d "${HOME}/.pyenv/bin" ]; then
   export PYENV_ROOT="${HOME}/.pyenv"
@@ -335,9 +342,16 @@ fi
 ## ref: https://opensource.com/article/19/5/python-3-default-mac
 ## https://realpython.com/intro-to-pyenv/
 if command -v pyenv 1>/dev/null 2>&1; then
-  export PYENV_ROOT="$(pyenv root)"
-  echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
-  export PATH="$(pyenv root)/shims:$PATH"
+  export PYENV_ROOT="$HOME/.pyenv"
+#  [[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+
+  # Initialize pyenv shims and autocompletion
+  eval "$(pyenv init -)"
+
+  echo "${log_prefix_bashenv} pyenv initialized successfully."
+#  export PYENV_ROOT="$(pyenv root)"
+#  echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
+#  export PATH="$(pyenv root)/shims:$PATH"
 
   #    ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
   #    eval "$(pyenv init -)"
@@ -347,12 +361,15 @@ if command -v pyenv 1>/dev/null 2>&1; then
   #      eval "$(pyenv virtualenv-init -)";
   #    fi
 
-  ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-  CERT_PATH=$(python -m certifi)
-  export SSL_CERT_FILE=${CERT_PATH}
-  export SSL_CERT_DIR=$(dirname "${CERT_PATH}")
-  export REQUESTS_CA_BUNDLE=${CERT_PATH}
 fi
+
+## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
+CERT_PATH=$(python -m certifi)
+export SSL_CERT_FILE=${CERT_PATH}
+export REQUESTS_CA_BUNDLE=${CERT_PATH}
+
+unset SSL_CERT_DIR
+#export SSL_CERT_DIR=$(dirname "${CERT_PATH}")
 
 if [ -d "${HOME}/bin" ]; then
     export PATH="${HOME}/bin:${PATH}"
@@ -381,7 +398,9 @@ if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
   export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 fi
 
-export PATH=".:${PATH}"
+if [ "$EUID" -ne 0 ]; then
+  export PATH=".:${PATH}"
+fi
 
 #echo "${log_prefix_bashenv} PATH=${PATH}"
 

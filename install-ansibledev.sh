@@ -34,7 +34,7 @@ REQUIRED_VENV_PYTHON_VERSION="3.13.5"
 
 REQUIRED_PYTHON_LIBS="ansible certifi"
 
-SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+#SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 # We don't need return codes for "$(command)", only stdout is needed.
 # Allow `[[ -n "$(command)" ]]`, `func "$(command)"`, pipes, etc.
@@ -259,7 +259,6 @@ function execute_eval_command() {
 #    echo "${COMMAND_RESULT}"
     abort "$(printf "Failed during: %s" "${RUN_COMMAND}")"
   fi
-
 }
 
 function is_installed() {
@@ -507,16 +506,28 @@ function setup_macos() {
   ## ref: https://github.com/Homebrew/install/issues/714
 #  yes "" | NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-  ## homebrew/dupes deprecated
-  ## ref: https://github.com/Homebrew/brew/issues/7628
-#  brew tap homebrew/dupes
-  brew untap homebrew/dupes >/dev/null 2>&1 || true
-
   ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
   ## ref: https://gist.githubusercontent.com/clayfreeman/2a5e54577bcc033e2f00/raw/gnuize.sh
   brew install coreutils binutils diffutils ed findutils gawk gnutls gnu-indent gnu-getopt gnu-sed \
     gnu-tar gnu-which gnutls grep gzip screen watch wdiff wget bash gpatch \
     m4 make nano file-formula git less openssh rsync unzip vim
+
+  brew install rust
+
+  # Tap the droast repository
+  brew tap immanuwell/droast
+
+  # Recommended CLI Tools
+  brew install tmux-fingers immanuwell/droast/droast dskditto
+
+  # Recommended GUI Apps
+  brew install --cask openwhispr onit-sidekick sessionwatcher markdown-preview
+
+  echo "Install flyline - Inline command completion & immediate suggestion generation..."
+  curl -sSfL https://github.com/HalFrgrd/flyline/releases/latest/download/install.sh | sh
+
+  echo "Install tau - Autonomous, multi-step agent workspace (code editing, repo analysis, terminal execution)."
+  curl -LsSf https://twotimespi.dev/install.sh | sh
 }
 
 function setup_linux_packages() {

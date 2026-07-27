@@ -224,13 +224,25 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
     # sources /etc/bash.bashrc).
     ## ref: https://www.buildahomelab.com/2022/04/26/how-to-install-ansible-with-pipenv-pyenv/
-    if ! shopt -oq posix; then
-      if [ -f /usr/share/bash-completion/bash_completion ]; then
-        . /usr/share/bash-completion/bash_completion
-      elif [ -f /etc/bash_completion ]; then
-        . /etc/bash_completion
+    if [ -z "$BASH_COMPLETION_LOADED" ]; then
+      export BASH_COMPLETION_LOADED=1
+      if ! shopt -oq posix; then
+        if [ -f /usr/share/bash-completion/bash_completion ]; then
+          . /usr/share/bash-completion/bash_completion
+        elif [ -f /etc/bash_completion ]; then
+          . /etc/bash_completion
+        elif [ -f /usr/local/etc/profile.d/bash_completion.sh ]; then
+          . /usr/local/etc/profile.d/bash_completion.sh
+        fi
       fi
     fi
+#    if ! shopt -oq posix; then
+#      if [ -f /usr/share/bash-completion/bash_completion ]; then
+#        . /usr/share/bash-completion/bash_completion
+#      elif [ -f /etc/bash_completion ]; then
+#        . /etc/bash_completion
+#      fi
+#    fi
 
     ## ref: https://devqa.io/brew-install-java/
     export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
@@ -270,6 +282,29 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
         source "${HOME}/.bash_path"
     fi
 
+    # Flyline - enhanced Bash experience
+    if [ -z "${FLYLINE_DISABLED}" ]; then
+        if ! enable -p | grep -q ' flyline$'; then
+            enable -f ${HOME}/.local/lib/libflyline.dylib flyline
+        fi
+    fi
+
+    ## Locate and source Flyline
+    #if [ -f "/usr/local/share/flyline/flyline.bash" ]; then
+    #    source /usr/local/share/flyline/flyline.bash
+    #elif [ -f "$(brew --prefix)/opt/flyline/share/flyline/flyline.bash" ]; then
+    #    source "$(brew --prefix)/opt/flyline/share/flyline/flyline.bash"
+    #fi
+
+    if [ -f "$HOME/.local/bin/flyline-ollama" ]; then
+      echo "${log_prefix_bashenv} configure flyline agent mode natively"
+      if type flyline &>/dev/null; then
+          flyline set-agent-mode \
+            --trigger-prefix 'ai: ' \
+            --command "${HOME}/.local/bin/flyline-ollama"
+      fi
+    fi
+
 else
     echo "${log_prefix_bashenv} setting environment for LINUX platform"
 
@@ -305,12 +340,14 @@ fi
 
 ## using rvm
 ## ref: https://nrogap.medium.com/install-rvm-in-macos-step-by-step-d3b3c236953b
-if [ -d "${HOME}/.rvm/scripts/rvm" ]; then
-    export RVM_SCRIPTS_DIR="${HOME}/.rvm/scripts"
-    echo "${log_prefix_bashenv} adding ${RVM_SCRIPTS_DIR} into PATH"
-    export PATH="${RVM_SCRIPTS_DIR}:$PATH"
-    source "${RVM_SCRIPTS_DIR}/rvm"
-fi
+#if [ -d "${HOME}/.rvm/scripts/rvm" ]; then
+#    export RVM_SCRIPTS_DIR="${HOME}/.rvm/scripts"
+#    echo "${log_prefix_bashenv} adding ${RVM_SCRIPTS_DIR} into PATH"
+#    export PATH="${RVM_SCRIPTS_DIR}:$PATH"
+#    source "${RVM_SCRIPTS_DIR}/rvm"
+#fi
+# Load RVM into a shell session *as a function*
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
 unset PYENV_BIN_DIR
 if [ -d "${HOME}/.pyenv/bin" ]; then
@@ -335,9 +372,16 @@ fi
 ## ref: https://opensource.com/article/19/5/python-3-default-mac
 ## https://realpython.com/intro-to-pyenv/
 if command -v pyenv 1>/dev/null 2>&1; then
-  export PYENV_ROOT="$(pyenv root)"
-  echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
-  export PATH="$(pyenv root)/shims:$PATH"
+  export PYENV_ROOT="$HOME/.pyenv"
+#  [[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+
+  # Initialize pyenv shims and autocompletion
+  eval "$(pyenv init -)"
+
+  echo "${log_prefix_bashenv} pyenv initialized successfully."
+#  export PYENV_ROOT="$(pyenv root)"
+#  echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
+#  export PATH="$(pyenv root)/shims:$PATH"
 
   #    ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
   #    eval "$(pyenv init -)"
@@ -347,12 +391,15 @@ if command -v pyenv 1>/dev/null 2>&1; then
   #      eval "$(pyenv virtualenv-init -)";
   #    fi
 
-  ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-  CERT_PATH=$(python -m certifi)
-  export SSL_CERT_FILE=${CERT_PATH}
-  export SSL_CERT_DIR=$(dirname "${CERT_PATH}")
-  export REQUESTS_CA_BUNDLE=${CERT_PATH}
 fi
+
+## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
+CERT_PATH=$(python -m certifi)
+export SSL_CERT_FILE=${CERT_PATH}
+export REQUESTS_CA_BUNDLE=${CERT_PATH}
+
+unset SSL_CERT_DIR
+#export SSL_CERT_DIR=$(dirname "${CERT_PATH}")
 
 if [ -d "${HOME}/bin" ]; then
     export PATH="${HOME}/bin:${PATH}"
@@ -381,7 +428,9 @@ if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
   export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 fi
 
-export PATH=".:${PATH}"
+if [ "$EUID" -ne 0 ]; then
+  export PATH=".:${PATH}"
+fi
 
 #echo "${log_prefix_bashenv} PATH=${PATH}"
 

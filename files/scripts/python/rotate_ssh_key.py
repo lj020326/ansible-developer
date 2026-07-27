@@ -38,7 +38,7 @@ SCRIPT_VERSION = "2026.06.22"
 SCRIPT_PATH = Path(__file__).resolve()
 SCRIPT_BASENAME = SCRIPT_PATH.name
 
-# Dynamic config file based on script name (e.g. rotate-ssh-key.py -> .rotate-ssh-key.yml)
+# Dynamic config file based on script name (e.g. rotate_ssh_key.py -> .rotate-ssh-key.yml)
 CONFIG_BASENAME = SCRIPT_BASENAME.replace('.py', '')
 DEFAULT_CONFIG_NAME = f".{CONFIG_BASENAME}.yml"
 

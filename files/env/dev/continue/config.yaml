@@ -1,0 +1,150 @@
+name: Global Config
+version: 1.0.0
+schema: v1
+
+models:
+  - name: "Qwen3-Coder 30B (Main)"
+    provider: ollama
+    model: qwen3-coder:30b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - chat
+      - edit
+      - apply
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  - name: "Qwen 3.5 27B"
+    provider: ollama
+    model: qwen3.5:27b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - chat
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  - name: "Devstral 24B"
+    provider: ollama
+    model: devstral:24b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - chat
+      - edit
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  - name: "Nomic Embed Text"
+    provider: ollama
+    model: nomic-embed-text:latest
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - embed
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  # Fast & capable autocomplete
+  - name: Gemma 4 E2B (Fast Draft)
+    provider: llama.cpp
+    apiBase: "${LLAMA_API_URL}"
+    model: gemma-4-E2B-it-Q5_K_M
+    contextLength: 4096
+    roles:
+      - autocomplete
+
+#  # AUTOCOMPLETE: Keep provider set to "ollama"
+#  - name: "Qwen2.5 Coder 7B (Autocomplete)"
+#    provider: ollama
+#    model: qwen2.5-coder:7b
+#    apiBase: "${OLLAMA_API_URL}"
+#    roles:
+#      - autocomplete
+#    requestOptions:
+#      headers:
+#        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+tabAutocompleteModel:
+  name: Gemma 4 E2B (Fast Draft)
+  provider: llama.cpp
+  apiBase: "${LLAMA_API_URL}"
+  model: gemma-4-E2B-it-Q5_K_M
+  requestOptions:
+    headers:
+      Authorization: "Bearer ${LLAMA_API_KEY}"
+#  name: "Qwen2.5 Coder 7B (Autocomplete)"
+#  provider: ollama
+#  model: qwen2.5-coder:7b
+#  apiBase: "${OLLAMA_API_URL}"
+#  requestOptions:
+#    headers:
+#      Authorization: "Basic ${OLLAMA_API_KEY}"
+
+tabAutocompleteOptions:
+  # This prevents suggestions from popping up immediately as you type
+  debounceDelay: 400
+  disable: false
+#  # Explicitly define which characters SHOULD trigger it (exclude the period)
+#  triggerCharacters: ["{", "[", "("]
+
+context:
+  - provider: file
+  - provider: code
+  - provider: codebase
+  - provider: terminal
+  - provider: diff
+
+rules:
+  - Always follow DRY principles and write self-documenting code.
+  - Prioritize clarity, maintainability, and test coverage.
+  - "For Ansible: Use FQCNs, prefer official collections, ensure full idempotency."
+  - "For Python: Follow PEP 8/Google style, use type hints where helpful."
+  - Write defensive code with clear error handling and logging.
+  - "In automation: Safety and idempotency are more important than brevity."
+  - Use existing patterns and conventions from the codebase whenever possible.
+  - Favor open source tools and contribute back to the community when feasible.
+
+customCommands:
+  - name: explain
+    description: Explain this code
+    prompt: "Explain this code in detail: what it does, why it was written this way, potential edge cases, and suggestions for improvement."
+  - name: refactor
+    description: Refactor for quality
+    prompt: "Refactor this code to be cleaner, more maintainable, and follow best practices while preserving exact functionality."
+  - name: test
+    description: Generate tests
+    prompt: "Write comprehensive unit and integration tests for this code, including edge cases."
+  - name: ansible-role
+    description: Review Ansible role
+    prompt: "Review this Ansible role or task. Suggest improvements for structure, idempotency, variable organization, documentation, and testing."
+  - name: groovylib
+    description: Jenkins Shared Library review
+    prompt: "Review this Groovy code for a Jenkins shared library. Suggest improvements for reusability, error handling, maintainability, and Pipeline compatibility."
+
+systemMessage: |
+  You are an expert DevOps, Platform Engineering, and Software Automation Architect.
+
+  Your core strengths include Ansible (collections, roles, modules, plugins), Python, Groovy/Jenkins Shared Libraries, Docker, Kubernetes, CI/CD, and GitOps.
+
+  Core principles you ALWAYS follow:
+  - Prioritize clarity, readability, and long-term maintainability over cleverness
+  - Emphasize idempotency, safety, reproducibility, and observability in all automation
+  - Follow DRY principles without premature abstraction
+  - Write self-documenting code with excellent naming conventions
+  - Prefer explicit over implicit
+  - Always consider security, observability, error handling, and operational concerns
+  - Favor open source tools and contribute back to the community whenever possible
+
+  When responding:
+  - Be concise but thorough — explain reasoning when it adds value
+  - Suggest incremental, safe, and reversible improvements
+  - Highlight potential edge cases, failure modes, and security implications
+  - Recommend appropriate testing strategies (unit, integration, molecule, etc.)
+  - Respect and build upon the existing code style and patterns in the codebase
+  - For Ansible: strongly prefer FQCNs and official collections
+
+  You are assisting a senior DevOps engineer who values quality, reliability, and sustainable automation.
+
+allowAnonymousTelemetry: false

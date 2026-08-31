@@ -29,7 +29,7 @@ Then you will be presented with a dashboard. Click on **+Add** to create a new o
 
 ![](./img/add-CA.png?resolution=1920,1)
 
-Give CA a useful common name, later on, you can use it to identify it. In this example I used AV-VPN\_CA.  
+Give CA a useful common name, later on, you can use it to identify it. In this example I used AV-VPN\_CA.
 select the CA method from method dropdown. If you have existing CA, you need to select **Import an existing Certificate Authority** and fill the required information in **certificate data** and **certificate private key** section and click on **save**.
 
 ![](./img/Exisiting-CA.png?resolution=1920,1)
@@ -48,7 +48,7 @@ The second step is to create and sign The second step in the process, which is c
 
 ![](./img/server-certificates.jpg.webp?resolution=1920,1)
 
-If you have already configured or purchased the server certificate. Select **Import an Existing Certificate** from the drop-down in the **Method** section.  
+If you have already configured or purchased the server certificate. Select **Import an Existing Certificate** from the drop-down in the **Method** section.
 Give the useful common name for the certificate. later on, it will be useful to identify it.
 
 Fill out the **Certificate data** and **Private key data** information in the **Import Certificate** section and click on **Save**.
@@ -163,7 +163,7 @@ Now you should have an **OpenVPN-client-export** utility installed.
 
 We now need to create the VPN user which has 2 section **User Properties** and **Create Certificate for User**. To do this go to **System** – **User Manager** and click on **Add** to create a new user.
 
-![](./img/User-Manager-1.jpg?resolution=1920,1)  
+![](./img/User-Manager-1.jpg?resolution=1920,1)
 ![](./img/User-Manager-2-1024x251.jpg?resolution=1920,1)
 
 Fill in the username and password which needs to match the config you created under Client Settings during the OpenVPN client configuration. Ensure you tick **click to** **create a user certificate.**
@@ -184,7 +184,7 @@ If all the configuration is correctly configured, you should now able to downloa
 
 Install OpenVPN client on your system. Provide the username and password. now it should be connected to the OpenVPN server. you can verify it by using **what’s my IP ?**  in google.
 
-![](./img/Connection-1.jpg?resolution=1920,1)  
+![](./img/Connection-1.jpg?resolution=1920,1)
 ![](./img/Baburam.jpg?resolution=1920,1)
 
 ## References
@@ -193,4 +193,4 @@ Install OpenVPN client on your system. Provide the username and password. now it
 * https://www.bleepingcomputer.com/vpn/guides/openvpn-server-pfsense/
 * https://www.comparitech.com/blog/vpn-privacy/openvpn-server-pfsense/
 * https://boredadmin.com/configure-opnevpnn-in-pfsense-and-export-client/
-* 
+*

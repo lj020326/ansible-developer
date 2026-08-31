@@ -41,13 +41,13 @@ Below is a contrived example of my data. I want to extract the names of all cust
             - name: n4
               value: v4
   tasks:
-  - set_fact: 
+  - set_fact:
        cust_lst: "{{ cust_lst|default([]) + [item.name] }}"
     with_items: "{{ mylst }}"
     # loop through item.env and look for elements where elem.name == n1
     when: item.env | length > 0
 
-  - debug: var=cust_lst 
+  - debug: var=cust_lst
 ```
 
 
@@ -146,8 +146,8 @@ TASK [prepare var] *************************************************************
 
 ok: [localhost] => (item={'apiVersion': 'v1', 'name': 'customer1', 'metaData': {'cycles': 10, 'ships': 12}, 'env': [{'name': 'n1', 'value': 'v1'}, {'name': 'n2', 'value': 'v2'}]})
 ok: [localhost] => (item={'apiVersion': 'v1', 'name': 'customer2', 'metaData': {'cycles': 10, 'ships': 12}, 'env': [{'name': 'n1', 'value': 'v1'}, {'name': 'n3', 'value': 'v3'}]})
-skipping: [localhost] => (item={'apiVersion': 'v1', 'name': 'customer3', 'metaData': {'cycles': 10, 'ships': 12}, 'env': [{'name': 'n3', 'value': 'v1'}, {'name': 'n4', 'value': 'v4'}]}) 
-skipping: [localhost] => (item={'apiVersion': 'v1', 'name': 'customer4', 'metaData': {'cycles': 10, 'ships': 12}, 'env': [{'name2': 'n3', 'value': 'v1'}, {'name2': 'n4', 'value': 'v4'}]}) 
+skipping: [localhost] => (item={'apiVersion': 'v1', 'name': 'customer3', 'metaData': {'cycles': 10, 'ships': 12}, 'env': [{'name': 'n3', 'value': 'v1'}, {'name': 'n4', 'value': 'v4'}]})
+skipping: [localhost] => (item={'apiVersion': 'v1', 'name': 'customer4', 'metaData': {'cycles': 10, 'ships': 12}, 'env': [{'name2': 'n3', 'value': 'v1'}, {'name2': 'n4', 'value': 'v4'}]})
 
 TASK [print var] *******************************************************************************************************************************************************************************************************
 ok: [localhost] => {
@@ -158,7 +158,7 @@ ok: [localhost] => {
 }
 
 PLAY RECAP *************************************************************************************************************************************************************************************************************
-localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0  
+localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 hope these help.
@@ -179,4 +179,4 @@ this task was found to be circumventing the 2.7.5 error:
 ## Reference
 
 * https://stackoverflow.com/questions/59202186/filter-elements-from-list-of-dictionaries-in-ansible-that-match-a-condition
-* 
+*

@@ -1,13 +1,13 @@
 ﻿<#
 .SYNOPSIS
-		This script demonstrates how to ue PowerShellLogging module by David Wyatt 
-		in order to log message using log4net framework and handle the filtered logging 
+		This script demonstrates how to ue PowerShellLogging module by David Wyatt
+		in order to log message using log4net framework and handle the filtered logging
 		of all existing write-* messages to log file.
 
-		This is highly useful for retrofitting existing code with the log4net framework. 
-		There is minimal impact to existing code-base, since no changes are required to 
-		existing write-* streams.  The existing error/warning/verbose/output streams 
-		will automatically be directed to the log4net handlers defined in write-log4net. 
+		This is highly useful for retrofitting existing code with the log4net framework.
+		There is minimal impact to existing code-base, since no changes are required to
+		existing write-* streams.  The existing error/warning/verbose/output streams
+		will automatically be directed to the log4net handlers defined in write-log4net.
 
 		The log4net configuration is configured in the log4net config file
 
@@ -17,11 +17,11 @@
 .OUTPUTS (with a S at the end....)
          log file
 
-.PARAMETER 
+.PARAMETER
 		none
 #>
 
-Import-Module PowerShellLogging 
+Import-Module PowerShellLogging
 
 function global:Write-Log4net {
     [CmdletBinding()]
@@ -37,27 +37,27 @@ function global:Write-Log4net {
     $Prefix = $Prefix.Trim()
 
     if ($Prefix) { $Prefix = "$Prefix " }
-        
+
     $Line = "$Prefix$Line"
 
-	switch ($LogLevel) { 
+	switch ($LogLevel) {
 		"Error" {$global:logger.Error($Line);}
 		"Warning" {$global:logger.Warn($Line);}
 		"Info" {$global:logger.Info($Line);}
 		"Debug" {$global:logger.Debug($Line);}
         default {throw "Unknown loglevel: $LogLevel for message $Line"}
-    }	
+    }
 }
 
 <#
 .SYNOPSIS
         Configure-Log4net - Initialize log4net logger
-.OUTPUTS 
+.OUTPUTS
         output is a log4net logger [log4net.ILog]
-.PARAMETER 
-		a single hash with the following two dependencies 
-			log4netDllPath - path location for log4net.dll 
-			logConfigFilePath - path location for log4net config file 
+.PARAMETER
+		a single hash with the following two dependencies
+			log4netDllPath - path location for log4net.dll
+			logConfigFilePath - path location for log4net config file
 #>
 function Configure-Log4net([hashtable] $configSettings) {
 	Add-Type -Assembly System.Configuration
@@ -67,7 +67,7 @@ function Configure-Log4net([hashtable] $configSettings) {
 	if ( -not (test-path $log4netDllPath) ) {
 		throw "Log4net library cannot be found on the path $log4netDllPath"
 	}
-	
+
 	[System.Reflection.Assembly]::LoadFrom($log4netDllPath) | Out-Null
 	[log4net.ILog] $logger = $null
 
@@ -84,11 +84,11 @@ function Configure-Log4net([hashtable] $configSettings) {
 		$logger = $LogManager::GetLogger("root")
 		Write-Verbose "Log4net Logger is configured"
 	}
-	
+
 	return $logger
 }
 
-function test-function { 
+function test-function {
 
 	write-output "test-function - log4net writes "
 	$global:logger.error("log.error: test-function")
@@ -110,9 +110,9 @@ write-output "starting log4net test"
 write-output "first suppress standard powershell verbose/warn/debug output streams"
 write-output "instead will use the log4net output stream from coloredconsoleappender"
 write-output "the only posh output stream left logging will be write-output"
-$WarningPreference = 'SilentlyContinue' 
-$VerbosePreference = 'SilentlyContinue' 
-$DebugPreference = 'SilentlyContinue' 
+$WarningPreference = 'SilentlyContinue'
+$VerbosePreference = 'SilentlyContinue'
+$DebugPreference = 'SilentlyContinue'
 
 if ((-not (Get-Variable -Name PSScriptRoot -ValueOnly -ErrorAction SilentlyContinue)) -and
     ($scriptBlockFile = $MyInvocation.MyCommand.ScriptBlock.File)) {
@@ -120,7 +120,7 @@ if ((-not (Get-Variable -Name PSScriptRoot -ValueOnly -ErrorAction SilentlyConti
 }
 
 ## set the locations for the log4net dll and configuration file used in the Init
-$logSettings = @{"log4netDllPath" = "$PSScriptRoot\log4net\log4net.dll" 
+$logSettings = @{"log4netDllPath" = "$PSScriptRoot\log4net\log4net.dll"
 				"logConfigFilePath" = "$PSScriptRoot\log4net\logConfig.xml"}
 
 write-output "load and configure log4net"
@@ -198,9 +198,9 @@ Write-Verbose "Verbose After loglevel change to all"
 Write-Output "Output After loglevel change to all"
 Write-Debug "Debug After loglevel change to all"
 
-test-function 
+test-function
 
-$logFile | Disable-OutputSubscriber 
+$logFile | Disable-OutputSubscriber
 
 Write-Output "content of dynamic log4net logging:"
 Get-Content $global:logger.Logger.Appenders.File

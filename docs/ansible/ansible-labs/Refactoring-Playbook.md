@@ -1,7 +1,7 @@
 ## LAB: Refactoring / Improving Playbook
 
 This scenario shows:
-- how to refactor / improve playbook 
+- how to refactor / improve playbook
 
 ### Prerequisite
 
@@ -12,7 +12,7 @@ This scenario shows:
 
 - We have playbook that is created in this LAB: ./Implement-First-Playbook.md
 
-``` 
+```
 ---
 
 - hosts: all
@@ -52,11 +52,11 @@ This scenario shows:
       name: php
       state: latest
     when: ansible_distribution == "CentOS"
-``` 
+```
 
 #### Consolidate same modules tasks into one task
 
-- Consolidate 'apt' and 'dnf' modules into one group both for Ubuntu and CentOS. 
+- Consolidate 'apt' and 'dnf' modules into one group both for Ubuntu and CentOS.
 - For both of them, they install two packages and update repository index.
 ```
 ---
@@ -88,7 +88,7 @@ This scenario shows:
 
 - Update install_apache.yml file and add variables: apache_package, php_package
 - Change 'apt' and 'dnf' to 'package'
- 
+
 ```
 ---
 
@@ -113,11 +113,10 @@ This scenario shows:
 172.21.76.102 apache_package=httpd php_package=php
 ```
 
-- Run: 
+- Run:
 
 ```
 ansible-playbook --ask-become-pass install_apache.yml
 ```
 
 ![image](./img/201663202-00e9288e-9c9f-4c2b-95f8-d7146a590da7.png)
-

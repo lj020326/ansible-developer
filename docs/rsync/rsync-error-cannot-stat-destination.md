@@ -32,7 +32,7 @@ rsync error: errors selecting input/output files, dirs (code 3) at main.c(635) [
 
 Similarly, in some cases, the rsync temp directory also creates problems with file copying. This happens due to the use of a temp-dir on a different filesystem than the destination file.
 
-Here, rsync tries to rename the finished file, copy the file and set proper permissions, ownership, etc. If for some reason the  
+Here, rsync tries to rename the finished file, copy the file and set proper permissions, ownership, etc. If for some reason the
 file vanishes during this updating, rsync will complain about it and show up errors.
 
 Ideally, the temp directory should be on the same file system as that of the destination file. But, keeping the temp directory on a different file system or the different drives will result in errors.
@@ -70,9 +70,9 @@ Here, Rsync will first copy the files from the temp-dir into partial-dir and the
 
 ## Conclusion
 
-In short, rsync error cannot stat destination occurs due to conflicts in the file system and insufficient permission of rsync user. 
+In short, rsync error cannot stat destination occurs due to conflicts in the file system and insufficient permission of rsync user.
 
 ## References
 
 * https://bobcares.com/blog/rsync-error-cannot-stat-destination/
-* 
+*

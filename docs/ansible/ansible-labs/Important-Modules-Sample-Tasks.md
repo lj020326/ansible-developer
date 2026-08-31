@@ -105,13 +105,13 @@ Details: https://docs.ansible.com/ansible/2.9/modules/list_of_files_modules.html
   file:
     path: /etc/foo
     state: absent
-``` 
+```
 
 ### LineInFile Module <a name="lineinfile"></a>
 
 Details: https://docs.ansible.com/ansible/2.9/modules/lineinfile_module.html#lineinfile-module
 
-``` 
+```
 # NOTE: Before 2.3, option 'dest', 'destfile' or 'name' was used instead of 'path'
 - name: Ensure SELinux is set to enforcing mode
   lineinfile:
@@ -170,7 +170,7 @@ Details: https://docs.ansible.com/ansible/2.9/modules/lineinfile_module.html#lin
     regexp: '^%ADMIN ALL='
     line: '%ADMIN ALL=(ALL) NOPASSWD: ALL'
     validate: /usr/sbin/visudo -cf %s
-``` 
+```
 
 ### Unarchive Module <a name="unarchive"></a>
 
@@ -201,13 +201,13 @@ Details: https://docs.ansible.com/ansible/2.9/modules/unarchive_module.html#unar
     extra_opts:
     - --transform
     - s/^xxx/yyy/
-```    
-    
+```
+
 ### Command Module <a name="command"></a>
 
 Details: https://docs.ansible.com/ansible/2.9/modules/command_module.html#command-module
 
-```    
+```
 - name: return motd to registered var
   command: cat /etc/motd
   register: mymotd
@@ -245,8 +245,8 @@ Details: https://docs.ansible.com/ansible/2.9/modules/command_module.html#comman
 
 - name: safely use templated variable to run command. Always use the quote filter to avoid injection issues.
   command: cat {{ myfile|quote }}
-  register: myoutput    
-``` 
+  register: myoutput
+```
 
 ### Shell Module <a name="shell"></a>
 
@@ -397,4 +397,4 @@ Details: https://docs.ansible.com/ansible/2.9/modules/psexec_module.html#psexec-
       Invoke-Expression ((New-Object Net.WebClient).DownloadString($url))
       exit
   delegate_to: localhost
-```  
+```

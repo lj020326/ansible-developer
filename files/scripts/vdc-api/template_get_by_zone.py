@@ -3,7 +3,7 @@
 #   Name: template_get_by_zone.py
 #   Purpose: List available templates to create a VM, in a specified zone
 #   Requires: class VDCApiCall in the file vdc_api_call.py
-# For download and information: 
+# For download and information:
 #   http://cloudstore.interoute.com/main/knowledge-centre/library/vdc-api-python-scripts
 #
 # Copyright (C) Interoute Communications Limited, 2014

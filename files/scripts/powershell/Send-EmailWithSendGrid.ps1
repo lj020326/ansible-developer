@@ -6,7 +6,7 @@
     This function sends an email using SendGrid APIs
 
 .DESCRIPTION
-    This function sends an email using SendGrid REST API. 
+    This function sends an email using SendGrid REST API.
 
 .EXAMPLE
    Send-EMailWithSendGrid -from "email@domain" -to "email@domain" -ApiKey "MY_SENDGRID_API_KEY" -Body "Test 1..2..3!" -Subject "Sendgrid Test"
@@ -19,7 +19,7 @@ function Send-EmailWithSendGrid {
     (
         [Parameter(Mandatory=$true)]
         [string] $From,
- 
+
         [Parameter(Mandatory=$true)]
         [String] $To,
 
@@ -56,7 +56,7 @@ function Send-EmailWithSendGrid {
                                             value = "$Body" })
                             } | ConvertTo-Json -Depth 10
 
-    Invoke-RestMethod   -Uri "https://api.sendgrid.com/v3/mail/send" -Method Post -Headers $headers -Body $jsonRequest 
+    Invoke-RestMethod   -Uri "https://api.sendgrid.com/v3/mail/send" -Method Post -Headers $headers -Body $jsonRequest
 
 }
 

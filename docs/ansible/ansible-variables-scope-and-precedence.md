@@ -53,7 +53,7 @@ day_of_the_week: Thursday
     - name: my-role
 ```
 
-**Result**: Thursday  
+**Result**: Thursday
 **Explanation**: It simply takes the default value from the role
 
 ### Test 2: Override the default with a new value
@@ -66,7 +66,7 @@ day_of_the_week: Thursday
     - name: my-role
 ```
 
-**Result**: Monday  
+**Result**: Monday
 **Explanation**: New value displayed as expected
 
 ### Test 3: Override variable from within the role
@@ -79,7 +79,7 @@ day_of_the_week: Thursday
         day_of_the_week: Monday
 ```
 
-**Result**: Monday  
+**Result**: Monday
 **Explanation**: New value displayed as expected
 
 ### Test 4: Load the role twice and change the default value for one of them
@@ -93,7 +93,7 @@ day_of_the_week: Thursday
     - name: my-role
 ```
 
-**Result**: Monday is displayed twice, one for each role  
+**Result**: Monday is displayed twice, one for each role
 **Explanation**: This is an unexpected result. You would have thought it the result would be Thursday for the first time the role loads and Monday for the second attempt but Ansible seems to override the value.
 
 ### Test 5: Change the order of loading from Test 4
@@ -107,7 +107,7 @@ day_of_the_week: Thursday
         day_of_the_week: Monday
 ```
 
-**Result**: Monday is displayed twice, one for each role  
+**Result**: Monday is displayed twice, one for each role
 **Explanation**: This is another unexpected result. Logic would dictate that the first one should be Thursday and Monday for the second attempt. The order in which the roles are defined does not affect the result.
 
 ### Test 6: Override value for both roles
@@ -123,7 +123,7 @@ day_of_the_week: Thursday
         day_of_the_week: Tuesday
 ```
 
-**Result**: Monday and Tuesday  
+**Result**: Monday and Tuesday
 **Explanation**: This is exactly what you would expect as you’re changing the default value.
 
 ### Test 7: Set global variable and override on role
@@ -139,7 +139,7 @@ day_of_the_week: Thursday
         day_of_the_week: Tuesday
 ```
 
-**Result**: Tuesday on both output  
+**Result**: Tuesday on both output
 **Explanation**: This is yet another unexpected result similar to tests 4 and 5. The local variable set for a single role seems to override the whole playbook.
 
 ### Test 8: Override variable from command line
@@ -158,13 +158,13 @@ day_of_the_week: Thursday
 and we’re running the playbook using
 
 ```
-ansible-playbook -i localhost, 
-  --connection=local 
-  -v main.yml 
+ansible-playbook -i localhost,
+  --connection=local
+  -v main.yml
   -e day_of_the_week=Yesterday
 ```
 
-**Result**: Yesterday  
+**Result**: Yesterday
 **Explanation**: Ansible documentation states that the command line has the highest precedence and it stands to reason that all the other variables are ignored.
 
 ### Test 9: Change variable with set\_fact
@@ -185,7 +185,7 @@ ansible-playbook -i localhost,
         day_of_the_week: Tuesday
 ```
 
-**Result**: Wednesday for both roles  
+**Result**: Wednesday for both roles
 **Explanation**: This is expected as set\_fact has precedence over roles.
 
 ### Test 10: Import variable from files
@@ -201,7 +201,7 @@ The day\_of\_the\_week variable is move into two files, one defines Wednesday an
     - name: my-role
 ```
 
-**Result**: Friday  
+**Result**: Friday
 **Explanation**: This is expected. The last value overrides the first one.
 
 ## Reference

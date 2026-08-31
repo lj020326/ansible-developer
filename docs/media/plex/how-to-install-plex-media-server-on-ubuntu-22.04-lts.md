@@ -155,7 +155,7 @@ Or the alternative if the above address does not work.
 localhost:32400/web/index.html#!/setup
 ```
 
-THROUGH AN SSH TUNNEL, the HTTP request will be redirected to http://localhost:32400/web, the remote server. 
+THROUGH AN SSH TUNNEL, the HTTP request will be redirected to http://localhost:32400/web, the remote server.
 
 Once the initial setup is done, you will access your Plex Media Server with your remote server IP address.
 
@@ -260,7 +260,7 @@ _Example:_
 [![How to Install Plex Media Server on Ubuntu 22.04 LTS
 ](https://www.linuxcapable.com/wp-content/uploads/2022/04/example-plex-main-dashboard-ubuntu-22.04-1024x569.png "How to Install Plex Media Server on Debian 11 Bullseye 15")](https://www.linuxcapable.com/wp-content/uploads/2022/04/example-plex-main-dashboard-ubuntu-22.04.png)
 
-During the initial setup, you may have noticed that your media did not appear or have problems adding content that won’t be picked up. Plex refused to find the content on your existing hard drive’s internal and external secondaries. This is partly due to Plex creating a dedicated user account named **plexuser**, which needs to read and execute permission on your media directories. 
+During the initial setup, you may have noticed that your media did not appear or have problems adding content that won’t be picked up. Plex refused to find the content on your existing hard drive’s internal and external secondaries. This is partly due to Plex creating a dedicated user account named **plexuser**, which needs to read and execute permission on your media directories.
 
 Ubuntu permissions can be set using chown or setfalc; both are good. Some examples of how to apply are below.
 
@@ -455,4 +455,4 @@ Plex is an excellent media server software with great features and a very active
 ## Reference
 
 * https://www.linuxcapable.com/how-to-install-plex-media-server-on-ubuntu-22-04-lts/
-* 
+*

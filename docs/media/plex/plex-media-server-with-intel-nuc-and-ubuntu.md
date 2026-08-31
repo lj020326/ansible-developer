@@ -7,28 +7,28 @@
 -   2 x 8GB DDR4 RAM (CT2K8G4SFD8213, [Link 117](https://www.amazon.com/dp/B015HQ9VEM))
 -   250GB M.2 PCIe NVMe SSD (Samsung 960 EVO MZ-V6E250BW, [Link 92](https://www.amazon.com/dp/B01LYFKX41))
 
-This hardware setup is meant to be an allrounder. Fast enough to transcode multiple movies at the same time, almost completely silent in order to run it in the living room and power efficient in order to run it 24/7. It is able to hardware transcode three H.264 1080p movies at the same time with ~30-35% CPU load. Transcoding a single H.265 4K HDR movie has ~35-40% CPU load.  
+This hardware setup is meant to be an allrounder. Fast enough to transcode multiple movies at the same time, almost completely silent in order to run it in the living room and power efficient in order to run it 24/7. It is able to hardware transcode three H.264 1080p movies at the same time with ~30-35% CPU load. Transcoding a single H.265 4K HDR movie has ~35-40% CPU load.
 If you are looking for a single user setup this NUC might be overkill, the [NUC i3 210](https://www.intel.com/content/www/us/en/products/boards-kits/nuc/kits/nuc7i3dnke.html) with 2 x 4GB RAM should be fine then.
 
-  
+
 
 ## Step 1: Install Ubuntu
 
 -   Update BIOS with latest from Intel’s website
-    
--   Install Ubuntu 22.04 LTS 64bit server version
-    
--   Use the following partition scheme (ESP size was suggested by Ubuntu, swap size is much bigger than usual because of RAM transcoding):
-    
-    > #1: 536MB, ESP, bootable
-    
 
-> #2: 64GB, swap  
+-   Install Ubuntu 22.04 LTS 64bit server version
+
+-   Use the following partition scheme (ESP size was suggested by Ubuntu, swap size is much bigger than usual because of RAM transcoding):
+
+    > #1: 536MB, ESP, bootable
+
+
+> #2: 64GB, swap
 > #3: 185,5GB, ext4
 
 -   Setup user named `plex`
 
-  
+
 
 ## Step 2: Install Plex Media Server
 
@@ -41,7 +41,7 @@ If you are looking for a single user setup this NUC might be overkill, the [NUC 
 -   Re-enable plex repository source
     -   By default the plex repository source from the package is disabled (commented out), enable it in `/etc/apt/sources.list.d/plexmediaserver.list`
 
-  
+
 
 ## Step 3: Setup NFS and Autofs
 
@@ -70,13 +70,13 @@ music     -fstype=nfs4    :/volume1/Music
 -   All your mount points are now available at `/data/...`
 -   Autofs will automatically unmount all mount points if there is no access within 5 minutes and remount if you try to access the mount point. You can keep ghost references to the mount points by adding `--ghost` in `auto.master` at the end of the appended line
 
-  
+
 
 ## Step 4: Configure Plex Media Server
 
 -   Open `http://<ip-of-your-server>:32400/web` in your browser and configure your server
 
-  
+
 
 ## Step 5: Setup RAM transcoding
 
@@ -94,7 +94,7 @@ tmpfs    /tmp    tmpfs    defaults,noatime,nosuid,nodev,noexec,size=64G,mode=177
     -   `sudo chown -R plex:plex /tmp/transcoding`
 -   Use `/tmp/transcoding` in Plex Media Server > Settings > Server > Transcoder > Temporary directory
 
-  
+
 
 ## Additional notes / tips
 
@@ -104,4 +104,4 @@ tmpfs    /tmp    tmpfs    defaults,noatime,nosuid,nodev,noexec,size=64G,mode=177
 ## Reference
 
 * https://forums.plex.tv/t/guide-plex-media-server-with-intel-nuc-and-ubuntu-16-04-lts/217937
-* 
+*

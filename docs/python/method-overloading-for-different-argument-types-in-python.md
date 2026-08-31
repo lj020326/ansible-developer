@@ -74,7 +74,7 @@ def multidispatch(*types):
         if mm is None:
             @functools.wraps(function)
             def wrapper(self, *args):
-                types = tuple(arg.__class__ for arg in args) 
+                types = tuple(arg.__class__ for arg in args)
                 function = wrapper.typemap.get(types)
                 if function is None:
                     raise TypeError("no match")

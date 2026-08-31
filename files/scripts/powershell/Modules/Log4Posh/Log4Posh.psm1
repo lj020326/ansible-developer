@@ -1,24 +1,24 @@
 ﻿<#
 .SYNOPSIS
 	This module implements the log4net framework and logs all existing write-* messages to log file.
-	This script uses PowerShellLogging module by David Wyatt. 
+	This script uses PowerShellLogging module by David Wyatt.
 
-	This can be used to retrofit existing code with the log4net framework. 
-	There is minimal impact to existing code-base, since no changes are required to 
-	existing write-* output streams.  The existing error/warning/verbose/output streams 
-	will automatically be directed to the log4net handlers defined in write-log4net. 
+	This can be used to retrofit existing code with the log4net framework.
+	There is minimal impact to existing code-base, since no changes are required to
+	existing write-* output streams.  The existing error/warning/verbose/output streams
+	will automatically be directed to the log4net handlers defined in write-log4net.
 
 	The log4net configuration is enabled in the log4net config file
 
 	The behavior can be customized or adjusted by modifying the config file accordingly
 	E.g., change color config or existing colorconsoleappender, add/remove appender(s), etc
 
-.OUTPUTS 
+.OUTPUTS
 	log file
 
 #>
 
-Import-Module PowerShellLogging 
+Import-Module PowerShellLogging
 
 function Write-Log4net {
     [CmdletBinding()]
@@ -36,19 +36,19 @@ function Write-Log4net {
     if ($Prefix) { $Prefix = "$Prefix " }
     $Line = "$Prefix$Line"
 
-	switch ($LogLevel) { 
+	switch ($LogLevel) {
 		"Error" {$global:logger.Error($Line);}
 		"Warning" {$global:logger.Warn($Line);}
 		"Info" {$global:logger.Info($Line);}
 		"Debug" {$global:logger.Debug($Line);}
 ## todo: use dll extensions in posh to extend log4net to implement trace/verbose
-#		"Trace" {$global:logger.Trace($Line);}  
-#		"Verbose" {$global:logger.Verbose($Line);}  
+#		"Trace" {$global:logger.Trace($Line);}
+#		"Verbose" {$global:logger.Verbose($Line);}
         default {throw "Unknown loglevel: $LogLevel for message $Line"}
-    }	
+    }
 }
 
-function Enable-Log4Posh 
+function Enable-Log4Posh
 {
 	<#
 	.SYNOPSIS
@@ -67,7 +67,7 @@ function Enable-Log4Posh
 		$logConfigFilePath,
 		[Alias("Dll")]
 		[string]
-		# Path of Log4net dll 
+		# Path of Log4net dll
 		$log4netDllPath,
         [Parameter(ValueFromRemainingArguments = $true)]
         $remainingArgs
@@ -103,30 +103,30 @@ function Enable-Log4Posh
 									-OnWriteWarning { Write-Log4net -LogLevel "Warning" -Line $args[0] -Prefix '[W]' } `
 									-OnWriteOutput  { Write-Log4net -LogLevel "Info" -Line $args[0] -Prefix '[O]' } `
 									-OnWriteDebug   { Write-Log4net -LogLevel "Debug" -Line $args[0] -Prefix '[D]' } `
-									-OnWriteVerbose { Write-Log4net -LogLevel "Debug" -Line $args[0] -Prefix '[V]' } 
-	
+									-OnWriteVerbose { Write-Log4net -LogLevel "Debug" -Line $args[0] -Prefix '[V]' }
+
 	return $logger
 }
 
 function Disable-Log4Posh {
 	<#
 	.SYNOPSIS
-	      Disable logging before the script exits 
+	      Disable logging before the script exits
 	#>
-	$global:logSubscriber | Disable-OutputSubscriber 
+	$global:logSubscriber | Disable-OutputSubscriber
 }
 
 function Test-LogSomething {
 	<#
 	.SYNOPSIS
-	      Logs diagnostic test messages at multiple levels below specified test level 
+	      Logs diagnostic test messages at multiple levels below specified test level
 		  in order to test that Logger Logging Level is working correctly.
 	#>
 	[CmdletBinding()]
 	Param(
-		[log4net.Core.Level] 
+		[log4net.Core.Level]
 		# The level at or below which the test messages should be logged
-		## 
+		##
 		## Order of log4net log levels
 		##
 		## $global:logger.Logger.Repository.LevelMap.AllLevels | sort -property value | select value, name | ft -auto
@@ -150,10 +150,10 @@ function Test-LogSomething {
 		##     120000 EMERGENCY
 		## 2147483647 OFF
 		##
-		$logTestLevel = [log4net.Core.Level]::WARN 
+		$logTestLevel = [log4net.Core.Level]::WARN
 	)
-	
-	$functionName = $MyInvocation.MyCommand	
+
+	$functionName = $MyInvocation.MyCommand
 
 	$logTestLevelVal = $global:logger.Logger.Repository.LevelMap[$logTestLevel].value
 
@@ -162,7 +162,7 @@ function Test-LogSomething {
 	if ($global:logger.Logger.Repository.LevelMap["INFO"].value -le $logTestLevelVal) { $global:logger.info("in $functionName - log.info: Info") }
 	if ($global:logger.Logger.Repository.LevelMap["DEBUG"].value -le $logTestLevelVal) { $global:logger.debug("in $functionName - log.debug: Debug")}
 	if ($global:logger.Logger.Repository.LevelMap["TRACE"].value -le $logTestLevelVal) { $global:logger.trace("in $functionName - log.trace: Trace")}
-#	Write-Error "in $functionName - Write-Error" 
+#	Write-Error "in $functionName - Write-Error"
 #	Write-Warning "in $functionName - Write-Warning"
 #	Write-Output "in $functionName - Write-Output"
 #	Write-Debug "in $functionName - Write-Debug"
@@ -170,14 +170,14 @@ function Test-LogSomething {
 }
 
 
-function Test-Log4Posh { 
+function Test-Log4Posh {
 
 	write-output "suppress standard powershell verbose/warn/debug output streams"
 	write-output "instead will use the log4net output stream from coloredconsoleappender"
 	write-output "the only posh output stream left logging will be write-output"
-	$WarningPreference = 'SilentlyContinue' 
-	$VerbosePreference = 'SilentlyContinue' 
-	$DebugPreference = 'SilentlyContinue' 
+	$WarningPreference = 'SilentlyContinue'
+	$VerbosePreference = 'SilentlyContinue'
+	$DebugPreference = 'SilentlyContinue'
 
 	if ((-not (Get-Variable -Name PSScriptRoot -ValueOnly -ErrorAction SilentlyContinue)) -and
 	($scriptBlockFile = $MyInvocation.MyCommand.ScriptBlock.File)) {
@@ -185,7 +185,7 @@ function Test-Log4Posh {
 	}
 
 	## set the locations for the log4net dll and configuration file used in the Init
-	$logSettings = @{log4netDllPath = "$PSScriptRoot\log4net\ILogExtensions.dll"; 
+	$logSettings = @{log4netDllPath = "$PSScriptRoot\log4net\ILogExtensions.dll";
 				logConfigFilePath = "$PSScriptRoot\log4net\logConfig.xml"}
 
 	write-output "load and configure log4net"
@@ -217,10 +217,9 @@ function Test-Log4Posh {
 	write-output "testing log4net writes with log level set to all"
 	Test-LogSomething
 
-	Disable-Log4Posh 
+	Disable-Log4Posh
 
 	Write-Output "content of dynamic log4net logging:"
-	Get-Content $logFileName 
+	Get-Content $logFileName
 
 }
-

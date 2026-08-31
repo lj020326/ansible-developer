@@ -58,15 +58,15 @@ experimenting with a particular tool to figure out if something can be supported
 - [Vault (Hashicorp)](#vault-hashicorp)
 
 ### Ansible Vault
-This is Ansible's built in secret management system, based on encrypting secrets into a file. Its usage 
-can be more general than Chef's encrypted data bags, as it can be applied to tasks, handlers, etc. 
-and not just to variables; but it is not transparent, in the sense that some tasks will be configured 
-differently when encryption is used. A command line tool is provided to manage the process, 
-and the suggested workflow is to check the encrypted files into source control. There does not appear 
-to be a way to have more than one password for a file, or to define different types of access 
+This is Ansible's built in secret management system, based on encrypting secrets into a file. Its usage
+can be more general than Chef's encrypted data bags, as it can be applied to tasks, handlers, etc.
+and not just to variables; but it is not transparent, in the sense that some tasks will be configured
+differently when encryption is used. A command line tool is provided to manage the process,
+and the suggested workflow is to check the encrypted files into source control. There does not appear
+to be a way to have more than one password for a file, or to define different types of access
 to a secret, or to audit access.
 
-If you are using Ansible and your main goal is to get the secrets out of plaintext files, this would 
+If you are using Ansible and your main goal is to get the secrets out of plaintext files, this would
 probably be your natural choice.
 
 Read more:
@@ -192,16 +192,16 @@ Read more:
 - http://docs.conjur.apiary.io/
 
 ### Crypt
-If you prefer a spartan approach but would like to use a (hopefully highly available) key-value store 
+If you prefer a spartan approach but would like to use a (hopefully highly available) key-value store
 instead of files, Crypt could be a solution for you. It relies on etcd or Consul for persistence,
-storing arbitrary data (which might be a single secret or any structured format like JSON) encrypted 
+storing arbitrary data (which might be a single secret or any structured format like JSON) encrypted
 using OpenPGP's public key crypto. Multiple recipients are supported by specifying a set of public keys
-at the time the secret is written, and the reader must have one of the corresponding private keys to 
+at the time the secret is written, and the reader must have one of the corresponding private keys to
 successfully decrypt.
 
 The implementation is a thin client-side Go glue layer binding together gzip, OpenPGP, and backend access. It may
 be used as a CLI tool for both reading and writing, or as a library. Management of encryption keys on OpenPGP
-keyrings, including having to find and re-encrypt all the affected secrets if one of the keys needs 
+keyrings, including having to find and re-encrypt all the affected secrets if one of the keys needs
 to be rotated, is left as an exercise to the user.
 
 Read more:

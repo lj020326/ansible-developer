@@ -3,7 +3,7 @@
 
 Today I tried [to create a docker secret](https://docs.docker.com/engine/reference/commandline/secret_create/) for a Docker Swarm stack.
 
-**Why?**  
+**Why?**
 The secret is encrypted, and you cannot read it. I’ve used environment variables before, but they are stored as plain text. You can see them if you inspect the Docker service/image.
 
 It took me a while to figure out how to use docker secrets with a `docker-compose.yml`.

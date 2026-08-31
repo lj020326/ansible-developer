@@ -34,9 +34,9 @@ Running on top of Docker, you can see a number of containers. We’ll focus more
 -   [Grafana](https://grafana.com/) - The most flexible Open Source data visualisation tool on the market, Grafana connects to Loki and Prometheus and displays the data it finds there
 
 > **But what about ELK?**
-> 
-> The ELK Stack (Elasticsearch, Logstash, and Kibana) is probably one of the best known open-source monitoring solutions out there and I’ve been using it in my professional life for nearly 10 years now.  
-> It scales, it ingests logs beautifully, and it’s one of the darlings of the open-source world, however recent changes around their approach to licensing and some experiences with using it to query metrics rather than logs have made me question whether it’s the right tool to be using in my professional work.  
+>
+> The ELK Stack (Elasticsearch, Logstash, and Kibana) is probably one of the best known open-source monitoring solutions out there and I’ve been using it in my professional life for nearly 10 years now.
+> It scales, it ingests logs beautifully, and it’s one of the darlings of the open-source world, however recent changes around their approach to licensing and some experiences with using it to query metrics rather than logs have made me question whether it’s the right tool to be using in my professional work.
 > This led me to discover Prometheus and Loki as alternatives (I’ve always used Grafana instead of Kibana because Grafana is far more flexible and connects to many more back-ends than Kibana can), and I though “what better way to experiment than on my home network?”. Three months in and I don’t regret it at all. Loki, Prometheus, and Grafana are all far more lightweight than their ELK counterparts and it _feels_ quicker to respond to complex queries. As a result, I’m sticking with this as a combination at home, and even starting to suggest it to clients at work!
 
 ## So how does it all glue together?

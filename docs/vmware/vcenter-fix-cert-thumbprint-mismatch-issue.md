@@ -11,16 +11,16 @@ mkdir /certificate
 -   Create a copy of the certificate and key from the vpxd-extension store
 
 ```shell
-/usr/lib/vmware-vmafd/bin/vecs-cli entry getcert --store vpxd-extension --alias vpxd-extension --output /certificate/vpxd-extension.crt    
+/usr/lib/vmware-vmafd/bin/vecs-cli entry getcert --store vpxd-extension --alias vpxd-extension --output /certificate/vpxd-extension.crt
 /usr/lib/vmware-vmafd/bin/vecs-cli entry getkey --store vpxd-extension --alias vpxd-extension --output /certificate/vpxd-extension.key
 ```
 
 -   Update the service endpoint using the vpxd-extension certificate
 
 ```shell
-python /usr/lib/vmware-vpx/scripts/updateExtensionCertInVC.py -e com.vmware.vim.eam -c /certificate/vpxd-extension.crt -k /certificate/vpxd-extension.key -s <FQDN> -u Administrator@<SSO Domain> -p <SSO Password>  
+python /usr/lib/vmware-vpx/scripts/updateExtensionCertInVC.py -e com.vmware.vim.eam -c /certificate/vpxd-extension.crt -k /certificate/vpxd-extension.key -s <FQDN> -u Administrator@<SSO Domain> -p <SSO Password>
 
-python /usr/lib/vmware-vpx/scripts/updateExtensionCertInVC.py -e com.vmware.rbd -c /certificate/vpxd-extension.crt -k /certificate/vpxd-extension.key -s <FQDN> -u Administrator@<SSO Domain> -p <SSO Password>  
+python /usr/lib/vmware-vpx/scripts/updateExtensionCertInVC.py -e com.vmware.rbd -c /certificate/vpxd-extension.crt -k /certificate/vpxd-extension.key -s <FQDN> -u Administrator@<SSO Domain> -p <SSO Password>
 
 python /usr/lib/vmware-vpx/scripts/updateExtensionCertInVC.py -e com.vmware.imagebuilder -c /certificate/vpxd-extension.crt -k /certificate/vpxd-extension.key -s <FQDN> -u Administrator@<SSO Domain> -p <SSO Password>
 ```
@@ -28,8 +28,8 @@ python /usr/lib/vmware-vpx/scripts/updateExtensionCertInVC.py -e com.vmware.imag
 -   Restart the services
 
 ```shell
-service-control --start vmware-eam  
-service-control --start vmware-imagebuilder  
+service-control --start vmware-eam
+service-control --start vmware-imagebuilder
 service-control --start vmware-rbd-watchdog
 ```
 
@@ -46,4 +46,4 @@ service-control --stop --all && service-control --start --all
 - https://knowledge.broadcom.com/external/article?legacyId=80588
 - https://knowledge.broadcom.com/external/article/318255
 - https://www.reddit.com/r/vmware/comments/117j44q/can_not_delete_orphaned_and_inaccessible_vcls/
-- 
+-

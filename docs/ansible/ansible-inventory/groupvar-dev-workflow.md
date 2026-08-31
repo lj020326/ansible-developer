@@ -10,9 +10,9 @@ At a high level, the process of adding/removing inventory groups consists of the
 1) add/remove group with _group-parent-child-ancestry_ into `inventory/xenv_groups.yml`.
 2) add/remove group variable settings in the respective group's `group_vars` file(s).
 3) map hosts into the _child (purpose|environment)-specific group_ in the respective environment `hosts.yml`.
-4) run [script to synchronize environment symlinks](../inventory/sync-inventory-xenv-links.sh).
+4) run [script to synchronize environment symlinks](../verify_inventory.py).
 5) run [script to perform inventory validations/tests](../inventory/run-inventory-tests.sh).
-6) Commit/Push the inventory groupvars code change(s). 
+6) Commit/Push the inventory groupvars code change(s).
 
 ## Inventory Group Development Process Details/Examples
 
@@ -97,7 +97,7 @@ all:
 
 ```
 
-### STEP 4: Run [script to synchronize environment symlinks](../inventory/sync-inventory-xenv-links.sh).
+### STEP 4: Run [script to synchronize environment symlinks](../verify_inventory.py).
 
 Run the [sync-inventory-xenv-links.sh](../inventory/sync-inventory-xenv-links.sh) shell script to synchronize symlinks for each new/removed group(s) into each environment directory.
 
@@ -106,7 +106,7 @@ Example:
 ljohnson@Lees-MacBook-Pro:[tests](main)$ git switch develop-lj
 Switched to branch 'develop-lj'
 Your branch is up to date with 'origin/develop-lj'.
-e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ sync-inventory-xenv-links.sh 
+e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ sync-inventory-xenv-links.sh
 [INFO ]: ==> PROJECT_DIR=/Users/ljohnson/repos/ansible/ansible-datacenter
 [INFO ]: ==> INVENTORY_DIR=/Users/ljohnson/repos/ansible/ansible-datacenter/inventory
 [INFO ]: ==> SYNC_FUNCTIONS[@]=all
@@ -117,11 +117,11 @@ e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ sync-inventory-xenv-links.sh
 e-leej@ansutilp1s4:[aap-inventory](develop-lj)$
 ```
 
-Running the synchronization will only need to be done upon adding or removing a `group_vars` file. 
+Running the synchronization will only need to be done upon adding or removing a `group_vars` file.
 
 The `group_vars` synchronization script enforces:
 
-1) highly efficient `group_vars` development workflow 
+1) highly efficient `group_vars` development workflow
 2) maintaining all `group_vars` in a _DRY_/_deduplicated_ method
 3) consolidated env-specific `group_vars` files available across all inventory child directories
 
@@ -138,7 +138,7 @@ Example run of the script with ideal validation results:
 
 ```shell
 e-leej@ansutilp1s4:[aap-inventory](develop-lj)$
-e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ run-inventory-tests.sh 
+e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ run-inventory-tests.sh
 [INFO ]: ==> PROJECT_DIR=/Users/ljohnson/repos/ansible/ansible-datacenter
 [INFO ]: ==> TEST_CASES=ALL
 [INFO ]: ==> run_tests(): TEST_CASES[@]=ALL
@@ -149,11 +149,11 @@ e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ run-inventory-tests.sh
 [INFO ]: ==> run_test_case(05): validate_child_inventories: SUCCESS
 [INFO ]: ==> run_test_case(06): validate_child_groupvars: SUCCESS
 [INFO ]: ==> run_tests(): ERROR_COUNT=0
-[INFO ]: ==> *********************** 
+[INFO ]: ==> ***********************
 [INFO ]: ==> OVERALL INVENTORY TEST RESULTS
 [INFO ]: ==> TOTAL TOTAL_FAILED=0
 [INFO ]: ==> TEST SUCCEEDED!
-e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ 
+e-leej@ansutilp1s4:[aap-inventory](develop-lj)$
 ```
 
 __Resolve any/all reported inventory issue(s) if any exist and repeat this step until none exist.__
@@ -164,8 +164,8 @@ After successful test, then add, commit, and push the inventory groupvars code c
 
 E.g., given a example feature branch named "feature/AIM-1234", the git code commit/push process is accomplished with:
 ```shell
-e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git add . 
-e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git commit -m "AIM-1234 - inventory group enhancements" 
+e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git add .
+e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git commit -m "AIM-1234 - inventory group enhancements"
 e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git push origin develop-lj
 ```
 
@@ -178,23 +178,23 @@ The inventory test pipeline will execute the same inventory test script (run-inv
 Make sure to pull in the latest default upstream branch ('development') code changes and switch to the upstream branch ('development'):
 
 ```shell
-e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git fetch origin development:development 
+e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git fetch origin development:development
 ## or if older git version, use 'git checkout development'
-e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git switch development  
-e-leej@ansutilp1s4:[aap-inventory](development)$ 
+e-leej@ansutilp1s4:[aap-inventory](develop-lj)$ git switch development
+e-leej@ansutilp1s4:[aap-inventory](development)$
 ```
 
 Create the feature branch locally or using the equivalent branch create button from the Jira UI:
 
 ```shell
 e-leej@ansutilp1s4:[aap-inventory](development)$ git checkout -b feature/AIM-1234
-e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$  
+e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$
 ```
 
 Make sure to set/push the feature upstream branch to same origin feature branch:
 
 ```shell
-e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ git push -u origin feature/AIM-1234 
+e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ git push -u origin feature/AIM-1234
 ```
 
 Copy the changes made in the developer's branch in the 'inventory/' directory to the feature branch:
@@ -212,7 +212,7 @@ Make sure all symlinks are synchronized in feature branch.
 
 The symlinks should copy over with prior checkout but redundantly running the sync script is simple way to validate:
 ```shell
-e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ sync-inventory-xenv-links.sh 
+e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ sync-inventory-xenv-links.sh
 [INFO ]: ==> PROJECT_DIR=/Users/ljohnson/repos/ansible/ansible-datacenter
 [INFO ]: ==> INVENTORY_DIR=/Users/ljohnson/repos/ansible/ansible-datacenter/inventory
 [INFO ]: ==> SYNC_FUNCTIONS[@]=all
@@ -224,7 +224,7 @@ e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ sync-inventory-xenv-links.
 
 Test/Validate the feature branch changes:
 ```shell
-e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ run-inventory-tests.sh 
+e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ run-inventory-tests.sh
 [INFO ]: ==> PROJECT_DIR=/Users/ljohnson/repos/ansible/ansible-datacenter
 [INFO ]: ==> TEST_CASES=ALL
 [INFO ]: ==> run_tests(): TEST_CASES[@]=ALL
@@ -235,16 +235,16 @@ e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ run-inventory-tests.sh
 [INFO ]: ==> run_test_case(05): validate_child_inventories: SUCCESS
 [INFO ]: ==> run_test_case(06): validate_child_groupvars: SUCCESS
 [INFO ]: ==> run_tests(): ERROR_COUNT=0
-[INFO ]: ==> *********************** 
+[INFO ]: ==> ***********************
 [INFO ]: ==> OVERALL INVENTORY TEST RESULTS
 [INFO ]: ==> TOTAL TOTAL_FAILED=0
-[INFO ]: ==> TEST SUCCEEDED! 
+[INFO ]: ==> TEST SUCCEEDED!
 ```
 
 Add, commit and push the feature branch changes:
 ```shell
 e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ git add .
-e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ git commit -m "AIM-1234 - inventory group enhancements" 
+e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ git commit -m "AIM-1234 - inventory group enhancements"
 e-leej@ansutilp1s4:[aap-inventory](feature/AIM-1234)$ git push origin feature/AIM-1234
 ```
 
@@ -383,7 +383,7 @@ Upon promotion into any upper environment, the developer/operator can use the sa
 
 The assumption is that the same test groups exist across all environment but with environment-specific hosts mapped into the test groups for each environment.
 
-For example, for the ntp playbook mentioned earlier, in all environments, the test group `testgroup_ntp` should exist.  
+For example, for the ntp playbook mentioned earlier, in all environments, the test group `testgroup_ntp` should exist.
 Then the test group hosts yaml (e.g., `TEST/testgroup_lnx.yml`) specifies the environment-specific hosts that belong to the test group `testgroup_ntp`.
 
 ### TEST group configuration across environments

@@ -8,14 +8,14 @@ You can work around the problem by using an [USB based NIC](https://www.virten.n
 ### Enable Passthrough
 
 1.  Open the vSphere Client, navigate to **ESX > Configure > Hardware > PCI Devices** and click **CONFIGURE PASSTHROUGH**.
-2.  Locate Realtek network card and activate it for passthrough.  
+2.  Locate Realtek network card and activate it for passthrough.
     ![](./img/esxi-passthrough-rtl8168.png)
 3.  Power-off the Virtual Machine where you want to add the network card.
 4.  Right-Click the Virtual Machine and select **Edit Settings...**
 5.  Click **ADD NEW DEVICE** and select **PCI Device**
 6.  Add the Network Adapter
 7.  Boot the Virtual Machine
-8.  Verify that you can see the Network Adapter  
+8.  Verify that you can see the Network Adapter
     ![](./img/passthru-nic-in-windows.png)
 
 You do now have a dedicated network card in your virtual machine. This gives you full performance PCIe network card performance in your virtual machine. Of course, you can only pass it to one machine, unless you take it a step further and...
@@ -26,20 +26,20 @@ If you want to use the same network card with other virtual machines, or VMkerne
 
 1.  Create a new vSwitch with no physical network adapters.
 2.  Add a VMkernel Port
-3.  Add a VM Portgroup named **bridge** and connect the Virtual Machine  
+3.  Add a VM Portgroup named **bridge** and connect the Virtual Machine
     ![](./img/vswitch-for-bridged-networking.png)
-4.  Edit the vSwitch and set **Promiscuous Mode** to **Accept**.  
+4.  Edit the vSwitch and set **Promiscuous Mode** to **Accept**.
     ![](./img/vswitch-promiscuous-mode.png)
-5.  In this example, I'm using a **Windows** machine to create the Bridge. Scroll down for a Linux bridge configuration example.  
-    Open **Network Connections**, mark both Adapters, Right-Click and click **Bridge Connections**.  
+5.  In this example, I'm using a **Windows** machine to create the Bridge. Scroll down for a Linux bridge configuration example.
+    Open **Network Connections**, mark both Adapters, Right-Click and click **Bridge Connections**.
     ![](./img/bridge-connections-windows.png)
-6.  You have now created a bridge that connects the vSwitch to the Realtek NIC. If you want to configure an IP address for the virtual machine, you have to set it on the new bridge interface.  
+6.  You have now created a bridge that connects the vSwitch to the Realtek NIC. If you want to configure an IP address for the virtual machine, you have to set it on the new bridge interface.
     ![](./img/bridge-connections-windows-configure-bridge.png)
 7.  If you are using the bridge to manage ESXi, make sure to configure auto-boot for the bridging virtual machine. (ESXi > Configure > Virtual Machines > VM Startup/Shutdown). Keep in mind that auto-boot only works for standalone ESXi Hosts or hosts that are in a not HA enabled Cluster.
 
 You should now be able to connect to the Virtual Machine (DHCP) and the VMkernel port (192.168.111.21). To make other Virtual Machines accessible, add them to the bridge Port Group on vSwitch1.
 
-**Create a Bridge on Debian based Linux  
+**Create a Bridge on Debian based Linux
 **If you want to use a lightweight VM for bridging, you can use Linux. Adding a bridge in Linux is as simple as in Windows:
 
 Install bridge-utils

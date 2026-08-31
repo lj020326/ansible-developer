@@ -3,7 +3,7 @@
 #   Name: vm_resetpassword.py
 #   Purpose: Reset the administrator/root user password for a virtual machine
 #   Requires: class VDCApiCall in the file vdc_api_call.py
-# For download and information: 
+# For download and information:
 #   http://cloudstore.interoute.com/main/knowledge-centre/library/vdc-api-python-scripts
 #
 # Copyright (C) Interoute Communications Limited, 2014

@@ -201,4 +201,4 @@ Once we have our secrets in place and workflow description committed, we can pus
 ## References
 
 * [Adding integration tests to Ansible Content Collections](https://steampunk.si/blog/adding-integration-tests-to-ansible-content-collections/)
-* 
+*

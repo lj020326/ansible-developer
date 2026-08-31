@@ -76,7 +76,7 @@ launchctl start org.samba.rsync ## (this last command is probably unneeded)
 
 ```
 
-To check if it is installed and running:  
+To check if it is installed and running:
 
 ```
 launchctl list | grep rsync
@@ -121,4 +121,4 @@ to /etc/rsyncd.conf. And to have the log rotated, create a file like /etc/newsys
 
 * http://bahut.alma.ch/2013/01/rsync-server-daemon-on-mac-os-x.html
 * https://stackoverflow.com/questions/33492709/rsync-with-launchd-on-os-x-always-gives-me-error-code-255
-* 
+*

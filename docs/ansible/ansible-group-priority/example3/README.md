@@ -1,7 +1,7 @@
 
 # Example 3: Validate prioritization with child groups having different depths
 
-In the next example, set the group 'override' such that it is not set at the same child 'depth' or 'level' as the 'product' group. 
+In the next example, set the group 'override' such that it is not set at the same child 'depth' or 'level' as the 'product' group.
 
 Consider the following case.
 
@@ -80,11 +80,11 @@ host1 | SUCCESS => {
 
 ## Conclusions/Next Steps
 
-The results may not be what are expected, since the variable set in `product1` group always wins even when the priority of the 'override' group is set higher. 
+The results may not be what are expected, since the variable set in `product1` group always wins even when the priority of the 'override' group is set higher.
 
 Even if the priority of the 'override' group and all of its child groups were set to the highest, in this case, 10, the 'test' variable is set by the `product1` group.
 
-The priority does not follow an intuitive merge path.  The deepest child group gets set and if multiple child group peers exist at the same depth, then the one with the greatest priority in that peer depth group will be set.  If the priority is the same among multiple groups at the greatest depth, then alphabetical sort order is used with the last in the sort group winning. 
+The priority does not follow an intuitive merge path.  The deepest child group gets set and if multiple child group peers exist at the same depth, then the one with the greatest priority in that peer depth group will be set.  If the priority is the same among multiple groups at the greatest depth, then alphabetical sort order is used with the last in the sort group winning.
 
 To summarize in the case when using the ansible_group_priority variable, the child group having the greatest child depth and greatest priority within that depth will always win.
 

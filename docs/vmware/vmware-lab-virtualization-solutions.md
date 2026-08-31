@@ -71,4 +71,4 @@ $1,999.95 [CONFIGURE](https://mitxpc.com/products/vm-epm-012i6l-8c)
 * https://williamlam.com/2018/11/supermicro-e300-9d-sys-e300-9d-8cn8tp-is-a-nice-esxi-vsan-kit.html
 * https://mitxpc.com/collections/vmware-compatible/Mini
 * https://www.amazon.com/Supermicro-SYS-E200-8D-FCBGA1667-2-5inch-Express/dp/B01K1JVM0Q/
-* 
+*

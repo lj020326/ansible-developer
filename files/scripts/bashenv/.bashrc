@@ -27,7 +27,8 @@ function isInstalled() {
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-    . /etc/bashrc
+    echo "${log_bash} loading global shell env..."
+    source /etc/bashrc
 fi
 
 if [ -f "${HOME}/.bash_functions" ]; then
@@ -46,11 +47,6 @@ if [ -f "${HOME}/.bash_prompt" ]; then
     source ~/.bash_prompt
 fi
 
-if [ -f "${HOME}/.bash_aliases" ]; then
-    echo "${log_prefix} setting aliases"
-    source "${HOME}/.bash_aliases"
-fi
-
 if [ -f "${HOME}/.bash_secrets" ]; then
     if [ -f "${HOME}/.vault_pass" ]; then
         if ! isInstalled ansible-vault; then
@@ -60,4 +56,9 @@ if [ -f "${HOME}/.bash_secrets" ]; then
             eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
         fi
     fi
+fi
+
+if [ -f "${HOME}/.bash_aliases" ]; then
+    echo "${log_prefix} setting aliases"
+    source "${HOME}/.bash_aliases"
 fi

@@ -2,7 +2,7 @@
 
 Ubuntu setup details:
 
-[Automated 20.04 Server Installation using PXE and live server image](https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image) 
+[Automated 20.04 Server Installation using PXE and live server image](https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image)
 ==================================================================================================================================================================================
 
 How to do an fully automated Ubuntu 20.04 Server install using PXE and
@@ -280,4 +280,3 @@ set the root password there; like this:
       ...
 
 [share](https://askubuntu.com/a/1239021 "short permalink to this answer")
-

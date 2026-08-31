@@ -1,5 +1,5 @@
-## By using your own script blocks as event handlers, you can define whatever behaviour you want.  
-## For example, this code reproduces the behaviour of 
+## By using your own script blocks as event handlers, you can define whatever behaviour you want.
+## For example, this code reproduces the behaviour of
 ## Enable-LogFile, but with a different date / time format:
 
 function Write-Log
@@ -19,7 +19,7 @@ function Write-Log
     $Prefix = $Prefix.Trim()
 
     if ($Prefix) { $Prefix = "$Prefix " }
-        
+
     $Now = Get-Date -Format 'G'
     $Line = "$Now - $Prefix$Line"
 
@@ -35,7 +35,7 @@ $logFile = Enable-OutputSubscriber -OnWriteDebug   { Write-Log -Path $logPath -L
                                    -OnWriteVerbose { Write-Log -Path $logPath -Line $args[0] -Prefix '[V]' } `
                                    -OnWriteWarning { Write-Log -Path $logPath -Line $args[0] -Prefix '[W]' } `
                                    -OnWriteOutput  { Write-Log -Path $logPath -Line $args[0] }
-                                   
+
 Write-Host 'Hello, world'
 Write-Verbose -Verbose 'Hello, Verbose world'
 $DebugPreference = 'Continue'
@@ -46,4 +46,3 @@ Write-Warning 'Hello, Warning world'
 $logFile | Disable-OutputSubscriber
 
 Get-Content $logPath
-

@@ -84,4 +84,4 @@ You can find more topics about PowerShell Active Directory commands and PowerShe
 ## References
 
 * https://shellgeek.com/active-directory-ports-and-authentication-protocols/
-* 
+*

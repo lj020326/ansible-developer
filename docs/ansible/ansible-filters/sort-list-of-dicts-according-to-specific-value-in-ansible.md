@@ -17,7 +17,7 @@ my_users:
 
 ```
 
-I would like to sort it according to the 'age' field and print it again using a method similar to the following. 
+I would like to sort it according to the 'age' field and print it again using a method similar to the following.
 
 ```
   tasks:
@@ -58,4 +58,4 @@ Then use the custom filter to sort the list of dicts:
 
 * https://therenegadecoder.com/code/how-to-sort-a-list-of-dictionaries-in-python/
 * https://stackoverflow.com/questions/51864288/sort-dict-according-to-specific-value-in-ansible
-* 
+*

@@ -10,7 +10,7 @@
 # This script does have a 'partner' script that powers the VMs off, you can
 # grab that script at http://blog.mwpreston.net/shares/
 #
-# Created By: Mike Preston, 2012 - With a whole lot of help from Eric Wright 
+# Created By: Mike Preston, 2012 - With a whole lot of help from Eric Wright
 #                                  (@discoposse)
 #
 # Variables:  $vcenter - The IP/DNS of your vCenter Server
@@ -20,13 +20,13 @@
 #
 #
 # Usage: ./poweronvms.ps1
-#       
+#
 #
 #################################################################################
 
 
 #Add-PSSnapin VMware.VimAutomation.Core
-#Import-Module PowerShellLogging 
+#Import-Module PowerShellLogging
 
 if ((-not (Get-Variable -Name PSScriptRoot -ValueOnly -ErrorAction SilentlyContinue)) -and
     ($scriptBlockFile = $MyInvocation.MyCommand.ScriptBlock.File)) {
@@ -46,23 +46,23 @@ function Perform-PowerOn {
 	[CmdletBinding()]
 	Param
 	(
-		[string] 
-		## serverfile is file that will store list of vm's that have been shut off 
+		[string]
+		## serverfile is file that will store list of vm's that have been shut off
 		$serverFile,
 		[string]
 		# Path of the configuration file of log4net
 		$logConfigFilePath,
 		[Alias("Dll")]
 		[string]
-		# Path of Log4net dll 
+		# Path of Log4net dll
 		$log4netDllPath,
 		[string]
 		# vcenter server to connect to
 		$vcenter,
-		[string] 
+		[string]
 		# vmhost to shut down
 		$vmhost,
-		[string] 
+		[string]
 		# list of vm's that are first to power on - nas/nfs shares, etc
 		$myImportantVMs,
 		[string]
@@ -76,7 +76,7 @@ function Perform-PowerOn {
 		$emailFrom,
 		[string]
 		# email address of recipient
-		$emailTo,  
+		$emailTo,
 		[string]
 		# dns of smtp server
 		$smtpServer,
@@ -87,7 +87,7 @@ function Perform-PowerOn {
 	Write-Verbose "Enable Log4Posh"
 	$global:logger = Enable-Log4Posh @PSBoundParameters
 	$logFileName = $global:logger.Logger.Appenders.File
-	$functionName = $MyInvocation.MyCommand	
+	$functionName = $MyInvocation.MyCommand
 
 	Write-Output "Starting $functionName"
 
@@ -96,47 +96,47 @@ function Perform-PowerOn {
 
 	try {
 		#check if the power on file exists - if it does, then there was a power outage... or someone ran it manually GRRRRR
-		Write-Verbose "Checking to see if Power Off dump file exists....." 
+		Write-Verbose "Checking to see if Power Off dump file exists....."
 
 		if (-not (Test-Path $serverfile)) {
 			throw "File ($serverfile) Not Found - aborting..."
 		}
 
-		Write-Verbose "File Found" 
+		Write-Verbose "File Found"
 		Write-Verbose ""
 
 		#connect to vcenter
 		Login-VCenter $vcenter
 		Write-Verbose ""
 
-		Write-Verbose "Phase 1 - exit standby by starting VM Host $vmhost..." 
+		Write-Verbose "Phase 1 - exit standby by starting VM Host $vmhost..."
 		Start-VmHostList $vmhost
 
 		Write-Verbose ""
-		Write-Verbose "Phase 2 - Starting the most important VMs first" 
+		Write-Verbose "Phase 2 - Starting the most important VMs first"
 		Write-Verbose ""
 
-		$vmlist = Get-VM $myImportantVMs | Select Name 
+		$vmlist = Get-VM $myImportantVMs | Select Name
 		Start-VmList $vmlist
 
-		Write-Verbose "Waiting until $requiredDatastores are available" 
+		Write-Verbose "Waiting until $requiredDatastores are available"
 		$timer = New-Object System.Diagnostics.Stopwatch
 		$timer.Start()
 		$timeout = 120
 		while ((Get-Datastore $requiredDatastores | where-object {$_.State -ne "Available" } ) )
 		{
 			$CurrentTime = $timer.Elapsed
-			$timeElapsed = ([int] $CurrentTime.TotalSeconds).ToString() 
-			Write-Verbose "waited $timeElapsed seconds for datastore startup" 
+			$timeElapsed = ([int] $CurrentTime.TotalSeconds).ToString()
+			Write-Verbose "waited $timeElapsed seconds for datastore startup"
 			# wait up to timeout seconds - then break
 			if ( $CurrentTime.TotalSeconds -ge $timeout) {
-				## throw terminating exception 
+				## throw terminating exception
 	#			$errorRecord = New-ErrorRecord System.InvalidOperationException TimeOut `
-	#			    OperationTimeout $required_datastore -Message "wait for $required_datastore exceeded timeout of $timeout seconds, timing out now" 
+	#			    OperationTimeout $required_datastore -Message "wait for $required_datastore exceeded timeout of $timeout seconds, timing out now"
 	#		    Write-Error -ErrorRecord $errorRecord
 	#			$PSCmdlet.ThrowTerminatingError($errorRecord)
 
-				$errorMsg = "wait for $required_datastore exceeded timeout of $timeout seconds, timing out now" 
+				$errorMsg = "wait for $required_datastore exceeded timeout of $timeout seconds, timing out now"
 			    Write-Error $errorMsg
 				throw $errorMsg
 			}
@@ -145,11 +145,11 @@ function Perform-PowerOn {
 
 		$timer.Stop()
 
-		$timeElapsed = ([int] $timer.Elapsed.TotalSeconds).ToString() 
-		Write-Verbose "Datastores $required_datastore started after $timeElapsed seconds!" 
+		$timeElapsed = ([int] $timer.Elapsed.TotalSeconds).ToString()
+		Write-Verbose "Datastores $required_datastore started after $timeElapsed seconds!"
 
 		Write-Verbose ""
-		Write-Verbose "Phase 3 - Starting the remaining VMs" 
+		Write-Verbose "Phase 3 - Starting the remaining VMs"
 		Write-Verbose ""
 		$vmlist = Import-CSV $serverfile
 		$vmlist = $vmlist | Where-Object {$myImportantVMs -notcontains $_.name}
@@ -158,14 +158,14 @@ function Perform-PowerOn {
 			Start-VmList $vmlist
 		}
 
-		Write-Verbose "Power on completed, I will now rename the dump file...." 
-		$DateStamp = get-date -uformat "%Y-%m-%d@%H-%M-%S"  
+		Write-Verbose "Power on completed, I will now rename the dump file...."
+		$DateStamp = get-date -uformat "%Y-%m-%d@%H-%M-%S"
 		$fileObj = get-item $serverfile
 		$extOnly = $fileObj.extension
 		$nameOnly = $fileObj.Name.Replace( $fileObj.Extension,'')
 		rename-item "$serverfile" "$nameOnly-$DateStamp$extOnly"
-		Write-Verbose "File has been renamed to $nameOnly-$DateStamp$extOnly"   
-		
+		Write-Verbose "File has been renamed to $nameOnly-$DateStamp$extOnly"
+
 	}
 	Catch [Exception] {
 		Write-Output "$($_.Exception.ToString()). $($_.InvocationInfo.PositionMessage)"
@@ -176,27 +176,26 @@ function Perform-PowerOn {
 		try { Disconnect-VIServer $vcenter -Confirm:$false -ErrorAction SilentlyContinue } catch { }
 		Write-Output "Finished $functionName"
 
-		# Disable logging before the script exits (good practice, but the LogFile will be garbage collected 
-		# so long as this variable was not in the Global Scope, as a backup in case the script crashes 
-		# or you somehow forget to call Disable-LogFile). 
-		Disable-Log4Posh 
-		
-#		Send-Report $subject $logFileName 
+		# Disable logging before the script exits (good practice, but the LogFile will be garbage collected
+		# so long as this variable was not in the Global Scope, as a backup in case the script crashes
+		# or you somehow forget to call Disable-LogFile).
+		Disable-Log4Posh
+
+#		Send-Report $subject $logFileName
 		Send-Report -logFileName $logFileName @PSBoundParameters
 	}
 }
 
 ##
-## start main script 
+## start main script
 ##
 
-#$WarningPreference = 'SilentlyContinue' 
-#$VerbosePreference = 'SilentlyContinue' 
-#$DebugPreference = 'SilentlyContinue' 
-$VerbosePreference = 'Continue' 
-$DebugPreference = 'Continue' 
+#$WarningPreference = 'SilentlyContinue'
+#$VerbosePreference = 'SilentlyContinue'
+#$DebugPreference = 'SilentlyContinue'
+$VerbosePreference = 'Continue'
+$DebugPreference = 'Continue'
 
 #$scriptname = (split-path $MyInvocation.MyCommand.Definition -Leaf)
 
 Perform-PowerOn @appSettings
-

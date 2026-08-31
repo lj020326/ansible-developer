@@ -50,4 +50,3 @@ See [this issue in ansible/ansible](https://github.com/ansible/ansible/issues/78
 ## Reference
 
 - [aptkey-deprecated-debianubuntu-how-fix-ansible](https://www.jeffgeerling.com/blog/2022/aptkey-deprecated-debianubuntu-how-fix-ansible)
-

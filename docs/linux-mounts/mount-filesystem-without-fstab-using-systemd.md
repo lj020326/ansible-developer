@@ -1,7 +1,7 @@
 
 How to mount filesystem without fstab using systemd
 ===
- 
+
 - [List currently mounted systemd units](#List_currently_mounted_systemd_units "List currently mounted systemd units")
 - [Location of systemd mount points](#Location_of_systemd_mount_points "Location of systemd mount points")
 - [Create filesystem](#Create_filesystem "Create filesystem")
@@ -104,7 +104,7 @@ A unit configuration file whose name ends in "`.mount`" encodes information abou
 
 ## Create filesystem
 
-Now for the sake of this article I will create `/dev/sdb1` to demonstrate mount filesystem without fstab. 
+Now for the sake of this article I will create `/dev/sdb1` to demonstrate mount filesystem without fstab.
 
 ```shell
 [root@rhel-8 ~]# mkfs.ext4 /dev/sdb1
@@ -331,4 +331,4 @@ Lastly I hope the steps from the article to [mount filesystem without fstab](htt
 
 * https://www.golinuxcloud.com/mount-filesystem-without-fstab-systemd-rhel-8/
 * [steps required to create filesystem](https://www.golinuxcloud.com/configure-software-linear-raid-linux/#Partitioning_with_fdisk "Step-by-Step Tutorial: Configure software Linear RAID 0 in Linux")
-* 
+*

@@ -10,7 +10,7 @@ Function Get-DatastoreMountInfo2 {
 		if (-not $Datastore) {
 			$Datastore = Get-Datastore
 		}
-		Foreach ($ds in $Datastore) {  
+		Foreach ($ds in $Datastore) {
 			$hostviewDSDiskName = $null
 			if ($ds.ExtensionData.Info.vmfs.extent) {
 				$hostviewDSDiskName = $ds.ExtensionData.Info.vmfs.extent[0].Diskname
@@ -33,9 +33,9 @@ Function Get-DatastoreMountInfo2 {
 						$hostviewDSAttachState = ""
 						if ($device.canonicalName -eq $hostviewDSDiskName) {
 							if ($device.operationalState[0] -eq "ok") {
-								$hostviewDSAttachState = "Attached"							
+								$hostviewDSAttachState = "Attached"
 							} elseif ($device.operationalState[0] -eq "off") {
-								$hostviewDSAttachState = "Detached"							
+								$hostviewDSAttachState = "Detached"
 							} else {
 								$hostviewDSAttachState = $device.operationalstate[0]
 							}
@@ -50,7 +50,7 @@ Function Get-DatastoreMountInfo2 {
 						Write-Verbose "Info = $Info"
 						$AllInfo += $Info
 					}
-					
+
 				}
 			}
 		}
@@ -69,7 +69,7 @@ Function Get-DatastoreMountInfo {
 		if (-not $Datastore) {
 			$Datastore = Get-Datastore
 		}
-		Foreach ($ds in $Datastore) {  
+		Foreach ($ds in $Datastore) {
 			if ($ds.ExtensionData.info.Vmfs) {
 				$hostviewDSDiskName = $ds.ExtensionData.Info.vmfs.extent[0].diskname
 				if ($ds.ExtensionData.Host) {
@@ -84,9 +84,9 @@ Function Get-DatastoreMountInfo {
 							if ($device.canonicalName -eq $hostviewDSDiskName) {
 								$hostviewDSAttachState = ""
 								if ($device.operationalState[0] -eq "ok") {
-									$hostviewDSAttachState = "Attached"							
+									$hostviewDSAttachState = "Attached"
 								} elseif ($device.operationalState[0] -eq "off") {
-									$hostviewDSAttachState = "Detached"							
+									$hostviewDSAttachState = "Detached"
 								} else {
 									$hostviewDSAttachState = $device.operationalstate[0]
 								}
@@ -98,7 +98,7 @@ Function Get-DatastoreMountInfo {
 								$AllInfo += $Info
 							}
 						}
-						
+
 					}
 				}
 			}
@@ -233,29 +233,29 @@ Function Attach-Datastore {
 function Activate-InactiveNFSDatastores {
 	<#
 	.SYNOPSIS
-	      This function determines which nfs datastores are inactive on which host 
+	      This function determines which nfs datastores are inactive on which host
 		  and then iterates through each host to remove each datastore
-		  usually upon removing on the host, vcenter will automatically update 
+		  usually upon removing on the host, vcenter will automatically update
 		  the inactive datastore back to active.
 		  if not, the function will add the nfs datastore back
 	#>
 	Set-PowerCLIConfiguration -DefaultVIServerMode Multiple -Confirm:$false | Out-Null
 
-	$datastores = Get-Datastore | Where {$_.Type -eq "NFS"} 
-	$inactiveDatastores = $datastores | Get-DatastoreMountInfo2 | Where-Object {$_.mounted -eq $false} | sort-object -property vmhost, datastore -unique 
-	$hostList = $inactiveDatastores | sort-object -property vmhost -unique 
+	$datastores = Get-Datastore | Where {$_.Type -eq "NFS"}
+	$inactiveDatastores = $datastores | Get-DatastoreMountInfo2 | Where-Object {$_.mounted -eq $false} | sort-object -property vmhost, datastore -unique
+	$hostList = $inactiveDatastores | sort-object -property vmhost -unique
 	Foreach ($item in $hostList) {
 		$esxhost = $item.vmhost
 		Write-Output "connecting to $esxhost"
 		Connect-VIServer $esxhost
-		$dsList = $inactiveDatastores | Where-Object {$_.vmhost -eq $esxhost} 
+		$dsList = $inactiveDatastores | Where-Object {$_.vmhost -eq $esxhost}
 		Foreach ($inactive in $dsList) {
 			## go directly to the host to forceably unmount
 			$dsName = $inactive.Datastore
 
-			$nfs = Get-Datastore $dsName 
-			$nfs = $nfs | sort-object -property name -unique 
-			
+			$nfs = Get-Datastore $dsName
+			$nfs = $nfs | sort-object -property name -unique
+
 	        [string]$shareName = $nfs.Name
 			Write-Output "found NFS share $sharename"
 
@@ -266,13 +266,13 @@ function Activate-InactiveNFSDatastores {
 			Write-Output "[sharename = $sharename; remoteHost = ($remoteHost); remotePath = ($remotePath)]"
 
 			$Info.ShareName = $shareName
-			$Info.remoteHost = $remoteHost 
-			$Info.remotePath = $remotePath 
+			$Info.remoteHost = $remoteHost
+			$Info.remotePath = $remotePath
 			Write-Output "Nfs Share Info = $Info"
 #			$AllInfo += $Info
 
 			Write-Output "Removing inactive datastore $dsName on $esxhost"
-			Remove-Datastore -Server $esxhost -Datastore $dsName -VMHost $esxhost -Confirm:$false 
+			Remove-Datastore -Server $esxhost -Datastore $dsName -VMHost $esxhost -Confirm:$false
 
 			Write-Output "Checking for datastore $dsName on $esxhost"
 			$dsList = Get-VMHost $esxhost | Get-Datastore $shareName | Where {$_.type -eq "NFS"} -ErrorAction SilentlyContinue
@@ -284,37 +284,37 @@ function Activate-InactiveNFSDatastores {
 		        New-Datastore -Nfs -VMHost $esxhost -Name $sharename -Path $remotePath -NfsHost $remoteHost | Out-Null
 		    } else {
 		        Write-Host "NFS mount $shareName already exists on $($esxhost), skipping to next share" -fore Red
-			}			
+			}
 		}
 		Write-Output "disconnecting from $esxhost"
 		Disconnect-VIServer $esxhost -Confirm:$false
 	}
 	Write-Output "DONE"
-	
+
 }
 
 #
 function Activate-InactiveHostNFSDatastoresOld {
 	<#
 	.SYNOPSIS
-	      This function determines which nfs datastores are inactive on which host 
+	      This function determines which nfs datastores are inactive on which host
 		  and then iterates through each host to remove each datastore
-		  usually upon removing on the host, vcenter will automatically update 
+		  usually upon removing on the host, vcenter will automatically update
 		  the inactive datastore back to active.
 		  if not, the function will add the nfs datastore back
 	#>
 
 #	Connect-VIServer $esxhost
-	$datastores = Get-Datastore | Where {$_.Type -eq "NFS"} 
-	$inactiveDatastores = $datastores | Get-DatastoreMountInfo2 | Where-Object {$_.mounted -eq $false} | sort-object -property vmhost, datastore -unique 
-	
+	$datastores = Get-Datastore | Where {$_.Type -eq "NFS"}
+	$inactiveDatastores = $datastores | Get-DatastoreMountInfo2 | Where-Object {$_.mounted -eq $false} | sort-object -property vmhost, datastore -unique
+
 	Foreach ($inactive in $inactiveDatastores ) {
 		## go directly to the host to forceably unmount
 		$dsName = $inactive.Datastore
 
-		$nfs = Get-Datastore $dsName 
-		$nfs = $nfs | sort-object -property name -unique 
-		
+		$nfs = Get-Datastore $dsName
+		$nfs = $nfs | sort-object -property name -unique
+
         [string]$shareName = $nfs.Name
 		Write-Output "found NFS share $sharename"
 
@@ -325,13 +325,13 @@ function Activate-InactiveHostNFSDatastoresOld {
 		Write-Output "[sharename = $sharename; remoteHost = ($remoteHost); remotePath = ($remotePath)]"
 
 		$Info.ShareName = $shareName
-		$Info.remoteHost = $remoteHost 
-		$Info.remotePath = $remotePath 
+		$Info.remoteHost = $remoteHost
+		$Info.remotePath = $remotePath
 		Write-Output "Nfs Share Info = $Info"
 #			$AllInfo += $Info
 
 		Write-Output "Removing inactive datastore $dsName on $esxhost"
-		Remove-Datastore -Server $esxhost -Datastore $dsName -VMHost $esxhost -Confirm:$false 
+		Remove-Datastore -Server $esxhost -Datastore $dsName -VMHost $esxhost -Confirm:$false
 
 		Write-Output "Checking for datastore $dsName on $esxhost"
 		$dsList = Get-VMHost $esxhost | Get-Datastore $shareName | Where {$_.type -eq "NFS"} -ErrorAction SilentlyContinue
@@ -343,13 +343,13 @@ function Activate-InactiveHostNFSDatastoresOld {
 	        New-Datastore -Nfs -VMHost $esxhost -Name $sharename -Path $remotePath -NfsHost $remoteHost | Out-Null
 	    } else {
 	        Write-Host "NFS mount $shareName already exists on $($esxhost), skipping to next share" -fore Red
-		}			
+		}
 	}
 	Write-Output "disconnecting from $esxhost"
 #	Disconnect-VIServer $esxhost -Confirm:$false
 
 	Write-Output "DONE"
-	
+
 }
 
 #
@@ -362,9 +362,9 @@ function Activate-InactiveNFSDatastores {
 	Process {
 		<#
 		.SYNOPSIS
-		      This function determines which nfs datastores are inactive on which host 
+		      This function determines which nfs datastores are inactive on which host
 			  and then iterates through each host to remove each datastore
-			  usually upon removing on the host, vcenter will automatically update 
+			  usually upon removing on the host, vcenter will automatically update
 			  the inactive datastore back to active.
 			  if not, the function will add the nfs datastore back
 		#>
@@ -376,7 +376,7 @@ function Activate-InactiveNFSDatastores {
 		}
 		Write-Output "disconnecting from $vcenter"
 		Disconnect-VIServer $vcenter -Confirm:$false
-		Write-Output "DONE"	
+		Write-Output "DONE"
 	}
 }
 
@@ -390,18 +390,18 @@ function Activate-InactiveHostNFSDatastores {
 	Process {
 		<#
 		.SYNOPSIS
-		      This function determines which nfs datastores are inactive on which host 
+		      This function determines which nfs datastores are inactive on which host
 			  and then iterates through each host to remove each datastore
-			  usually upon removing on the host, vcenter will automatically update 
+			  usually upon removing on the host, vcenter will automatically update
 			  the inactive datastore back to active.
 			  if not, the function will add the nfs datastore back
 		#>
 
 		Connect-VIServer $esxhost
-		$datastores = Get-Datastore | Where {$_.Type -eq "NFS"} 
-		$inactiveDatastores = $datastores | Where {$_.extensiondata.host.mountinfo.mounted -eq $false} 
-	#	$inactiveDatastores = $datastores | Where {$_.extensiondata.host.mountinfo.accessible -eq $false} 
-		
+		$datastores = Get-Datastore | Where {$_.Type -eq "NFS"}
+		$inactiveDatastores = $datastores | Where {$_.extensiondata.host.mountinfo.mounted -eq $false}
+	#	$inactiveDatastores = $datastores | Where {$_.extensiondata.host.mountinfo.accessible -eq $false}
+
 		Foreach ($nfs in $inactiveDatastores ) {
 			## go directly to the host to forceably unmount
 	        [string]$shareName = $nfs.Name
@@ -412,10 +412,10 @@ function Activate-InactiveHostNFSDatastores {
 	        [string]$remotePath = $nfs.extensiondata.info.nas.remotepath
 			Write-Output "[sharename = $sharename; remoteHost = ($remoteHost); remotePath = ($remotePath)]"
 			Write-Output "Removing inactive datastore $shareName on $esxhost"
-			Remove-Datastore -Server $esxhost -Datastore $shareName -VMHost $esxhost -Confirm:$false 
+			Remove-Datastore -Server $esxhost -Datastore $shareName -VMHost $esxhost -Confirm:$false
 
 			Write-Output "Checking for datastore $shareName on $esxhost"
-			$dsList = Get-VMHost $esxhost | Get-Datastore $shareName | Where {$_.type -eq "NFS"} -ErrorAction SilentlyContinue 
+			$dsList = Get-VMHost $esxhost | Get-Datastore $shareName | Where {$_.type -eq "NFS"} -ErrorAction SilentlyContinue
 			Write-Verbose "$dsList.count=$($dsList.count)"
 			If ($dsList -eq $null) {
 		        Write-Host "NFS mount $shareName doesn't exist on $($esxhost)" -fore Red
@@ -427,7 +427,7 @@ function Activate-InactiveHostNFSDatastores {
 		}
 		Write-Output "disconnecting from $esxhost"
 		Disconnect-VIServer $esxhost -Confirm:$false
-		Write-Output "DONE"	
+		Write-Output "DONE"
 	}
 }
 
@@ -438,7 +438,7 @@ function Activate-InactiveHostNFSDatastores {
 #Activate-InactiveNFSDatastores $vcenter
 #Disconnect-VIServer $vcenter -Confirm:$false
 #
-#Get-DatastoreMountInfo2 
+#Get-DatastoreMountInfo2
 #Get-Datastore | Get-DatastoreMountInfo | Sort Datastore, VMHost | FT -AutoSize
 #
 #Get-Datastore IX2ISCSI01 | Unmount-Datastore

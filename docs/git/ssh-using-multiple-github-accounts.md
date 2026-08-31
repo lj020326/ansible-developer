@@ -170,7 +170,7 @@ $ ssh -T github.com-work
 Head back over to your personal GitHub account. Create a new repository with your desired project name, say, `test-ssh`. Follow the steps below to clone the repository, create your first commit and push to GitHub:
 
 ```shell
-$ git clone git@github.com-personal:USERNAME/test-ssh.git 
+$ git clone git@github.com-personal:USERNAME/test-ssh.git
 $ cd test-ssh
 $ touch index.html
 $ echo "Hello World" >> index.html

@@ -44,30 +44,30 @@ The
 _files that contain this line are skipped_:
 
 -   \# flake8: noqa
-    
+
     `# flake8: noqa`
 -   Lines that contain a
-    
+
     \# noqa
-    
+
     `# noqa` comment at the end will not issue warnings.
 -   You can ignore specific errors on a line with
-    
+
     \# noqa: <error>
-    
+
     `# noqa: <error>`, e.g.,
-    
+
     \# noqa: E234
-    
+
     `# noqa: E234`.
 -   Multiple codes can be given, separated by a comma. The
-    
+
     noqa
-    
+
     `noqa` token is case insensitive, the colon before the list of codes is required otherwise the part after
-    
+
     noqa
-    
+
     `noqa` is ignored
 
 ## Examples
@@ -114,10 +114,10 @@ import os
 
 def foo():
     pass
-    
+
 def foo():
     pass
-    
+
 x=5
 
 print("46 equals 2 = ", 46 == 2)
@@ -180,10 +180,10 @@ import os   # noqa: F401 used for comfort only
 
 def foo():
     pass
-    
+
 def foo():  # noqa
     pass
-    
+
 x=5 # noqa: E225
 
 print("46 equals 2 = ", 46 == 2)
@@ -264,4 +264,4 @@ The #noqa directive is particularly useful in informing code inspectors to _igno
 * https://flake8.pycqa.org/en/latest/
 * https://www.alpharithms.com/noqa-python-501210/
 * https://stackoverflow.com/questions/28594049/does-pep8-fail-to-recognize-noqa-in-some-instances
-* 
+*

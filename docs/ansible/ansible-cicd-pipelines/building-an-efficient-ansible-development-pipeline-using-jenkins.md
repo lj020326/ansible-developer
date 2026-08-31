@@ -58,7 +58,7 @@ pipeline {
                 failure {
                     echo 'GIT checkout failed :('
                 }
-               
+
             }
         }
         /* End Pull Ansible code from GIT */

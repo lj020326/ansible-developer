@@ -10,9 +10,9 @@ This task explains how to put a cluster in retreat mode.
 1.  Login to the vSphere Client.
 2.  Navigate to the cluster on which vCLS must be deactivated.
 3.  Copy the cluster domain ID from the URL of the browser. It should be similar to domain-c(number).
-    
+
     Note: Only copy the numbers to the left of the colon in the URL.
-    
+
 4.  Navigate to the vCenter Server Configure tab.
 5.  Under Advanced Settings, click the Edit Settings button.
 6.  Add a new entry config.vcls.clusters.domain-c(number).enabled. Use the domain ID copied in step 3.
@@ -31,4 +31,4 @@ To remove Retreat Mode from the cluster, change the value in step 7 to True.
 
 - https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.resmgmt.doc/GUID-F98C3C93-875D-4570-852B-37A38878CE0F.html
 - https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-96BD6016-4BE7-4B1C-8269-568D1555B08C.html
-- 
+-

@@ -53,9 +53,9 @@ Stages molecule runs:
 
 ## **Working with Molecule**
 
-We will use **Docker** as the driver. It was our choice because it is lightweight and easy to use/setup/install. 
+We will use **Docker** as the driver. It was our choice because it is lightweight and easy to use/setup/install.
 
-Whenever we develop a new role, we can just run it locally and `exec` into the container if something does not go well. Then we can quickly test multiple operating systems like Debian, CentOS, RedHat or Ubuntu.  
+Whenever we develop a new role, we can just run it locally and `exec` into the container if something does not go well. Then we can quickly test multiple operating systems like Debian, CentOS, RedHat or Ubuntu.
 
 We also will use **inspec** as our verifier and yamlint as the linter of choice.
 
@@ -65,9 +65,9 @@ We also will use **inspec** as our verifier and yamlint as the linter of choice.
 
 ```
 $ virtualenv /tmp/.env
-Running virtualenv with interpreter /home/linuxbrew/.linuxbrew/bin/python2  
-New python executable in /tmp/.env/bin/python2  
-Also creating executable in /tmp/.env/bin/python  
+Running virtualenv with interpreter /home/linuxbrew/.linuxbrew/bin/python2
+New python executable in /tmp/.env/bin/python2
+Also creating executable in /tmp/.env/bin/python
 Installing setuptools, pkg_resources, pip, wheel...done.
 ```
 
@@ -81,9 +81,9 @@ $ source /tmp/.env/bin/active
 3. Install Molecule
 
 ```shell
-(.env) $ pip install molecule==2.20  
-DEPRECATION: Python 2.7 will reach the end of its life on January 1st, 2020. Please upgrade your Python as Python 2.7 won't be maintained after that date. A future version of pip will drop support for Python 2.7.  
-Collecting molecule==2.20  
+(.env) $ pip install molecule==2.20
+DEPRECATION: Python 2.7 will reach the end of its life on January 1st, 2020. Please upgrade your Python as Python 2.7 won't be maintained after that date. A future version of pip will drop support for Python 2.7.
+Collecting molecule==2.20
 Downloading
 [..omitted..]
 Successfully installed ansible-lint-4.1.0 entrypoints-0.3 flake8-3.7.7 functools32-3.2.3.post2 idna-2.7 molecule-2.20.0 pbr-5.1.1 pycodestyle-2.5.0 pyflakes-2.1.1 testinfra-1.19.0 typing-3.6.6
@@ -93,13 +93,13 @@ Successfully installed ansible-lint-4.1.0 entrypoints-0.3 flake8-3.7.7 functools
 
 ```shell
 (.env) $ pip list | grep -e molecule -e ansible
-ansible                       2.7.9      
-ansible-lint                  4.1.0      
-molecule                      2.20.0     
+ansible                       2.7.9
+ansible-lint                  4.1.0
+molecule                      2.20.0
 testinfra                     1.19.0
 ```
 
-After the preparation is done we could initialize our first role with molecule  
+After the preparation is done we could initialize our first role with molecule
 Find all possible options with help:
 
 ```shell
@@ -118,7 +118,7 @@ Options:
   --help                          Show this message and exit.
 ```
 
-So we choose to use a docker driver with the yamlinter and the inspec verifier.  
+So we choose to use a docker driver with the yamlinter and the inspec verifier.
 (Please **replace role-name** in your case)
 
 ```shell
@@ -414,7 +414,7 @@ $ molecule test
 --> Validating schema [...]/role-name/molecule/default/molecule.yml.
 Validation completed successfully.
 --> Test matrix
-    
+
 └── default
     ├── lint
     ├── cleanup
@@ -429,7 +429,7 @@ Validation completed successfully.
     ├── verify
     ├── cleanup
     └── destroy
-    
+
 --> Scenario: 'default'
 --> Action: 'lint'
 --> Executing Yamllint on files found in [...]/role-name/...
@@ -441,11 +441,11 @@ An error occurred during the test sequence action: 'lint'. Cleaning up.
 --> Action: 'destroy'
 ```
 
-We now 
+We now
 
-1) fix the issue and 
-2) run again 
-3) develop more code and 
+1) fix the issue and
+2) run again
+3) develop more code and
 4) repeat prior 3 steps until feature is complete (so on and so forth...)
 
 ## Sum-up
@@ -472,4 +472,3 @@ Cheers and thanks for reading
 - [Goss](https://goss.rocks/)
 - [Testinfra](https://testinfra.readthedocs.io/en/latest/)
 - [TDD with ansible](https://d-heinrich.medium.com/test-driven-development-with-ansible-using-molecule-3386cef987ac)
-

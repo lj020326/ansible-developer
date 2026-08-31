@@ -16,4 +16,3 @@ echo '{"deprecatedCgroupv1": true}' | \
 
 echo "Restart docker desktop"
 open --background -a Docker
-

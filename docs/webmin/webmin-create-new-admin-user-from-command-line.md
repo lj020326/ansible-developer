@@ -46,4 +46,4 @@ PW = password you used in above step
 ## Reference
 
 * https://serverok.in/webmin-create-new-admin-user-from-command-line
-* 
+*

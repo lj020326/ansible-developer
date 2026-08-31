@@ -287,7 +287,7 @@ you run the given command.
     $ pyenv which python3.3
     /home/yyuu/.pyenv/versions/3.3.3/bin/python3.3
 
-Use --nosystem argument in case when you don't need to search command in the 
+Use --nosystem argument in case when you don't need to search command in the
 system environment.
 
 ## `pyenv whence`
@@ -309,7 +309,7 @@ version's `bin` directory is at the front.
 For example, if the currently selected Python version is 3.9.7:
 
     pyenv exec pip install -r requirements.txt
-    
+
 is equivalent to:
 
     PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt
@@ -371,7 +371,7 @@ Configure the shell environment for pyenv
       -                    Initialize shims directory, print PYENV_SHELL variable, completions path
                            and shell function
       --path               Print shims path
-      --no-rehash          Add no rehash command to output     
+      --no-rehash          Add no rehash command to output
 
 ## `pyenv completions`
 
@@ -403,4 +403,4 @@ fi
 ## Reference
 
 * https://github.com/pyenv/pyenv/blob/master/COMMANDS.md
-* 
+*

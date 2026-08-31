@@ -10,12 +10,12 @@ When you `init` or `clone` a git repository into a directory, you are, by defaul
 -   The **repository** who takes by default the form of a `.git` directory. It contains all the technical files and directories needed by git to maintain the project's versions.
 -   The **working tree** which is all the files and directories that are under version control.
 
-A **bare repository** is a repository without a working tree. It only contains what you would normally find under the `.git` directory.  
+A **bare repository** is a repository without a working tree. It only contains what you would normally find under the `.git` directory.
 It can be used as a remote! Indeed you can clone a repository from a local directory if this last contains a bare instance of a git repository.
 
 ### Stash
 
-`stash` is a git command that allows you to record the current state of the working tree and the index and then go back to a clean working tree. These records are stored on a stack that can be visualized with `git stash list`.  
+`stash` is a git command that allows you to record the current state of the working tree and the index and then go back to a clean working tree. These records are stored on a stack that can be visualized with `git stash list`.
 To recover the last record from the stack, run `git stash pop`.
 
 ## Setting the scene
@@ -39,14 +39,14 @@ If the work is not in a state where you would commit it; quite often, if you are
 6.  check out the branch you were formely on
 7.  pop the last stashed piece of work
 
-And then only you can proceed with you work.  
+And then only you can proceed with you work.
 Phew, that is a lot of inconvenience.
 
 ## git worktree to the rescue
 
 With `git worktree` you can link other working trees to your repository.
 
-Taken we are working on the `new-feature` branch and that we need to abandon the work to create a hotfix for the `main` branch.  
+Taken we are working on the `new-feature` branch and that we need to abandon the work to create a hotfix for the `main` branch.
 In the Terminal, and from the root of the directory that hosts the current working tree, run:
 
 ```
@@ -55,7 +55,7 @@ $ git worktree add ../hotfix main
 
 This has created a new working tree, checked out to the `main` branch, inside of the directory `../hotfix`.
 
-Now you can move to this directory to create the fix.  
+Now you can move to this directory to create the fix.
 Stage, commit and push.
 
 If you come back to your previous directory, you should still have the `new-feature` branch checked out, and you should be able to resume your work where you left it at. Joy!
@@ -100,7 +100,7 @@ $ echo "gitdir: ./.bare" > .git
 
 So far, we created a directory for our project, `cd` into it, clone `my-awesome-project` as a bare repository into a `.bare` directory. This `.bare` directory contains what the `.git` directory contains if we would have gone for a standard `git clone` command.
 
-Where it is executed, the `git` command either refer to a `.git` directory or to a `.git` file. This last needs though to contain a pointer to the repository directory. The pointer is the `gitdir` setting.  
+Where it is executed, the `git` command either refer to a `.git` directory or to a `.git` file. This last needs though to contain a pointer to the repository directory. The pointer is the `gitdir` setting.
 Actually in every directory created by the `git worktree add` command, you can find a `.git` file that contains this `gitdir` setting.
 
 Now it is time to create the 2 worktrees:
@@ -148,7 +148,7 @@ The good news is that I came up with solutions to cover up for them. You will fi
 ## References
 
 - https://morgan.cugerone.com/blog/how-to-use-git-worktree-and-in-a-clean-way/
-- [Git worktree reference](https://git-scm.com/docs/git-worktree) 
+- [Git worktree reference](https://git-scm.com/docs/git-worktree)
 - [Git stash reference](https://git-scm.com/docs/git-stash)
 - [What is a bare Git repo and why you need them on YouTube](https://www.youtube.com/watch?v=8aZW9mYOxhc)
 - [Answer talking about .git file and .git folder on Stackoverflow](https://stackoverflow.com/a/67501784)

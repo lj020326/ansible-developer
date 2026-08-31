@@ -13,4 +13,3 @@ if (Test-Path -Path $DestinationFolder){
 else {
     Write-Error "Invalid Path: $DestinationFolder"
 }
-

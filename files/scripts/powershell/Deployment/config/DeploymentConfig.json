@@ -10,7 +10,7 @@
         "type": "PROD"
     },
     "artefacts":[
-        {     
+        {
             "uri" :"https://raw.githubusercontent.com/PaoloFrigo/scriptinglibrary/master/Blog/PowerShell/Proxy-Functions.ps1",
             "filename": "Proxy-Functions.ps1",
             "description": "Proxy Functions, Latest Release"

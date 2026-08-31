@@ -80,7 +80,7 @@ public static X509Certificate2 GetUserCertificateFromAD(string ldapPath, string 
 Use it like this:
 
 ```powershell
-X509Certificate2 Certificate = GetUserCertificateFromAD("LDAP://DC=domain,DC=local", "myuser", "mypassword", 
+X509Certificate2 Certificate = GetUserCertificateFromAD("LDAP://DC=domain,DC=local", "myuser", "mypassword",
                                                         "john.doe@domain.com", "userCertificate",
                                                         "(&(objectCategory = person)(objectClass = user)(name={0}))");
 ```
@@ -96,4 +96,4 @@ Ta-da!
 ## References
 
 * https://mjc.si/2016/12/10/get-user-certificate-from-active-directory/
-* 
+*

@@ -78,4 +78,3 @@ All VLANs added…
 ![netgear_vlans](./img/netgear_vlans.png)
 
 That completes today’s post. I appreciate this may be hard to piece all together without a diagram. I will draw up something in the coming days and add it to this or even a previous post. Next post we will deploy the nested ESXi hosts.
-

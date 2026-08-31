@@ -33,4 +33,4 @@ OgtbmbueudkVEH/Lxe1EAAAAEUFuc2libGUgQml0YnVja2V0AQIDBA==
 ## Reference
 
 * https://en.euro-linux.com/docs/ansible-awx.php?p=credentials/extract_credentials
-* 
+*

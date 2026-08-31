@@ -17,7 +17,7 @@ Function Init-PowerCLI {
 	# This script adds some helper functions and sets the appearance. You can pick and choose parts of this file for a fully custom appearance.
 	#. "C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Scripts\Initialize-VIToolkitEnvironment.ps1"
 	. "C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Scripts\Initialize-PowerCLIEnvironment.ps1"
-	Import-Module PowerCLI/DatastoreMod 
+	Import-Module PowerCLI/DatastoreMod
 }
 
 restorenfs

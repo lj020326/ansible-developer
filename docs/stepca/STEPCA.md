@@ -47,7 +47,7 @@ To get fingerprint of root ca:
 
 	ref: https://smallstep.com/blog/embarrassingly-easy-certificates-on-aws-azure-gcp/
 
-	The --fingerprint is for the root certificate used by step-ca. 
+	The --fingerprint is for the root certificate used by step-ca.
 	Find it by running the following command on your CA:
 
 		step certificate fingerprint $(step path)/certs/root_ca.crt
@@ -94,20 +94,20 @@ Examples:
 		Bootstraping azure VMs with step-ca certs using IID based authn
 			https://smallstep.com/blog/embarrassingly-easy-certificates-on-aws-azure-gcp/
 
-		Instance identity documents (IIDs) are simply credentials that identify an instance's name and owner. 
+		Instance identity documents (IIDs) are simply credentials that identify an instance's name and owner.
 		By presenting an IID in a request, a workload can prove that it's running on a VM instance that you own.
 
-		The major clouds have different names for IIDs: 
-			AWS calls them instance identity documents, 
-			GCP calls them instance identity tokens, and 
-			Azure calls them access tokens. 
+		The major clouds have different names for IIDs:
+			AWS calls them instance identity documents,
+			GCP calls them instance identity tokens, and
+			Azure calls them access tokens.
 
-		The "metadata" included in an IID also differs between clouds, along with many other implementation details. 
+		The "metadata" included in an IID also differs between clouds, along with many other implementation details.
 		Abstractly, though, they're all the same: signed bearer tokens that identify, minimally, the name and owner of a VM.
 
-		IIDs are returned from a metadata API exposed via a non-routable IP address (the link-local address 169.254.169.254). 
-		This magic is orchestrated by the hypervisor, which identifies the requesting VM and services IID requests locally. 
-		The upshot is: IIDs are very easy to get from within a VM via one unauthenticated HTTP request. 
+		IIDs are returned from a metadata API exposed via a non-routable IP address (the link-local address 169.254.169.254).
+		This magic is orchestrated by the hypervisor, which identifies the requesting VM and services IID requests locally.
+		The upshot is: IIDs are very easy to get from within a VM via one unauthenticated HTTP request.
 		Barring any security issues, they're impossible to get from anywhere else.
 
 
@@ -128,13 +128,13 @@ How to run with existing pki / root ca cert:
 			step ca init --root=[ROOT_CERT_FILE] --key=[ROOT_PRIVATE_KEY_FILE]
 
 	2) Option 2: More secure
-		
-		CAs are usually pretty locked down and it's bad practice to move the private key around. 
 
-		We assume that's not an option and give you the instructions to do this "the right way", by 
+		CAs are usually pretty locked down and it's bad practice to move the private key around.
 
-			1) generating a CSR for step-ca, 
-			2) getting it signed by your existing root, and 
+		We assume that's not an option and give you the instructions to do this "the right way", by
+
+			1) generating a CSR for step-ca,
+			2) getting it signed by your existing root, and
 			3) configuring step-ca to use it.
 
 		When you run step ca init we create a couple artifacts under ~/.step/. The important ones for us are:
@@ -145,7 +145,7 @@ How to run with existing pki / root ca cert:
 			~/.step/secrets/root_ca_key is your root CA signing key
 			~/.step/secrets/intermediate_ca_key is the intermediate signing key used by step-ca
 
-		The easiest thing to do is to run step ca init to get this scaffolding configuration in place, 
+		The easiest thing to do is to run step ca init to get this scaffolding configuration in place,
 		then remove/replace these artifacts with new ones that are tied to your existing root CA.
 
 		1) First, step-ca does not actually need the root CA signing key. So you can simply remove that file:
@@ -156,8 +156,8 @@ How to run with existing pki / root ca cert:
 
 			mv /path/to/your/existing/root.crt ~/.step/certs/root_ca.crt
 
-		3) Now you need to generate a new signing key and intermediate certificate, signed by your existing root CA. 
-			To do that we can use the step certificate create subcommand to generate a certificate signing request (CSR) 
+		3) Now you need to generate a new signing key and intermediate certificate, signed by your existing root CA.
+			To do that we can use the step certificate create subcommand to generate a certificate signing request (CSR)
 			that we'll have your existing root CA sign, producing an intermediate certificate.
 
 			To generate those artifacts run:
@@ -167,16 +167,16 @@ How to run with existing pki / root ca cert:
 		4) Next, you'll need to transfer the CSR file (intermediate.csr) to your existing root CA and get it signed.
 
 			OpenSSL
-			
+
 			openssl ca -config [ROOT_CA_CONFIG_FILE] \
 			  -extensions v3_intermediate_ca \
 			  -days 3650 -notext -md sha512 \
 			  -in intermediate.csr \
 			  -out intermediate.crt
 			CFSSL
-			
+
 			For CFSSL you'll need a signing profile that specifies a 10-year expiry:
-			
+
 			cat > ca-smallstep-config.json <<EOF
 			{
 			  "signing": {
@@ -190,22 +190,22 @@ How to run with existing pki / root ca cert:
 			}
 			EOF
 			Now use that config to sign the intermediate certificate:
-			
+
 			cfssl sign -ca ca.pem \
 			    -ca-key ca-key.pem \
 			    -config ca-smallstep-config.json \
 			    -profile smallstep
 			    -csr intermediate.csr | cfssljson -bare
 			This process will yield a signed intermediate.crt certificate (or cert.pem for CFSSL). Transfer this file back to the machine running step-ca.
-			
+
 			Finally, replace the intermediate .crt and signing key produced by step ca init with the new ones we just created:
-			
+
 			mv intermediate.crt ~/.step/certs/intermediate_ca.crt
 			mv intermediate_ca_key ~/.step/secrets/intermediate_ca_key
-	
 
-		
-	
+
+
+
 
 How to install step-cli
 	ref: https://smallstep.com/docs/step-cli/installation
@@ -246,67 +246,67 @@ Using with a custom root ca cert:
 
 	Option 1: The easy way
 		If you have your root CA signing key available, you can run:
-	
+
 			step ca init --root=[ROOT_CERT_FILE] --key=[ROOT_PRIVATE_KEY_FILE]
 
 		The root certificate can be in PEM or DER format, and the signing key can be a PEM file containing a PKCS#1, PKCS#8, or RFC5915 (for EC) key.
 
 	Option 2: More secure
 
-		That said, CAs are usually pretty locked down and it's bad practice to move the private key around. 
+		That said, CAs are usually pretty locked down and it's bad practice to move the private key around.
 
 		So I'm gonna assume that's not an option and give you the more complex instructions to do this "the right way".
 
 		To summarize, this involves:
-			1) Generate a CSR for step-ca, 
-			2) Get it signed by your existing root, and 
+			1) Generate a CSR for step-ca,
+			2) Get it signed by your existing root, and
 			3) Configure step-ca to use it.
-		
-		When you run step ca init we create a couple artifacts under ~/.step/. 
+
+		When you run step ca init we create a couple artifacts under ~/.step/.
 		The important ones for us are:
-		
+
 		~/.step/certs/root_ca.crt is your root CA certificate
 		~/.step/secrets/root_ca_key is your root CA signing key
 		~/.step/certs/intermediate_ca.crt is your intermediate CA cert
 		~/.step/secrets/intermediate_ca_key is the intermediate signing key used by step-ca
 
-		The easiest thing to do is to 
-		1) run step ca init to get this scaffolding configuration in place, then 
+		The easiest thing to do is to
+		1) run step ca init to get this scaffolding configuration in place, then
 		2) remove/replace these artifacts with new ones that are tied to your existing root CA.
-		
-		First, step-ca does not actually need the root CA signing key. 
+
+		First, step-ca does not actually need the root CA signing key.
 		So you can simply remove that file:
-		
+
 			rm ~/.step/secrets/root_ca_key
 
 		Next, replace step-ca's root CA cert with your existing root certificate:
-		
+
 			mv /path/to/your/existing/root.crt ~/.step/certs/root_ca.crt
 
-		Now you need to generate a new signing key and intermediate certificate, signed by your existing root CA. 
+		Now you need to generate a new signing key and intermediate certificate, signed by your existing root CA.
 		To do that we can use the step certificate create subcommand to generate a certificate signing request (CSR).
 		Then have your existing root CA sign, producing an intermediate certificate.
-		
+
 		To generate those artifacts run:
-		
+
 			step certificate create "Intermediate CA Name" intermediate.csr intermediate_ca_key --csr
 
 		Next, you'll need to transfer the CSR file (intermediate.csr) to your existing root CA and get it signed.
-		
+
 		Now you need to get the CSR executed by your existing root CA.
 
 		OpenSSL
-		
+
 			openssl ca -config [ROOT_CA_CONFIG_FILE] \
 			  -extensions v3_intermediate_ca \
 			  -days 3650 -notext -md sha512 \
 			  -in intermediate.csr \
 			  -out intermediate.crt
 			CFSSL
-			
+
 		CFSSL
 			For CFSSL you'll need a signing profile that specifies a 10-year expiry:
-			
+
 			cat > ca-smallstep-config.json <<EOF
 			{
 			  "signing": {
@@ -320,33 +320,33 @@ Using with a custom root ca cert:
 			}
 			EOF
 			Now use that config to sign the intermediate certificate:
-			
+
 			cfssl sign -ca ca.pem \
 			    -ca-key ca-key.pem \
 			    -config ca-smallstep-config.json \
 			    -profile smallstep
 			    -csr intermediate.csr | cfssljson -bare
 			This process will yield a signed intermediate.crt certificate (or cert.pem for CFSSL). Transfer this file back to the machine running step-ca.
-		
+
 		Finally, replace the intermediate .crt and signing key produced by step ca init with the new ones we just created:
-		
+
 			mv intermediate.crt ~/.step/certs/intermediate_ca.crt
 			mv intermediate_ca_key ~/.step/secrets/intermediate_ca_key
 
 		That should be it! You should be able to start step-ca and the certificates should be trusted by anything that trusts your existing root CA.
 
-	
-	Orig/old answer:
-		when you run step ca init this creates a PKI with a root and intermediate certificate. 
-		The root certificate and the intermediate cert + key are then referenced (by file location) in the step-ca configuration file - ca.json.
-	
-		Suppose you have your own root and intermediate certificates already. 
-		You can run step ca init and just replace the values in ca.json with the locations of your existing files and the CA should work.
-	
-		Suppose you only have a root certificate and you'd like to bootstrap a new PKI using that root.
-		E.g., to create a new intermediate cert signed by that root. 
 
-		You can run step ca init --root <my-root.pem> --key <my-root-priv-key> and this will create an intermediate certificate 
+	Orig/old answer:
+		when you run step ca init this creates a PKI with a root and intermediate certificate.
+		The root certificate and the intermediate cert + key are then referenced (by file location) in the step-ca configuration file - ca.json.
+
+		Suppose you have your own root and intermediate certificates already.
+		You can run step ca init and just replace the values in ca.json with the locations of your existing files and the CA should work.
+
+		Suppose you only have a root certificate and you'd like to bootstrap a new PKI using that root.
+		E.g., to create a new intermediate cert signed by that root.
+
+		You can run step ca init --root <my-root.pem> --key <my-root-priv-key> and this will create an intermediate certificate
 		and create a ca.json file with the correct root and intermediates already filled in.
 
 
@@ -385,7 +385,7 @@ PING test123.example.int (10.0.0.20): 56 data bytes
 --- test123.example.int ping statistics ---
 2 packets transmitted, 2 packets received, 0% packet loss
 round-trip min/avg/max = 0.246/0.565/0.885 ms
-~ # 
+~ #
 
 ```
 

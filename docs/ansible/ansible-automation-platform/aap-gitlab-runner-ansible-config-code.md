@@ -97,11 +97,11 @@ You will get something like the following during the registration process:
 
 ```shell
 Enter the GitLab instance URL (for example, https://gitlab.com/):
-[https://gitlab.chrislab.internal]: 
+[https://gitlab.chrislab.internal]:
 Enter the registration token:
 token
 Enter a description for the runner:
-[gitlabrunner1.chrislab.internal]: Ansible EE: controller-system-ee:dev from quay.chrislab.internal/aap2/     
+[gitlabrunner1.chrislab.internal]: Ansible EE: controller-system-ee:dev from quay.chrislab.internal/aap2/
 Enter tags for the runner (comma-separated):
 controller-system-ee
 Enter optional maintenance note for the runner:
@@ -112,7 +112,7 @@ docker
 Enter the default Docker image (for example, ruby:2.7):
 quay.chrislab.internal/aap2/controller-system-ee:dev
 Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
- 
+
 Configuration (with the authentication token) was saved in "/etc/gitlab-runner/config.toml"
 ```
 
@@ -139,7 +139,7 @@ $ vim /etc/gitlab-runner/config.toml
 ```
 
 ```ini
-  
+
   [runners.docker]
     tls_verify = false
     image = "quay.chrislab.internal/aap2/controller-system-ee:dev"
@@ -244,4 +244,4 @@ The [third article in the series](aap-self-service-config-code-ansible.md) inclu
 ## Reference
 
 * https://www.redhat.com/sysadmin/gitlab-runner-ansible-config-code
-* 
+*

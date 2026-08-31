@@ -13,7 +13,7 @@ $query = "from:attacker@domain.com" #", subject:, content:"  #"KEYWORD OR KEYWOR
 Add-PSSnapin Microsoft.Exchange.Management.PowerShell.SnapIn;
 
 #Check if your user is a member of these groups
-#Get-RoleGroupMember "Discovery Management" 
+#Get-RoleGroupMember "Discovery Management"
 #Get-RoleGroupMember "Organization Management"
 
 Get-Mailbox -ResultSize unlimited | Search-Mailbox -SearchQuery "$query" -TargetMailbox $admin -TargetFolder "SearchAndDeleteLog" -LogOnly -LogLevel Full

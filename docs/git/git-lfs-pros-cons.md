@@ -28,23 +28,23 @@ The git pull request itself will slow down, and subsequently impede the developm
 The adoption or removal of Git LFS in a repository is an irreversible decision that requires rewriting history and losing your original commit SHAs.
 
 Since the LFS pointer is part of the Merkle tree that a Git commit derives from, you can't add or remove LFS from a repo without rewriting existing Git commit SHAs.
-In some contexts, rewriting history is tolerable. In many others, it is an extremely expensive proposition. 
+In some contexts, rewriting history is tolerable. In many others, it is an extremely expensive proposition.
 
-Even if a rewrite is acceptable in the short term, things may change in the future. If you adopt LFS today, you are committing to 
+Even if a rewrite is acceptable in the short term, things may change in the future. If you adopt LFS today, you are committing to
 
-a) running an LFS server forever 
-b) incurring a history rewrite in the future in order to remove LFS from your repo, or 
-c) ceasing to provide an LFS server and locking out people from using older Git commits. 
+a) running an LFS server forever
+b) incurring a history rewrite in the future in order to remove LFS from your repo, or
+c) ceasing to provide an LFS server and locking out people from using older Git commits.
 
 ### LFS is More Complexity
 
-LFS is more complex for Git end users.  Git users have to install, configure, and sometimes know about the existence of Git LFS. 
+LFS is more complex for Git end users.  Git users have to install, configure, and sometimes know about the existence of Git LFS.
 
-LFS is more complexity for Git server operators as well. Instead of a self-contained Git repository and server to support, you now have to support a likely separate HTTP server to facilitate LFS access. 
+LFS is more complexity for Git server operators as well. Instead of a self-contained Git repository and server to support, you now have to support a likely separate HTTP server to facilitate LFS access.
 
 ## Conclusion
 
-The main point of this post is to highlight some drawbacks with using Git LFS. 
+The main point of this post is to highlight some drawbacks with using Git LFS.
 
 
 ## References:
@@ -55,4 +55,3 @@ The main point of this post is to highlight some drawbacks with using Git LFS.
 4. [Pricing - Bitbucket](https://bitbucket.org/product/pricing?tab=cloud)
 5. [Products Full Feature Comparison - GitLab](https://about.gitlab.com/pricing/self-hosted/feature-comparison/)
 6. [Current limitations for Git LFS with Bitbucket](https://confluence.atlassian.com/bitbucket/current-limitations-for-git-lfs-with-bitbucket-828781638.html)
-

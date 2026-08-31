@@ -57,4 +57,4 @@ This results in:
 ## Reference
 
 * https://stackoverflow.com/questions/49747576/loop-through-a-list-of-dictionaries-and-return-another-list-in-ansible
-* 
+*

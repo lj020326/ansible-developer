@@ -13,6 +13,3 @@ echo "date=$DATE"
 cmd=""
 echo "$cmd"
 `$cmd`
-
-
-

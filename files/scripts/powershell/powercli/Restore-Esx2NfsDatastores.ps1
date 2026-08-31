@@ -1,5 +1,5 @@
 ﻿
-Import-Module PowerCLI/DatastoreMod 
+Import-Module PowerCLI/DatastoreMod
 
 Function Restore-Esx2NfsDatastores {
 	<#
@@ -10,7 +10,7 @@ Function Restore-Esx2NfsDatastores {
 	PS C:\> Restore-NfsDatastores
 
 	#>
-	
+
 	$vmhost = "esx2.johnson.local"
 	Activate-InactiveHostNFSDatastores $vmhost
 }

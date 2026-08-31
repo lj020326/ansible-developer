@@ -40,4 +40,4 @@ Ansible applies variable precedence. The following is the order of precedence fr
 ## Reference
 
 * https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
-* 
+*

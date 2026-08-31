@@ -5,10 +5,10 @@ nftables is a new subsystem of the Linux kernel that replaces several parts of t
 
 ## How is nftables different from IPtables?
 
-In IPtables, there are several chains and tables that are loaded by default.  
+In IPtables, there are several chains and tables that are loaded by default.
 In nftables, there are no default chains or tables.
 
-In IPtables, there is only one target per rule.  
+In IPtables, there is only one target per rule.
 In nftables, you can perform multiple actions within a single rule.
 
 In nftables, there is a tool called ipset. Using ipset allows for the listing of multiple networks or addresses which can be matched in a single rule.
@@ -193,7 +193,7 @@ chain output {
 type filter hook output priority 0; policy accept;
 }
 }
-root@host:~# 
+root@host:~#
 ```
 
 ## nft Command Synopsis
@@ -245,4 +245,3 @@ Learn how this new service can fit into your overall security plan for your serv
 
 * https://wiki.nftables.org/wiki-nftables/index.php/Configuring_chains
 * https://www.liquidweb.com/kb/how-to-install-nftables-in-ubuntu/
-

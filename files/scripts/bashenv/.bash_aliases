@@ -29,6 +29,9 @@ alias fgrep='fgrep --color=auto'              # show differences in colour
 alias stop-flyline='export FLYLINE_DISABLED=1; enable -d flyline 2>/dev/null'
 alias start-flyline='unset FLYLINE_DISABLED; enable -f ${HOME}/.local/lib/libflyline.dylib flyline 2>/dev/null'
 
+alias rununits='./run-tests.sh units'
+alias runsanity='./run-tests.sh sanity'
+
 #
 # Some shortcuts for different directory listings
 # alias ls='ls -hF --color=tty'                 # classify files in colour
@@ -55,6 +58,8 @@ alias cdtechdocs='cd ~/repos/docs/docs-tech/infrastructure'
 alias cddocker='cd ~/docker'
 
 alias cddockerrepo='cd ~/repos/docker'
+alias cddockerhome='cd /home/container-user/docker'
+alias cddockermedia='cd /home/media/docker'
 alias cdjenkinsrepo='cd ~/repos/jenkins'
 alias cdnoderepo='cd ~/repos/nodejs'
 alias cdpythonrepo='cd ~/repos/python'
@@ -266,6 +271,11 @@ alias dockerstackps="docker stack ps --filter='desired-state=running' docker_sta
 alias dockerbash="docker_bash"
 alias dockerexecsh="docker_exec_sh"
 alias dockerexecbash="docker_exec_bash"
+
+## llm utils
+alias llmutils="llm-utils.sh"
+alias checknvidiaversion="check_nvidia_version"
+alias postmortem="sre-shutdown-postmortem.sh"
 
 ## test endpoint connectivity
 alias curltest="curl -s -L -o /dev/null -w '%{http_code}\n' --max-time 5"
@@ -480,7 +490,14 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW32|MINGW64)$ ]]; then
 
 elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
   echo "${log_prefix_aliases} setting aliases for DARWIN env"
+  echo ""
   # alias emacs='emacs -q --load "${HOME}/.emacs.d/init.el"'
+
+  ######
+  # instantly grabs the updated Cellar target path, copies it to the clipboard,
+  # and opens both Finder and System Settings to the exact page,
+  # minimizing the update fix to just a quick 'Cmd + Shift + G' -> 'Cmd + V'
+  alias fixbashtcc="fix-bash-tcc.sh"
 
   ## ref: https://opensource.com/article/19/5/python-3-default-mac
   # alias python=/usr/local/bin/python3

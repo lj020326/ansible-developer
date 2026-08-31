@@ -16,7 +16,7 @@ The following list contains all steps we need to automate in order to reach our 
 
 We’ll start by having a look at the terminology used by Ansible, followed by an overview of the main language features that can be used to write playbooks. At the end of the guide, you’ll find the contents of a full provisioning example to automate the steps described for setting up Apache on Ubuntu 18.04.
 
-**Note**: this guide is intended to get you introduced to the Ansible language and how to write playbooks to automate your server provisioning. 
+**Note**: this guide is intended to get you introduced to the Ansible language and how to write playbooks to automate your server provisioning.
 
 ## Getting Started
 
@@ -56,7 +56,7 @@ Playbooks are `YAML` files containing a series of directives to automate the pro
 - hosts: all
   become: true
   tasks:
-     - name: Update apt-cache 
+     - name: Update apt-cache
        apt: update_cache=yes
 
      - name: Install Vim
@@ -100,7 +100,7 @@ To create a loop within a task, include the option `with_items` with an array of
   with_items:
      - vim
      - git
-     - curl  
+     - curl
 ```
 
 You can also use an **array variable** to define your items:
@@ -228,10 +228,8 @@ If you need to specify a different SSH user to connect to the remote server, you
 
 ## Conclusion
 
-Ansible is a minimalist IT automation tool that has a low learning curve, using `YAML` for its provisioning scripts. It has a great number of built-in modules that can be used to abstract tasks such as installing packages and working with templates. 
+Ansible is a minimalist IT automation tool that has a low learning curve, using `YAML` for its provisioning scripts. It has a great number of built-in modules that can be used to abstract tasks such as installing packages and working with templates.
 
 ## Reference
 
 - https://www.digitalocean.com/community/tutorials/configuration-management-101-writing-ansible-playbooks
-
-

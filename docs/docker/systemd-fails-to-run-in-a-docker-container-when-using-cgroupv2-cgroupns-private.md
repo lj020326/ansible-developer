@@ -158,7 +158,7 @@ Userns remapping has got a lot of drawbacks and the best possible scenario for m
 
 It's not enough that your kernel has cgroupv2 enabled. Depending on the linux distribution bundled systemd might prefer to use v1 by default.
 
-You can tell systemd to use cgroupv2 via kernel cmdline parameter:  
+You can tell systemd to use cgroupv2 via kernel cmdline parameter:
 `systemd.unified_cgroup_hierarchy=1`
 
 It might also be needed to explicitly disable _hybrid_ cgroupv1 support to avoid problems using: `systemd.legacy_systemd_cgroup_controller=0`
@@ -244,4 +244,4 @@ $ docker run --rm -it --privileged debiansys
 * https://www.ansible.com/blog/developing-and-testing-ansible-roles-with-molecule-and-podman-part-1
 * https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule
 * https://molecule.readthedocs.io/en/latest/getting-started.html
-* 
+*

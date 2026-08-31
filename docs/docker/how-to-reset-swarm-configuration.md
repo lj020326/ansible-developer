@@ -22,4 +22,4 @@ docker node rm --force swarm-node-03
 - https://stackoverflow.com/questions/62173586/docker-where-is-reset-to-factory-defaults-on-linux
 - https://docs.docker.com/reference/cli/docker/node/rm/
 - https://docs.docker.com/reference/cli/docker/node/rm/#force
-- 
+-

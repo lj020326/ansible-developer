@@ -4,8 +4,8 @@
 ## linked list containing data struct nodes with bubble sort
 
 ```c
-#include<stdio.h> 
-#include<stdlib.h> 
+#include<stdio.h>
+#include<stdlib.h>
 #include <string.h>
 #define MAX_BUILDINGS 100
 #define MAX_NAME 64
@@ -20,23 +20,23 @@ typedef struct Building{
     struct Building* next;
 }bd;
 
-typedef struct Node 
-{ 
+typedef struct Node
+{
     struct Building* data;
     struct Node* next;
 
-}node; 
+}node;
 
-void bubbleSort(struct Node *start); 
+void bubbleSort(struct Node *start);
 
 void freeList(struct Node *start);
-  
+
 /* Function to swap data of two nodes a and b*/
-void swap(struct Node *a, struct Node *b); 
-  
+void swap(struct Node *a, struct Node *b);
+
 /* Function to print nodes in a given linked list */
-void printList(struct Node *start); 
-  
+void printList(struct Node *start);
+
 node* getBuildingList(FILE *file){
     node *i = (node*)malloc(sizeof(node));
     i->data = (bd*)malloc(sizeof(bd));
@@ -78,16 +78,16 @@ node* getBuildingList(FILE *file){
     i->next = getBuildingList(file);
     return i;
 }
-    
-/*int main(int argc, char *argv[]) 
-{ 
+
+/*int main(int argc, char *argv[])
+{
     if (argc != 2) {
         printf("Usage: ./buildEff <number>\n");
         return 0;
     }
-    
+
     FILE *fptr = fopen(argv[1], "r");
-    
+
     if (fptr == NULL){
         printf("Error: file not found\n");
         return 0;
@@ -97,8 +97,8 @@ node* getBuildingList(FILE *file){
     struct Node *start = getBuildingList(fptr);
 
 
-    //int arr[] = {12, 56, 2, 11, 1, 90}; 
-    //int list_size, i; 
+    //int arr[] = {12, 56, 2, 11, 1, 90};
+    //int list_size, i;
     //int arr[MAX_BUILDINGS];
 
 
@@ -107,19 +107,19 @@ node* getBuildingList(FILE *file){
     bubbleSort(start);
     printList(start);
 }
-    return 0; 
-} 
+    return 0;
+}
 */
 
-int main(int argc, char *argv[]) 
-{ 
+int main(int argc, char *argv[])
+{
     if (argc != 2) {
         printf("Usage: ./buildEff <number>\n");
         return 0;
     }
-    
+
     FILE *fptr = fopen(argv[1], "r");
-    
+
     if (fptr == NULL){
         printf("Error: file not found\n");
         return 0;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     rewind(fptr);
 
     struct Node *start = getBuildingList(fptr);
-    
+
     if (start != NULL) {
         bubbleSort(start);
         printList(start);
@@ -147,69 +147,69 @@ int main(int argc, char *argv[])
     }
 
     fclose(fptr);
-    return 0; 
+    return 0;
 }
 
 
-  
+
 /* Function to insert a node at the beginning of a linked list */
-/*void insertAtTheBegin(struct Node **start_ref, struct Building data) 
-{ 
-    struct Node *ptr1 = (struct Node*)malloc(sizeof(struct Node)); 
-    ptr1->data = &data; 
-    ptr1->next = *start_ref; 
-    *start_ref = ptr1; 
-} 
+/*void insertAtTheBegin(struct Node **start_ref, struct Building data)
+{
+    struct Node *ptr1 = (struct Node*)malloc(sizeof(struct Node));
+    ptr1->data = &data;
+    ptr1->next = *start_ref;
+    *start_ref = ptr1;
+}
 */
-  
+
 /* Function to print nodes in a given linked list */
-void printList(struct Node *start) 
-{ 
-    struct Node *temp = start;  
-    while (temp!=NULL) 
-    { 
-       // printf("%d ", temp->data); 
-        printf("%s %.6f\n", temp->data->BuildingName, temp->data->Efficiency); 
-        temp = temp->next; 
-    } 
-} 
-  
+void printList(struct Node *start)
+{
+    struct Node *temp = start;
+    while (temp!=NULL)
+    {
+       // printf("%d ", temp->data);
+        printf("%s %.6f\n", temp->data->BuildingName, temp->data->Efficiency);
+        temp = temp->next;
+    }
+}
+
 /* Bubble sort the given linked list */
-void bubbleSort(struct Node *start) 
-{ 
-    int swapped, i; 
-    struct Node *ptr1; 
-    struct Node *lptr = NULL; 
-  
+void bubbleSort(struct Node *start)
+{
+    int swapped, i;
+    struct Node *ptr1;
+    struct Node *lptr = NULL;
+
     /* Checking for empty list */
-    if (start == NULL) 
-        return; 
-  
+    if (start == NULL)
+        return;
+
     do
-    { 
-        swapped = 0; 
-        ptr1 = start; 
-  
-        while (ptr1->next != lptr) 
-        { 
-            //if (ptr1->data > ptr1->next->data) 
-            if (ptr1->data->Efficiency < ptr1->next->data->Efficiency) 
-            { 
-                swap(ptr1, ptr1->next); 
-                swapped = 1; 
-            } 
+    {
+        swapped = 0;
+        ptr1 = start;
+
+        while (ptr1->next != lptr)
+        {
+            //if (ptr1->data > ptr1->next->data)
+            if (ptr1->data->Efficiency < ptr1->next->data->Efficiency)
+            {
+                swap(ptr1, ptr1->next);
+                swapped = 1;
+            }
             else if (ptr1->data->Efficiency == ptr1->next->data->Efficiency){
                 if (strcmp(ptr1->data->BuildingName, ptr1->next->data->BuildingName) > 0){
                     swap(ptr1, ptr1->next);
                     swapped = 1;
                 }
             }
-            ptr1 = ptr1->next; 
-        } 
-        lptr = ptr1; 
-    } 
-    while (swapped); 
-} 
+            ptr1 = ptr1->next;
+        }
+        lptr = ptr1;
+    }
+    while (swapped);
+}
 
 void freeList(struct Node *start) {
     while (start != NULL) {
@@ -221,12 +221,12 @@ void freeList(struct Node *start) {
 }
 
 /* function to swap data of two nodes a and b*/
-void swap(struct Node *a, struct Node *b) 
-{ 
-    struct Building* temp = a->data; 
-    a->data = b->data; 
-    b->data = temp; 
-} 
+void swap(struct Node *a, struct Node *b)
+{
+    struct Building* temp = a->data;
+    a->data = b->data;
+    b->data = temp;
+}
 ```
 
 ## Simple generic example
@@ -287,7 +287,7 @@ void free_list(List* list) {
 int main() {
 	// create a new list
 	List* int_list = create_list();
-	
+
 	// add some integers to the list
 	int x = 42;
 	add_to_list(int_list, (void*)&x);
@@ -295,16 +295,16 @@ int main() {
 	add_to_list(int_list, (void*)&y);
 	int z = 99;
 	add_to_list(int_list, (void*)&z);
-	
+
 	// remove the integers from the list and print them
 	int* int_ptr = NULL;
 	while ((int_ptr = (int*)remove_from_list(int_list)) != NULL) {
 		printf("%d\n", *int_ptr);
 	}
-	
+
 	// free the memory used by the list
 	free_list(int_list);
-	
+
 	return 0;
 }
 
@@ -312,8 +312,8 @@ int main() {
 
 ## Another Example
 
-Following code for project which reads data from a .txt file and creates linked list of structures for 2 different 
-operations on that structures (CRUD). 
+Following code for project which reads data from a .txt file and creates linked list of structures for 2 different
+operations on that structures (CRUD).
 
 The file contains data of rooms in a hotel and its guests with below pattern:
 
@@ -343,21 +343,21 @@ Jahodova 3, Bratislava
 20210302
 ```
 
-In the file each room record starts with --- and each guest record starts with #. 
+In the file each room record starts with --- and each guest record starts with #.
 Each line of file has data of one property (different datatypes) of room or guest.
 
-Following is example code to create the linked list and print; however, it could use enhancement due to use of 
+Following is example code to create the linked list and print; however, it could use enhancement due to use of
 global variables in the printGuest() function.
 
-Instead the printGuest() function should take a parameter as the head of Guest linked list and traverse it. 
+Instead the printGuest() function should take a parameter as the head of Guest linked list and traverse it.
 
 
 ```c
 #include <stdio.h>
-#include <stdlib.h>     
-#include <string.h>    
-#include <ctype.h>      
-#include <errno.h>      
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
 
 #define FILE_NAME "hotel.txt"
 #define MAXC   1024     /* if you need a constant, #define one (or more) */
@@ -377,7 +377,7 @@ typedef struct Room {
     int numberOfBeds;
     double price;
     struct Guest *guests;
-    struct Room *next; 
+    struct Room *next;
 } Room;
 
 Room *head = NULL;
@@ -412,7 +412,7 @@ void insertRoom(int roomNo, int noOfBed, double price, Guest *geusts){
     tail->next = hotelRoom;
     if (head == NULL) {
         head = hotelRoom;
-    }    
+    }
 }
 
 void insertGeust(char* name, char* address, int startDate, int endDate){
@@ -424,7 +424,7 @@ void insertGeust(char* name, char* address, int startDate, int endDate){
     gstTail->next = gst;
     if (gstHead == NULL) {
         gstHead = gst;
-    }    
+    }
 }
 
 void n() {
@@ -436,7 +436,7 @@ void n() {
     char line[MAXC];
 
     FILE *fp = fopen(FILE_NAME, "r");
-    if (!fp) { 
+    if (!fp) {
         perror ("file open failed");
     }
 
@@ -499,7 +499,7 @@ void n() {
             }
             secondCounter = 0;
         }
-        
+
         if (feof(fp) != 0){
             firstCounter = 0;
             hashCounter = 0;
@@ -538,7 +538,7 @@ void printGuest(){
         printf("\n%d", ptrr->beginningOfReservation);
         printf("\n%d", ptrr->endOfreservation);
         ptrr = ptrr->next;
-    }  
+    }
 }
 
 int length() {
@@ -578,5 +578,4 @@ int main(int argc, char **argv) {
 The following example is not as helpful due to being quite convoluted
 - https://stackoverflow.com/questions/23279119/creating-and-understanding-linked-lists-of-structs-in-c
 - http://www.mahonri.info/SO/23279119_LinkedList_101.c
-- 
-
+-

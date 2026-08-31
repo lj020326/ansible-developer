@@ -24,21 +24,21 @@ updateIsApplicable = False
 For i = 0 To searchResult.Updates.Count-1
    Set update = searchResult.Updates.Item(i)
    If UCase(update.Title) = UCase(updateTitle) Then
-   'Update in list of applicable updates 
+   'Update in list of applicable updates
    'Determine if it is already installed or not
       If update.IsInstalled = False Then
          WScript.Echo vbCRLF & _
          "Result: Update applicable, not installed."
          updateIsApplicable = True
          updateToInstall.Add(update)
-      Else 
+      Else
          'Update is installed so notify user and quit
          WScript.Echo vbCRLF & _
          "Result: Update applicable, already installed."
          updateIsApplicable = True
-         WScript.Quit 
+         WScript.Quit
       End If
-   End If 
+   End If
 Next
 
 If updateIsApplicable = False Then
@@ -48,26 +48,26 @@ End If
 
 WScript.Echo vbCRLF & "Would you like to install now? (Y/N)"
 stdInput = WScript.StdIn.Readline
- 
-If (strInput = "N" or strInput = "n") Then 
+
+If (strInput = "N" or strInput = "n") Then
    WScript.Quit
 ElseIf  (stdInput = "Y" OR stdInput = "y") Then
    'Download update
-   Set downloader = updateSession.CreateUpdateDownloader() 
+   Set downloader = updateSession.CreateUpdateDownloader()
    downloader.Updates = updateToInstall
    WScript.Echo vbCRLF & "Downloading..."
    Set downloadResult = downloader.Download()
    WScript.Echo "Download Result: " & downloadResult.ResultCode
-  
+
    'Install Update
    Set installer = updateSession.CreateUpdateInstaller()
    WScript.Echo vbCRLF & "Installing..."
    installer.Updates = updateToInstall
    Set installationResult = installer.Install()
-  
+
    'Output the result of the installation
    WScript.Echo "Installation Result: " & _
    installationResult.ResultCode
    WScript.Echo "Reboot Required: " & _
-   installationResult.RebootRequired 
+   installationResult.RebootRequired
 End If

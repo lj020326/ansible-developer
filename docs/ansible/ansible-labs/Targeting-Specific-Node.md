@@ -13,13 +13,13 @@ This scenario shows:
 - Update inventory file.
 - Make groups by giving names with '[]'.
 
-``` 
+```
 [web_servers]
 172.21.79.85
 
 [database_servers]
 172.21.76.101
-``` 
+```
 
 ![image](./img/201671961-6eb2815e-67e1-43d5-9e36-49bcebe0dad4.png)
 
@@ -65,7 +65,7 @@ This scenario shows:
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
-    
+
 - hosts: database_servers
   become: true
   tasks:
@@ -81,9 +81,9 @@ This scenario shows:
       name: mariadb-server
       state: latest
     when: ansible_distribution == "Ubuntu"
-```    
+```
 
-- Run 
+- Run
 
 ```
 ansible-playbook --ask-become-pass site.yml
@@ -99,4 +99,3 @@ systemctl status mariadb
 ```
 
 ![image](./img/201671418-42d8734a-d55f-4247-8451-db45e7a889a4.png)
-

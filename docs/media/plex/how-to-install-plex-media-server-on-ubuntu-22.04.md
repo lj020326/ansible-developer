@@ -225,12 +225,12 @@ This page gives you a detailed explanation of how plex works. You will also see 
 
 On the new page that appears, you will see the **Plex Pass** pop-up window that shows the various subscription rates. Close it and start configuring your Plex media server. Follow the steps below.
 
-1.  Enter the name that you want to use for your Plex media server. For this post, we will set it as Ubuntu Plex media server.  
-    ![word image 10933 11](./img/word-image-10933-11.png "How to Install Plex Media Server on Ubuntu 22.04 26")  
+1.  Enter the name that you want to use for your Plex media server. For this post, we will set it as Ubuntu Plex media server.
+    ![word image 10933 11](./img/word-image-10933-11.png "How to Install Plex Media Server on Ubuntu 22.04 26")
     Click _Next_ to continue.
-2.  On the next screen, you will need to add the media library. Click the **Add Library** button and select a folder on your system containing your media files. For this post, we used the Music and the Videos directories. You can add as many libraries as you wish.  
+2.  On the next screen, you will need to add the media library. Click the **Add Library** button and select a folder on your system containing your media files. For this post, we used the Music and the Videos directories. You can add as many libraries as you wish.
     ![word image 10933 12 1](./img/word-image-10933-12-1.png "How to Install Plex Media Server on Ubuntu 22.04 27")
-3.  Click _Next_ to continue. On the next screen, click _Done_ to save and apply your new configurations. You will see a window similar to the image below. That’s it! You have successfully configured the Plex media server on your Ubuntu system.  
+3.  Click _Next_ to continue. On the next screen, click _Done_ to save and apply your new configurations. You will see a window similar to the image below. That’s it! You have successfully configured the Plex media server on your Ubuntu system.
     ![word image 10933 13](./img/word-image-10933-13.png "How to Install Plex Media Server on Ubuntu 22.04 28")
 
 ## Configure Access and Permissions
@@ -327,4 +327,4 @@ The Plex Media Server is a very nice tool for streaming your media library to al
 
 * https://bytexd.com/how-to-install-plex-media-server-on-ubuntu/
 * https://www.linuxcapable.com/how-to-install-plex-media-server-on-ubuntu-22-04-lts/
-* 
+*

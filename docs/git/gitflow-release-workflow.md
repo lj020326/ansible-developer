@@ -1,11 +1,11 @@
 
 # Gitflow Release Workflow
 
-Gitflow is a Git release workflow that is a novel strategy for managing multiple Git branches. 
+Gitflow is a Git release workflow that is a novel strategy for managing multiple Git branches.
 
 ## What is Gitflow?
 
-Gitflow is an alternative Git branching model that involves the use of feature branches and multiple primary branches. It was first published and made popular by [Vincent Driessen at nvie](http://nvie.com/posts/a-successful-git-branching-model/). Compared to trunk-based development, Gitflow has numerous, longer-lived branches and larger commits. Under this model, developers create a feature branch and delay merging it to the main trunk branch until the feature is complete. 
+Gitflow is an alternative Git branching model that involves the use of feature branches and multiple primary branches. It was first published and made popular by [Vincent Driessen at nvie](http://nvie.com/posts/a-successful-git-branching-model/). Compared to trunk-based development, Gitflow has numerous, longer-lived branches and larger commits. Under this model, developers create a feature branch and delay merging it to the main trunk branch until the feature is complete.
 
 Gitflow can be used for projects that have a scheduled release cycle and for the [DevOps best practice](https://www.atlassian.com/devops/what-is-devops/devops-best-practices) of [continuous delivery](https://www.atlassian.com/continuous-delivery). This workflow doesn’t add any new concepts or commands beyond what’s required for the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow). Instead, it assigns very specific roles to different branches and defines how and when they should interact. In addition to `feature` branches, it uses individual branches for preparing, maintaining, and recording releases. Of course, you also get to leverage all the benefits of the Feature Branch Workflow: pull requests, isolated experiments, and more efficient collaboration.
 
@@ -155,7 +155,7 @@ git checkout main
 git checkout -b hotfix_branch
 ```
 
-When using the git-flow extensions: 
+When using the git-flow extensions:
 
 ```
 $ git flow hotfix start hotfix_branch
@@ -210,8 +210,8 @@ Here we discussed the Gitflow Workflow. Gitflow is one of many styles of [Git wo
 Some key takeaways to know about Gitflow are:
 
 -   The workflow is great for a release-based software workflow.
--   Gitflow offers a dedicated channel for hotfixes to production.  
-     
+-   Gitflow offers a dedicated channel for hotfixes to production.
+
 
 The overall flow of Gitflow is:
 

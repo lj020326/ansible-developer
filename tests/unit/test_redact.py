@@ -40,12 +40,36 @@ auth:
 
 
 class TestEnvIniProcessing:
-    def test_default_redaction(self):
+    def test_boundary_redaction(self):
         """Tests standard substring and case-insensitive redaction on INI/Shell files."""
         result = process_env_ini(
             content=SAMPLE_ENV_INI,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
+            case_sensitive=False,
+            peek_count=0,
+        )
+
+        assert "DB_HOST=localhost" in result
+        assert "DB_PORT=5432" in result
+        assert "SESSION_TIMEOUT=3600" in result
+
+        # Sensitive keys should be masked
+        assert "API_KEY=<redacted>" in result
+        # Note: Match exact inline comment string output from regex processing
+        assert "USER_PASSWORD=<redacted> # inline comment" in result
+        assert 'APP_SECRET="<redacted>"' in result
+
+        # Secrets should not leak
+        assert "sk-proj-1234567890abcdef" not in result
+        assert "SuperSecretPass123!" not in result
+
+    def test_substring_redaction(self):
+        """Tests standard substring and case-insensitive redaction on INI/Shell files."""
+        result = process_env_ini(
+            content=SAMPLE_ENV_INI,
+            keys=DEFAULT_REDACT_KEYS,
+            match_type="substring",
             case_sensitive=False,
             peek_count=0,
         )
@@ -65,11 +89,11 @@ class TestEnvIniProcessing:
         assert "SuperSecretPass123!" not in result
 
     def test_exact_match_only(self):
-        """Tests that exact_match=True prevents partial key matches (e.g., API_KEY vs KEY)."""
+        """Tests that match_type="exact" prevents partial key matches (e.g., API_KEY vs KEY)."""
         result = process_env_ini(
             content=SAMPLE_ENV_INI,
             keys=["key"],  # Only search for exact "key"
-            exact_match=True,
+            match_type="exact",
             case_sensitive=False,
             peek_count=0,
         )
@@ -82,7 +106,7 @@ class TestEnvIniProcessing:
         result = process_env_ini(
             content="api_key=secret123\nAPI_KEY=secret456",
             keys=["api_key"],
-            exact_match=True,
+            match_type="exact",
             case_sensitive=True,
             peek_count=0,
         )
@@ -95,7 +119,7 @@ class TestEnvIniProcessing:
         result = process_env_ini(
             content="API_KEY=sk-proj-1234567890abcdef",
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=3,
         )
@@ -115,7 +139,7 @@ class TestYamlProcessing:
         result = process_yaml(
             content=SAMPLE_YAML,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=0,
         )
@@ -137,7 +161,7 @@ class TestYamlProcessing:
         result = process_yaml(
             content=SAMPLE_YAML,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=4,
         )
@@ -153,7 +177,7 @@ class TestYamlProcessing:
         result = process_yaml(
             content=short_secret_yaml,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=5,  # 5 prefix + 5 suffix > total length of 3
         )
@@ -176,7 +200,7 @@ OTHER_VAR=keep_me
         result = process_env_ini(
             content=multiline_env,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=15,
         )
@@ -197,7 +221,7 @@ OTHER_VAR=keep_me
         result = process_env_ini(
             content=env_content,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=0,
         )
@@ -212,7 +236,7 @@ OTHER_VAR=keep_me
         result = process_env_ini(
             content=env_content,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=4,
         )
@@ -230,7 +254,7 @@ OTHER_VAR=keep_me
         result = process_env_ini(
             content=env_content,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=4,
         )
@@ -251,7 +275,7 @@ OTHER_VAR=keep_me
         result = process_yaml(
             content=yaml_content,
             keys=DEFAULT_REDACT_KEYS,
-            exact_match=False,
+            match_type="boundary",
             case_sensitive=False,
             peek_count=4,
         )
@@ -260,3 +284,43 @@ OTHER_VAR=keep_me
         assert "LLAMA_ARG_API_KEY: null" in result or "LLAMA_ARG_API_KEY:" in result
         assert "LLAMA_ARG_SECRET_TOKEN: ''" in result or "LLAMA_ARG_SECRET_TOKEN: null" in result
         assert "LLAMA_ARG_MODELS_DIR: /models" in result
+
+    def test_match_types(self):
+        """Tests exact, boundary, and substring matching behavior."""
+        content = "KEYCLOAK_USER=admin\nMY_API_KEY=secret123\nPASSWORD=pass123\n"
+
+        # Boundary (Default): Redacts MY_API_KEY and PASSWORD, ignores KEYCLOAK_USER
+        res_boundary = process_env_ini(
+            content,
+            DEFAULT_REDACT_KEYS,
+            match_type="boundary",
+            case_sensitive=False,
+            peek_count=0,
+        )
+        assert "KEYCLOAK_USER=admin" in res_boundary
+        assert "MY_API_KEY=<redacted>" in res_boundary
+        assert "PASSWORD=<redacted>" in res_boundary
+
+        # Exact: Only redacts exact matches ('PASSWORD' assuming 'password' is in keys)
+        res_exact = process_env_ini(
+            content,
+            DEFAULT_REDACT_KEYS,
+            match_type="exact",
+            case_sensitive=False,
+            peek_count=0,
+        )
+        assert "KEYCLOAK_USER=admin" in res_exact
+        assert "MY_API_KEY=secret123" in res_exact
+        assert "PASSWORD=<redacted>" in res_exact
+
+        # None: Pure substring matching, redacts KEYCLOAK_USER because it contains 'key'
+        res_substring = process_env_ini(
+            content,
+            DEFAULT_REDACT_KEYS,
+            match_type="substring",
+            case_sensitive=False,
+            peek_count=0,
+        )
+        assert "KEYCLOAK_USER=<redacted>" in res_substring
+        assert "MY_API_KEY=<redacted>" in res_substring
+        assert "PASSWORD=<redacted>" in res_substring

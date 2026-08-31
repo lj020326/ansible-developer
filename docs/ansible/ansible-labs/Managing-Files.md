@@ -16,12 +16,12 @@ This scenario shows:
 - Create html file in the control node.
 - Create directory and web page.
 
-``` 
+```
 mkdir files
 nano files/default_site.html
-``` 
+```
 
-``` 
+```
 <html>
    <title>Ansible File Transfer Test</title>
 
@@ -29,11 +29,11 @@ nano files/default_site.html
       <p>Ansible Great!</p>
    </body>
 </html>
-``` 
+```
 
 - Update 'site.yml' file (implemented in [LAB: Adding Tags](./Tags.md))
 
-``` 
+```
 ---
 
 - hosts: all
@@ -75,7 +75,7 @@ nano files/default_site.html
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
-    
+
   - name: copy default (index) html file for site
     tags: apache,apache2,httpd
     copy:
@@ -83,8 +83,8 @@ nano files/default_site.html
       dest: /var/www/html/index.html
       owner: root
       group: root
-      mode: 0644    
-    
+      mode: 0644
+
 - hosts: database_servers
   become: true
   tasks:
@@ -102,19 +102,19 @@ nano files/default_site.html
       name: mariadb-server
       state: latest
     when: ansible_distribution == "Ubuntu"
-``` 
+```
 
 ![image](./img/201684361-7894105d-09b2-46ac-920b-b8702ce8f234.png)
 
-- Run following: 
+- Run following:
 
 ```
 ansible-playbook --ask-become-pass site.yml
-``` 
+```
 
 ![image](./img/201685754-26180f5c-04ee-4d8b-a0ee-38edde586312.png)
 
-- File is transferred to node1: 
+- File is transferred to node1:
 
 ![image](./img/201686161-0ace79c4-0b99-40d2-8494-e5c7fb061df6.png)
 
@@ -124,7 +124,7 @@ ansible-playbook --ask-become-pass site.yml
 
 - Update 'site.yml' file with adding unzip package (name: install unzip) and unarchive file (name: install terraform).
 
-``` 
+```
 ---
 
 - hosts: all
@@ -166,7 +166,7 @@ ansible-playbook --ask-become-pass site.yml
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
-    
+
   - name: copy default (index) html file for site
     tags: apache,apache2,httpd
     copy:
@@ -174,8 +174,8 @@ ansible-playbook --ask-become-pass site.yml
       dest: /var/www/html/index.html
       owner: root
       group: root
-      mode: 0644    
-      
+      mode: 0644
+
   - name: install unzip
     package:
       name: unzip
@@ -187,8 +187,8 @@ ansible-playbook --ask-become-pass site.yml
       remote_src: yes
       owner: root
       group: root
-      mode: 0755  
-      
+      mode: 0755
+
 - hosts: database_servers
   become: true
   tasks:
@@ -206,7 +206,7 @@ ansible-playbook --ask-become-pass site.yml
       name: mariadb-server
       state: latest
     when: ansible_distribution == "Ubuntu"
-``` 
+```
 
 ![image](./img/201689373-a244449e-ca81-48d9-9947-dffaf6802e81.png)
 
@@ -214,18 +214,10 @@ ansible-playbook --ask-become-pass site.yml
 
 ```
 ansible-playbook --ask-become-pass site.yml
-``` 
+```
 
 ![image](./img/201689863-cffbe7ac-2501-454d-9509-011886629d51.png)
 
 - Installed on node1
 
 ![image](./img/201690101-8620f86c-d27a-4f51-8f40-1be649efcf54.png)
-
-
-
-
-
-
-
-

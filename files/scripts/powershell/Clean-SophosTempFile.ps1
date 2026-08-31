@@ -14,10 +14,10 @@ if (test-path $SophosTempDir){
         catch{
             Write-Error "Clean-up operation failed."
             exit 1
-        }        
+        }
     }
 }
 else {
     Write-Error "The Sophos directory doesn't exist $SophosTempDir"
 }
-exit 0 
+exit 0

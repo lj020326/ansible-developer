@@ -3,7 +3,7 @@ Terraform Deployments with Ansible - Part 1
 ===
 
 > In this series
-> 
+>
 > 1.  Motivation & Ansible 101
 > 2.  [Terraform & Ansible](./terraform-deployments-with-ansible-part-2.md "Terraform & Ansible")
 

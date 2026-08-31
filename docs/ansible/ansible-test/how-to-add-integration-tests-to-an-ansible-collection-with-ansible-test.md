@@ -59,7 +59,7 @@ If you want the integration test to run a role in your collection, be sure to us
 `- include_role:       name: geerlingguy.php_roles.php`
 
 > **Note**: Currently, the only way to use collection or role dependencies inside the docker test container is by installing them manually, directly inside your collection's directories, before running `ansible-test`. There is an open issue to get this resolved so collection dependencies can work correctly with `ansible-test --docker`: [Support testing collections with deps using --docker](https://github.com/ansible/ansible/issues/59563).
-> 
+>
 > **Additional Note**: Currently, the only way to test for role _idempotence_ (that is, if you run it multiple times, it only makes changes the first time, and just ensures state in follow-up runs) is to build your own checks in a `runme.sh` shell script. See the following issue for progress in making idempotence testing easier: [ansible-test idempotence tests for roles in Ansible Collections](https://github.com/ansible/ansible/issues/60226).
 
 For right now, I'd recommend sticking with Molecule for role testing, and using `ansible-test` more for module and plugin testing. I believe the long-term goal is to make it so Molecule can (if desired) be used as a more developer-friendly frontend to the `ansible-test` tool, but a lot of these things are still moving parts, as noted in the beginning of this post.
@@ -67,4 +67,3 @@ For right now, I'd recommend sticking with Molecule for role testing, and using 
 ## Reference
 
 * [how-add-integration-tests-ansible-collection-ansible-test](https://www.jeffgeerling.com/blog/2019/how-add-integration-tests-ansible-collection-ansible-test)
-

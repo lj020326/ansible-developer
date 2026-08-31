@@ -18,7 +18,7 @@ This scenario shows:
 
 #### "Apt Install" command in the playbook
 
-``` 
+```
 nano install_apache.yml
 # copy followings:
 ---
@@ -30,7 +30,7 @@ nano install_apache.yml
   - name: install apache2 package
     apt:
       name: apache2
-``` 
+```
 
 ![image](./img/201101204-780321bf-57b7-450b-89e9-1c5d6deb5e39.png)
 
@@ -38,9 +38,9 @@ nano install_apache.yml
 
 - Run playbook
 
-``` 
+```
 ansible-playbook --ask-become-pass install_apache.yml
-``` 
+```
 
 - Under Task "install apache2 package", status are changed, this means installing apache2 packet on the nodes successfully
 
@@ -64,7 +64,7 @@ ansible-playbook --ask-become-pass install_apache.yml
 
 - Add "apt update" and install other packages
 
-``` 
+```
 ---
 
 - hosts: all
@@ -82,19 +82,19 @@ ansible-playbook --ask-become-pass install_apache.yml
   - name: add php support for apache
     apt:
       name: libapache2-mod-php
-``` 
+```
 
 ![image](./img/201105158-4b3e598b-0726-444f-8844-ee99fc8f8d82.png)
 
-``` 
+```
 ansible-playbook --ask-become-pass install_apache.yml
-``` 
+```
 
 ![image](./img/201105473-2697a57a-4334-484f-97d9-501452007259.png)
 
 - Add "state: latest" to install latest version of the app
 
-``` 
+```
 ---
 
 - hosts: all
@@ -123,7 +123,7 @@ ansible-playbook --ask-become-pass install_apache.yml
 - Create "remove_apache.yml" to uninstall apps.
 - Use "state:absent" to uninstall.
 
-``` 
+```
 ---
 
 - hosts: all
@@ -143,9 +143,9 @@ ansible-playbook --ask-become-pass install_apache.yml
 
 ![image](./img/201107052-4e2c2d50-d7e7-44dd-8352-bd91f7e7be6b.png)
 
-``` 
+```
 ansible-playbook --ask-become-pass remove_apache.yml
-``` 
+```
 
 ![image](./img/201107516-ff2b2337-a01c-401d-af0a-177ac38c58c7.png)
 
@@ -158,7 +158,7 @@ ansible-playbook --ask-become-pass remove_apache.yml
 - Add 'when: ansible-distribution == "Ubuntu"' into the install_apache.yaml file
 - With 'when', it is possible to install command on specific distro (e.g. Ubuntu, Centos)
 
-``` 
+```
 ---
 
 - hosts: all
@@ -182,7 +182,7 @@ ansible-playbook --ask-become-pass remove_apache.yml
       state: latest
     when: ansible_distribution == "Ubuntu"
 ```
-- To get more information about the specific node. 
+- To get more information about the specific node.
 
 ```
 ansible all -m gather_facts --limit 172.21.79.85 | grep ansible_distribution
@@ -235,10 +235,10 @@ ansible all -m gather_facts --limit 172.21.79.85 | grep ansible_distribution
       state: latest
     when: ansible_distribution == "CentOS"
 ```
-Run: 
-``` 
+Run:
+```
 ansible-playbook --ask-become-pass install_apache.yml
-``` 
+```
 - Tasks that are defined for 'CentOS' are skipped
 
 ![image](./img/201657035-511cf7aa-8b17-4f87-95f9-4ea8d2772b1d.png)

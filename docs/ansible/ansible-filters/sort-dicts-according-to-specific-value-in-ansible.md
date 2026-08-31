@@ -56,4 +56,4 @@ Then use the custom filter to sort the dicts:
 ## References
 
 * https://stackoverflow.com/questions/51864288/sort-dict-according-to-specific-value-in-ansible
-* 
+*

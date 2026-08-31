@@ -18,7 +18,7 @@ mkdir host_vars
 
 ![image](./img/202507475-c42f278e-0999-4cdd-b9dd-c60d52d44639.png)
 
-- If the nodes in the inventory are defined with IPs, create file with 'IP.yml' (if they are defined with domain name, files are 
+- If the nodes in the inventory are defined with IPs, create file with 'IP.yml' (if they are defined with domain name, files are
 'domain_name.yml')
 
 - Add following variable into the file:
@@ -36,7 +36,7 @@ php_package_name: libapache2-mod-php
 ![image](./img/202508480-f7e094da-0d31-4327-a219-82e690b41acf.png)
 
 - Update 'roles/web_servers/tasks/main.yml' by adding variables (with quotation mark ") that are defined in files in host_vars directory.
-- For each node, defined host variables are used for variables. 
+- For each node, defined host variables are used for variables.
 
 ```
 - name: install apache and php
@@ -82,7 +82,7 @@ php_package_name: libapache2-mod-php
 - name: install unzip
   package:
     name: unzip
-    
+
 - name: install terraform
   unarchive:
     src: https://releases.hashicorp.com/terraform/1.3.4/terraform_1.3.4_linux_amd64.zip
@@ -90,7 +90,7 @@ php_package_name: libapache2-mod-php
     remote_src: yes
     owner: root
     group: root
-    mode: 0755    
+    mode: 0755
 ```
 
 ![image](./img/202510904-92f51a73-83d1-4c19-b376-37d8c236e7c4.png)
@@ -102,4 +102,3 @@ ansible-playbook site.yml
 ```
 
 ![image](./img/202511367-dd789f83-a7d5-40e1-9f2c-e3fec2e1f44c.png)
-

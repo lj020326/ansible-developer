@@ -3,7 +3,7 @@
 #   Name: vm_start.py
 #   Purpose: Start a virtual machine from a stopped state
 #   Requires: class VDCApiCall in the file vdc_api_call.py
-# For download and information: 
+# For download and information:
 #   http://cloudstore.interoute.com/main/knowledge-centre/library/vdc-api-python-scripts
 #
 # Copyright (C) Interoute Communications Limited, 2014

@@ -47,9 +47,9 @@ Initiate your cleanup crusade by understanding the space occupancy with the **do
 
 ```console
 $ docker system df
-$ 
-$ # for a detailed view 
-$ docker system df -v 
+$
+$ # for a detailed view
+$ docker system df -v
 ```
 
 However, one thing you may find, if your host is 100% full, the docker system df command may not be able to run.
@@ -135,10 +135,10 @@ When the built-in commands fall short for Docker overlay2 cleanup, or you desire
 Manually remove dangling or unused images and containers with precision using the following commands:
 
 ```console
-# Remove dangling images 
-$ docker rmi $(docker images -f "dangling=true" -q) 
+# Remove dangling images
+$ docker rmi $(docker images -f "dangling=true" -q)
 
-# Remove exited containers 
+# Remove exited containers
 $ docker rm -v $(docker ps -aq -f status=exited)
 ```
 
@@ -159,13 +159,13 @@ $ df -h du -sch /var/lib/docker/overlay2
 The container’s logs are vital but can be space-consuming, even if not directly related to Docker overlay2 cleanup. Restrict log files size by modifying the log parameters in **/etc/docker/daemon.json** and restarting the Docker daemon.
 
 ```console
-# Edit the daemon.json file 
-$ vi /etc/docker/daemon.json 
+# Edit the daemon.json file
+$ vi /etc/docker/daemon.json
 
-# Add the following entries 
-{ "log-driver":"json-file", "log-opts": {"max-size":"3m", "max-file":"1"} } 
+# Add the following entries
+{ "log-driver":"json-file", "log-opts": {"max-size":"3m", "max-file":"1"} }
 
-# Restart the Docker daemon 
+# Restart the Docker daemon
 $ systemctl daemon-reload systemctl restart docker
 ```
 
@@ -174,16 +174,16 @@ $ systemctl daemon-reload systemctl restart docker
 In a [Kubernetes setup](https://www.virtualizationhowto.com/2021/07/setup-kubernetes-ubuntu-20-04-step-by-step-cluster-configuration/), a more nuanced approach is needed. Draining nodes, stopping the kubelet and Docker services, followed by a comprehensive Docker cleanup can reclaim significant disk space.
 
 ```console
-# Drain the node 
-$ kubectl drain this_node --ignore-daemonsets --delete-local-data 
+# Drain the node
+$ kubectl drain this_node --ignore-daemonsets --delete-local-data
 
-# Stop kubelet service 
-$ kubelet stop 
+# Stop kubelet service
+$ kubelet stop
 
-# Restart Docker 
+# Restart Docker
 $ service docker restart
- 
-# Clean up Docker 
+
+# Clean up Docker
 $ docker system prune --all --volumes --force
 ```
 
@@ -207,7 +207,7 @@ $ systemctl start docker
 
 **What causes the /var/lib/docker/overlay2 directory to grow in size?**
 
-The /var/lib/docker/overlay2 directory is the hub where Docker stores the layers of your containers and images. Each time a new container or image is created, a new layer is added to this directory. Similarly, when you update or modify containers or images, additional layers are created.  
+The /var/lib/docker/overlay2 directory is the hub where Docker stores the layers of your containers and images. Each time a new container or image is created, a new layer is added to this directory. Similarly, when you update or modify containers or images, additional layers are created.
 Over time, these layers accumulate, causing the directory to swell in size. It’s important that you keep a close watch on this directory and perform regular cleanups. It helps to make sure your Docker host doesn’t run out of disk space.
 
 **How can I check the disk space used by Docker containers?**
@@ -224,12 +224,12 @@ The docker system prune command is a more extensive cleanup command compared to 
 
 **How does Docker Overlay2 compare to other storage drivers?**
 
-Docker Overlay2 has a significant advantage in terms of disk space efficiency due to its layered file system structure. Unlike other storage drivers that might duplicate common files across different containers or images, Overlay2 stores common files just once, saving a substantial amount of disk space.  
+Docker Overlay2 has a significant advantage in terms of disk space efficiency due to its layered file system structure. Unlike other storage drivers that might duplicate common files across different containers or images, Overlay2 stores common files just once, saving a substantial amount of disk space.
 However, each storage driver has its unique set of features and might be suited for different scenarios based on performance, consistency, and other operational requirements.
 
 **Can I switch to a different storage driver once Docker is already installed?**
 
-Yes, but switching storage drivers is not a straightforward task and requires a good understanding of Docker and its configuration.  
+Yes, but switching storage drivers is not a straightforward task and requires a good understanding of Docker and its configuration.
 It involves stopping Docker, moving or deleting the /var/lib/docker directory, configuring the new storage driver in the Docker configuration file, and restarting Docker. It’s advisable to backup your Docker data before attempting to switch storage drivers.
 
 **What are some common issues encountered with the Docker Overlay2 file system?**

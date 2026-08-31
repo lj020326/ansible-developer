@@ -1,10 +1,10 @@
 ﻿
 <<<<<<< HEAD
-function test-function { 
+function test-function {
 
     Write-Verbose "Testing log"
 
-    $logFile | Disable-LogFile 
+    $logFile | Disable-LogFile
 
     Get-Content $logFileName
 
@@ -14,13 +14,13 @@ $logFileName = "C:\apps\powershell\logs\test1.log"
 
 $logFile = Enable-LogFile -Path $logFileName
 
-Enable-OutputSubscriber -OnWriteVerbose {$fn=Get-FunctionName; "$fn"}    
+Enable-OutputSubscriber -OnWriteVerbose {$fn=Get-FunctionName; "$fn"}
 
 Write-Verbose "Before output subscription"
 
-test-function 
+test-function
 =======
-Import-Module PowerShellLogging 
+Import-Module PowerShellLogging
 
 function Write-Log {
     [CmdletBinding()]
@@ -36,7 +36,7 @@ function Write-Log {
     $Prefix = $Prefix.Trim()
 
     if ($Prefix) { $Prefix = "$Prefix " }
-        
+
     $Now = Get-Date -Format 'G'
     $Line = "$Now - $Prefix$Line"
 
@@ -44,7 +44,7 @@ function Write-Log {
 
 }
 
-function test-function { 
+function test-function {
 
     Write-Verbose "Testing log"
 
@@ -61,9 +61,9 @@ $logFile = Enable-OutputSubscriber -OnWriteDebug   { Write-Log -Path $logPath -L
                                    -OnWriteOutput  { Write-Log -Path $logPath -Line $args[0] }
 
 
-test-function 
+test-function
 
-$logFile | Disable-OutputSubscriber 
+$logFile | Disable-OutputSubscriber
 
 Get-Content $logPath
 >>>>>>> 000a7e67081903b2b20b9e9256cf23270cd965c8

@@ -8,9 +8,9 @@ There _is_ a difference here, and it's significant, but _understanding_ it is tr
 A commit, in Git, stores two things:
 
 -   It has a full snapshot of _every_ file, frozen for all time, as of the form that file had at the time you told Git to make the snapshot. (We'll see where these files actually come from later: the surprise is that it's not the files you see and work with / on.) These files are stored in a special, read-only, Git-only, compressed and _de-duplicated_ format, that only Git itself can use. The de-duplication takes care of the fact that each _new_ commit usually has mostly the same files as some older, existing commit. Those files literally get shared between commits—which is completely safe, since no part of any commit can ever be altered.
-    
+
 -   Besides the snapshot, each commit has some _metadata_. The metadata hold information such as who made the commit and when. You get to put a log message in here as well, explaining _why_ you made the commit, so that someone else—or your future self—can come back and see what you meant to do. (It's a good idea to put in a high level explanation of what was wrong with the previous commit and what this one is doing to improve it, in case you later find a bug. There's no point putting in low-level details about individual changed lines, because `git diff` or `git show` can show that mechanically.) Like the snapshot, this metadata is also frozen for all time—in fact, that's a feature of every internal Git object: none can _ever be changed_, not even by Git itself.
-    
+
 
 Now, to _find_ a commit directly, Git needs to know the commit's _hash ID_. Commit hash IDs are big ugly strings representing a large [hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal) number, which is actually a cryptographic checksum of the contents of the commit. (This is why the contents can't change: changing even a single bit changes the checksum. Git makes sure, during extraction, that the _contents_ still checksum to the _key_ used to find the object. The objects themselves are stored in a [key-value database](https://en.wikipedia.org/wiki/Key%E2%80%93value_database), with the keys being the checksums.)
 
@@ -203,4 +203,4 @@ ___
 - https://stackoverflow.com/questions/69125521/does-one-git-worktree-support-multiple-branches
 - https://www.gitkraken.com/learn/git/git-worktree
 - https://morgan.cugerone.com/blog/how-to-use-git-worktree-and-in-a-clean-way/
-- 
+-

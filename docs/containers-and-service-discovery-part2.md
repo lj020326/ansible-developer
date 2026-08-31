@@ -42,7 +42,7 @@ What I _will_ be doing, is providing sample configuration files as we go. If you
 ### Setting up the basics
 
 > **NOTE**
-> 
+>
 > From this point on I’m going to assume that you have a Linux server with at least 8G of RAM available to you, that you’ve updated it to the latest version of your particular Linux release, and that you have installed [Docker Server](https://docs.docker.com/engine/install/). If you don’t have this, you’ll need it before we start…
 
 [Consul](https://www.consul.io/) is going to form the basis for everything that we do, so [follow the instructions](https://learn.hashicorp.com/collections/consul/getting-started) to get started with Consul and, once you’ve completed the tutorial, stop the consul server and remove the `data_dir` folder that’s listed in your config file. This gives us a clean installation of consul to get started with.

@@ -182,18 +182,18 @@ jobs:
         uses: actions/checkout@v1
         with:
           path: ansible_collections/dettonville/system
- 
+
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
- 
+
       - name: Install dependencies
         run: |
           sudo apt install docker
           python -m pip install --upgrade pip
           pip install molecule yamllint ansible-lint docker
- 
+
       - name: Run role test
         run: >-
           molecule --version &&
@@ -278,18 +278,18 @@ jobs:
         uses: actions/checkout@v1
         with:
           path: ansible_collections/dettonville/system
- 
+
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
- 
+
       - name: Install dependencies
         run: |
           sudo apt install docker
           python -m pip install --upgrade pip
           pip install molecule yamllint ansible-lint docker
- 
+
       - name: Run role test
         run: >-
           molecule --version &&
@@ -355,18 +355,18 @@ jobs:
         uses: actions/checkout@v1
         with:
           path: ansible_collections/dettonville/system
- 
+
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
- 
+
       - name: Install dependencies
         run: |
           sudo apt install docker
           python -m pip install --upgrade pip
           pip install molecule yamllint ansible-lint docker
- 
+
       - name: Run role test
         run: >-
           molecule --version &&
@@ -385,4 +385,3 @@ If you have questions please feel free to comment.
 ## Reference
 
 * https://dettonville.com/2020/04/30/ansible-collections-role-tests-with-molecule/
-

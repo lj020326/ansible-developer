@@ -29,4 +29,3 @@ echo "****replacing ${FROM} to ${TO}"
 replace_pattern "${FROM}" "${TO}" true
 ret_val=$?
 echo "ret_val=$ret_val"
-

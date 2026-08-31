@@ -16,4 +16,3 @@ curl -sL https://${ENDPOINT}/ > ${CERT_IMPORT_DIR}/ca-certificates.${ENDPOINT_NA
 #echo | openssl s_client -showcerts -servername ${TARGET_HOST} -connect ${ENDPOINT} 2>/dev/null \
 #  | awk '/-----BEGIN CERTIFICATE-----/, /-----END CERTIFICATE-----/' >> ${CERT_IMPORT_DIR}/ca-certificates.${ENDPOINT_NAME}.crt
 update-ca-certificates
-

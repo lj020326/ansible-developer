@@ -141,23 +141,23 @@ Else {
 		foreach($vm in $vms){
 			$Details = "" | Select-Object VM, IPAddress
   			$vmIP = $vm.Guest.IPAddress
-  	
+
 				foreach($ip in $vmIP){
     				if($ip -eq $tgtIP) {
-						Write-Host "Found the VM!" 
-	 					$Details.VM = $vm.Name 
+						Write-Host "Found the VM!"
+	 					$Details.VM = $vm.Name
 						$Details.IPAddress = $tgtIP
-						
+
 						$Details.PSTypeNames.Clear()
 						$Details.PSTypeNames.Add('VMCommunity.PowerPack.VM')
 						$Details
 					}
 				}
 		}
-}		
+}
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
-} 
+}
 
 
 ]]></script>
@@ -182,29 +182,29 @@ Else {
 		foreach($vm in $vms){
 			$Details = "" | Select-Object VM
   			$vmMAC = $vm | Get-NetworkAdapter | select MacAddress
-  	
+
 				foreach($mac in $vmMAC){
     				if($mac.MacAddress -eq $tgtMAC) {
-						Write-Host "Found the VM!" 
-	 					$Details.VM = $vm.Name 
-						
+						Write-Host "Found the VM!"
+	 					$Details.VM = $vm.Name
+
 						$Details.PSTypeNames.Clear()
 						$Details.PSTypeNames.Add('VMCommunity.PowerPack.VM')
 						$Details
 					}
 				}
 		}
-}		
+}
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
-} 
+}
 
 ]]></script>
                   <IconB64>AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA4AAAAYAAAAGgAAABoAAAAaAAAAGgAAABoAAAAaAAAAGgAAABoAAAAaAAAAGgAAABcAAAASAAAADgAAAAQAAAAbAAAAMA8PD4ZGRkalRkZGpUZGRqUPDw+GAAAAMwAAADMCAgKkAgICpAICAqQCAgKkAgICpAICAqQAAAAAAAAAAAAAAAAjIyN9q6ur/6urq/+rq6v/IyMjfQAAAAAAAAAABAQEjoeHh/+Dg4P/g4OD/4eHh/8EBASOMTExWTAwMHcwMDB3MDAwd5+fn/+fn5//n5+f/zAwMHcwMDB3MDAwdwQEBJNubm7/ampq/zPMM/9ubm7/BAQEkzY2NnTNzc3/zs7O/9PT0//X19f/2tra/9nZ2f/V1dX/0NDQ/87Ozv9ZWVn/VVVV/1VVVf9VVVX/VVVV/wICAqg7Oztyz8/P/8OOSf/VmUj/36NR/+isWf/usl//9Lhk/+66c//Pz8//mZmZ/8jIyP+9vb3/0dHR/8jIyP8pKSl6QUFBcNTU1P+3ey7/zZFB/9KWRP/ZnUr/4KRP/+erVP/qrlz/1NTU/6Kiov/Nzc3/wsLC/5mZmf/Nzc3/MzMzdUVFRW3Z2dn/snYq/86SRv/KjkL/xoo9/8WJO//Gijz/05dJ/9nZ2f+np6f/19fX/9LS0v/S0tL/19fX/zo6OnJKSkpr3t7e/7Z6Lv/hpVn/4aVZ/+GlWf/hpVn/4aVZ/9ebT//e3t7/rKys/7q6uv+9vb3/vb29/7q6uv9BQUFvTk5OauLi4v+seDX/u38z/76CNv/BhTn/xoo+/8yQRP/KllP/4uLi/7CwsP/i4uL/3d3d/93d3f/i4uL/R0dHbVJSUmjq6ur/5eXl/+Xl5f/l5eX/5eXl/+Xl5f/l5eX/5eXl/+rq6v+1tbX/wsLC/8fHx//Hx8f/wsLC/0xMTGpVVVVNVVVVZ1VVVWdVVVVnVVVVZ1VVVWdVVVVnVVVVZ1VVVWdVVVVnUVFRaOrq6v/l5eX/5eXl/+rq6v9RUVFoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFRUVE1UVFRnVFRUZ1RUVGdUVFRnVFRUTQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//+sQQAArEEAAKxB4MCsQQAArEEAAKxBAACsQQAArEEAAKxBAACsQQAArEEAAKxBAACsQf/ArEH//6xB//+sQQ==</IconB64>
                 </container>
                 <container name="VM Selected OS &amp; Installed OS" Description="" ResultView="6daa7380-b4f9-422e-a7b7-1a86193e14eb" id="79a89bd6-ca76-44c8-8377-a504480857bb" type="Script@" returntype="Selected.VMware.Vim.VirtualMachine#@@@#System.Management.Automation.PSCustomObject#@@@#System.Object">
                   <script><![CDATA[if ($global:defaultviservers) {
-	$Details = Get-View -ViewType VirtualMachine | Where { $_.Guest.GuestFullname} | Sort Name |Select-Object Name, @{N="SelectedOS";E={$_.Guest.GuestFullName}}, @{N="InstalledOS";E={$_.Summary.Config.GuestFullName}} 
+	$Details = Get-View -ViewType VirtualMachine | Where { $_.Guest.GuestFullname} | Sort Name |Select-Object Name, @{N="SelectedOS";E={$_.Guest.GuestFullName}}, @{N="InstalledOS";E={$_.Summary.Config.GuestFullName}}
 	$Details.PSTypeNames.Clear()
 	$Details.PSTypeNames.Add('VMCommunity.PowerPack.VM')
 	$Details
@@ -460,7 +460,7 @@ Else {
 			}
 			If (($_.Exception.Message) -match "The RPC Server is unavailable.") {
 				$Global:err = "Unable to make WMI call to this machine"
-			}	
+			}
 			continue
 		}
 		$Global:err = $null
@@ -540,7 +540,7 @@ if ($global:defaultviservers) {
 			$Details
 		}
 		$i++
-	}	
+	}
 }
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -559,12 +559,12 @@ if ($global:defaultviservers) {
 	# Generated On: 25/11/2009 12:55
 	# Generated By: IT2000
 	########################################################################
-	
+
 	#region Import the Assemblies
 	[reflection.assembly]::loadwithpartialname("System.Windows.Forms") | Out-Null
 	[reflection.assembly]::loadwithpartialname("System.Drawing") | Out-Null
 	#endregion
-	
+
 	#region Generated Form Objects
 	$form1 = New-Object System.Windows.Forms.Form
 	$button1 = New-Object System.Windows.Forms.Button
@@ -572,27 +572,27 @@ if ($global:defaultviservers) {
 	$comboBox1 = New-Object System.Windows.Forms.ComboBox
 	$InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
 	#endregion Generated Form Objects
-	
+
 	#----------------------------------------------
 	#Generated Event Script Blocks
 	#----------------------------------------------
 	#Provide Custom Code for events specified in PrimalForms.
-	$button1_OnClick= 
+	$button1_OnClick=
 	{
 	$global:vmcpu = $comboBox1.SelectedItem
 	$form1.close()
 	}
-	
-	$handler_label2_Click= 
+
+	$handler_label2_Click=
 	{
 	#TODO: Place custom script here
-	
+
 	}
-	
+
 	$OnLoadForm_StateCorrection=
 	{#Correct the initial state of the form to prevent the .Net maximized form issue
 		$form1.WindowState = $InitialFormWindowState
-		
+
 		Foreach ($vm in (Get-VM | Sort Name)){
 			$comboBox1.items.add($VM)
 			$comboBox1.SelectedIndex=0
@@ -602,7 +602,7 @@ if ($global:defaultviservers) {
 		$button1.visible = $true
 		$form1.Text = "Please select a virtual machine"
 	}
-	
+
 	#----------------------------------------------
 	#region Generated Form Code
 	$form1.AutoScaleMode = 0
@@ -614,9 +614,9 @@ if ($global:defaultviservers) {
 	$System_Drawing_Size.Width = 392
 	$form1.ClientSize = $System_Drawing_Size
 	$form1.FormBorderStyle = 1
-	
+
 	$form1.Controls.Add($InfoLabel)
-	
+
 	$button1.TabIndex = 2
 	$System_Drawing_Size = New-Object System.Drawing.Size
 	$System_Drawing_Size.Height = 23
@@ -624,19 +624,19 @@ if ($global:defaultviservers) {
 	$button1.Size = $System_Drawing_Size
 	$button1.Name = "button1"
 	$button1.UseVisualStyleBackColor = $True
-	
+
 	$button1.Visible = $False
 	$button1.Text = "OK"
 	$System_Drawing_Point = New-Object System.Drawing.Point
 	$System_Drawing_Point.X = 300
 	$System_Drawing_Point.Y = 21
 	$button1.Location = $System_Drawing_Point
-	
+
 	$button1.DataBindings.DefaultDataSourceUpdateMode = 0
 	$button1.add_Click($button1_OnClick)
-	
+
 	$form1.Controls.Add($button1)
-	
+
 	$label1.TabIndex = 1
 	$label1.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",8.25,1,3,1)
 	$System_Drawing_Size = New-Object System.Drawing.Size
@@ -650,11 +650,11 @@ if ($global:defaultviservers) {
 	$System_Drawing_Point.X = 8
 	$System_Drawing_Point.Y = 26
 	$label1.Location = $System_Drawing_Point
-	
+
 	$label1.DataBindings.DefaultDataSourceUpdateMode = 0
-	
+
 	$form1.Controls.Add($label1)
-	
+
 	$System_Drawing_Point = New-Object System.Drawing.Point
 	$System_Drawing_Point.X = 64
 	$System_Drawing_Point.Y = 21
@@ -668,24 +668,24 @@ if ($global:defaultviservers) {
 	$System_Drawing_Size.Height = 21
 	$System_Drawing_Size.Width = 217
 	$comboBox1.Size = $System_Drawing_Size
-	
+
 	$form1.Controls.Add($comboBox1)
-	
+
 	#endregion Generated Form Code
-	
+
 	#Save the initial state of the form
 	$InitialFormWindowState = $form1.WindowState
 	#Init the OnLoad event to correct the initial state of the form
 	$form1.add_Load($OnLoadForm_StateCorrection)
-		
+
 	#Show the Form
 	$form1.ShowDialog()| Out-Null
-	
+
 	} #End Function
-	
+
 	#Call the Function
 	GenerateForm
-	
+
 
 	$vms = $global:vmcpu
 	ForEach ($VM in $VMs){
@@ -700,7 +700,7 @@ if ($global:defaultviservers) {
 			$Details.PSTypeNames.Add('Virtu-al.PowerPack.VM')
 			$Details
 		}
-	}	
+	}
 }
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -1055,7 +1055,7 @@ Else {
 		$obj = New-Object psobject
 		$obj | Add-Member -membertype NoteProperty -Name Host -value $_.Name
 		$obj | Add-Member -membertype NoteProperty -Name Version -value "$($_.Summary.Config.Product.Name) $($_.Summary.Config.Product.Version)"
-		$memMgr = Get-View $_.ConfigManager.MemoryManager 
+		$memMgr = Get-View $_.ConfigManager.MemoryManager
 		$obj | Add-Member -membertype NoteProperty -Name ConsoleMemoryMB -value ($_.Config.ConsoleReservation.ServiceConsoleReserved / 1MB)
 		$obj | Add-Member -membertype NoteProperty -Name MEMReservedMB -value ($memMgr.ConsoleReservationInfo.ServiceConsoleReserved / 1Mb)
 		$obj.PSTypeNames.Clear()
@@ -1137,9 +1137,9 @@ Else {
                 </container>
                 <container name="Host Alarms" Description="" ResultView="6daa7380-b4f9-422e-a7b7-1a86193e14eb" id="e60bfc32-4b30-4367-92b1-d48514548696" type="Script@" returntype="Virtu-al.PowerPack.VMHostAlarm#@@@#Virtu-al.PowerPack.VMHost">
                   <script><![CDATA[if ($global:defaultviservers) {
-	$serviceInstance = get-view ServiceInstance 
-	$alarmMgr = get-view $serviceInstance.Content.alarmManager 
-	$HostsViews = Get-View -ViewType hostsystem 
+	$serviceInstance = get-view ServiceInstance
+	$alarmMgr = get-view $serviceInstance.Content.alarmManager
+	$HostsViews = Get-View -ViewType hostsystem
 	$valarms = $alarmMgr.GetAlarm($null) | select value, @{N="name";E={(Get-View -Id $_).Info.Name}}
 	foreach ($HostsView in $HostsViews){
 		if ($HostsView.TriggeredAlarmState){
@@ -1367,7 +1367,7 @@ Else {
 		$obj | Add-Member -membertype NoteProperty -Name BeaconInterval -value $NicTeaming.BeaconInterval
 		$obj | Add-Member -membertype NoteProperty -Name LoadBalancingPolicy -value $NicTeaming.LoadBalancingPolicy
 		$obj | Add-Member -membertype NoteProperty -Name NetworkFailoverDetectionPolicy -value $NicTeaming.NetworkFailoverDetectionPolicy
-		$obj | Add-Member -membertype NoteProperty -Name NotifySwitches  -value $NicTeaming.NotifySwitches 
+		$obj | Add-Member -membertype NoteProperty -Name NotifySwitches  -value $NicTeaming.NotifySwitches
 		$obj | Add-Member -membertype NoteProperty -Name FailbackEnabled -value $NicTeaming.FailbackEnabled
 		If ($NicTeaming.ActiveNic -gt 1){
 			$obj | Add-Member -membertype NoteProperty -Name ActiveNic -value ([string]::join(' , ',($NicTeaming.ActiveNic)))
@@ -1456,7 +1456,7 @@ Else {
 			$obj | Add-Member -membertype NoteProperty -Name VLAN -value $PortGroup.VLanId
 			$obj | Add-Member -membertype NoteProperty -Name LoadBalancingPolicy -value $NicTeaming.LoadBalancingPolicy
 			$obj | Add-Member -membertype NoteProperty -Name NetworkFailoverDetectionPolicy -value $NicTeaming.NetworkFailoverDetectionPolicy
-			$obj | Add-Member -membertype NoteProperty -Name NotifySwitches  -value $NicTeaming.NotifySwitches 
+			$obj | Add-Member -membertype NoteProperty -Name NotifySwitches  -value $NicTeaming.NotifySwitches
 			$obj | Add-Member -membertype NoteProperty -Name FailbackEnabled -value $NicTeaming.FailbackEnabled
 			If ($NicTeaming.ActiveNic -gt 1){
 				$obj | Add-Member -membertype NoteProperty -Name ActiveNic -value ([string]::join(' , ',($NicTeaming.ActiveNic)))
@@ -1594,22 +1594,22 @@ Else {
 	foreach($esx in (Get-VMHost | Sort Name)){
 		foreach($vswitch in (Get-VirtualSwitch -VMHost $esx | where {$_.NumPortsAvailable -lt $num})){
 			$Details = "" | Select-Object VMHost, vSwitch, NumPorts , NumPortsAvailable
-		
+
 			$Details.VMHost = $esx.Name
-			$Details.vSwitch = $vswitch.Name			
+			$Details.vSwitch = $vswitch.Name
 			$Details.NumPorts = $vswitch.NumPorts
 			$Details.NumPortsAvailable = $vswitch.NumPortsAvailable
-					
+
 			$Details.PSTypeNames.Clear()
 			$Details.PSTypeNames.Add('VMCommunity.PowerPack.vSwitchWithlessthenXports')
 			$Details.PSTypeNames.Add('VMCommunity.PowerPack.NET')
 			$Details
 		}
-	}		
+	}
 }
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
-} 
+}
 
 ]]></script>
                   <IconB64>AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8/f7/+/7+//39/f///v3///79///9/f///f7///3////+/P/8/v3/+/3+//7++f/6+Pj/0c7O/9PX1P/7+/3/+Pf4//Hz9f/w+Pj/8vT1//H49P/x+PP/9vf4//Py+v/69/T/9/j2//L3+P/n+PP/3eLi/5ONjv+Xm5z/7Ozw//Ds5//y7ub/4+zt/+vp7v/y6e7/7+vk/+7q6v/l6PD/7+vu//Hs7P/u7Or/4e3p/9HUyP+tpJ7/m5yk/9jZ2v/9+/7/2uf3/3qt2v9sq+j/aazs/4/I7v97rdr/Yqnn/2Cq4P9kreD/Z63l/2ip5P+CpMD/oqGm/5OUjf/g4df/zN/B/22xYv9DoFf/SqNj/06iZv9ToVv/SJhW/0CeZf9Gn2H/SqBn/0mga/9Fm2n/bJB5/7Ksqv+QkI7/19fX/7DPq/9cwVj/Ws5Z/1XIVP9Yx1P/Ws1Y/13HWv9juWf/drpp/26yZf9rtGj/Y7lh/4KjgP+9urr/mpuc/8zIzv+wz6f/R70//0LSOf83zjr/Rsc//zrHP/9Jv0n/rs+y/9fO0f+Tl5b/n5qX/3ysc/95n3H/wLrA/5aQlf/QzM7/qdaj/yzFL/8jzyv/I841/zjJOf8pzTP/N8U6/6rTsf/azNj/kI2a/56Rn/92rnn/aJtp/7Sptv+UiZL/0c7O/6/Sqf9uy2z/msqV/5yyn/+FnXr/TrRN/zHMK/9Du0T/TLZC/0qyRf9Sskf/SLA8/3KYZP9sbWv/bXNw/8/Nzv+xya//j9OU/7rZtv+4xr3/pbej/3zEhf9sym3/jMOW/5rDm/+BsIr/g66K/265ev+Io4r/lIuY/42Ujf/HycT/s9Cu/4HXe/+b7JL/mumZ/57pm/+O54//lN6N/9Pozv/o4eH/sbCx/7ews/+Zv5H/gqJ7/7Sir/+Khor/zdHQ/7DSrf+C2Xv/m/KX/5rumf+Z7Zr/ne6f/6Xlpv/C5cL/z+HR/73Rwf+61MH/q+Cs/4y2jv+zrKr/lZKK/9TZ1P+307H/ZKtT/2euVv9kqlb/ZKhX/2WyV/9gsE//aKpX/2upXP9mqln/aaZg/2moYv+Bq4X/qKWp/5iQlf/a2tz/6Ovo/+Tt5v/k7Ob/5+/q/+Ps5//l6ej/6ejr/+rn7P/q6Ov/6Orr/+jq6v/k7eL/zdDQ/6iipv+lppr/3uDc//38/P/+/f7//v3+//78/P/+/v3//f7+//v9/v/4/v3/9/76//v+/f/9/f7//v72/+Le3v+QjY3/nZyd//v5/P///v///v7///7+/v/+/v7//v7+///+/v/+/v7//f/+//7//f/+/v7//v3+//7+/f/x8vD/ztDL/9fZ1v/+/v//AACsQQAArEEAAKxBAACsQQAArEEAAKxBAACsQQAArEEAAKxBAACsQQAArEEAAKxBAACsQQAArEEAAKxBAACsQQ==</IconB64>
@@ -1753,7 +1753,7 @@ Else {
                 <container name="Cluster Alarms" Description="" id="44b927df-2782-4120-8f0f-fbf810fabe07" type="Script@" returntype="Virtu-al.PowerPack.CLUAlarm#@@@#Virtu-al.PowerPack.CLU">
                   <script><![CDATA[if ($global:defaultviservers) {
 	foreach ($clusview in (Get-View -ViewType ClusterComputeResource)) {
-		if ($clusview.ConfigIssue) {           
+		if ($clusview.ConfigIssue) {
 			$CluConfigIssues = $clusview.ConfigIssue
 			Foreach ($CluConfigIssue in $CluConfigIssues) {
 				$Details = "" | Select-Object Name, Message
@@ -1795,12 +1795,12 @@ if ($global:defaultviservers) {
 	# Generated On: 25/11/2009 12:55
 	# Generated By: IT2000
 	########################################################################
-	
+
 	#region Import the Assemblies
 	[reflection.assembly]::loadwithpartialname("System.Windows.Forms") | Out-Null
 	[reflection.assembly]::loadwithpartialname("System.Drawing") | Out-Null
 	#endregion
-	
+
 	#region Generated Form Objects
 	$form1 = New-Object System.Windows.Forms.Form
 	$button1 = New-Object System.Windows.Forms.Button
@@ -1808,27 +1808,27 @@ if ($global:defaultviservers) {
 	$comboBox1 = New-Object System.Windows.Forms.ComboBox
 	$InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
 	#endregion Generated Form Objects
-	
+
 	#----------------------------------------------
 	#Generated Event Script Blocks
 	#----------------------------------------------
 	#Provide Custom Code for events specified in PrimalForms.
-	$button1_OnClick= 
+	$button1_OnClick=
 	{
 	$global:Cluster = $comboBox1.SelectedItem
 	$form1.close()
 	}
-	
-	$handler_label2_Click= 
+
+	$handler_label2_Click=
 	{
 	#TODO: Place custom script here
-	
+
 	}
-	
+
 	$OnLoadForm_StateCorrection=
 	{#Correct the initial state of the form to prevent the .Net maximized form issue
 		$form1.WindowState = $InitialFormWindowState
-		
+
 		Foreach ($Cluster in (Get-Cluster | Sort Name)){
 			$comboBox1.items.add($Cluster)
 			$comboBox1.SelectedIndex=0
@@ -1838,7 +1838,7 @@ if ($global:defaultviservers) {
 		$button1.visible = $true
 		$form1.Text = "Please select a cluster"
 	}
-	
+
 	#----------------------------------------------
 	#region Generated Form Code
 	$form1.AutoScaleMode = 0
@@ -1850,9 +1850,9 @@ if ($global:defaultviservers) {
 	$System_Drawing_Size.Width = 392
 	$form1.ClientSize = $System_Drawing_Size
 	$form1.FormBorderStyle = 1
-	
+
 	$form1.Controls.Add($InfoLabel)
-	
+
 	$button1.TabIndex = 2
 	$System_Drawing_Size = New-Object System.Drawing.Size
 	$System_Drawing_Size.Height = 23
@@ -1860,19 +1860,19 @@ if ($global:defaultviservers) {
 	$button1.Size = $System_Drawing_Size
 	$button1.Name = "button1"
 	$button1.UseVisualStyleBackColor = $True
-	
+
 	$button1.Visible = $False
 	$button1.Text = "OK"
 	$System_Drawing_Point = New-Object System.Drawing.Point
 	$System_Drawing_Point.X = 300
 	$System_Drawing_Point.Y = 21
 	$button1.Location = $System_Drawing_Point
-	
+
 	$button1.DataBindings.DefaultDataSourceUpdateMode = 0
 	$button1.add_Click($button1_OnClick)
-	
+
 	$form1.Controls.Add($button1)
-	
+
 	$label1.TabIndex = 1
 	$label1.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",8.25,1,3,1)
 	$System_Drawing_Size = New-Object System.Drawing.Size
@@ -1886,11 +1886,11 @@ if ($global:defaultviservers) {
 	$System_Drawing_Point.X = 8
 	$System_Drawing_Point.Y = 26
 	$label1.Location = $System_Drawing_Point
-	
+
 	$label1.DataBindings.DefaultDataSourceUpdateMode = 0
-	
+
 	$form1.Controls.Add($label1)
-	
+
 	$System_Drawing_Point = New-Object System.Drawing.Point
 	$System_Drawing_Point.X = 64
 	$System_Drawing_Point.Y = 21
@@ -1904,24 +1904,24 @@ if ($global:defaultviservers) {
 	$System_Drawing_Size.Height = 21
 	$System_Drawing_Size.Width = 217
 	$comboBox1.Size = $System_Drawing_Size
-	
+
 	$form1.Controls.Add($comboBox1)
-	
+
 	#endregion Generated Form Code
-	
+
 	#Save the initial state of the form
 	$InitialFormWindowState = $form1.WindowState
 	#Init the OnLoad event to correct the initial state of the form
 	$form1.add_Load($OnLoadForm_StateCorrection)
-		
+
 	#Show the Form
 	$form1.ShowDialog()| Out-Null
-	
+
 	} #End Function
-	
+
 	#Call the Function
 	GenerateForm
-	
+
 
 	$vms = @(($global:Cluster | Get-VM | Where {$_.PowerState -eq "PoweredOn"}) | Sort Name)
 	$i = 1
@@ -1940,7 +1940,7 @@ if ($global:defaultviservers) {
 			$Details
 		}
 		$i++
-	}	
+	}
 }
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -1970,23 +1970,23 @@ Else {
 	foreach($clus in (Get-Cluster | Sort Name)){
 		foreach($rule in (Get-DrsRule -Cluster $clus)){
 			$Details = "" | Select-Object Cluster, RuleName, Status, KeepTogether, VMs
-		
+
 				$vmName = Get-VM -Id $rule.VMIds
-	
-					$Details.Cluster = $clus.Name			
+
+					$Details.Cluster = $clus.Name
 					$Details.RuleName = $rule.Name
 					$Details.Status = $rule.Enabled
 					$Details.KeepTogether = $rule.KeepTogether
-					
-					$Details.VMs = [string]$vmName 
-						
+
+					$Details.VMs = [string]$vmName
+
 					$Details.PSTypeNames.Clear()
 					$Details.PSTypeNames.Add('VMCommunity.PowerPack.DRSRules')
 					$Details.PSTypeNames.Add('VMCommunity.PowerPack.Cluster')
 					$Details
 		}
 	}
-}		
+}
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
 } ]]></script>
@@ -2068,7 +2068,7 @@ Else {
                   <script><![CDATA[if ($global:defaultviservers) {
 	Foreach ($cluster in (Get-View -ViewType ClusterComputeResource | Get-VIObjectByVIView)){
 		Foreach ($vm in ( $cluster | Get-VM | Sort Name | Get-View )){
-							
+
 		if ($vm.Config.CpuAllocation.Reservation -gt "256"){
 			$cpu = "1"
 		}
@@ -2078,31 +2078,31 @@ Else {
 			$mem = "1"
 		}
 		else{$mem = "0"}
-				
+
 		if ($cpu -eq "1" -or $mem -eq "1"){
-			
+
 		$Details = New-object PSObject
-		$Details | Add-Member -Name Cluster -Value $cluster.name -Membertype NoteProperty	
-		$Details | Add-Member -Name VMName -Value $vm.name -Membertype NoteProperty		
-				
+		$Details | Add-Member -Name Cluster -Value $cluster.name -Membertype NoteProperty
+		$Details | Add-Member -Name VMName -Value $vm.name -Membertype NoteProperty
+
 		if($cpu -eq "1"){
-			$Details | Add-Member -Name "CPU Reservation" -Value $vm.Config.CpuAllocation.Reservation -Membertype NoteProperty		
+			$Details | Add-Member -Name "CPU Reservation" -Value $vm.Config.CpuAllocation.Reservation -Membertype NoteProperty
 		}
-		else{$Details | Add-Member -Name "CPU Reservation" -Value $null -Membertype NoteProperty}		
-	
+		else{$Details | Add-Member -Name "CPU Reservation" -Value $null -Membertype NoteProperty}
+
 		if($mem -eq "1"){
-			$Details | Add-Member -Name "Memory Reservation" -Value $vm.Config.MemoryAllocation.Reservation -Membertype NoteProperty		
+			$Details | Add-Member -Name "Memory Reservation" -Value $vm.Config.MemoryAllocation.Reservation -Membertype NoteProperty
 		}
 		else{$Details | Add-Member -Name "Memory Reservation" -Value $null -Membertype NoteProperty}
-			
+
 		$Details.PSTypeNames.Clear()
 		$Details.PSTypeNames.Add('VMCommunity.PowerPack.SlotSizes')
 		$Details.PSTypeNames.Add('VMCommunity.PowerPack.Cluster')
 		$Details
 		}
 		}
-	}	
-}	
+	}
+}
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
 } ]]></script>
@@ -2282,7 +2282,7 @@ if ($noConnection) {
                   <script><![CDATA[if ($global:defaultviservers) {
 	$num = Read-Host "How many VMs"
 	[int]$tmp=0
-	while (-not [int]::tryparse($num,[ref]$tmp)){$num = Read-Host "How many VMs"}	
+	while (-not [int]::tryparse($num,[ref]$tmp)){$num = Read-Host "How many VMs"}
 	Foreach ($ds in (Get-DataStore )){
 		$Details = "" |Select-Object DataStore,TotalVMs
 		if (($ds | Get-VM).count -ge $num){
@@ -2316,18 +2316,18 @@ Else {
                 <container name="Return Datastore name by Canonical name" Description="" id="24787163-9e83-417e-b0b4-46320d30441f" type="Script@">
                   <script><![CDATA[if ($global:defaultviservers) {
 	$id = Read-Host "Enter the Canonical Name (aka: naa.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)"
-    foreach($esx in (Get-VMHost)){	
+    foreach($esx in (Get-VMHost)){
 	$Details = "" |Select-Object DataStore
 		foreach($ds in (Get-VMHost $esx | Get-Datastore | where{$_.Type -eq "vmfs"} | Get-View)){
 			$Details = "" |Select-Object DataStore
     			$ds.Info.Vmfs.Extent | %{
 	 			if($_.DiskName -eq $id){
-        			$Details.DataStore = $ds.Info.Name 
+        			$Details.DataStore = $ds.Info.Name
 				}
    			}
 		}
 		$Details.PSTypeNames.Clear()
-		$Details	
+		$Details
 	}
 }
 Else {
@@ -2374,7 +2374,7 @@ Else {
 foreach($clus in (Get-Cluster)){
 	foreach($rp in (Get-ResourcePool -Location $clus | Get-View | Where-Object `
   	{$_.Name -ne "Resources" -and $_.Summary.QuickStats.BalloonedMemory -ne "0"})){
-   
+
    		$Details = "" | Select-Object Cluster, ResourcePool, SwappedMemory ,BalloonedMemory
 
     	$Details.Cluster = $clus.Name
@@ -2387,7 +2387,7 @@ foreach($clus in (Get-Cluster)){
 		$Details.PSTypeNames.Add('VMCommunity.PowerPack.RP')
 		$Details
 		}
-	}	
+	}
 }
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -2426,7 +2426,7 @@ Else {
 		$Details.Name = $Template.name
 		$Details.Host = $VMHostIDs[$Template.Runtime.Host.Value]
 		$Details.Cluster = Get-cluster -VMHost (Get-VMHost -Name ($VMHostIDs[$Template.Runtime.Host.Value]))
-		
+
 		$Details.PSTypeNames.Clear()
 		$Details.PSTypeNames.Add('Virtu-al.PowerPack.TempInfo')
 		$Details.PSTypeNames.Add('Virtu-al.PowerPack.Temp')
@@ -2507,13 +2507,13 @@ Else {
     	$Details.VM = $snap.VM
     	$Details.SnapName = $snap.Name
     	$Details.Created = $snap.Created
-						
+
 		$Details.PSTypeNames.Clear()
 		$Details.PSTypeNames.Add('VMCommunity.PowerPack.VUMSnapActive')
 		$Details.PSTypeNames.Add('VMCommunity.PowerPack.Snap')
 		$Details
 	}
-}		
+}
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
 } ]]></script>
@@ -2567,7 +2567,7 @@ Else {
                   </items>
                 </container>
                 <container name="Detailed Permission List" Description="" id="8a57a00f-ad9f-4a46-b2ee-53f713e4d287" type="Script@" returntype="Virtu-al.PowerPack.PermDetailedList#@@@#Virtu-al.PowerPack.Permissions">
-                  <script><![CDATA[Foreach ($Object in Get-Inventory){ 
+                  <script><![CDATA[Foreach ($Object in Get-Inventory){
 	$Perms = $Object  | Get-VIPermission
 	Foreach ($Perm in $Perms){
 		$obj = new-object psobject
@@ -3559,7 +3559,7 @@ $InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
 #Generated Event Script Blocks
 #----------------------------------------------
 #Provide Custom Code for events specified in PrimalForms.
-$button1_OnClick= 
+$button1_OnClick=
 {
 #TODO: Place custom script here
 	$global:esxhost = $comboBox1.SelectedItem
@@ -3567,19 +3567,19 @@ $button1_OnClick=
 	$form1.close()
 }
 
-$handler_label2_Click= 
+$handler_label2_Click=
 {
 #TODO: Place custom script here
 
 }
 
-$handler_label1_Click= 
+$handler_label1_Click=
 {
 #TODO: Place custom script here
 
 }
 
-$handler_form1_Load= 
+$handler_form1_Load=
 {
 #TODO: Place custom script here
 		Foreach ($esx in (Get-VMHost | Sort Name)){
@@ -3715,14 +3715,14 @@ function Move-Template{
     if($datastore -ne ""){$svmotion = $true}
 
     Write-Host "Converting $template to VM"
-    $vm = Set-Template -Template (Get-Template $template) -ToVM 
+    $vm = Set-Template -Template (Get-Template $template) -ToVM
 
     if($svmotion){
         Write-Host "Migrate $template to $esx and $datastore"
         Move-VM -VM (Get-VM $vm) -Destination (Get-VMHost $esx) `
         -Datastore (Get-Datastore $datastore) -Confirm:$false
         (Get-VM $vm | Get-View).MarkAsTemplate() | Out-Null
-    }        
+    }
 
     if($vmotion){
         Write-Host "Migrate $template to $esx"
@@ -3847,7 +3847,7 @@ Else {
               <script><![CDATA[if ($global:defaultviservers) {
 	$input | ForEach-Object {
 		Get-VmHostService -VMHost $_.Name | Where-Object {$_.key -eq "ntpd"} | Start-VMHostService -Confirm:$false
-	}		
+	}
 }
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -3861,7 +3861,7 @@ Else {
               <script><![CDATA[if ($global:defaultviservers) {
 	$input | ForEach-Object {
 		Get-VmHostService -VMHost $_.Name | Where-Object {$_.key -eq "ntpd"} | Stop-VMHostService -Confirm:$false
-	}		
+	}
 }
 Else {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can use this node. Please click on the ''Managed Hosts'' node of the VMware PowerPack, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -3906,23 +3906,23 @@ $InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
 #Generated Event Script Blocks
 #----------------------------------------------
 #Provide Custom Code for events specified in PrimalForms.
-$button1_OnClick= 
+$button1_OnClick=
 {
 #TODO: Place custom script here
 	$global:destesx = $comboBox1.SelectedItem
 	$global:destdatastore = $comboBox2.SelectedItem
-	$global:movetemplate = 1	
+	$global:movetemplate = 1
 	$form1.close()
 }
 
-$button2_OnClick= 
+$button2_OnClick=
 {
 #TODO: Place custom script here
 	$global:movetemplate = 0
 	$form1.close()
 }
 
-$handler_label1_Click= 
+$handler_label1_Click=
 {
 #TODO: Place custom script here
 
@@ -3935,14 +3935,14 @@ $OnLoadForm_StateCorrection=
 		Foreach ($esx in (Get-VMHost | Sort Name)){
 			$comboBox1.items.add($esx)
 			$comboBox1.SelectedIndex=0
-			
+
 		}
 		Foreach ($ds in (Get-VMHost $comboBox1.SelectedItem | Get-Datastore | Sort Name)){
 			$comboBox2.items.add($ds)
 			$comboBox2.SelectedIndex=0
-			
+
 		}
-	
+
 	$comboBox1.Add_SelectedIndexChanged({&$check})
 }
 
@@ -4089,9 +4089,9 @@ function Move-Template{
     if($esx -eq ""){Write-Host "Enter an ESX hostname"}
     if($esx -ne "" -and $datastore -eq ""){$vmotion = $true}
     if($datastore -ne ""){$svmotion = $true}
-	
+
     Write-Host "Converting $template to VM"
-    $vm = Set-Template -Template (Get-Template $template) -ToVM 
+    $vm = Set-Template -Template (Get-Template $template) -ToVM
 
     if($svmotion){
         Write-Host "Move $template to $esx and $datastore"
@@ -4099,7 +4099,7 @@ function Move-Template{
         -Datastore (Get-Datastore $datastore) -Confirm:$false
         (Get-VM $vm | Get-View).MarkAsTemplate() | Out-Null
 		 Write-Host "Move $template to $esx and $datastore completed succesfully"
-    }        
+    }
 
     if($vmotion){
         Write-Host "Move $template to $esx"
@@ -4109,7 +4109,7 @@ function Move-Template{
 }
 
 
-if($global:movetemplate -eq "1"){ 
+if($global:movetemplate -eq "1"){
 	$input | ForEach-Object {
 		Move-Template $_.Name $global:destesx $global:destdatastore
 	}
@@ -4158,7 +4158,7 @@ function Convert-ToVM{
 function Convert-ToTemplate{
 	param([string]$vm)
 	Write-Host "Converting $vm back to template"
-	$vmView = Get-VM $vm | Get-View 
+	$vmView = Get-VM $vm | Get-View
 	$vmView.MarkAsTemplate() | Out-Null
 }
 
@@ -4171,15 +4171,15 @@ function Update-LinuxVM{
 	if($toolsStatus -eq "guestToolsRunning"){
 		# Determining Linux Distro
 		if($os -match 'Red Hat Enterprise Linux'){
-			Write-Host "RedHat or CentOS installation found" -fore Yellow 
+			Write-Host "RedHat or CentOS installation found" -fore Yellow
 			$update = "yum clean all && yum update -y"
 		}
 		elseif($os -match 'Debian GNU'){
-			Write-Host "Debian installation found" 
+			Write-Host "Debian installation found"
 			$update = "apt-get update && apt-get upgrade -y"
-		}	
+		}
 		else{Write-Host "No update possible" -fore Red}
-		
+
 		# ifconfig
 		if($ifconfig -ne ""){
 		Write-Host "Configuring IP settings" -fore Green
@@ -4191,7 +4191,7 @@ function Update-LinuxVM{
 		Write-Host "Setting default gateway" -fore Green
 		$vm | Invoke-VMScript -HostCredential $hc -GuestCredential $gc $route
 		}
-		
+
 		# Update command
 		Write-Host "Running the update command" -fore Green
 		$vm | Invoke-VMScript -HostCredential $hc -GuestCredential $gc $update
@@ -4203,7 +4203,7 @@ function Update-LinuxVM{
 
 function PowerOff-VM{
 	param([string] $vm)
-	
+
 	Shutdown-VMGuest -VM (Get-VM $vm) -Confirm:$false | Out-Null
 	Write-Host "Shutdown $vm"
 	do {
@@ -4214,12 +4214,12 @@ function PowerOff-VM{
 
 function PowerOn-VM{
 	param([string] $vm)
-	
+
 	if($vm -eq ""){	Write-Host "Please enter a valild VM name"}
-	
+
 	if((Get-VM $vm).powerstate -eq "PoweredOn"){
 		Write-Host "$vm is already powered on"}
-	
+
 	else{
 		Start-VM -VM (Get-VM $vm) -Confirm:$false | Out-Null
 		Write-Host "Starting $vm"
@@ -4232,12 +4232,12 @@ function PowerOn-VM{
 
 function Reboot-VM{
 	param([string] $vm)
-	
+
 	if($vm -eq ""){	Write-Host "Please enter a valild VM name"}
-	
+
 	if((Get-VM $vm).powerstate -eq "PoweredOff"){
 		Write-Host "$vm is already powered off"}
-	
+
 	else{
 		Write-Host "Restart $vm"
 		Restart-VMGuest -VM (Get-VM $vm) -Confirm:$false
@@ -4246,14 +4246,14 @@ function Reboot-VM{
 			$status = (Get-vm $vm | Get-View).Guest.ToolsRunningStatus
 		}until($status -eq "guestToolsRunning")
 		return "OK"
-	}	
+	}
 }
 
 function Write-CustomField{
 	param([string] $vm)
 		if($vm -eq ""){	Write-Host "Please enter a valild VM name"}
 		$date = Get-Date -Format "dd-MM-yyyy"
-		
+
 		Get-VM $vm | Set-CustomField -Name "Last Update" -Value $date | Out-Null
 }
 
@@ -4279,14 +4279,14 @@ function Delete-Snapshot{
 
 function vMotion-VM{
 	param([string] $vm, [string]$esx)
-	
+
 	if($vm -eq ""){	Write-Host "Please enter a valild VM name"}
 	if($esx -eq ""){Write-Host "Please enter a valild ESX Server name"}
-	
-	else{	
+
+	else{
 		$vmhost = (Get-VMHost -VM (Get-VM $vm)).Name
 		if($vmhost -ne $esx){
-			move-vm -VM (get-vm $vm) -Destination (get-vmhost $esx) -Confirm:$false 
+			move-vm -VM (get-vm $vm) -Destination (get-vmhost $esx) -Confirm:$false
 		}
 		else{Write-Host "$vm is already running on $esx"}
 	}
@@ -4301,52 +4301,52 @@ function vMotion-VM{
 
 $input | Foreach{
 	[string]$template = $_.Name
-		
-	Convert-ToVM $_.Name 
-	
+
+	Convert-ToVM $_.Name
+
 	if((Get-VM $_.Name | Select Name -ExpandProperty CustomFields | where {$_.Key -eq "Last Update"}).Value -ne $currentDate){
-	
+
 		if ($vmotion){
 			Write-Host "migrating $template to $esxhost"
 			vMotion-VM $_.Name $esxhost
 		}
-		
+
 		if ($deletesnapshot) {
 			Delete-Snapshot $_.Name SnapshotBeforeUpdates
 		}
-		
+
 		$poweron = PowerOn-VM $_.Name
 		if($poweron -eq "Ok"){
 			Write-Host "PowerOn OK"
 			Sleep 30
-			
+
 		if ($createsnapshot) {
 			Create-Snapshot $_.Name SnapshotBeforeUpdates
 		}
-			
+
 			$hc = $Host.UI.PromptForCredential("Please enter credentials", "Enter ESX host credentials for $esxhost", "root", "")
-			$gc = $Host.UI.PromptForCredential("Please enter credentials", "Enter Guest credentials for $_.Name", "root", "")	
-				
+			$gc = $Host.UI.PromptForCredential("Please enter credentials", "Enter Guest credentials for $_.Name", "root", "")
+
 			Update-LinuxVM $_.Name
-			
+
 		if($reboot){
 			$rebootVM = Reboot-VM $_.Name
 			if($rebootVM -eq "Ok"){
 				Write-Host "Reboot OK"
 			}
 		}
-		
+
 			$poweroff = PowerOff-VM $_.Name
 			if($poweroff -eq "Ok"){
 			Write-Host "PowerOff OK"
 				sleep 5
-				
+
 				Write-CustomField $_.Name
 				Convert-ToTemplate $_.Name
 				Write-Host "Installing updates completed on $template" -ForegroundColor Green
-			}	
+			}
 		}
-	
+
 	}
 	else{
 		Write-Host "Template $template is already up to date" -ForegroundColor Green
@@ -4375,7 +4375,7 @@ $file = $ofd.FileName
 $rules = @()
 # Type in a PowerShell script here
 $input | ForEach-Object {
-    $drsRules = Get-DrsRule -Cluster (Get-Cluster -Name $_.Cluster) -Name $_.RuleName  
+    $drsRules = Get-DrsRule -Cluster (Get-Cluster -Name $_.Cluster) -Name $_.RuleName
 	$rules += $drsRules
 }
 $rules | Export-CliXml $file
@@ -4411,20 +4411,20 @@ $InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
 #Generated Event Script Blocks
 #----------------------------------------------
 #Provide Custom Code for events specified in PrimalForms.
-$button1_OnClick= 
+$button1_OnClick=
 {
 #TODO: Place custom script here
 	$global:cl = $comboBox1.SelectedItem
 	$form1.close()
 }
 
-$handler_label1_Click= 
+$handler_label1_Click=
 {
 #TODO: Place custom script here
 
 }
 
-$handler_form1_Load= 
+$handler_form1_Load=
 {
 #TODO: Place custom script here
 		Foreach ($clus in (Get-Cluster | Sort Name)){
@@ -4531,7 +4531,7 @@ ForEach ($rule in (Import-CliXml $file)){
 	Write-Host "Rule $strRule already exist on Cluster $cl"
 	}
 	else{
-	
+
 	Write-Host "Creating rule $strRule on Cluster $cl"
 	New-DrsRule -Cluster (Get-Cluster -Name "$cl") `
    	-Name $rule.Name -Enabled $rule.Enabled `
@@ -4565,7 +4565,7 @@ $input | ForEach-Object {
             <container name="Reset CPU Reservation" Description="" id="6efac569-7a3e-4dd2-9acc-9dc3b46448ac" type="Action@" RequireSelection="Yes" DisplayResults="Refresh">
               <script><![CDATA[# Type in a PowerShell script here
 $input | ForEach-Object {
- 	Get-VM $_.VMName | Get-VMResourceConfiguration | Set-VMResourceConfiguration -CpuReservationMhz "0" 
+ 	Get-VM $_.VMName | Get-VMResourceConfiguration | Set-VMResourceConfiguration -CpuReservationMhz "0"
 }]]></script>
               <IconB64>AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfACcApAAzAMsAMwDLADMAywAzAMsAMwDLADMAywAzAMsAMwDLACcApQAAACIAAAAAAAAAAAAAAAAAAAAAAAAAEC8vD4b8/PL/+Pju//j47v/4+O7/+Pju//j47v/4+O7//Pzy/wFCAcgAAAARAAAAAAAAAAAAAAAAAAAAAAAAAGbd3d3/mZmZ//Hx6f/v1c3/79XN/+/Vzf/v1c3/79XN//j48P8CTgLLAAAAGgAAABoAAAAaAAAAGgAAABEAAAAAVVUwd/n58f/z8+v/8/Pr//Pz6//z8+v/8/Pr//Pz6//5+fH/AlAC8wAzAMsAMwDLADMAywAnAKUAAAAiAAAAZt3d3f+ZmZn/9fXt//DZ0f/w2dH/8NnR//DZ0f/w2dH/+vrz/z2AOv/4+O7/+Pju//z88v8BQgHIAAAAAAAAAABiYjty+/v1//b28P/29vD/9vbw//b28P/29vD/9vbw//v79f87ezP/79XN/+/Vzf/4+PD/AlECxQAAAAAAAABm3d3d/5mZmf/4+PP/893V//Pd1f/z3dX/893V//Pd1f/8/Pf/PYY7//Pz6//z8+v/+fnx/wJWAsQAAAAAAAAAAG5uRW39/fn/+vr2//r69v/6+vb/+vr2//r69v/6+vb//f35/z2DNf/w2dH/8NnR//r68/8CWgLDAAAAAAAAAGbd3d3/mZmZ//v7+f/14tr/9eLa//Xi2v/14tr/9eLa//39+/8/jT7/9vbw//b28P/7+/X/Al4CwgAAAAAAAAAAd3dOav7+/f/9/fv//f37//39+//9/fv//f37//39+//+/v3/P4o4//Pd1f/z3dX//Pz3/wJjAsEAAAAAAAAAZt3d3f+ZmZn//v7+//bl3f/25d3/9uXd//bl3f/25d3////+/0KUQf/6+vb/+vr2//39+f8CZwLAAAAAAAAAAAB/f1Vn//////////////////////////////////////////9BkDv/9eLa//Xi2v/9/fv/A2oDwAAAAAAAAAAAA3YDjgN2A70DdgO9A3YDvRJ2DdhEmUT/RJlD/0SZQ/9EmUP/crJx//39+//9/fv//v79/wNuA78AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGbd3d3/mZmZ//7+/v/25d3/9uXd//bl3f/25d3/9uXd/////v8DcQO+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf39VZ///////////////////////////////////////////A3QDvgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN2A44DdgO9A3YDvQN2A70DdgO9A3YDvQN2A70DdgO9A3YDvQN2A44AAAAAAA+sQQAPrEEAAKxBgACsQQABrEGAAaxBAAGsQYABrEEAAaxBgAGsQQABrEGAAaxBgAGsQfABrEH4AaxB+AGsQQ==</IconB64>
               <Types>
@@ -4605,7 +4605,7 @@ else{
 	$input | ForEach-Object {
 		Get-VMHost $_.Name | Get-View | % {
  			$_.Name | Where { $_.Config.ConsoleReservation.ServiceConsoleReserved -ne ($num*1mb) }
-			(Get-View -Id $_.ConfigManager.MemoryManager).ReconfigureServiceConsoleReservation($num*1mb) 
+			(Get-View -Id $_.ConfigManager.MemoryManager).ReconfigureServiceConsoleReservation($num*1mb)
 		}
 	}
 }
@@ -5391,7 +5391,7 @@ $input | ForEach-Object {
 		[string]$icon="information",
 		[string]$title="Message Box"
 	)
-	
+
 	# Buttons: OkOnly, OkCancel, AbortRetryIgnore, YesNoCancel, YesNo, RetryCancel
 	# Icons: Critical, Question, Exclamation, Information
 	[reflection.assembly]::loadwithpartialname("microsoft.visualbasic") | Out-Null
@@ -5425,9 +5425,9 @@ a.dsphead2 {BORDER-RIGHT: #B1BABF 1px solid; PADDING-RIGHT: 5em; BORDER-TOP: #B1
 a.dsphead1 span.dspchar{font-family:monospace;font-weight:normal;}
 td {VERTICAL-ALIGN: TOP; FONT-FAMILY: Tahoma}
 th {VERTICAL-ALIGN: TOP; COLOR: #CC0000; TEXT-ALIGN: left}
-BODY {margin-left: 4pt} 
-BODY {margin-right: 4pt} 
-BODY {margin-top: 6pt} 
+BODY {margin-left: 4pt}
+BODY {margin-right: 4pt}
+BODY {margin-top: 6pt}
 </style>
 
 
@@ -5442,7 +5442,7 @@ function dsp(loc){
       foc=loc.parentNode.nextSibling.style?
          loc.parentNode.nextSibling:
          loc.parentNode.nextSibling.nextSibling;
-      foc.style.display=foc.style.display=='block'?'none':'block';}}  
+      foc.style.display=foc.style.display=='block'?'none':'block';}}
 
 if(!document.getElementById)
    document.write('<style type="text/css">\n'+'.dspcont{display:block;}\n'+ '</style>');
@@ -5555,7 +5555,7 @@ Function Get-VIServices {
 	} Else {
 		$Services = get-wmiobject win32_service -ComputerName $VISRV | Where {$_.DisplayName -like "VMware*" }
 	}
-	
+
 	$myCol = @()
 	Foreach ($service in $Services){
 		$MyDetails = "" | select-Object Name, State, StartMode, Health
@@ -5645,7 +5645,7 @@ Function Get-SnapshotSummary {
 		} elseif ($InputObject) {
 			$InputObject
 		} elseif ($_) {
-			
+
 			$mySnaps = @()
 			foreach ($snap in $_){
 				$SnapshotInfo = Get-SnapshotExtra $snap
@@ -5662,7 +5662,7 @@ Function Get-SnapshotSummary {
 
 Function Get-SnapshotTree{
 	param($tree, $target)
-	
+
 	$found = $null
 	foreach($elem in $tree){
 		if($elem.Snapshot.Value -eq $target.Value){
@@ -5673,7 +5673,7 @@ Function Get-SnapshotTree{
 	if($found -eq $null -and $elem.ChildSnapshotList -ne $null){
 		$found = Get-SnapshotTree $elem.ChildSnapshotList $target
 	}
-	
+
 	return $found
 }
 
@@ -5681,17 +5681,17 @@ Function Get-SnapshotExtra ($snap){
 	$guestName = $snap.VM	# The name of the guest
 	$tasknumber = 999		# Windowsize of the Task collector
 	$taskMgr = Get-View TaskManager
-	
+
 	# Create hash table. Each entry is a create snapshot task
 	$report = @{}
-	
+
 	$filter = New-Object VMware.Vim.TaskFilterSpec
 	$filter.Time = New-Object VMware.Vim.TaskFilterSpecByTime
 	$filter.Time.beginTime = (($snap.Created).AddDays(-5))
 	$filter.Time.timeType = "startedTime"
-	
+
 	$collectionImpl = Get-View ($taskMgr.CreateCollectorForTasks($filter))
-	
+
 	$dummy = $collectionImpl.RewindCollector
 	$collection = $collectionImpl.ReadNextTasks($tasknumber)
 	while($collection -ne $null){
@@ -5699,7 +5699,7 @@ Function Get-SnapshotExtra ($snap){
 			$row = New-Object PsObject
 			$row | Add-Member -MemberType NoteProperty -Name User -Value $_.Reason.UserName
 			$vm = Get-View $_.Entity
-			if($vm -ne $null){ 
+			if($vm -ne $null){
 				$snapshot = Get-SnapshotTree $vm.Snapshot.RootSnapshotList $_.Result
 				if($snapshot -ne $null){
 					$key = $_.EntityName + "&" + ($snapshot.CreateTime.ToString())
@@ -5710,7 +5710,7 @@ Function Get-SnapshotExtra ($snap){
 		$collection = $collectionImpl.ReadNextTasks($tasknumber)
 	}
 	$collectionImpl.DestroyCollector()
-	
+
 	# Get the guest's snapshots and add the user
 	$snapshotsExtra = $snap | % {
 		$key = $_.vm.Name + "&" + ($_.Created.ToString())
@@ -5728,7 +5728,7 @@ Function Get-UnShareableDatastore {
 		If (($datastore | get-view).summary.multiplehostaccess -eq $false){
 			ForEach ($VM in (get-vm -datastore $Datastore )){
 				$SAHost = "" | Select VM, Datastore
-				$SAHost.VM = $VM.Name 
+				$SAHost.VM = $VM.Name
 				$SAHost.Datastore = $Datastore.Name
 				$Report += $SAHost
 			}
@@ -5772,16 +5772,16 @@ Function New-TrustAllWebClient {
 	$TASource=@'
 	  namespace Local.ToolkitExtensions.Net.CertificatePolicy {
 	    public class TrustAll : System.Net.ICertificatePolicy {
-	      public TrustAll() { 
+	      public TrustAll() {
 	      }
 	      public bool CheckValidationResult(System.Net.ServicePoint sp,
-	        System.Security.Cryptography.X509Certificates.X509Certificate cert, 
+	        System.Security.Cryptography.X509Certificates.X509Certificate cert,
 	        System.Net.WebRequest req, int problem) {
 	        return true;
 	      }
 	    }
 	  }
-'@ 
+'@
 	$TAResults=$Provider.CompileAssemblyFromSource($Params,$TASource)
 	$TAAssembly=$TAResults.CompiledAssembly
 

@@ -2,7 +2,7 @@ Bitbucket Supported Markdown for READMEs, comments, and Wiki
 ====================
 
 [Markdown][fireball] for readmes is pretty popular.  So, I've given you a demo
-here of all the markup we support. In some cases, I copied the doc/examples entirely from the Fireball Markdown site. 
+here of all the markup we support. In some cases, I copied the doc/examples entirely from the Fireball Markdown site.
 
 I didn't duplicate all the Markdown doc everything tho. For the entire docs and a deeper explanation of Markdown, you still need to go to the [Markdown][fireball] site.
 
@@ -15,7 +15,7 @@ On this page:
 	* [Emphasis](#markdown-header-emphasis)
 
 	* [Strikethrough](#markdown-header-strikethrough)
-	
+
 	* [Preformatted code](#markdown-header-preformatted-code)
 
 	* [Links](#markdown-header-links)
@@ -40,7 +40,7 @@ On this page:
 Bitbucket does NOT support
 ================================
 
-Please note, we don't support arbitrary HTML in Markdown, for example `<table>` tags. Instead, we use 
+Please note, we don't support arbitrary HTML in Markdown, for example `<table>` tags. Instead, we use
 [safe mode](http://pythonhosted.org/Markdown/reference.html#safe_mode). Safe mode requires that you replace, remove, or escape HTML tags appropriately.
 
 - - -
@@ -49,10 +49,10 @@ Please note, we don't support arbitrary HTML in Markdown, for example `<table>` 
 
 These elements occur within a line of text.  So, for example font changes or links.
 
- 
+
 ## Emphasis
 
-Markdown treats * (asterisk) and _ (underscores) as emphasis markers. 
+Markdown treats * (asterisk) and _ (underscores) as emphasis markers.
 
 *single asterisks*
 
@@ -103,10 +103,10 @@ Use the `printf()` function.
 is produced from:
 
 	Use the `printf()` function.
-	
+
 To include a literal backtick character within a code span, you can use multiple backticks as the opening and closing delimiters:
 
-``There is a literal backtick (`) here.``	
+``There is a literal backtick (`) here.``
 
 
 ## Links
@@ -122,16 +122,16 @@ So an inline link to [Yahoo](http://www.yahoo.com) looks like this:
 Reference-style links use a second set of square brackets, inside which you place a label of your choosing to identify the link:
 
 	This is [an example][id] reference-style link.
-	
+
 Which gives you a link like this:
 
 This is [an example][id] reference-style link.
-	
+
 Elsewhere in the document, usually at the bottom of the file, you define your link label on a line by itself:
 
 	[id]: http://example.com/  "Optional Title Here"
-	
-Links can get pretty fancy, so if you want the long form version, visit the 
+
+Links can get pretty fancy, so if you want the long form version, visit the
  official [Markdown][fireball] docs.
 
 
@@ -146,7 +146,7 @@ Markdown uses an image syntax that is intended to resemble the syntax for links,
 	![Alt text](http://www.addictedtoibiza.com/wp-content/uploads/2012/12/example.png)
 
 	![Alt text](http://www.addictedtoibiza.com/wp-content/uploads/2012/12/example.png "Optional title")
-	
+
 - - -
 # Block Elements
 
@@ -158,31 +158,31 @@ These are elements that are a single or multiple lines in length
 You can create Atx-style headings by prefixing with a # (hash mark)
 
 # Heading 1 markup  `# Heading 1`
-# 
+#
 ## Heading 2 markup  `## Heading 2`
-## 
+##
 ### Heading 3 markup   `### Heading 3`
-### 
+###
 #### Heading 4 markup  `#### Heading 4`
-#### 
+####
 ##### Heading 5 markup  `##### Heading 5`
-##### 
+#####
 ###### Heading 6 markup  `###### Heading 6`
-###### 
+######
 You can also create Setext-style headings which have two levels.
 
-Level 1 markup use an equal sign = (equal sign) 
+Level 1 markup use an equal sign = (equal sign)
 ==============================
 
 
-	 Level 1 markup use an equal sign = (equal sign)   	 
+	 Level 1 markup use an equal sign = (equal sign)
 	 ==============================
-	 
-Level 2 markup uses - (dashes) 
+
+Level 2 markup uses - (dashes)
 -------------
 
 
-	Level 2 markup uses - (dashes) 
+	Level 2 markup uses - (dashes)
 	-------------
 
 
@@ -207,17 +207,17 @@ Markdown uses email-style > (greater than) characters for blockquoting. If youâ
 
 > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,
 > consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.
-> 
+>
 > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse
 > id sem consectetuer libero luctus adipiscing.
 
 
 	> This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,
 	> consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.
-	> 
+	>
 	> Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse
 	> id sem consectetuer libero luctus adipiscing.
-	
+
 Blockquotes can be nested (i.e. a blockquote-in-a-blockquote):
 
 > This is the first level of quoting.
@@ -235,24 +235,24 @@ Blockquotes can be nested (i.e. a blockquote-in-a-blockquote):
 Blockquotes can contain other Markdown elements, including headers, lists, and code blocks:
 
 > ## This is a header.
-> 
+>
 > 1.   This is the first list item.
 > 2.   This is the second list item.
-> 
+>
 > Here's some example code:
-> 
+>
 >     return shell_exec("echo $input | $markdown_script");
 
 
 	> ## This is a header.
-	> 
+	>
 	> 1.   This is the first list item.
 	> 2.   This is the second list item.
-	> 
+	>
 	> Here's some example code:
-	> 
+	>
 	>     return shell_exec("echo $input | $markdown_script");
-	
+
 
 
 
@@ -262,71 +262,71 @@ Markdown supports ordered (numbered) and unordered (bulleted) lists.  List marke
 
 Form bulleted lists with any of * (asterisk), + (plus), or - (dash). You can one or any or mix of these to form a list:
 
-* Red 
-+ Green 
+* Red
++ Green
 - Blue
 
 
 		* Red
 		+ Green
 		- Blue
-	
+
 Ordered lists require a numeric character followed by a . (period).
 
 1. Item one
-1. Item two 
+1. Item two
 1. Item three
 
 		1. Item one
-		1. Item two 
+		1. Item two
 		1. Item three
-    
+
 Notice the actual value of the number doesn't matter in the list result. However, for readability better to use this markup:
 
 		1. Item one
-		2. Item two 
+		2. Item two
 		3. Item three
-		
+
 Lists can be embedded in lists. List items may consist of multiple paragraphs. Each subsequent paragraph in a list item must be indented by either 4 spaces or one tab:
 
-* Red 
-+ Green 
-	* dark  green 
-	* lime	
-- Blue		
+* Red
++ Green
+	* dark  green
+	* lime
+- Blue
 	1. Item one
-		1. subitem 1 
+		1. subitem 1
 		1. subitem 2
-	1. Item two 
-	
-	    This is is a first paragraph. 
-	    
-	    * Green 
+	1. Item two
+
+	    This is is a first paragraph.
+
+	    * Green
 		* Blue
-	    
+
 	    This is a second paragraph.
-	    
+
 	1. Item three
-	
+
 The code for these embedded lists or paragraphs is:
 
-			* Red 
-			+ Green 
-				* dark  green 
-				* lime	
-			- Blue		
+			* Red
+			+ Green
+				* dark  green
+				* lime
+			- Blue
 				1. Item one
 					1. subitem 1
 					1. subitem 2
-				1. Item two 
-	
-					This is is a first paragraph. 
-		
-					* Green 
+				1. Item two
+
+					This is is a first paragraph.
+
+					* Green
 					* Blue
-		
+
 					This is a second paragraph.
-		
+
 				1. Item three
 
 You can also embed blockquotes in a list.
@@ -391,19 +391,19 @@ Comes from this code:
 	------------- | -------------
 	Content Cell  | Content Cell
 	Content Cell  | Content Cell
-	
-	
+
+
 You can only put simple lines in a table.
 
 You can specify alignment for each column by adding colons to separator lines. A colon at the left of the separator line, left-aligns the column. A colon on the right, right-aligns the column. Add colons to both sides to center the column is center-aligned.
 
-Right     | Left   | Center 
+Right     | Left   | Center
 ---------:| :----- |:-----:
 Computer  |  $1600 | one
 Phone     |    $12 | three
 Pipe      |     $1 | eleven
 
-	Right     | Left   | Center 
+	Right     | Left   | Center
 	---------:| :----- |:-----:
 	Computer  |  $1600 | one
 	Phone     |    $12 | three
@@ -462,7 +462,7 @@ You can also highlight snippets of text (Bitbucket uses the excellent [Pygments]
 ```
 #!python
 #
-def wiki_rocks(text): formatter = lambda t: "funky"+t return formatter(text) 		
+def wiki_rocks(text): formatter = lambda t: "funky"+t return formatter(text)
 ```
 
 To do this, do not indent the block. Start the block with ` ``` ` three ticks. Then, provide the comment with the type of syntax you are using.  There is a [the vast library of Pygment lexers][lexers]. Bitbucket accepts the 'short name' or the 'mimetype' of anything in there.
@@ -478,7 +478,7 @@ Which you create with this code:
 	~~~~
 	This is a code block, fenced-style
 	~~~~
-	
+
 See [Michel Fortin's blog][extra] to try out more examples of this coding style. Not everything he demos is guaranteed to work though.
 
 
@@ -497,7 +497,7 @@ You can produce a horizontal line with any of the following codes:
 	- - - -
 
 	-----------------------
-	
+
 The output looks like this:
 
 * * *
@@ -506,7 +506,7 @@ The output looks like this:
 
 *****
 
-- - - 
+- - -
 
 -----------------------
 
@@ -515,8 +515,8 @@ The output looks like this:
 
 
 [lexers]: http://pygments.org/docs/lexers/
-[fireball]: http://daringfireball.net/projects/markdown/ 
-[Pygments]: http://pygments.org/ 
+[fireball]: http://daringfireball.net/projects/markdown/
+[Pygments]: http://pygments.org/
 [Extra]: http://michelf.ca/projects/php-markdown/extra/
 [id]: http://example.com/  "Optional Title Here"
 [BBmarkup]: https://confluence.atlassian.com/x/xTAvEw

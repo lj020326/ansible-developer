@@ -112,4 +112,4 @@ In other news, you can now use Consul domains directly in your browsers! Sadly, 
 ## References
 
 * https://verynomagic.com/2015/07/multiple-dns-resolvers-in-os-x.html
-* 
+*

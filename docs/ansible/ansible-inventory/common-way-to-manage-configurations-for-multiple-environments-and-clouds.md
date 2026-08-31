@@ -54,7 +54,7 @@ Solution highlights as follows
 -   Configuration data retrieved by the means of API, in the form of key-value pares. For example, an application, to retrieve the Cassandra database port number, would make a REST call similar to
 
 > `curl [http://config-service.mydomain/api/v1/cassandra/sandbox/cassandra_port](http://config-service.mydomain/api/v1/cassandra/sandbox/cassandra_port)`
-> 
+>
 > Where `cassandra` is application configuration, `sandbox` is the environment and `cassandra_port` is config parameter-key.
 
 -   Configuration data stored in JSON format and may take a form of flat layout or fairly complex and nested.
@@ -144,22 +144,22 @@ make deps
 At this point your directory should have the structure:
 
 ```
-├── config-data  
-├── pkg  
-│ ├── darwin\_amd64  
-│ └── dep  
-│ └── sources  
-└── service-config-data  
-│ ├── github.com  
-│ │ ├── lj020326  
-│ │ │ └── service-common-lib  
-│ │ ├── subosito  
-│ │ └── tidwall  
-│ ├── gitutil  
-│ ├── handlers  
-│ └── helpers  
-├── vars-gcp.mk  
-├── vars.mk  
+├── config-data
+├── pkg
+│ ├── darwin\_amd64
+│ └── dep
+│ └── sources
+└── service-config-data
+│ ├── github.com
+│ │ ├── lj020326
+│ │ │ └── service-common-lib
+│ │ ├── subosito
+│ │ └── tidwall
+│ ├── gitutil
+│ ├── handlers
+│ └── helpers
+├── vars-gcp.mk
+├── vars.mk
 └── watch.sh
 ```
 
@@ -194,33 +194,33 @@ $ curl http://localhost:8000/api/v2/test/sandbox/hello?out=json"world"
 Consider an example of the configuration file `[k8s-cluster.json](https://github.com/lj020326/config-data/blob/sandbox/k8s-cluster.json)` in branch `sandbox`, that looks like this
 
 ```json
-{  
-    "name" : "jx-sandbox",  
-    "k8s-name" : "k8s-sandbox",  
-    "apps": [  
-        {  
-            "name" : "jenkins",  
-            "app-type" : "devops"  
-        },  
-        {  
-            "name" : "grafana",  
-            "app-type" : "devops"  
-        },  
-        {  
-            "name" : "cassandra",  
-            "app-type" : "storage"  
-        }  
-    ],  
-    "env" : "sandbox",  
-    "region" : "us-east",  
-    "git-org" : "",  
-    "kubectl-ver" : "v1.13.0",  
-    "helm-ver": "v2.1.3",  
-    "docker-ver" : "1.12.6",  
-    "cloud-provider":{  
-        "name": "ibmcloud",  
-        "api-endpoint" : "https://api.us-east.bluemix.net"  
-    }  
+{
+    "name" : "jx-sandbox",
+    "k8s-name" : "k8s-sandbox",
+    "apps": [
+        {
+            "name" : "jenkins",
+            "app-type" : "devops"
+        },
+        {
+            "name" : "grafana",
+            "app-type" : "devops"
+        },
+        {
+            "name" : "cassandra",
+            "app-type" : "storage"
+        }
+    ],
+    "env" : "sandbox",
+    "region" : "us-east",
+    "git-org" : "",
+    "kubectl-ver" : "v1.13.0",
+    "helm-ver": "v2.1.3",
+    "docker-ver" : "1.12.6",
+    "cloud-provider":{
+        "name": "ibmcloud",
+        "api-endpoint" : "https://api.us-east.bluemix.net"
+    }
 }
 ```
 

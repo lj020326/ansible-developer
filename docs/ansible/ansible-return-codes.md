@@ -66,4 +66,4 @@ The main takeaways for an operator, from the above testing:
 
 - https://jwkenney.github.io/ansible-return-codes/
 - https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html
-- 
+-

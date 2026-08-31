@@ -1,9 +1,9 @@
 ﻿
-# I'm not the author of the function Get-InstalledSoftware 
+# I'm not the author of the function Get-InstalledSoftware
 # More info on:
 # https://github.com/RamblingCookieMonster/PowerShell/blob/master/Get-InstalledSoftware.ps1
 
-# I'm just using sharing this implementation on scriptinglibary.com 
+# I'm just using sharing this implementation on scriptinglibary.com
 
 function Get-InstalledSoftware {
 <#
@@ -45,21 +45,21 @@ function Get-InstalledSoftware {
         [Parameter(
             Position = 0,
             ValueFromPipeline=$true,
-            ValueFromPipelineByPropertyName=$true, 
+            ValueFromPipelineByPropertyName=$true,
             ValueFromRemainingArguments=$false
         )]
         [ValidateNotNullOrEmpty()]
         [Alias('CN','__SERVER','Server','Computer')]
             [string[]]$ComputerName = $env:computername,
-        
+
             [string]$DisplayName = $null,
-        
+
             [string]$Publisher = $null
     )
 
     Begin
     {
-        
+
         #define uninstall keys to cover 32 and 64 bit operating systems.
         #This will yeild only 32 bit software and double entries on 64 bit systems running 32 bit PowerShell
             $UninstallKeys = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
@@ -73,7 +73,7 @@ function Get-InstalledSoftware {
         #Loop through each provided computer.  Provide a label for error handling to continue with the next computer.
         :computerLoop foreach($computer in $computername)
         {
-            
+
             Try
             {
                 #Attempt to connect to the localmachine hive of the specified computer
@@ -90,7 +90,7 @@ function Get-InstalledSoftware {
             #Loop through the 32 bit and 64 bit registry keys
             foreach($uninstallKey in $UninstallKeys)
             {
-            
+
                 Try
                 {
                     #Open the Uninstall key
@@ -99,8 +99,8 @@ function Get-InstalledSoftware {
 
                     #If the reg key exists...
                     if($regkey)
-                    {    
-                                        
+                    {
+
                         #Retrieve an array of strings containing all the subkey names
                             $subkeys = $regkey.GetSubKeyNames()
 
@@ -109,20 +109,20 @@ function Get-InstalledSoftware {
                             {
 
                                 #Build the full path to the key for this software
-                                    $thisKey = $UninstallKey+"\\"+$key 
-                            
+                                    $thisKey = $UninstallKey+"\\"+$key
+
                                 #Open the subkey for this software
                                     $thisSubKey = $null
                                     $thisSubKey=$reg.OpenSubKey($thisKey)
-                            
+
                                 #If the subkey exists
                                 if($thisSubKey){
                                     try
                                     {
-                            
+
                                         #Get the display name.  If this is not empty we know there is information to show
                                             $dispName = $thisSubKey.GetValue("DisplayName")
-                                
+
                                         #Get the publisher name ahead of time to allow filtering using Publisher parameter
                                             $pubName = $thisSubKey.GetValue("Publisher")
 
@@ -140,7 +140,7 @@ function Get-InstalledSoftware {
                                                 DisplayName = $dispname
                                                 Publisher = $pubName
                                                 Version = $thisSubKey.GetValue("DisplayVersion")
-                                                UninstallString = $thisSubKey.GetValue("UninstallString") 
+                                                UninstallString = $thisSubKey.GetValue("UninstallString")
                                                 InstallDate = $thisSubKey.GetValue("InstallDate")
                                             } | select ComputerName, DisplayName, Publisher, Version, UninstallString, InstallDate
                                         }
@@ -166,7 +166,7 @@ function Get-InstalledSoftware {
                         Write-Error "Registry access to $computer denied.  Check your permissions.  Details: $_"
                         continue computerLoop
                     }
-                    
+
                 }
             }
         }

@@ -175,19 +175,19 @@ The tutorial I found has great information, and code to move all **non-default**
 
 # mount the drive as read/write
 mount -rw /
- 
+
 # create a directory for "disabled" extensions
 mkdir /Volumes/MAC\ HD/Library/ExtensionsDisabled
- 
+
 # view files that exist in your Extensions folder but not the recovery partition
 kexts=`comm -23 <(ls /Volumes/MAC\ HD/Library/Extensions|sort) <(ls /Library/Extensions|sort)`
 echo $kexts
- 
+
 # move "extra" kext files to the "disabled" directory
 for kext in $kexts; do
-    mv /Volumes/MAC\ HD/Library/Extensions/$kext /Volumes/MAC\ HD/Library/ExtensionsDisabled/$kext; 
+    mv /Volumes/MAC\ HD/Library/Extensions/$kext /Volumes/MAC\ HD/Library/ExtensionsDisabled/$kext;
 done
- 
+
 exit
 ```
 
@@ -225,4 +225,3 @@ Good luck and hopefully you are as happy as I was after dealing with such a stup
 - [Mac startup key combinations](https://support.apple.com/en-us/HT201255)
 - [Mounting/Unlocking Encrypted Drive in OSX Recovery Terminal](http://apple.stackexchange.com/questions/236206/backup-files-from-terminal-in-recovery-mode)
 - [how-to-fix-mac-osx-stuckhanging-on-progress-bar-will-not-boot](https://smyl.es/how-to-fix-mac-osx-stuckhanging-on-progress-bar-will-not-boot/)
-

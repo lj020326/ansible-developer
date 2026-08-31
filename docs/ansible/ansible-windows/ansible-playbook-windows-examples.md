@@ -124,4 +124,4 @@ So, that was all about Ansible playbooks, which can be used for remote windows a
 ## Reference
 
 * https://geekflare.com/ansible-playbook-windows-example/
-* 
+*

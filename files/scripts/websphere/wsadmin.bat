@@ -11,13 +11,13 @@ echo WAS_HOME=%WAS_HOME%
 
 echo JAVA_HOME=%JAVA_HOME%
 if not exist "%JAVA_HOME%\bin\java.exe" (
-  echo Can not find a java.exe 
+  echo Can not find a java.exe
   exit
 )
 
 echo JYTHON_HOME=%JYTHON_HOME%
 if not exist "%JYTHON_HOME%\jython.jar" (
-  echo Can not find a jython.jar 
+  echo Can not find a jython.jar
   exit
 )
 
@@ -28,8 +28,8 @@ set USER_INSTALL_ROOT=-Duser.install.root=%WAS_HOME%
 set WAS_INSTALL_ROOT=-Dwas.install.root=%WAS_HOME%
 set WAS_LIBS=%WAS_HOME%\lib
 
-set WAS_LOGGING=-Djava.util.logging.manager=com.ibm.ws.bootstrap.WsLogManager -Djava.util.logging.configureByServer=true 
-set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.traceString=com.ibm.*=all=disabled 
+set WAS_LOGGING=-Djava.util.logging.manager=com.ibm.ws.bootstrap.WsLogManager -Djava.util.logging.configureByServer=true
+set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.traceString=com.ibm.*=all=disabled
 set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.traceFile=%WAS_HOME%\logs\wsadmin.traceout
 set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.validationOutput=%WAS_HOME%\logs\wsadmin.valout
 
@@ -52,4 +52,4 @@ set TC=-Dcom.ibm.websphere.thinclient=true
 set C_PATH="%WAS_HOME%\properties;%WAS_LIBS%\com.ibm.ws.admin.client_8.5.0.jar;%WAS_LIBS%\com.ibm.ws.security.crypto.jar;%WAS_LIBS%\ibmkeycert.jar;%WAS_LIBS%\ibmpkcs.jar;%WAS_LIBS%\jsoup-1.7.2.jar;%JYTHON_HOME%\jython.jar"
 @REM set C_PATH=%JYTHON_HOME%\jython.jar;%WAS_HOME%\properties;%WAS_LIBS%\com.ibm.ws.admin.client_8.5.0.jar;%WAS_LIBS%\com.ibm.ws.security.crypto.jar;%WAS_LIBS%\ibmkeycert.jar;%WAS_LIBS%\ibmpkcs.jar;%WAS_LIBS%\jsoup-1.7.2.jar
 
-%JAVA_EXE% %JAVA_OPTS% %TC% %SOAP_CONFIG% %AUTH_CONFIG% %SSL_CONFIG% %USER_INSTALL_ROOT% %WAS_INSTALL_ROOT% %WAS_LOGGING% -classpath %C_PATH% com.ibm.ws.scripting.WasxShell %* 
+%JAVA_EXE% %JAVA_OPTS% %TC% %SOAP_CONFIG% %AUTH_CONFIG% %SSL_CONFIG% %USER_INSTALL_ROOT% %WAS_INSTALL_ROOT% %WAS_LOGGING% -classpath %C_PATH% com.ibm.ws.scripting.WasxShell %*

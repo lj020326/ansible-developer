@@ -102,7 +102,7 @@ entry 2: |
     text
     entry
 """
-    
+
 yaml = ruamel.yaml.YAML()
 yaml.indent(mapping=4)
 yaml.preserve_quotes = True
@@ -159,4 +159,3 @@ Alternatively, you probably get a Python datastructure that preserves comments o
 
 - https://stackoverflow.com/questions/74049751/ruamel-yaml-preserve-comments-and-blank-lines-when-dumping-a-class-that-was-pre
 - https://towardsdatascience.com/writing-yaml-files-with-python-a6a7fc6ed6c3
-

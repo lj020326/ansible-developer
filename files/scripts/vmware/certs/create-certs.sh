@@ -24,4 +24,3 @@ do
     echo "copy certs to directory [$dir]"
     cp -p rui.{key,pem} ${dir}/
 done
-

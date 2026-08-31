@@ -13,7 +13,7 @@ Deploying your public key to the remote hosts as the same user is quite simple. 
 
 The only thing you want to pay attention here is that when you execute the playbook, you need to specify [**_ask-pass_**](http://docs.ansible.com/ansible/latest/intro_getting_started.html#remote-connection-information) to let ansible ask you for the ssh password if it is needed:
 
-There is one more problem. If you access to a host via ssh for the first time, you will be asked about whether to add RSA key fingerprint of this host.  
+There is one more problem. If you access to a host via ssh for the first time, you will be asked about whether to add RSA key fingerprint of this host.
 However, with **_ask-pass_** being specified, ansible will directly run into an error if this is the first time you access to that host.
 
 To walk through this, you will need to disable SSH authenticity checking by adding an **_ansible.cfg_** to the place where you want to execute the playbook:
@@ -49,4 +49,4 @@ By doing so, you will be able to deploy your public key to the remote hosts as t
 ## Reference
 
 * https://medium.com/@visualskyrim/ansible-playbook-deploy-the-public-key-to-remote-hosts-da3f3b4b5481
-* 
+*

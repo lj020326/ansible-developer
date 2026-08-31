@@ -1,5 +1,5 @@
 ﻿
-Import-Module PowerCLI/DatastoreMod 
+Import-Module PowerCLI/DatastoreMod
 
 Function Restore-NfsDatastores {
 	<#
@@ -10,7 +10,7 @@ Function Restore-NfsDatastores {
 	PS C:\> Restore-NfsDatastores
 
 	#>
-	
+
 	$vcenter = "vcenter50.johnson.local"
 	Activate-InactiveNFSDatastores $vcenter
 }

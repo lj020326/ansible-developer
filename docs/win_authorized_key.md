@@ -104,4 +104,3 @@ Common return values are documented [here](https://docs.ansible.com/ansible/late
 |__unique__<br><font color="purple">boolean</font> | success | Whether the key is unique.<br><br>__Sample:__<br><font color=blue>False</font> |
 |__user__<br><font color="purple">string</font> | success | The username on the remote host whose authorized_keys file will be modified.<br><br>__Sample:__<br><font color=blue>user</font> |
 |__validate_certs__<br><font color="purple">boolean</font> | success | This only applies if using a https url as the source of the keys. If set to `no`, the SSL certificates will not be validated.<br><br>__Sample:__<br><font color=blue>True</font> |
-

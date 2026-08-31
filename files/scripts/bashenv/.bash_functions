@@ -3,6 +3,39 @@ log_prefix_functions=".bash_functions"
 
 echo "${log_prefix_functions} configuring shell functions..."
 
+# Initialize pyenv ONLY if it hasn't been set up yet (e.g., non-interactive PyCharm subshells)
+if [ -d "${HOME}/.pyenv" ]; then
+  export PYENV_ROOT="${HOME}/.pyenv"
+
+  # Only prepend to PATH if it's not already in PATH
+  case ":${PATH}:" in
+    *":${PYENV_ROOT}/shims:"*) ;;
+    *)
+      echo "${log_prefix_functions}: Path updated for PYENV_ROOT [${PYENV_ROOT}]: ${PATH}"
+      export PATH="${PYENV_ROOT}/shims:${PATH}"
+      ;;
+  esac
+
+  case ":${PATH}:" in
+    *":${PYENV_ROOT}/bin:"*) ;;
+    *)
+      echo "${log_prefix_functions}: Path updated for PYENV_ROOT [${PYENV_ROOT}]: ${PATH}"
+      export PATH="${PYENV_ROOT}/bin:${PATH}" ;;
+  esac
+
+  if command -v pyenv >/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+  fi
+fi
+#if [ -d "${HOME}/.pyenv" ]; then
+#  export PYENV_ROOT="${HOME}/.pyenv"
+#  export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
+#  echo "${log_prefix_functions}: Path updated for PYENV_ROOT [${PYENV_ROOT}]: ${PATH}"
+#  if command -v pyenv >/dev/null 2>&1; then
+#    eval "$(pyenv init -)"
+#  fi
+#fi
+
 unalias ansible_debug_variable 1>/dev/null 2>&1 || true
 unset -f ansible_debug_variable || true
 function ansible_debug_variable() {
@@ -310,7 +343,7 @@ function package_git_directory() {
 #
 unalias package_ansible_role 1>/dev/null 2>&1 || true
 unset -f package_ansible_role || true
-package_ansible_role() {
+function package_ansible_role() {
     # Check if a role path is provided
     if [ -z "$1" ]; then
         echo "Usage: package_ansible_role <role_path>"
@@ -435,6 +468,37 @@ function add_winpath() {
     export PATH="$PATH:$paths"
 }
 
+#####
+## gpu / llm
+unset -f check_nvidia_version || true
+check_nvidia_version() {
+    local proc_ver mod_ver
+
+    # Extract driver version from /proc/driver/nvidia/version
+    proc_ver=$(grep -oP 'NVRM version:.*?\b\K[0-9]+\.[0-9]+(\.[0-9]+)?' /proc/driver/nvidia/version 2>/dev/null)
+
+    # Extract version field from modinfo nvidia
+    mod_ver=$(modinfo nvidia 2>/dev/null | awk '/^version:/ {print $2}')
+
+    # Handle missing files/modules
+    if [[ -z "$proc_ver" || -z "$mod_ver" ]]; then
+        echo "❌ Error: Could not read NVIDIA version from one or both sources."
+        return 1
+    fi
+
+    echo "Proc driver version: $proc_ver"
+    echo "Modinfo version:     $mod_ver"
+
+    # Match if mod_ver starts with proc_ver (or vice-versa)
+    if [[ "$mod_ver" == "$proc_ver"* || "$proc_ver" == "$mod_ver"* ]]; then
+        echo "✅ Versions match."
+        return 0
+    else
+        echo "⚠️ Mismatch detected! (Proc: $proc_ver vs Modinfo: $mod_ver)"
+        return 2
+    fi
+}
+
 ##
 ##
 unset -f setenv-python || true
@@ -553,7 +617,7 @@ function get-certs() {
 }
 
 ## ref: https://stackoverflow.com/questions/42635253/display-received-cert-with-curl
-## example usage: 
+## example usage:
 ##
 ##   certinfo admin2.johnson.int 5000
 ##

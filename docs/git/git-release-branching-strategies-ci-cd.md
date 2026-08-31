@@ -82,4 +82,4 @@ Depending on your team’s risk tolerance and working style, any of these branch
 ## Reference
 
 * https://madeintandem.com/blog/branching-strategies-ci-cd/
-* 
+*

@@ -1,7 +1,7 @@
 
 # Usage
 
-## MacOS 
+## MacOS
 
 I don't think that this is an M1 issue. I see something similar on an Intel Macbook when trying to run the official Ubuntu:18.04 image on 4.3.0.
 
@@ -45,7 +45,7 @@ $ docker run \
 $ docker exec -it systemd-ubuntu bash
 root@05e98d7df57a:/# systemctl is-system-running
 running
-root@05e98d7df57a:/# 
+root@05e98d7df57a:/#
 ```
 
 
@@ -108,4 +108,4 @@ $ umount /tmp/cgroup/systemd && rmdir /tmp/cgroup/systemd /tmp/cgroup
 * https://github.com/docker/for-mac/issues/6073
 * https://github.com/moby/moby/issues/30723
 * https://hub.docker.com/r/tozd/ubuntu-systemd/#!
-* 
+*

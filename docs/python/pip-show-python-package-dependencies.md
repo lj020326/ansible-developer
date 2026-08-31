@@ -60,4 +60,4 @@ RPi.GPIO==0.7.0
 
 - https://www.shellhacks.com/pip-show-python-package-dependencies/
 - https://stackoverflow.com/questions/9232568/identifying-the-dependency-relationship-for-python-packages-installed-with-pip
-- 
+-

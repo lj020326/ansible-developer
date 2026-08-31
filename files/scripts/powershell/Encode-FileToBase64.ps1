@@ -16,6 +16,5 @@ function Encode-FileToBase64{
 }
 
 #Example
-get-childitem | export-csv example.csv    
-Encode-FileToBase64 example.csv         
-
+get-childitem | export-csv example.csv
+Encode-FileToBase64 example.csv

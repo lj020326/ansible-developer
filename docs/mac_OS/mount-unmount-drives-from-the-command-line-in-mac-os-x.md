@@ -2,7 +2,7 @@
 # Mount & Unmount Drives from the Command Line in Mac OS X
 
 You can mount and unmount drives, volumes, and disks from the command line of MacOS and Mac OS X.
-  
+
 This method works with:
 
 - external USB disks

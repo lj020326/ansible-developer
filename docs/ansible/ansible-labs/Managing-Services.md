@@ -22,9 +22,9 @@ This scenario shows:
       enabled: yes
     when: ansible_distribution == "Ubuntu"
 ```
-- Updated site.yml 
+- Updated site.yml
 
-``` 
+```
 ---
 
 - hosts: all
@@ -66,15 +66,15 @@ This scenario shows:
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
-    
+
   - name: start apache (Ubuntu)
     tags: ubuntu,apache,apache2
     service:
       name: apache2
       state: started
       enabled: yes
-    when: ansible_distribution == "Ubuntu"    
-    
+    when: ansible_distribution == "Ubuntu"
+
   - name: copy default (index) html file for site
     tags: apache,apache2,httpd
     copy:
@@ -82,8 +82,8 @@ This scenario shows:
       dest: /var/www/html/index.html
       owner: root
       group: root
-      mode: 0644    
-      
+      mode: 0644
+
   - name: install unzip
     package:
       name: unzip
@@ -95,8 +95,8 @@ This scenario shows:
       remote_src: yes
       owner: root
       group: root
-      mode: 0755  
-      
+      mode: 0755
+
 - hosts: database_servers
   become: true
   tasks:
@@ -114,21 +114,21 @@ This scenario shows:
       name: mariadb-server
       state: latest
     when: ansible_distribution == "Ubuntu"
-``` 
+```
 - Stop apache2 service and see the service is stopped.
 
-``` 
+```
 systemctl stop apache2
 systemctl status apache2
-``` 
+```
 
 ![image](./img/201748361-1423d4e9-f880-44f6-9f3c-c7c3c0afe712.png)
 
-- Run 
+- Run
 
-``` 
+```
 ansible-playbook --ask-become-pass site.yml
-``` 
+```
 
 - It is seen that apache2 service is started:
 
@@ -164,17 +164,17 @@ sudo nano /etc/apache2/sites-available/000-default.conf
     when: apache2_service.changed
 ```
 
-- As can seen printscreen, when the keyword is written in the register part (apache2_service), is changed, restart service is restarted. The task depends on the registered variable status. 
+- As can seen printscreen, when the keyword is written in the register part (apache2_service), is changed, restart service is restarted. The task depends on the registered variable status.
 
 ![image](./img/201753745-29e9e879-770a-46e5-a315-1da40f0cd1fa.png)
 
-- **IMPORTANT:** If the register variable is defined consecutively, if second task does not run with same register variable (because first same task handled it), because second one does not change, so restart task does not run.   
+- **IMPORTANT:** If the register variable is defined consecutively, if second task does not run with same register variable (because first same task handled it), because second one does not change, so restart task does not run.
 
 ![image](./img/201755326-44284c95-db0d-46c3-8f22-f224d845bd5b.png)
 
 - Updated site.yml:
 
-``` 
+```
 ---
 
 - hosts: all
@@ -216,7 +216,7 @@ sudo nano /etc/apache2/sites-available/000-default.conf
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
-    
+
   - name: start apache (Ubuntu)
     tags: ubuntu,apache,apache2
     service:
@@ -224,7 +224,7 @@ sudo nano /etc/apache2/sites-available/000-default.conf
       state: started
       enabled: yes
     when: ansible_distribution == "Ubuntu"
-    
+
   - name: change email address for admin (Ubuntu)
     tags: ubuntu,apache,apache2
     lineinfile:
@@ -240,7 +240,7 @@ sudo nano /etc/apache2/sites-available/000-default.conf
       name: apache2
       state: restarted
     when: apache2_service.changed
-    
+
   - name: copy default (index) html file for site
     tags: apache,apache2,httpd
     copy:
@@ -248,8 +248,8 @@ sudo nano /etc/apache2/sites-available/000-default.conf
       dest: /var/www/html/index.html
       owner: root
       group: root
-      mode: 0644    
-      
+      mode: 0644
+
   - name: install unzip
     package:
       name: unzip
@@ -261,8 +261,8 @@ sudo nano /etc/apache2/sites-available/000-default.conf
       remote_src: yes
       owner: root
       group: root
-      mode: 0755  
-      
+      mode: 0755
+
 - hosts: database_servers
   become: true
   tasks:
@@ -280,7 +280,7 @@ sudo nano /etc/apache2/sites-available/000-default.conf
       name: mariadb-server
       state: latest
     when: ansible_distribution == "Ubuntu"
-``` 
+```
 
 - It can be seen that it is changed:
 

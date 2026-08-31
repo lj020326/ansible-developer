@@ -61,62 +61,62 @@ Copy snippet
 Let's take a look at how Molecule developer preview aligns more closely with Ansible content collection development and testing. All the examples here are available in the upstream Molecule [project documentation](https://ansible.readthedocs.io/projects/molecule/getting-started/).
 
 1.  One of the recommended ways to create a collection is to place it under the `collections/ansible_collections` directory:
-    
+
     ```
     ansible-galaxy collection init foo.bar
     ```
-    
+
     Copy snippet
-    
+
 2.  Navigate to the `roles` directory in your new collection:
-    
+
     ```
     cd <path to your collection>/foo.bar/roles/
     ```
-    
+
     Copy snippet
-    
+
 3.  Initialize a new role for this collection:
-    
+
     ```
     ansible-galaxy role init my_role
     ```
-    
+
     Copy snippet
-    
+
 4.  Add a task under `my_role/tasks/main.yml`:
-    
+
     ```
     ---
     - name: Task is running from within the role
       ansible.builtin.debug:
         msg: "This is a task from my_role."
     ```
-    
+
     Copy snippet
-    
+
 5.  Add Molecule to the content collection:
-    
+
     -   Create a new directory in your collection called `extensions`.
-        
+
     -   `cd` to the new `extensions` directory:
-        
+
         ```
         cd <path to your collection>/extensions/
         ```
-        
+
         Copy snippet
-        
+
 6.  Initialize the default Molecule scenario:
-    
+
     ```
     molecule init scenario
     ```
-    
+
     Copy snippet
-    
+
 7.  Edit the `molecule.yml` file to use your local collection development environment as described. Add the following entry to your `<path_to_your_collection>/extensions/molecule/default/molecule.yml` file:
-    
+
     ```
     provisioner:
       name: ansible
@@ -124,19 +124,19 @@ Let's take a look at how Molecule developer preview aligns more closely with Ans
         defaults:
           collections_path: ${ANSIBLE_COLLECTIONS_PATH}
     ```
-    
+
     Copy snippet
-    
+
 8.  Then, set the `ANSIBLE_COLLECTIONS_PATH` environment variable at the command line before running Molecule:
-    
+
     ```
     export ANSIBLE_COLLECTIONS_PATH=/home/user/working/collections
     ```
-    
+
     Copy snippet
-    
+
     Note that the path should reflect the location up to the `collections` directory and not the `ansible_collections` directory.
-    
+
 
 ## Molecule scenarios
 
@@ -262,4 +262,4 @@ _Last updated: September 19, 2023_
 ## Reference
 
 - https://developers.redhat.com/articles/2023/09/13/introducing-ansible-molecule-ansible-automation-platform
-- 
+-

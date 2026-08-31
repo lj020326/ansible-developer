@@ -30,4 +30,4 @@ You can find the plugin on sidepanel of Jenkins.
 * https://github.com/jenkinsci/xml-job-to-job-dsl-plugin/
 * https://stackoverflow.com/questions/69364938/error-creating-jobdsl-parameters-programatically
 * https://stackoverflow.com/questions/48368407/any-predefined-jenkins-job-convert-them-to-dsl
-* 
+*

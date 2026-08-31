@@ -40,4 +40,3 @@ See the other repo [Interoute/API-fun-and-education](https://github.com/Interout
 [vm_stop.py](https://github.com/Interoute/VDC-API-examples-Python/blob/master/vm_stop.py): Stop a virtual machine from a running state
 
 [zone_get_all.py](https://github.com/Interoute/VDC-API-examples-Python/blob/master/zone_get_all.py): List the available zones
-

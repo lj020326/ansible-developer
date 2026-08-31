@@ -13,7 +13,7 @@ Adding your tv/device model# to a search will probably help narrow it down even 
 
 ___
 
-*** TONE MAPPING SUPPORT ADDED @ [https://support.plex.tv/articles/hdr-to-sdr-tone-mapping/](https://support.plex.tv/articles/hdr-to-sdr-tone-mapping/) ***  
+*** TONE MAPPING SUPPORT ADDED @ [https://support.plex.tv/articles/hdr-to-sdr-tone-mapping/](https://support.plex.tv/articles/hdr-to-sdr-tone-mapping/) ***
 do note: enabling tone mapping potentially can cause your server to no longer be able to transcode 4k due to the extra load, especially on windows (only cpu currently supported).
 
 ___
@@ -73,9 +73,9 @@ ___
 -   If you are direct playing 4k, then you do NOT need a hugely powerful server, you just need fast enough disk and network.
 -   To avoid transcoding for remote and non-4k clients, keep your 4k content in separate plex libraries. (and don’t give users who can’t direct play 4k access to them)
 -   This may of course mean that you keep a 4k copy and a 1080/720 copy, but if you are collecting 4k content then you should not be worried about storage space, should you?
--   if you don’t want to create a separate library, you can use LABELS to restrict your users from seeing 4k content:  
-    ![image](https://global.discourse-cdn.com/plex/original/3X/3/a/3ab1bb4dd22a571b7ccfc7fae2324af52bbe09e6.png)  
-    
+-   if you don’t want to create a separate library, you can use LABELS to restrict your users from seeing 4k content:
+    ![image](https://global.discourse-cdn.com/plex/original/3X/3/a/3ab1bb4dd22a571b7ccfc7fae2324af52bbe09e6.png)
+
 
 ___
 
@@ -137,7 +137,7 @@ the gtx 1030 does not have any encoder, so while it can decode 4k (the hard part
 
 amd gpu transcoding should work in windows, not sure about linux (I don’t know the details here, will update over time)
 
-related plex support articles  
+related plex support articles
 [https://support.plex.tv/articles/115002178853-using-hardware-accelerated-streaming/](https://support.plex.tv/articles/115002178853-using-hardware-accelerated-streaming/)
 
 ___
@@ -150,37 +150,37 @@ ___
 -   [Ok how do I get my HD audio along with 4k to direct play ?!?!?](https://forums.plex.tv/t/info-plex-4k-transcoding-and-you-aka-the-rules-of-4k/378203#Q4)
 -   [how can I determine exactly why plex is transcoding?](https://forums.plex.tv/t/info-plex-4k-transcoding-and-you-aka-the-rules-of-4k/378203#Q5)
 
-  
+
 Q: Why does vlc/kodi/infuse/(any other common apps?) direct play my 4k content, while plex player doesn’t?
 
 -   A: those applications are custom designed standalone applications which have their own built in codecs and capabilities and do not require a server, while plex clients are typically a lightweight app that depends more on the DEVICE to do the playback of directly compatible containers/codecs and make use of the SERVER to do the heavy lifting to convert (transcode) content which is not directly handled by the device/player.
 
 ___
 
-  
+
 Q: Why is my 4k smart tv app transcoding? its 4k it should be direct playing?!!?!? netflix/hulu/amazon/etc play in 4k with no problem?
 
--   A: smart tvs do not normally support the HD AUDIO that is included with 4k bluray rips/remuxes. when you are ripping your own 4k disks, you can see and choose which audio streams are included, make sure to include an dolby digital or dts 5.1 or stereo stream.  
-    then when you are going to play a movie, make sure that 5.1 or stereo stream is selcted.  
-    netflix etc does not use HD audio so it does not have this problem.  
-    also, netflix etc have greater control over both their APP and the how their CONTENT is encoded, so they can match them up to get the best experience.  
+-   A: smart tvs do not normally support the HD AUDIO that is included with 4k bluray rips/remuxes. when you are ripping your own 4k disks, you can see and choose which audio streams are included, make sure to include an dolby digital or dts 5.1 or stereo stream.
+    then when you are going to play a movie, make sure that 5.1 or stereo stream is selcted.
+    netflix etc does not use HD audio so it does not have this problem.
+    also, netflix etc have greater control over both their APP and the how their CONTENT is encoded, so they can match them up to get the best experience.
     plex has to deal with content from all over the place, with unknown/inconsistent qualities and codec variations. Streaming 4k is also MUCH lower bitrate than 4k bluray remuxes.
 
 ___
 
-  
+
 Q: Why doesn’t my 4k smart tv direct play hd audio?
 
--   A: most smart tvs are made as cheaply as possible, have crappy speakers, and only include the bare minimum codecs and functionality required to get the job done.  
-    so mostly only dolbydigital/dts 5.1 or stereo is directly compatible.  
-    most smart tvs do allow for hdmi passthrough via something called ARC.  
-    however ARC does not support the HD audio as explained previously, so again dd/dts 5.1 or stereo is generally the best that can come out of the tv.  
-    some brand new tvs and receivers support a new version of HDMI which has hd audio support via E-ARC.  
+-   A: most smart tvs are made as cheaply as possible, have crappy speakers, and only include the bare minimum codecs and functionality required to get the job done.
+    so mostly only dolbydigital/dts 5.1 or stereo is directly compatible.
+    most smart tvs do allow for hdmi passthrough via something called ARC.
+    however ARC does not support the HD audio as explained previously, so again dd/dts 5.1 or stereo is generally the best that can come out of the tv.
+    some brand new tvs and receivers support a new version of HDMI which has hd audio support via E-ARC.
     even then, e-arc support is still in its infancy.
 
 ___
 
-  
+
 Q: Ok how do I get my HD audio along with 4k to direct play ?!?!?
 
 -   A: you must use a plex client that can directly handle the codecs you are using, including the HD audio. This will likely NOT be your smart TV, it will be a separate device. You must also have the HARDWARE (ie receiver) that can handle the hd audio, like an atmos/4k receiver.
@@ -195,15 +195,15 @@ there are other possible solutions, but I don’t have any experience with them 
 
 ___
 
-  
+
 Q: how can I determine exactly why plex is transcoding?
 
 -   A: go to [Plex](https://app.plex.tv/desktop) > settings > console > filter > type “mde” without the quotes
 -   play the video on the device in question
 -   examine the log entries with the MDE: and TPU: lines, these should help explain why plex is transcoding.
 
-in the logs, look for entries with  
-`mde:` will tell WHY something is transcoded  
+in the logs, look for entries with
+`mde:` will tell WHY something is transcoded
 `tpu:` will tell you WHAT cpu/or gpu transcoder mode is used
 
 you can see/filter the logs @ [https://app.plex.tv/desktop](https://app.plex.tv/desktop) > settings > console
@@ -212,7 +212,7 @@ or settings > troubleshooting > download logs
 
 ___
 
-What about DOLBY VISION ?  
+What about DOLBY VISION ?
 DV is a whole other can of worms. Again the 2019 shield pro is your best bet, but some DV compatible tvs can support DV playback with the plex smart tv app.
 
 Not all TV’s support all the various DV profiles (of which there are several).
@@ -234,4 +234,3 @@ this topic is a work in progress and with your help, I’ll attempt to keep upda
 ## References
 
 - https://forums.plex.tv/t/info-plex-4k-transcoding-and-you-aka-the-rules-of-4k/378203
-

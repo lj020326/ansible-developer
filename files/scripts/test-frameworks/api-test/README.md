@@ -84,7 +84,7 @@ Integrate automated tests in CI workflow.
 
 Error exit code on failure
 
-## [Installing Api-Test](#installing) 
+## [Installing Api-Test](#installing)
 
 Api-test is a bash program that automates JSON API testing using curl command to make API requests and jq for JSON processing.
 
@@ -933,4 +933,4 @@ rm /usr/local/bin/api-test
 
 * Docs: [https://subeshbhandari.com/api-test](https://subeshbhandari.com/api-test)
 * https://awesomeopensource.com/project/subeshb1/api-test
-* 
+*

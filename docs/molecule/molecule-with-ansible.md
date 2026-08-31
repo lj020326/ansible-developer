@@ -46,9 +46,9 @@ We can add in our molecule directly in the `rolename` folder. We will create a `
 Inside the default folder we will add in our instructions to setup our container and run our ansible role against the container by creating two files called `converge.yml` and `molecule.yml`.
 
 -   `molecule.yml` is the central configuration entrypoint for Molecule. With this file, you can configure each tool that Molecule will employ when testing your role.
-    
+
 -   `converge.yml` is the playbook file that contains the call for your role. Molecule will invoke this playbook with ansible-playbook and run it against an instance created by the driver.
-    
+
 
 First we will create our `converge.yml` file. This file will hold the steps necessary to converge our instances.The `converge` command applies the current version of the role to all the running container instances. Molecule `converge` does not restart the instances if they are already running. It tries to converge those instances by making their configuration match the desired state described by the role currently testing.
 
@@ -104,7 +104,7 @@ To fully test your ansible role from container creation to, configuration, to de
 
 to run through the process of creating the container, running the ansible script against the container, then destroying the container.
 
-If you would like to manually go through the process then use the following steps to (1) create, (2) converge, (3) test, and (4) destroy. 
+If you would like to manually go through the process then use the following steps to (1) create, (2) converge, (3) test, and (4) destroy.
 
 ### Molecule Create
 First create the container using:
@@ -151,4 +151,4 @@ Lastly, to destroy the container use:
 ## Reference
 
 * https://whatsyourssn.com/posts/molecule-with-ansible/
-* 
+*

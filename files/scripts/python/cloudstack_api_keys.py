@@ -78,4 +78,3 @@ def admin_apikeys_from_cloudstack():
 def keys_valid():
     # implementation of keys_valid function
     pass
-

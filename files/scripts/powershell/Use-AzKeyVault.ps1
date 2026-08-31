@@ -14,7 +14,7 @@ Get-AzKeyVault
 Get-AzKeyVault azkeyvscriptinglibXXXXX
 
 # Add a secret to the Vault
-$MySecret = Get-Credential 
+$MySecret = Get-Credential
 Set-AzKeyVaultSecret -VaultName azkeyvscriptinglibXXXXX -name $Mysecret.username -SecretValue $Mysecret.password
 
 # Retrieve a secret from the Vault in a SecureString Format

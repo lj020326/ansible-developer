@@ -1,7 +1,7 @@
 
 # How to debug dockerhub pull image
 
-**TL;DR** Gain an understanding of Container image manifests, how these are calculated|verified, and how manifests correspond to layers. 
+**TL;DR** Gain an understanding of Container image manifests, how these are calculated|verified, and how manifests correspond to layers.
 
 > **NB** Your sha256’s will vary
 
@@ -28,7 +28,7 @@ Then:
 ```shell
 $ docker history ${IMAGE}:${TAG} \
 --format="{{.ID}}\t{{.CreatedBy}}"
-IMAGE               CREATED BY                                      
+IMAGE               CREATED BY
 c8c7079fcada        /bin/sh -c #(nop)  ENTRYPOINT ["/app"]
 de61bd0d36a4        /bin/sh -c #(nop) COPY file:549fe06ce41c1ab2…
 a5a1c6b2c22f        bazel build ...
@@ -445,9 +445,9 @@ $ ./skopeo inspect docker://gcr.io/${PROJECT}/${IMAGE}:${TAG}
 ```
 
 > **NB** There’s no `/v2/` in the GCR URL in this case.
-> 
+>
 > **NB** The `Digest` and the `Layers[]` values match.
-> 
+>
 > **NB** The Digests match because the manifests are identical.
 
 ## Layers
@@ -519,7 +519,7 @@ Another riff on the sha256 calculations for Container Registry’s underlying bu
 ```shell
 $ BUCKET=[[YOUR-BUCKET]]
 $ for OBJECT in $(gsutil ls gs://${BUCKET}/containers/images)
-do 
+do
   OBJECT_SHA=$(gsutil cp ${OBJECT} - | sha256sum | head --bytes 64)
   printf "%s\tsha==%s\n" ${OBJECT} ${OBJECT_SHA}
 done

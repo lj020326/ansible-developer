@@ -32,6 +32,3 @@ Setting up AWX
 * [Creating custom ee awx phil griffiths](https://www.linkedin.com/pulse/creating-custom-ee-awx-phil-griffiths/)
 * [robertdebock/ansible-role-awx: Install and configure AWX on your system](https://github.com/robertdebock/ansible-role-awx)
 * [Host your own on-premise Ansible Galaxy - HackMD](https://hackmd.io/@pulp/ansible-containers?print-pdf#/)
-
-
-

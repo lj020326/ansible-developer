@@ -65,11 +65,11 @@ In either case, derived or explicitly defined, there will be the need to assign 
 For example, consider a feature that is intended for the derived group 'windows_dmz'.
 Also consider that the test machine does not fit the 'network' characteristics to properly conform to the derivation logic to assign the test machine into the DMZ network.
 
-### Setting up and Synchronizing the development/test inventory into AWX 
+### Setting up and Synchronizing the development/test inventory into AWX
 
 #### Create Inventory Repo feature development branch
 
-1. Clone the inventory repository from Bitbucket  
+1. Clone the inventory repository from Bitbucket
     1.  The repository contains a Prod folder for the Production Ansible install and a TEST folder for the TEST Ansible install.
     2.  Inside each of those subfolders are folders for specific inventories. We are moving towards one example.int folder that contains all of the hosts managed by that instance of Ansible and one aap-inventory folder that contains only the Ansible hosts themselves for managing itself.
 2. Create a branch from an active Jira ticket in the repository
@@ -77,12 +77,12 @@ Also consider that the test machine does not fit the 'network' characteristics t
 4. Add/update any data in the group_vars files to reflect changes to any group configuration.
 
 Upon successful feature development / validation:<br>
-5. Create a Pull Request from your branch in Bitbucket.<br> 
+5. Create a Pull Request from your branch in Bitbucket.<br>
 6. The Inventory change will be reviewed during a DC Architecture meeting for validation before going to Change Management (if necessary).
 
 #### Setup Developer Inventory Project in AWX
 
-Do not manage group vars/memberships via the UI as those will be overwritten with the next Bitbucket refresh. 
+Do not manage group vars/memberships via the UI as those will be overwritten with the next Bitbucket refresh.
 The best workflow to update/synchronize the development inventory into AWX is to:
 
 1.  Create a Project in Ansible TEST that you can use for your inventory changes - e.g.
@@ -232,12 +232,12 @@ group_names:
 ```
 
 Placing the test machine into the group by overriding the ansible magic/special variable 'group_names' is strongly discouraged.
-It will override all the group configurations/definitions for the target host including any/all that may be necessary for other play logic to work correctly.  
+It will override all the group configurations/definitions for the target host including any/all that may be necessary for other play logic to work correctly.
 
-The advantage of using the aforementioned inventory group based approach is that any/all existing inventory host groups are readily available supporting all/any supporting/dependent/downstream play/role logic.  
+The advantage of using the aforementioned inventory group based approach is that any/all existing inventory host groups are readily available supporting all/any supporting/dependent/downstream play/role logic.
 
 In fact, as a general rule, do not override 'ansible magic/special variables' since much is lost with little to gain.
-Using such methods, the results can often be considered suspect since they can be inconsistent with actual production playbook run results.  
+Using such methods, the results can often be considered suspect since they can be inconsistent with actual production playbook run results.
 
 
 ## Ansible feature validations
@@ -254,7 +254,7 @@ The feature developer can develop the test cases to validate the feature set usi
 
 Then at time of deployment, the feature developer can support the feature functional validation success by referring to the functional test automation results as the supporting evidence of complete feature validation.
 
-The benefit of implementing functional test automation is that at any time going forward, feature functionality can be easily validated whenever the following occurs: 
+The benefit of implementing functional test automation is that at any time going forward, feature functionality can be easily validated whenever the following occurs:
 
 1) new features are added to the existing feature set (regression)
 2) changes are made with respect to supporting/dependent libraries/components used by the feature
@@ -267,30 +267,30 @@ Smoke tests are usually sets of critical feature tests that are run to validate 
 For infrastructure automation smoke testing, one might consider a having a set of plays that verify that all hosts in the inventory meet a set of infrastructure core requirements, such as:
 
 1) pass ansible ssh ping,
-2) pass credential checks: 
-   1) ansible credential valid 
+2) pass credential checks:
+   1) ansible credential valid
    2) machine admin account credential matches cyberark safe account password
    3) machine service account passwords match cyberark safe account passwords
-3) pass machine and service route PKI certificate authority (ca) checks 
-   1) valid ca root cert 
-   2) valid ca signed cert chain(s) 
-   3) non-expired 
+3) pass machine and service route PKI certificate authority (ca) checks
+   1) valid ca root cert
+   2) valid ca signed cert chain(s)
+   3) non-expired
    4) non-revoked
 4) pass system truststore checks (valid root cert, only corp-valid certs and cert chains)
 5) pass check OS/SW version/patch updates are up-to-date
-6) pass service list check to validate that only 'defined' services are running 
-7) pass critical set OS compliance checks 
+6) pass service list check to validate that only 'defined' services are running
+7) pass critical set OS compliance checks
 8) pass disk storage checks  with defined threshold/tolerance/limit
    1) tempfs / etc
-   2) log rotations performed 
-   3) total log size (e.g., 'du -h --max-depth=1 --exclude=nfs --exclude=proc --no-dereference /var/log') 
+   2) log rotations performed
+   3) total log size (e.g., 'du -h --max-depth=1 --exclude=nfs --exclude=proc --no-dereference /var/log')
    4) file log sizes
-9) pass machine resources checks with defined threshold/tolerance/limit 
+9) pass machine resources checks with defined threshold/tolerance/limit
    1) Number of ionodes consumed/free(avail)
    2) Number of connections consumed/free(avail)
    3) Number of open file handles
-10) if DB machine, pass DB specific checks meets defined threshold/tolerance/limit 
-    1) disk IOmeter test  
+10) if DB machine, pass DB specific checks meets defined threshold/tolerance/limit
+    1) disk IOmeter test
     2) tempDb size
 11) validate VM backups are valid/current if defined
 
@@ -310,7 +310,7 @@ The new feature tests are usually sets of tests used to validate the new feature
 
 The feature interoperability validation tests should look to determine if the feature is implemented in a way that sufficiently meets integration requirements with existing environment components/APIs/libraries/OS versions/etc.
 
-The benefit of implementing interoperability test automation is that at any time going forward, feature interoperability can be easily validated whenever the following occurs: 
+The benefit of implementing interoperability test automation is that at any time going forward, feature interoperability can be easily validated whenever the following occurs:
 
 1) new features are added to the existing feature set (regression)
 2) changes are made with respect to supporting/dependent libraries/components used by the feature
@@ -323,7 +323,7 @@ The feature performance validation tests should look to determine if the feature
 
 For example, if the 'deploy-VM' role has a performance requirement to be able to deploy 10 VMs in less than 5 minutes, then tests should be set up to validate that this performance requirement.
 
-The benefit of implementing performance test automation is that at any time going forward, feature performance can be easily validated whenever the following occurs: 
+The benefit of implementing performance test automation is that at any time going forward, feature performance can be easily validated whenever the following occurs:
 
 1) new features are added to the existing feature set (regression)
 2) changes are made with respect to supporting/dependent libraries/components used by the feature
@@ -349,7 +349,7 @@ The challenge and possible problem(s) with the monitoring-only approach is:
 #### Solution to monitoring host runtime configuration with inventory group_vars/host_vars specifications
 
 A better solution would be to run a 'site.yml' defined set of smoke tests with the change report as a part of an overall suite of 'monitoring' solutions/tools.
-Advantages using this approach are 
+Advantages using this approach are
 
 1) full alignment of site group_vars/host_vars configurations in defined inventory state.
 2) with regular/periodic site playbook runs:
@@ -365,11 +365,11 @@ Advantages using this approach are
 #### Inventory host configurations comparison with host runtime state
 
 Assuming all group_vars and host_vars are set up to fully configure and specify any host machine, smoke tests can then be executed on a regular basis to compare the host runtime configuration versus the intended inventory configuration.  This would provide a very robust solution for monitoring and assessing the state of the inventory.
-Failed tests should highlight hosts requiring some care in aligning with the inventory, or the inventory may require to be updated to reflect the new configuration of any host that does not align with the group_vars/host_vars state.  
+Failed tests should highlight hosts requiring some care in aligning with the inventory, or the inventory may require to be updated to reflect the new configuration of any host that does not align with the group_vars/host_vars state.
 
 ### Monitoring versus site alignment/synchronization with the defined inventory
 
-While reporting can be helpful to determine if changes are occuring outside of the ansible automation framework, another tool to add to the arsenal would be to run regular site synchronization plays for the essential/core OS level bootstrap to guarantee and assert the site is in alignment with the inventory state.  
+While reporting can be helpful to determine if changes are occuring outside of the ansible automation framework, another tool to add to the arsenal would be to run regular site synchronization plays for the essential/core OS level bootstrap to guarantee and assert the site is in alignment with the inventory state.
 
 
 ### Multiple target hosts validation
@@ -392,8 +392,8 @@ Consider a typical client-server use case.
 
 For example, take a role that sets up postfix for the following 2 configurations into 2 sites (site1 and site4):
 
-1) primary postfix server to relay traffic to an external outbound STMP agent and 
-2) hosts defined in a group that will relay internal SMTP traffic to the corresponding site primary postfix server.  
+1) primary postfix server to relay traffic to an external outbound STMP agent and
+2) hosts defined in a group that will relay internal SMTP traffic to the corresponding site primary postfix server.
 
 Then consider the following configuration groups can be defined to support this role:
 
@@ -404,7 +404,7 @@ Then consider the following configuration groups can be defined to support this 
 
 The test inventory can then define test groups to add test machines in the resulting 4 aforementioned groups in the following way/method:
 
-#### Binding test groups to intended 'production'/'final' deployment groups 
+#### Binding test groups to intended 'production'/'final' deployment groups
 
 1) Setup the 'production'/'final' groups to be PR'd and deployed:
 
@@ -419,7 +419,7 @@ postfix:
       children:
         postfix_primary_relay_site1:
         postfix_primary_relay_site2:
-            
+
     postfix_relay_client:
       children:
          postfix_relay_client_site1:
@@ -436,11 +436,11 @@ testgroup:
     testgroup_lnx:
 
       children:
-        
+
         postfix:
           test_postfix_primary_relay: {}
           test_postfix_relay_client: {}
-          
+
         testgroup_postfix:
           children:
            test_postfix_primary_relay:
@@ -451,7 +451,7 @@ testgroup:
                 test_postfix_primary_relay_site2:
                   hosts:
                     testd1s4.example.int: {}
-                   
+
             test_postfix_relay_client:
               children:
                  test_postfix_relay_client_site1:
@@ -478,7 +478,7 @@ ansible-inventory -i TEST/ --graph --yaml test_postfix_primary_relay
 ansible-inventory -i TEST/ --graph --yaml test_postfix_relay_client
 ```
 
-2) Check the group vars are correctly setup for the test hosts 
+2) Check the group vars are correctly setup for the test hosts
 
 Group based query:
 ```shell
@@ -525,41 +525,41 @@ In this case, the feature can be developed and PR'd into two PRs supporting the 
 
 ## Patterns and Scopes requiring specific SOPs
 
-### 1: Domain Use Cases 
+### 1: Domain Use Cases
 
 This use case is common and usually involves:
 
-1) SW Deployments involving Large Disjoint and/or Complementary Sub-Groups 
-2) Inventory Configuration State for each sub-group (e.g., A/B or Client / Server machine configs within a network domain) 
+1) SW Deployments involving Large Disjoint and/or Complementary Sub-Groups
+2) Inventory Configuration State for each sub-group (e.g., A/B or Client / Server machine configs within a network domain)
 
 When meeting these conditions, this SOP is required for any playbook and corresponding roles (e.g., client/server configurations).
 
-Basically / put simply, whenever there is the following inventory group requirement conditions: 
+Basically / put simply, whenever there is the following inventory group requirement conditions:
 
-1) a large group "A", and 
-2) a very small/finite subset group "B" within "A", and 
-3) the need exists to have a 3rd group "C" which is the difference of A - B = C, and 
+1) a large group "A", and
+2) a very small/finite subset group "B" within "A", and
+3) the need exists to have a 3rd group "C" which is the difference of A - B = C, and
 4) the need to maintain the configuration state for each of the groups "A", "B", and "C" in group_vars/group[A|B|C].yml format
 
 Many use cases require shared services enabling a complimentary set of clients within a defined superset group.
 
-Service based use cases usually involve: 
+Service based use cases usually involve:
 
-1) a network or domain group "A" 
-   Example domains/networks 
-   1) 'DMZ'/'internal'/'cloud1'/'cloud2', 
-   2) 'site1'/'site2'/../'siteN', 
-   3) 'env1'/'env2'/../'envN', 
-   4) 'prod'/'qa', 
+1) a network or domain group "A"
+   Example domains/networks
+   1) 'DMZ'/'internal'/'cloud1'/'cloud2',
+   2) 'site1'/'site2'/../'siteN',
+   3) 'env1'/'env2'/../'envN',
+   4) 'prod'/'qa',
    5) etc
-2) a finite/small subset machines hosting shared services in group "B"  
+2) a finite/small subset machines hosting shared services in group "B"
 3) a large subset of 'client' machines, group "C" that is the complement of group "B" within the superset group "A" ('domain', 'network', etc)
 
 Example domain/network shared services:
 - router/gateways/firewalls
-- dns/dhcp 
+- dns/dhcp
 - ntp/time/chrony
-- ldap/AD 
+- ldap/AD
 - mail/postfix
 - nfs/samba/cifs/storage
 - archive servers (apache archiva, jfrog artifactory, sonatype nexus, etc)
@@ -571,7 +571,7 @@ Example domain/network shared services:
 Currently, functionality exists in ansible playbook to sufficiently limit hosts to an implied "subset" set of machines using the [patterns supported by the limit feature](https://docs.ansible.com/ansible/latest/user_guide/intro_patterns.html).  For example, to specify all hosts in webservers except those in atlanta:
 
 ```shell
-ansible-playbook site.yml --limit 'webservers:!atlanta' 
+ansible-playbook site.yml --limit 'webservers:!atlanta'
 ```
 
 Now consider the following inventory use case.
@@ -579,7 +579,7 @@ Now consider the following inventory use case.
 
 In the aforementioned diagram/example, to limit the targeted hosts to only clients:
 ```shell
-ansible-playbook site.yml --limit 'network_a:!network_a_servers' 
+ansible-playbook site.yml --limit 'network_a:!network_a_servers'
 ```
 
 However, if there are any configurations that the client group requires, then this method is insufficient.
@@ -591,11 +591,11 @@ For example, if the YAML-based inventory supported the following feature then th
 ```yaml
 all:
   children:
-    network_a_clients: 
+    network_a_clients:
       hosts: network_a:!network_a_servers
       vars:
         network_server_list: "{{ groups['network_a_servers'] }}"
-      
+
     network_a:
       hosts:
         admin01: {}
@@ -608,7 +608,7 @@ all:
         ...
         ...
         machine99: {}
-    
+
     network_a_servers:
       hosts:
         admin01: {}
@@ -624,13 +624,13 @@ But alas, the YAML-based ansible inventory does not support this feature, at lea
 
 Say the following parameters are given:
 
-* A 'network' (parent) group has 100, 1000, or lets say __N machines__ and 
+* A 'network' (parent) group has 100, 1000, or lets say __N machines__ and
 * A subset 'network_server' group only has a far less _finite number_ of instances, say 2, 4, or __M machines__
 * A derived 'network_client' defined as the parent group of __N machines__ minus the server group of __M machines__.
 
-So given an inventory with a 'network' group of 1000 machines, and a 'network_server' group of 4 machines, then the 'network_client' group would have 996 machines. 
+So given an inventory with a 'network' group of 1000 machines, and a 'network_server' group of 4 machines, then the 'network_client' group would have 996 machines.
 
-Maintaining a 'network_client' group for multiple use-cases would have to re-define the child group of __(N - M) machines__. 
+Maintaining a 'network_client' group for multiple use-cases would have to re-define the child group of __(N - M) machines__.
 
 This can present risks since then each 'network_client' group is almost the same size as the parent 'network_server' group and exposes risks of maintaining synchronization of the group.
 
@@ -699,4 +699,3 @@ This section will seek to document the processes, procedures, and/or steps requi
 This section remains to be completed (TBC).
 
 This section will seek to document the processes, procedures, and/or steps required whenever changes and/or enhancements are made to any tower-inventory related inventory.
-

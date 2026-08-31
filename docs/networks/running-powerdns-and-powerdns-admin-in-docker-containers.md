@@ -61,7 +61,7 @@ sudo systemctl disable systemd-resolved
 Remove the symbolic link.
 
 ```
-$ ls -lh /etc/resolv.conf 
+$ ls -lh /etc/resolv.conf
 -rw-r--r-- 1 root root 49 Feb 23 04:53 /etc/resolv.conf
 $ sudo unlink /etc/resolv.conf
 ```
@@ -235,10 +235,10 @@ services:
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=powerdnsadmin
-      - MYSQL_USER=pdns 
+      - MYSQL_USER=pdns
       - MYSQL_PASSWORD=mypdns
     ports:
-      - 3306:3306 
+      - 3306:3306
     restart: always
     volumes:
       - /pda-mysql:/var/lib/mysql
@@ -262,18 +262,18 @@ services:
       - PDNS_gmysql_user=pdns
       - PDNS_gmysql_dbname=powerdnsadmin
       - PDNS_gmysql_password=mypdns
-      - PDNS_master=yes 
+      - PDNS_master=yes
       - PDNS_api=yes
-      - PDNS_api_key=secret 
-      - PDNSCONF_API_KEY=secret 
-      - PDNS_webserver=yes 
-      - PDNS_webserver-allow-from=127.0.0.1,10.0.0.0/8,172.0.0.0/8,192.0.0.0/24 
-      - PDNS_webserver_address=0.0.0.0 
-      - PDNS_webserver_password=secret2 
-      - PDNS_version_string=anonymous 
-      - PDNS_default_ttl=1500 
-      - PDNS_allow_notify_from=0.0.0.0 
-      - PDNS_allow_axfr_ips=127.0.0.1 
+      - PDNS_api_key=secret
+      - PDNSCONF_API_KEY=secret
+      - PDNS_webserver=yes
+      - PDNS_webserver-allow-from=127.0.0.1,10.0.0.0/8,172.0.0.0/8,192.0.0.0/24
+      - PDNS_webserver_address=0.0.0.0
+      - PDNS_webserver_password=secret2
+      - PDNS_version_string=anonymous
+      - PDNS_default_ttl=1500
+      - PDNS_allow_notify_from=0.0.0.0
+      - PDNS_allow_axfr_ips=127.0.0.1
 
   web_app:
     image: ngoduykhanh/powerdns-admin:latest

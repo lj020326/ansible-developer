@@ -1,6 +1,6 @@
 ## LAB: Adding Tags
 
-Tags are useful when we want to run specific part of the playbook. If we tagged with specific keywords, only tagged part would run.  
+Tags are useful when we want to run specific part of the playbook. If we tagged with specific keywords, only tagged part would run.
 
 This scenario shows:
 - how to add tags and run according to specific tags
@@ -14,7 +14,7 @@ This scenario shows:
 
 - Tags are added with "tags" keyword. "tags: Always" run always, other tags could be custom defined (e.g. apache, mariadb, etc.)
 
-``` 
+```
 ---
 
 - hosts: all
@@ -56,7 +56,7 @@ This scenario shows:
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
-    
+
 - hosts: database_servers
   become: true
   tasks:
@@ -74,7 +74,7 @@ This scenario shows:
       name: mariadb-server
       state: latest
     when: ansible_distribution == "Ubuntu"
-``` 
+```
 
 - To see the defined tags, run following:
 

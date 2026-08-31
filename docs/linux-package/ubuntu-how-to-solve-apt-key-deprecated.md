@@ -66,7 +66,7 @@ Or you can add the `arch=amd64` in the same fashion:
 deb [arch=amd64 signed-by=/usr/share/keyrings/<myrepository>-archive-keyring.gpg] <https://repository.example.com/debian/ stable main>
 ```
 
-Also, using `curl WEBSITE | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/FILE.gpg` is better than `curl WEBSITE | sudo gpg --dearmour > /etc/apt/trusted.gpg.d/FILE.gpg`. I found that using > causes permission errors sometimes. 
+Also, using `curl WEBSITE | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/FILE.gpg` is better than `curl WEBSITE | sudo gpg --dearmour > /etc/apt/trusted.gpg.d/FILE.gpg`. I found that using > causes permission errors sometimes.
 
 Finally, confirm that the /etc/apt/trusted.gpg is correct format.
 
@@ -84,7 +84,7 @@ If this is helpful give thanks to @Terrance
 
 ## Examples
 
-### Add Docker gpg 
+### Add Docker gpg
 
 to keyring:
 ```shell
@@ -113,4 +113,4 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/webmin.gpg] https://download
 - https://askubuntu.com/questions/1328806/how-to-solve-apt-key-deprecated
 - https://unix.stackexchange.com/questions/583266/the-keys-in-the-keyring-etc-apt-trusted-gpg-are-ignored-as-the-file-has-an-un
 - https://9to5answer.com/the-key-s-in-the-keyring-etc-apt-trusted-gpg-are-ignored-as-the-file-has-an-unsupported-filetype
-- 
+-

@@ -505,12 +505,15 @@ function setup_macos() {
   ## ref: https://docs.brew.sh/Installation#unattended-installation
   ## ref: https://github.com/Homebrew/install/issues/714
 #  yes "" | NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#  HOMEBREW_BUILD_FROM_SOURCE=1 brew upgrade
+  export HOMEBREW_NO_AUTO_UPDATE=1
+  brew upgrade
 
   ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
   ## ref: https://gist.githubusercontent.com/clayfreeman/2a5e54577bcc033e2f00/raw/gnuize.sh
-  brew install coreutils binutils diffutils ed findutils gawk gnutls gnu-indent gnu-getopt gnu-sed \
-    gnu-tar gnu-which gnutls grep gzip screen watch wdiff wget bash gpatch \
-    m4 make nano file-formula git less openssh rsync unzip vim
+  brew install coreutils binutils diffutils ed findutils gawk gnutls gnu-indent gnu-getopt \
+    gnu-sed gnu-which gnu-tar gnutls grep gzip screen watch wdiff wget bash gpatch \
+    m4 make nano file-formula git less openssh rsync unzip vim hadolint
 
   brew install rust
 
@@ -521,10 +524,34 @@ function setup_macos() {
   brew install tmux-fingers immanuwell/droast/droast dskditto
 
   # Recommended GUI Apps
-  brew install --cask openwhispr onit-sidekick sessionwatcher markdown-preview
+#  brew install --cask openwhispr onit-sidekick sessionwatcher markdown-preview
+  brew install --cask openwhispr onit-sidekick markdown-preview
 
-  echo "Install flyline - Inline command completion & immediate suggestion generation..."
-  curl -sSfL https://github.com/HalFrgrd/flyline/releases/latest/download/install.sh | sh
+  local FLYLINE_DYLIB="${HOME}/.local/lib/libflyline.dylib"
+
+#  echo "Install flyline - Inline command completion & immediate suggestion generation..."
+#  curl -sSfL https://github.com/HalFrgrd/flyline/releases/latest/download/install.sh | sh
+  # Check if flyline exists AND can be dynamically loaded without errors into the target Bash
+  if [[ -f "${FLYLINE_DYLIB}" ]] && "${BREW_BASH}" -c "enable -f '${FLYLINE_DYLIB}' flyline" &>/dev/null; then
+    log_info "Flyline is already installed and functional. Skipping build."
+  else
+    echo "Install flyline - Inline command completion & immediate suggestion generation..."
+    curl -sSfL https://github.com/HalFrgrd/flyline/releases/latest/download/install.sh | sh
+#  else
+#    log_info "Building and installing flyline locally from source..."
+#    local FLYLINE_BUILD_DIR
+#    FLYLINE_BUILD_DIR="$(mktemp -d)"
+#
+#    mkdir -p "${HOME}/.local/lib"
+#
+#    git clone https://github.com/HalFrgrd/flyline.git "${FLYLINE_BUILD_DIR}"
+#    (
+#      cd "${FLYLINE_BUILD_DIR}" || exit 1
+#      cargo build --release
+#      cp target/release/libflyline.dylib "${FLYLINE_DYLIB}"
+#    )
+#    rm -rf "${FLYLINE_BUILD_DIR}"
+  fi
 
   echo "Install tau - Autonomous, multi-step agent workspace (code editing, repo analysis, terminal execution)."
   curl -LsSf https://twotimespi.dev/install.sh | sh

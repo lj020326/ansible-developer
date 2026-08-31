@@ -2,10 +2,10 @@
 # Python class to simplify access to the Interoute Virtual Data Centre API
 # Original code by Kelcey Damage & Kraig Amador, 2012
 # Developed for Interoute.com by Sandy Walker, 2014
-# For download and information: 
+# For download and information:
 # http://cloudstore.interoute.com/main/knowledge-centre/library/vdc-api-python-scripts
 
-# This program is configured for Python version 2.6/2.7 
+# This program is configured for Python version 2.6/2.7
 #
 # Copyright (C) Interoute Communications Limited, 2014
 

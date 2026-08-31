@@ -44,4 +44,4 @@ $ docker manifest inspect lj020326/centos8-systemd-python:latest | jq .manifests
 * https://github.com/docker/hub-feedback/issues/2043#issuecomment-1161578466
 * https://github.com/docker/hub-feedback/issues/2043
 * https://github.com/docker/hub-feedback/issues/1925
-* 
+*

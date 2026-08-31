@@ -5,8 +5,8 @@ So you're doing Infrastructure-as-Code? Sure. But have you ever heard of test-dr
 
 ## TDD for infrastructure code development using Ansible, Molecule & TestInfra
 
-Part 1: Test-driven infrastructure development with Ansible & Molecule  
-Part 2: [Continuous Infrastructure with Ansible, Molecule & TravisCI](tdd-continuous-infrastructure-ansible-molecule-travisci.md)  
+Part 1: Test-driven infrastructure development with Ansible & Molecule
+Part 2: [Continuous Infrastructure with Ansible, Molecule & TravisCI](tdd-continuous-infrastructure-ansible-molecule-travisci.md)
 Part 3: [Continuous cloud infrastructure with Ansible, Molecule & TravisCI on AWS](tdd-ansible-molecule-travisci-aws.md)
 
 ## What about TDD in Infrastructure-as-Code?
@@ -99,7 +99,7 @@ Before we can actually start writing our test cases, we should enable Molecule t
 ```yaml
 scenario:
   name: default
- 
+
 driver:
   name: vagrant
   provider:
@@ -111,12 +111,12 @@ platforms:
     cpus: 1
     provider_raw_config_args:
     - "customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]"
- 
+
 provisioner:
   name: ansible
   lint:
     enabled: false
- 
+
 lint:
   enabled: false
 verifier:
@@ -197,22 +197,22 @@ We should assert on these necessary steps inside our testcase. Now let's take a 
 
 ```python
 import os
- 
+
 import testinfra.utils.ansible_runner
- 
+
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
- 
- 
+
+
 def test_is_docker_installed(host):
     package_docker = host.package('docker-ce')
- 
+
     assert package_docker.is_installed
- 
- 
+
+
 def test_run_hello_world_container_successfully(host):
     hello_world_ran = host.run("docker run hello-world")
- 
+
     assert 'Hello from Docker!' in hello_world_ran.stdout
 
 ```
@@ -246,20 +246,20 @@ Following the well-known cycle in Test-driven development, we now may implement 
     state: present
   ignore_errors: true
   become: true
- 
+
 - name: add docker apt repo
   apt_repository:
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
     update_cache: yes
   become: true
- 
+
 - name: install Docker apt package
   apt:
     pkg: docker-ce
     state: latest
     update_cache: yes
   become: true
- 
+
 - name: add vagrant user to docker group.
   user:
     name: vagrant

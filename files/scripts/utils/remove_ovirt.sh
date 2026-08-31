@@ -38,4 +38,3 @@ do
    echo "! error removing $d"
    exit 1
 done
-

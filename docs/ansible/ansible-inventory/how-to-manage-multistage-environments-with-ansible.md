@@ -363,9 +363,8 @@ See the [ansible-datacenter inventory](https://github.com/lj020326/ansible-datac
 
 ## Conclusion
 
-In this article, we’ve explored the flexibility that Ansible provides for managing your hosts across multiple environments. This allows users to adopt many different strategies for handling variable precedence when a host is a member of multiple groups, but the ambiguity and lack of official direction can be challenging. As with any technology, the best fit for your organization will depend on your use-cases and the complexity of your requirements. The best way to find a strategy that fits your needs is to experiment. 
+In this article, we’ve explored the flexibility that Ansible provides for managing your hosts across multiple environments. This allows users to adopt many different strategies for handling variable precedence when a host is a member of multiple groups, but the ambiguity and lack of official direction can be challenging. As with any technology, the best fit for your organization will depend on your use-cases and the complexity of your requirements. The best way to find a strategy that fits your needs is to experiment.
 
 ## Reference
 
 * [How to Manage Multistage Environments with Ansible](https://www.digitalocean.com/community/tutorials/how-to-manage-multistage-environments-with-ansible)
-

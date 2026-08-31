@@ -66,4 +66,3 @@ fi
 get_site_cacerts ${host} ${port} ${certs_dir}
 
 import_curl_cacert ${alias} ${curl_capath} ${certs_dir}
-

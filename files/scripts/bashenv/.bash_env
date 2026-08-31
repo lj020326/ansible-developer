@@ -39,7 +39,7 @@ export DOCKER_REGISTRY_INTERNAL="media.${NETWORK_INTERNAL_DOMAIN}:5000"
 
 #export MOLECULE_IMAGE_NAMESPACE="media.${NETWORK_INTERNAL_DOMAIN}:5000"
 export MOLECULE_IMAGE_REGISTRY="media.${NETWORK_INTERNAL_DOMAIN}:5000"
-export EDITOR=/usr/local/bin/emacs
+export EDITOR=emacs
 
 export PYTHON_VERSION="3"
 export TEST_PYTHON_VERSION="3.10"
@@ -123,7 +123,6 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     export VSCODE_BINDIR="${HOME}/AppData/Local/Programs/Microsoft VS Code/bin"
 
 #    export EDITOR=/c/apps/notepad++/notepad++.exe
-    export EDITOR=/usr/bin/emacs
 
     echo "${log_prefix_bashenv} setting PATH for MSYS/MINGW platform"
     ## set user path
@@ -177,6 +176,8 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     echo "${log_prefix_bashenv} setting environment for DARWIN platform"
 
     export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+#    export MallocStackLogging=0
+#    export MallocStackLoggingNoCompact=1
 
     ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
     ## ref: https://dev.to/rithvik78/change-the-default-java-version-on-macos-3jee
@@ -188,7 +189,6 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
 
     ## ref: https://apple.stackexchange.com/questions/371997/suppressing-the-default-interactive-shell-is-now-zsh-message-in-macos-catalina
     export BASH_SILENCE_DEPRECATION_WARNING=1
-    export EDITOR=/usr/local/bin/emacs
     export VSCODE_SETTINGS_DIR="${HOME}/Library/Application\ Support/Code/User"
 
     ## set user path
@@ -283,6 +283,11 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     fi
 
     # Flyline - enhanced Bash experience
+    # Force Flyline out of debug/simulation fallback
+    export FLYLINE_DEBUG=0
+    export FLYLINE_SIMULATION=0
+
+    # Flyline - enhanced Bash experience
     if [ -z "${FLYLINE_DISABLED}" ]; then
         if ! enable -p | grep -q ' flyline$'; then
             enable -f ${HOME}/.local/lib/libflyline.dylib flyline
@@ -301,7 +306,7 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
       if type flyline &>/dev/null; then
           flyline set-agent-mode \
             --trigger-prefix 'ai: ' \
-            --command "${HOME}/.local/bin/flyline-ollama"
+            --command "${HOME}/.local/bin/flyline-ollama" >/dev/null 2>&1
       fi
     fi
 
@@ -426,6 +431,16 @@ fi
 if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
   ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
   export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+fi
+
+if [ -f "/usr/local/opt/nvm/nvm.sh" ]; then
+  echo "${log_prefix_bashenv} init nvm"
+  export NVM_DIR="$HOME/.nvm"
+  mkdir -p "$NVM_DIR"
+  # This loads nvm
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"
+  # This loads nvm bash_completion
+  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
 fi
 
 if [ "$EUID" -ne 0 ]; then

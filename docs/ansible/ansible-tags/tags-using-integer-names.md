@@ -1,5 +1,5 @@
 
-There is inconsistent behavior with respect to tags with names containing only numbers, or numbers combined with underscores. 
+There is inconsistent behavior with respect to tags with names containing only numbers, or numbers combined with underscores.
 
 The version of ansible we are using to demonstrate this.
 
@@ -74,7 +74,7 @@ The run successfully resolves tags when running the playbook for the quoted task
       "msg": "Test of an integer tag"
   }
   PLAY RECAP ********************************************************************************************************************************************************************************************************************************************************************
-  localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+  localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
   ```
 
 * Test 2
@@ -88,7 +88,7 @@ ok: [localhost] => {
     "msg": "Test of an integer tag"
 }
 PLAY RECAP ********************************************************************************************************************************************************************************************************************************************************************
-localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 ## Conclusion
@@ -100,4 +100,3 @@ As of Python version 3.6 (and [PEP-515](https://www.python.org/dev/peps/pep-0515
 Python will consider underscores as just number separators for readability.  So you could do 9_999_999 to make 9999999 more readable.  The python interpreter then considers 9_9_9 to be the same as 999.
 
 This python version difference behavior also explains why one may encounter ansible repos in the wild (github.com) using integer name based tags without quotes.   It is likely the respective repo developers were using an ansible environment with python versions < 3.6 at the time of publishing to the repo.
-

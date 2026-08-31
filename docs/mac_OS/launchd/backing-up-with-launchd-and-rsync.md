@@ -13,7 +13,7 @@ After a bunch of research and checking out some examples on the web, most which 
 
 The following is my final implementation for your approval, dissection, and hopefully, feedback.
 
-**launchd plist** placed in _“/Library/LaunchDaemons/com.firefallpro.daily\_backup”_:  
+**launchd plist** placed in _“/Library/LaunchDaemons/com.firefallpro.daily\_backup”_:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/
@@ -44,7 +44,7 @@ DTDs/PropertyList-1.0.dtd">
 ```
 
 
-**Shell script** placed in _“/Users/admin/Documents/daily\_backup.sh”_:  
+**Shell script** placed in _“/Users/admin/Documents/daily\_backup.sh”_:
 ```shell
 #!/bin/bash
 /usr/bin/rsync -qaEu /Library/WebServer/www/ /Volumes/Backup\ HD/daily;
@@ -66,4 +66,4 @@ I hope this helps someone, and if I revise my strategy I’ll make sure to updat
 ## References
 
 * https://blog.firefall.com/2006/03/backing-up-with-launchd-and-rsync-in.html
-* 
+*

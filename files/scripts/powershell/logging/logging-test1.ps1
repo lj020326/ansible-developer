@@ -1,5 +1,5 @@
 ﻿
-function test-function { 
+function test-function {
 
     $logFileName = "C:\apps\powershell\logs\test1.log"
 
@@ -7,14 +7,14 @@ function test-function {
 
     Write-Verbose "Before output subscription"
 
-    Enable-OutputSubscriber -OnWriteVerbose {$fn=Get-FunctionName; "$fn"}    
+    Enable-OutputSubscriber -OnWriteVerbose {$fn=Get-FunctionName; "$fn"}
 
     Write-Verbose "After output subscription"
 
-    $logFile | Disable-LogFile 
+    $logFile | Disable-LogFile
 
     Get-Content $logFileName
 
 }
 
-test-function 
+test-function

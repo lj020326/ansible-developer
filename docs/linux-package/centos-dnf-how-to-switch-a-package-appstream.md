@@ -75,4 +75,4 @@ Noteworthy is the previous answer about switching streams. If RHEL is release 8.
 * https://linuxopsys.com/topics/remove-packages-using-dnf
 * https://unix.stackexchange.com/questions/704616/remove-all-dnf-modules-currently-installed
 * https://support.shells.net/hc/en-us/articles/360060397794-Using-DNF-to-install-remove-and-update-packages-on-Fedora
-* 
+*

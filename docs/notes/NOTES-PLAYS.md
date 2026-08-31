@@ -24,7 +24,7 @@ run-remote.sh ansible-playbook -v site.yml --tags cloudmonkey
 
 
 ```bash
-run-remote.sh 
+run-remote.sh
 run-remote.sh ansible -i inventory/hosts.ini all -m ping
 run-remote.sh ansible -i inventory/hosts.ini -m ping
 run-remote.sh ansible -i inventory/hosts.ini openstack -m ping
@@ -57,5 +57,5 @@ run-remote.sh kolla-ansible -i inventory/hosts-openstack.ini stop --yes-i-really
 run-remote.sh openstack server create --image cirros --flavor m1.tiny --key-name mykey --network demo-net demo1
 run-remote.sh scripts/kolla-ansible/init-runonce.sh
 
-gethist | grep run-remote | sort -n | uniq >> NOTES-ANSIBLE.md 
+gethist | grep run-remote | sort -n | uniq >> NOTES-ANSIBLE.md
 ```

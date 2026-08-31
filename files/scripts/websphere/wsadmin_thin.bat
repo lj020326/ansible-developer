@@ -31,7 +31,7 @@ set CLIENTSOAP=-Dcom.ibm.SOAP.ConfigURL=file://localhost/autobuild/autobuild/scr
 set CLIENTSAS=-Dcom.ibm.CORBA.ConfigURL=file:"%USER_INSTALL_ROOT%"\sas.client.props
 set CLIENTSSL=-Dcom.ibm.SSL.ConfigURL=file://localhost/autobuild/autobuild/scripts/wasadmin/test/wasadmin/ssl.client.props
 
-@REM the following are wsadmin property 
+@REM the following are wsadmin property
 @REM you need to change the value to enabled to turn on trace
 set wsadminTraceString=-Dcom.ibm.ws.scripting.traceString=com.ibm.*=all=disabled
 set wsadminTraceFile=-Dcom.ibm.ws.scripting.traceFile="%USER_INSTALL_ROOT%"\logs\wsadmin.traceout
@@ -86,12 +86,10 @@ goto loop
 set C_PATH="\autobuild\autobuild\lib\jython\jython.jar;%WAS_HOME%\properties;%WAS_HOME%\com.ibm.ws.admin.client_7.0.0.jar;%WAS_HOME%\com.ibm.ws.security.crypto.jar;"
 
 @REM set PERFJAVAOPTION=-Xms256m -Xmx256m -Xj9 -Xquickstart
-set PERFJAVAOPTION=-Xms256m -Xmx256m 
+set PERFJAVAOPTION=-Xms256m -Xmx256m
 
 if "%JAASSOAP%"=="" set JAASSOAP=-Djaassoap=off
 
 @echo off
 
 "%JAVA_EXE%" -Dpython.path=/autobuild/autobuild/scripts;/autobuild/autobuild/lib/jython  %PERFJAVAOPTION% %WAS_LOGGING% %javaoption% %CONSOLE_ENCODING% %WAS_DEBUG% "%CLIENTSOAP%" "%JAASSOAP%" "%CLIENTSAS%" "%CLIENTSSL%" %WSADMIN_PROPERTIES_PROP% %WORKSPACE_PROPERTIES% "-Duser.install.root=%USER_INSTALL_ROOT%" "-Dwas.install.root=%WAS_HOME%" %wsadminTraceFile% %wsadminTraceString% %wsadminValOut% %wsadminHost% %wsadminConnType% %wsadminPort% %wsadminLang% -classpath %C_PATH% com.ibm.ws.scripting.WasxShell %*
-
-

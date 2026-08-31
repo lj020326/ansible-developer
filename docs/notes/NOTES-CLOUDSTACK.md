@@ -17,7 +17,7 @@ virt-install \
  --pxe \
  --boot=hd,network \
  --network=bridge:dcos-br0,model=virtio,mac=52:54:00:e2:87:91
-  
+
 ssh root@192.168.40.91
 
 # http://docs.cloudstack.apache.org/projects/cloudstack-installation/en/4.9/management-server/index.html
@@ -55,7 +55,7 @@ mysql_secure_installation
 
 
 
-cloudstack-setup-databases cloud:Welcome1@localhost --deploy-as=root:Welcome1 -m Welcome1 -k Welcome1 
+cloudstack-setup-databases cloud:Welcome1@localhost --deploy-as=root:Welcome1 -m Welcome1 -k Welcome1
 
 cat >> /etc/sudoers <<EOF
 Defaults:cloud !requiretty

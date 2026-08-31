@@ -202,4 +202,4 @@ The user Ansible 'logs in' as.
 ## Reference
 
 * https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/reference_appendices/special_variables.rst
-* 
+*

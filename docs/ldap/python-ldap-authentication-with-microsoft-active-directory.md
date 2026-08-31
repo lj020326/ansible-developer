@@ -43,7 +43,7 @@ To try it out, grab the current IP of the Windows server (`ipconfig /all` in `cm
 
 ```shell
 $ python
-Python 2.7.9 (default, Mar  1 2015, 12:57:24) 
+Python 2.7.9 (default, Mar  1 2015, 12:57:24)
 [GCC 4.9.2] on linux2
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import ldap
@@ -110,7 +110,7 @@ Try it from the interpreter using `import test_ldap` and `test_ldap.authenticate
 
 ```shell
 $ python
-Python 2.7.9 (default, Mar  1 2015, 12:57:24) 
+Python 2.7.9 (default, Mar  1 2015, 12:57:24)
 [GCC 4.9.2] on linux2
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import test_ldap
@@ -261,7 +261,7 @@ except ldap.SERVER_DOWN:
 except ldap.LDAPError, e:
     if type(e.message) == dict and e.message.has_key('desc'):
         print e.message['desc']
-    else: 
+    else:
         print e
 
 ```
@@ -306,7 +306,7 @@ def authenticate(address, username, password):
     except ldap.LDAPError, e:
         if type(e.message) == dict and e.message.has_key('desc'):
             return "Other LDAP error: " + e.message['desc']
-        else: 
+        else:
             return "Other LDAP error: " + e
     finally:
         conn.unbind_s()
@@ -329,7 +329,7 @@ This post was an exploration into Python, Active Directory, and if they work tog
 >>> results = con.search_s(basedn,ldap.SCOPE_SUBTREE,"(cn=*)")
 >>> for dn,entry in results:
 ...     ldif_writer.unparse(dn,entry)
-... 
+...
 dn: CN=Jane Doe,OU=Students,DC=mooctest,DC=local
 accountExpires: 9223372036854775807
 badPasswordTime: 130723115748598376
@@ -367,5 +367,4 @@ userAccountControl: 512
 ## References
 
 * https://blog.thomastoye.be/python-ldap-authentication-with-microsoft-active-directory-46661bebc483
-* 
-
+*

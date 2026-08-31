@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-#Paolo Frigo, https://scriptinglibrary.com 
+#Paolo Frigo, https://scriptinglibrary.com
 
 import speedtest #pip3 install speedtest-cli
 import os

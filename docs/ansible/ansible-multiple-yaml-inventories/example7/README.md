@@ -3,11 +3,11 @@
 
 This example use case is related to whenever the need exists to set up a set and disjoint set of sub-group configurations required for any playbook and corresponding roles (e.g., client/server configurations).
 
-Basically / put simply, whenever there is the following conditions: 
+Basically / put simply, whenever there is the following conditions:
 
-1) a large group A, and 
-2) a very small/finite subset group B within A, and 
-3) the need exists to have a 3rd group C which is the difference of A - B = C, and 
+1) a large group A, and
+2) a very small/finite subset group B within A, and
+3) the need exists to have a 3rd group C which is the difference of A - B = C, and
 4) the need to maintain the configuration state for group C in group_vars/groupC.yml format
 
 Many use cases require network-specific servers/fixtures/assets to be setup for to serve/enable clients for network groups within an enterprise.
@@ -32,7 +32,7 @@ The following section addresses the network/client needs for this use case speci
 Currently, functionality exists in ansible playbook to sufficiently limit hosts to an implied "subset" set of machines using the [patterns supported by the limit feature](https://docs.ansible.com/ansible/latest/user_guide/intro_patterns.html).  For example, to specify all hosts in webservers except those in atlanta:
 
 ```shell
-ansible-playbook site.yml --limit 'webservers:!atlanta' 
+ansible-playbook site.yml --limit 'webservers:!atlanta'
 ```
 
 Now consider the following inventory use case.
@@ -40,7 +40,7 @@ Now consider the following inventory use case.
 
 In the aforementioned diagram/example, to limit the targeted hosts to only clients:
 ```shell
-ansible-playbook site.yml --limit 'network_a:!network_a_servers' 
+ansible-playbook site.yml --limit 'network_a:!network_a_servers'
 ```
 
 However, if there are any configurations that the client group requires, then this method is insufficient.
@@ -52,11 +52,11 @@ For example, if the YAML-based inventory supported the following feature then th
 ```yaml
 all:
   children:
-    network_a_clients: 
+    network_a_clients:
       hosts: network_a:!network_a_servers
       vars:
         network_server_list: "{{ groups['network_a_servers'] }}"
-      
+
     network_a:
       hosts:
         admin01: {}
@@ -69,7 +69,7 @@ all:
         ...
         ...
         machine99: {}
-    
+
     network_a_servers:
       hosts:
         admin01: {}
@@ -91,14 +91,14 @@ Maintaining such a group configuration can be problematic.
 
 E.g., Say the following parameters are given:
 
-* A 'ntp_network' (parent) group has 100, 1000, or lets say __N machines__ and 
+* A 'ntp_network' (parent) group has 100, 1000, or lets say __N machines__ and
 * A subset 'ntp_server' group only has a far less _finite number_ of instances, say 2, 4, or __M machines__
-* A derived 'ntp_client' derived by group_names | intersect(['ntp_network'])==1 and group_names | intersect(['ntp_server'])==0 
+* A derived 'ntp_client' derived by group_names | intersect(['ntp_network'])==1 and group_names | intersect(['ntp_server'])==0
   * this results in __N machines__ minus the server group of __M machines__.
 
-So given an inventory with a 'ntp_network' group of 1000 machines, and a 'ntp_server' group of 4 machines, then the 'ntp_client' group would have 996 machines. 
+So given an inventory with a 'ntp_network' group of 1000 machines, and a 'ntp_server' group of 4 machines, then the 'ntp_client' group would have 996 machines.
 
-Maintaining a 'ntp_client' group for multiple use-cases would have to redefine the child group of __(N - M) machines__. 
+Maintaining a 'ntp_client' group for multiple use-cases would have to redefine the child group of __(N - M) machines__.
 
 This can present risks since then each 'ntp_client' group is almost the same size as the parent 'network_server' group and exposes risks of maintaining synchronization of the group.
 
@@ -155,16 +155,16 @@ Each site.yml inventory will be setup similar to the following with the "[dmz|in
 ```yaml
 all:
   hosts:
-    admin01.qa.site[1|2].example.[dmz|int]: 
+    admin01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/admin01.qa.site[1|2].example.[dmz|int]
       foreman: <94 keys>
-    admin02.qa.site[1|2].example.[dmz|int]: 
+    admin02.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/admin01.qa.site[1|2].example.[dmz|int]
       foreman: <94 keys>
-    app01.qa.site[1|2].example.[dmz|int]: 
+    app01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/app01.qa.site[1|2].example.[dmz|int]
       foreman: <94 keys>
-    app02.qa.site[1|2].example.[dmz|int]: 
+    app02.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/app01.qa.site[1|2].example.[dmz|int]
       foreman: <94 keys>
     web01.qa.site[1|2].example.[dmz|int]:
@@ -644,21 +644,19 @@ ok: [web02.qa.site2.example.int] => {
 }
 
 PLAY RECAP **************************************************************************************************************************************************************************************************************************************************************
-admin01.qa.site1.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0   
-admin01.qa.site2.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0   
-admin02.qa.site1.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0   
-admin02.qa.site2.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0   
-app01.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
-app01.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
-app02.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
-app02.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
-localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
-web01.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
-web01.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
-web02.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
-web02.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
+admin01.qa.site1.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0
+admin01.qa.site2.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0
+admin02.qa.site1.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0
+admin02.qa.site2.example.int : ok=1    changed=0    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0
+app01.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
+app01.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
+app02.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
+app02.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
+localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
+web01.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
+web01.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
+web02.qa.site1.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
+web02.qa.site2.example.int : ok=2    changed=1    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0
 
 
 ```
-
-

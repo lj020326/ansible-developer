@@ -13,9 +13,9 @@ This scenario shows:
 
 - Install Ansible on all nodes
 
-``` 
+```
 sudo apt install ansible
-``` 
+```
 
 - Create directory and inventory file to put managed nodes' IPs
 
@@ -27,23 +27,23 @@ sudo apt install ansible
 
 - Ping all nodes with ansible
 
-``` 
+```
 ansible all -i inventory -m ping
-``` 
+```
 
 ![image](./img/201089266-84c032d5-7647-45ec-b44a-0323cf7f6274.png)
 
-**NOTE:** If you use secure private SSH keys on each nodes (copied these keys on each nodes), it should be used "ansible all --key-file ~/.ssh -i inventory -m ping" 
+**NOTE:** If you use secure private SSH keys on each nodes (copied these keys on each nodes), it should be used "ansible all --key-file ~/.ssh -i inventory -m ping"
 
 - Create config file (ansible.cfg)
 
-``` 
+```
 touch ansible.cfg
 # copy followings:
 [defaults]
 inventory = inventory
 # private_key_file = ~/.ssh/ansible
-``` 
+```
 
 ![image](./img/201090216-084d1328-88fc-462f-b307-d95c8d8b752d.png)
 
@@ -57,7 +57,7 @@ inventory = inventory
 
 ```
 ansible all --list-hosts
-``` 
+```
 ![image](./img/201090920-d5d2a294-698a-4e62-89e7-7df3f1d1834d.png)
 
 - Gather all nodes' information (all resources' information: cpu, ip, ssd, etc.) from all hosts
@@ -65,18 +65,18 @@ ansible all --list-hosts
 ```
 # -m parameter means ansible module
 ansible all -m gather_facts
-``` 
+```
 
 ![image](./img/201091229-60ab2618-ba53-4460-96f8-7c69a4a9c6b1.png)
 
-- Gather information from specific node 
+- Gather information from specific node
 
 ```
 ansible all -m gather_facts --limit 172.26.215.23
 ```
 
 - Run "sudo apt update" for all nodes using ansible
-- As it is seen in the printscreen, it does not work. 
+- As it is seen in the printscreen, it does not work.
 
 ```
 ansible all -m apt -a update_cache=true
@@ -112,6 +112,3 @@ ansible all -m apt -a "name=snapd state=latest" --become --ask-become-pass
 ```
 
 ![image](./img/201097511-9b0893f5-120c-4af1-be6d-a35fc15681a5.png)
-
-
-

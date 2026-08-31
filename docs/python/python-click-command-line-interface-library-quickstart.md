@@ -1,5 +1,5 @@
 
-# `Click` command line interface quickstart 
+# `Click` command line interface quickstart
 
 You can get the library directly from PyPI:
 
@@ -59,28 +59,28 @@ A few seconds later and you are good to go.
 There is a screencast available which shows the basic API of Click and how to build simple applications with it. It also explores how to build commands with subcommands.
 
 -   [Building Command Line Applications with Click](https://www.youtube.com/watch?v=kNke39OZ2k0)
-    
+
 
 Examples of Click applications can be found in the documentation as well as in the GitHub repository together with readme files:
 
 -   `inout`: [File input and output](https://github.com/pallets/click/tree/main/examples/inout)
-    
+
 -   `naval`: [Port of docopt naval example](https://github.com/pallets/click/tree/main/examples/naval)
-    
+
 -   `aliases`: [Command alias example](https://github.com/pallets/click/tree/main/examples/aliases)
-    
+
 -   `repo`: [Git-/Mercurial-like command line interface](https://github.com/pallets/click/tree/main/examples/repo)
-    
+
 -   `complex`: [Complex example with plugin loading](https://github.com/pallets/click/tree/main/examples/complex)
-    
+
 -   `validation`: [Custom parameter validation example](https://github.com/pallets/click/tree/main/examples/validation)
-    
+
 -   `colors`: [Color support demo](https://github.com/pallets/click/tree/main/examples/colors)
-    
+
 -   `termui`: [Terminal UI functions demo](https://github.com/pallets/click/tree/main/examples/termui)
-    
+
 -   `imagepipe`: [Multi command chaining demo](https://github.com/pallets/click/tree/main/examples/imagepipe)
-    
+
 
 ## Basic Concepts - Creating a Command[¶](https://click.palletsprojects.com/en/8.1.x/quickstart/#basic-concepts-creating-a-command "Permalink to this heading")
 
@@ -247,4 +247,4 @@ I strongly recommend having a look at the [Setuptools Integration](https://click
 
 - https://click.palletsprojects.com/en/8.1.x/quickstart/
 - https://click.palletsprojects.com/en/8.1.x/api/
-- 
+-

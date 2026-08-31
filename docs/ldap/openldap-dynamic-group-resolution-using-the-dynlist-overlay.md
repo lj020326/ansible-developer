@@ -86,7 +86,7 @@ When successful, the `dynlist` overlay returns the evaluated results as distinct
 # LDAPv3
 # base <cn=team123-admin,ou=jenkins,ou=applications,ou=groups,dc=dettonville,dc=int> with scope baseObject
 # filter: (objectClass=groupOfURLs)
-# requesting: member 
+# requesting: member
 #
 
 # team123-admin, jenkins, applications, groups, dettonville.int
@@ -118,6 +118,6 @@ The same query as the aforementioned ldapsearch using **apache directory studio*
 
 > [!IMPORTANT]
 > **Permission Issues and Empty Responses**
-> If your `ldapsearch` query returns the group entry successfully but the `member:` keys are missing entirely from the output, the issue is almost always caused by an Access Control List (ACL) restriction. 
-> 
+> If your `ldapsearch` query returns the group entry successfully but the `member:` keys are missing entirely from the output, the issue is almost always caused by an Access Control List (ACL) restriction.
+>
 > The `dynlist` overlay evaluates the `memberURL` using the context of the user binding to the directory (in this case, `cn=readonly`). If the bind user does not have explicit `read` or `search` access to **both** the application group entity *and* the target user objects residing under `ou=users,dc=dettonville,dc=int`, the overlay will silently drop the generated attributes. Ensure your `slapd.access` rules grant sufficient access to your application/lookup service accounts.

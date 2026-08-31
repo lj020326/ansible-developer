@@ -15,7 +15,7 @@ openssl pkcs12 -in $PfxCert -nokeys -out $CertName.pem
 #Remove the passphrase from the private key
 openssl rsa -in key.pem -out $CertName.key
 
-#Create a Zip file 
+#Create a Zip file
 zip $CertName.zip $CertName.pem key.pem $CertName.key $PfxCert
 
 echo "$CertName.pem, key.pem and $CertName.key generated from $PfxCert"

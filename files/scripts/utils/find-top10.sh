@@ -1,7 +1,7 @@
 #!/bin/bash
 # Paolo Frigo, https://www.scriptinglibrary.com
-#THIS SCRIPT RETURNS THE TOP N IP IN THE IIS LOGS FOLDER 
-TOP=10   
+#THIS SCRIPT RETURNS THE TOP N IP IN THE IIS LOGS FOLDER
+TOP=10
 
 function find_top_ip () {
     IISLOG=$1
@@ -9,7 +9,7 @@ function find_top_ip () {
     echo "--------------------------------------"
     echo "   HIT | IP"
     echo "--------------------------------------"
-    cat $IISLOG | cut -d ' ' -f 9 | sort | uniq -c | sort -r | head -n $TOP 
+    cat $IISLOG | cut -d ' ' -f 9 | sort | uniq -c | sort -r | head -n $TOP
     echo "--------------------------------------"
 }
 

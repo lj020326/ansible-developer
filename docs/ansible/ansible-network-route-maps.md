@@ -5,9 +5,9 @@ Red Hat Ansible Engine v2.9 [introduced the first set of Resource Modules](https
 
 In the past, we have gone through resource modules that facilitate managing [BGP](https://www.ansible.com/blog/getting-started-with-bgp-global-resource-modules), [OSPFv2](https://www.ansible.com/blog/getting-started-with-ospfv2-resource-modules), [ACLs](https://www.ansible.com/blog/deep-dive-acl-configuration-management-using-ansible-network-automation-resource-modules) and [VLANS](https://www.ansible.com/blog/deep-dive-on-vlans-resource-modules-for-network-automation) configurations on network devices. In this blog post, we’ll cover the newly added route maps resource modules using cisco.nxos.nxos\_route\_maps as an example.
 
-Route maps are used to define which routes from a source routing protocol are to be distributed to a target routing protocol. It also allows filtering routes that are sent or received between BGP peers. Every route map can have multiple entries, with each entry having a sequence number and an action (the “permit” or “deny” clause) associated with it. Each of these contain an ordered set of match criterias (the “match” clause) that are successively evaluated. Route maps are similar to access lists (ACLs), but are more powerful and flexible than them and can be used to match routes based on conditions that ACLs cannot verify. In fact, route maps have the ability to leverage an existing ACL as a match criteria within it. They can also modify information associated with a route while redistributing it into the target protocol using the “set” clause. 
+Route maps are used to define which routes from a source routing protocol are to be distributed to a target routing protocol. It also allows filtering routes that are sent or received between BGP peers. Every route map can have multiple entries, with each entry having a sequence number and an action (the “permit” or “deny” clause) associated with it. Each of these contain an ordered set of match criterias (the “match” clause) that are successively evaluated. Route maps are similar to access lists (ACLs), but are more powerful and flexible than them and can be used to match routes based on conditions that ACLs cannot verify. In fact, route maps have the ability to leverage an existing ACL as a match criteria within it. They can also modify information associated with a route while redistributing it into the target protocol using the “set” clause.
 
-Route maps are an extremely powerful feature in the networking landscape, and with all its bells and whistles, it can be difficult to manually manage them, especially in a production environment where the margin of error is very small. This is where the route maps resource modules can step in! Let us walk through several examples on how to leverage and make the best use of them in real world scenarios. 
+Route maps are an extremely powerful feature in the networking landscape, and with all its bells and whistles, it can be difficult to manually manage them, especially in a production environment where the margin of error is very small. This is where the route maps resource modules can step in! Let us walk through several examples on how to leverage and make the best use of them in real world scenarios.
 
 ## The Certified Ansible Content Collection
 
@@ -15,7 +15,7 @@ The route maps resource module is available for the following Ansible-maintained
 
 <table><tbody><tr><td><p>Platform</p></td><td><p>Full Collection Path</p></td><td><p>Automation Hub Link<br>(requires subscription)</p></td><td><p>Ansible Galaxy Link</p></td></tr><tr><td><p><span>Arista EOS</span></p></td><td><p><span>arista.eos.eos_route_maps</span></p></td><td><p><a href="https://cloud.redhat.com/ansible/automation-hub/repo/published/arista/eos/content/module/eos_route_maps"><span>Hub</span></a></p></td><td><p><a href="https://galaxy.ansible.com/arista/eos" rel="noopener"><span>Galaxy</span></a></p></td></tr><tr><td><p><span>Cisco IOS</span></p></td><td><p><span>cisco.ios.ios_route_maps</span></p></td><td><p><a href="https://cloud.redhat.com/ansible/automation-hub/repo/published/cisco/ios/content/module/ios_route_maps"><span>Hub</span></a></p></td><td><p><a href="https://galaxy.ansible.com/cisco/ios"><span>Galaxy</span></a></p></td></tr><tr><td><p><span>Cisco NX-OS</span></p></td><td><p><span>cisco.nxos.nxos_route_maps</span></p></td><td><p><a href="https://cloud.redhat.com/ansible/automation-hub/repo/published/cisco/nxos/content/module/nxos_route_maps"><span>Hub</span></a></p></td><td><p><a href="https://galaxy.ansible.com/cisco/nxos"><span>Galaxy</span></a></p></td></tr><tr><td><p><span>Juniper JunOS</span></p></td><td><p><span>junipernetwork.junos.junos_routing_instances</span></p></td><td><p><a href="https://cloud.redhat.com/ansible/automation-hub/repo/published/junipernetworks/junos/content/module/junos_routing_instances"><span>Hub</span></a></p></td><td><p><a href="https://galaxy.ansible.com/junipernetworks/junos"><span>Galaxy</span></a></p></td></tr><tr><td><p><span>VyOS</span></p></td><td><p><span>vyos.vyos.vyos_route_maps</span></p></td><td><p><a href="https://cloud.redhat.com/ansible/automation-hub/repo/published/vyos/vyos"><span>Hub</span></a></p></td><td><p><a href="https://galaxy.ansible.com/vyos/vyos"><span>Galaxy</span></a></p></td></tr></tbody></table>
 
-  
+
 **Note:** For Cisco IOS-XR, it is suggested to use the [cisco.iosxr.iosxr\_config](https://cloud.redhat.com/ansible/automation-hub/repo/published/cisco/iosxr/content/module/iosxr_config) module and the platform’s Route Policy Language(RPL) to configure route maps.
 
 This blog uses the nxos\_route\_maps module from the cisco.nxos Collection and a Cisco Nexus 9000v running NX-OS 9.3.6 as reference for all the configuration management operations in the examples.
@@ -24,7 +24,7 @@ For more information on Ansible Content Collections, please refer to the followi
 
 ## Getting started - Managing Route Maps configuration with Ansible
 
-The route maps resource module provides the same level of functionality that a user can achieve when configuring manually on a device running Cisco NX-OS. But combined with the power of Ansible’s fact gathering capabilities and resource module approach, this is more closely aligned with how network professionals work day to day. Like all supported resource modules, the route\_maps module also supports the following seven states: 
+The route maps resource module provides the same level of functionality that a user can achieve when configuring manually on a device running Cisco NX-OS. But combined with the power of Ansible’s fact gathering capabilities and resource module approach, this is more closely aligned with how network professionals work day to day. Like all supported resource modules, the route\_maps module also supports the following seven states:
 
 -   merged
 -   replaced
@@ -32,7 +32,7 @@ The route maps resource module provides the same level of functionality that a u
 -   deleted
 -   gathered
 -   rendered
--   parsed 
+-   parsed
 
 Let us take a look at them one by one.
 
@@ -66,7 +66,7 @@ Resource modules have the ability to convert the network platform specific confi
   gather_facts: no
   vars:
     destination: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}"
-  
+
   tasks:
   - name: Use Route Maps resource module to gather existing configuration
     cisco.nxos.nxos_route_maps:
@@ -198,7 +198,7 @@ route_maps:
         match:
             ipv6:
                 address:
-                    prefix_lists: 
+                    prefix_lists:
                     - AllowIPv6Prefix
             interfaces: Ethernet1/1
         set:
@@ -216,7 +216,7 @@ route_maps:
             route_types:
             - level-1
             - level-2
-            tags: 
+            tags:
             - 2
             ip:
               multicast:
@@ -247,7 +247,7 @@ The final merged playbook should look like this:
 
 ```
 - name: Merge with the existing on-box running configuration
-  cisco.nxos.nxos_route_maps: 
+  cisco.nxos.nxos_route_maps:
     config: "{{ route_maps }}"
     state: merged
 
@@ -352,9 +352,9 @@ route_maps:
         match:
             ipv6:
                 address:
-                    prefix_lists: 
+                    prefix_lists:
                     - AllowIPv6Prefix
-            interfaces: 
+            interfaces:
             - Ethernet1/1
         set:
             as_path:
@@ -381,7 +381,7 @@ route_maps:
             route_types:
             - level-1
             - level-2
-            tags: 
+            tags:
             - 2
             ip:
               multicast:
@@ -392,7 +392,7 @@ route_maps:
                 group:
                   prefix: 239.0.0.0/24
     route_map: rmap2
-    
+
 -   entries:
     -   action: deny
         description: rmap3-20-deny
@@ -565,7 +565,7 @@ route-map rmap3 deny 20
 
 ## Using state deleted - Deleting configuration changes
 
-Now that we have seen how to configure and modify route maps, let’s take a look at how to delete them with state: deleted. 
+Now that we have seen how to configure and modify route maps, let’s take a look at how to delete them with state: deleted.
 
 ### Deleting specified route map(s)
 
@@ -641,7 +641,7 @@ Running this task gives us the following output:
 
 ## Using state parsed - Development and working offline
 
-This state reads the configuration from the running\_config option and transforms it into structured data as per the module’s argspec. Like state: rendered, this state also doesn’t require a connection to the target device. This is very helpful for experimenting, troubleshooting or creating offline sources of truth for network resources. 
+This state reads the configuration from the running\_config option and transforms it into structured data as per the module’s argspec. Like state: rendered, this state also doesn’t require a connection to the target device. This is very helpful for experimenting, troubleshooting or creating offline sources of truth for network resources.
 
 ```
 - name: Parse externally provided route-maps configuration

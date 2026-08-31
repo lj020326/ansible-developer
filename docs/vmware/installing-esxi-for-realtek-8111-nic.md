@@ -34,14 +34,14 @@ For better detail, see the original blog post I mentione (https://www.sysadminst
 With both of the offline bundles (ESXi and the Realtek driver) in the same directory, we can now run some more commands:
 
 1.  Create the software depot:
-    
+
     ```shell
      PS C:\Users\Andrew\Downloads> Add-EsxSoftwareDepot ".\net55-r8168-8.045a-napi-offline_bundle.zip", `
-        "ESXi-6.7.0-20201104001-standard.zip" 
+        "ESXi-6.7.0-20201104001-standard.zip"
     ```
-    
+
 2.  Create an image profile by cloning an existing one:
-    
+
     ```shell
      PS C:\Users\Andrew\Downloads> Get-EsxImageProfile
      PS C:\Users\Andrew\Downloads> New-EsxImageProfile -CloneProfile ESXi-6.7.0-20201104001-standard `
@@ -49,22 +49,22 @@ With both of the offline bundles (ESXi and the Realtek driver) in the same direc
      PS C:\Users\Andrew\Downloads> Set-EsxImageProfile ESXi-6.7.0-20201104001-standard-RTL8111 `
         -AcceptanceLevel CommunitySupported
     ```
-    
+
 3.  Add the driver to the new image profile:
-    
+
     ```shell
      PS C:\Users\Andrew\Downloads> Get-EsxSoftwarePackage
      PS C:\Users\Andrew\Downloads> Add-EsxSoftwarePackage -ImageProfile ESXi-6.7.0-20201104001-standard-RTL8111 `
         -SoftwarePackage net55-r8168
     ```
-    
+
 4.  Create the ISO:
-    
+
     ```shell
      PS C:\Users\Andrew\Downloads> Export-EsxImageProfile -ImageProfile ESXi-6.7.0-20201104001-standard-RTL8111 `
         -ExportToIso -filepath .\VMware-ESXi-6.7.0-20201104001-RTL8111.iso
     ```
-    
+
 
 ### Create the Bootable USB Drive
 
@@ -86,5 +86,3 @@ It appears that this really only works for ESXi <7, which is not a problem for m
 * https://avojak.com/blog/2020/12/19/installing-esxi-for-realtek-8111-nic/
 * https://www.geekdecoder.com/how-to-customize-esxi-install-with-realtek-drivers/
 * https://www.virten.net/2020/09/realtek-nic-and-esxi-7-0-use-passthrough-to-make-use-of-the-adapter/
-
-

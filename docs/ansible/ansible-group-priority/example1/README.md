@@ -1,7 +1,7 @@
 
 # Example 1: Test with child groups having same depth
 
-One might observe what is believed to be unexpected results when `ansible_group_priority` is used in inventory groups that have a parent/child relationship. 
+One might observe what is believed to be unexpected results when `ansible_group_priority` is used in inventory groups that have a parent/child relationship.
 
 For example, create an inventory structurally that looks like this:
 
@@ -40,7 +40,7 @@ graph TD;
     F --> I["host1"]
 ```
 
-## Inventory 
+## Inventory
 
 The inventory implementing the aforementioned hierarchy as an ini inventory [hosts.ini](./hosts.ini):
 
@@ -104,7 +104,7 @@ host1 | SUCCESS => {
 }
 ```
 
-So far so good, since the `cluster` group priority is '10'. 
+So far so good, since the `cluster` group priority is '10'.
 
 The same results can be confirmed when you convert the same inventory to yaml as [hosts.yml](./hosts.yml):
 
@@ -121,4 +121,3 @@ host1 | SUCCESS => {
 The merging of multiple groups works as expected for this case.
 
 The [next example](../example2/README.md) will validate/test a change to a group var.
-

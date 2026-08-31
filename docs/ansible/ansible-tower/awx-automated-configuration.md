@@ -2,17 +2,17 @@
 Using ansible to configure tower
 ===
 
-Ansible Content Collections are a new way of distributing content, including modules, for Ansible. For detailed information on how to use collections in general, please read [Colin McNaughton’s blog post about the topic](https://www.ansible.com/blog/getting-started-with-ansible-collections).  
+Ansible Content Collections are a new way of distributing content, including modules, for Ansible. For detailed information on how to use collections in general, please read [Colin McNaughton’s blog post about the topic](https://www.ansible.com/blog/getting-started-with-ansible-collections).
 
 The AWX and Ansible Tower Collections allow Ansible Playbooks to interact with AWX and Ansible Tower. Much like interacting with AWX or Red Hat Ansible Tower via the web-based UI or the API, the modules provided by the AWX Collection are another way to create, update or delete objects as well as perform tasks such as run jobs, configure Ansible Tower and more. This article will discuss new updates regarding this collection, as well as an example playbook and details on how to run it successfully.
 
 The AWX Collection [awx.awx](https://galaxy.ansible.com/awx/awx) is the upstream community distribution available on Ansible Galaxy.  The downstream supported Ansible Collection [ansible.tower](https://cloud.redhat.com/ansible/automation-hub/ansible/tower) is available on Automation Hub alongside the release of Ansible Tower 3.7.  For more details on the difference between Ansible Galaxy and Automation Hub please refer to [Ajay Chenampara’s blog post](https://www.ansible.com/blog/author/ajay-chenampara).
 
-This collection is a replacement for the [Ansible Tower web modules](https://docs.ansible.com/ansible/latest/modules/list_of_web_infrastructure_modules.html#ansible-tower) which were previously housed and maintained directly in the [Ansible repo](https://github.com/ansible/ansible/tree/stable-2.9/lib/ansible/modules/web_infrastructure/ansible_tower). The modules were initially [added to the AWX source](https://github.com/ansible/awx/pull/4701) in October of 2019, when collections work began; the tower\_\* modules in Ansible Core were [marked for official migration](https://github.com/ansible/ansible/pull/67233) shortly after. 
+This collection is a replacement for the [Ansible Tower web modules](https://docs.ansible.com/ansible/latest/modules/list_of_web_infrastructure_modules.html#ansible-tower) which were previously housed and maintained directly in the [Ansible repo](https://github.com/ansible/ansible/tree/stable-2.9/lib/ansible/modules/web_infrastructure/ansible_tower). The modules were initially [added to the AWX source](https://github.com/ansible/awx/pull/4701) in October of 2019, when collections work began; the tower\_\* modules in Ansible Core were [marked for official migration](https://github.com/ansible/ansible/pull/67233) shortly after.
 
 ## Improvements in the AWX Collection
 
-The modules delivered by Ansible Core and the initial versions of the AWX Collection had a dependency on libraries provided by the [tower-cli](https://github.com/ansible/tower-cli) project.  Due to the deprecation of tower-cli, there is work currently being done to remove that dependency. This has led to a major update to the AWX Collection.  
+The modules delivered by Ansible Core and the initial versions of the AWX Collection had a dependency on libraries provided by the [tower-cli](https://github.com/ansible/tower-cli) project.  Due to the deprecation of tower-cli, there is work currently being done to remove that dependency. This has led to a major update to the AWX Collection.
 
 During the removal of tower-cli, we have tried to keep the modules backwards-compatible with their corresponding version that shipped in Ansible Core. This way, if you have already leveraged the tower\_\* modules from Ansible Core, there should be very little work required when switching to the AWX Collection. For more information, see the [**Deprecation Updates**](https://docs.google.com/document/d/1HCPVLmLmNVX59MiAWlOAmnJUMKYfQed6pd64sr3tOLg/edit#heading=h.rfgzmyttyslb) section below.
 
@@ -20,7 +20,7 @@ In addition, we have standardized the modules’ operational logic, thus making 
 
 The syncing of the collection to the Red Hat Ansible Tower versions also allows the modules’ parameters to be kept in sync with the options available within the web UI and API. As part of the recent changes, we have added some new [tooling](https://github.com/ansible/awx/tree/devel/awx_collection/tools) as well as updated many of the modules to now include parameters for functionality which have been added to Ansible Tower since the modules were initially released.
 
-The collection now also provides better support for idempotency as well as check\_mode. In previous versions using check\_mode, older modules would simply ensure that they could connect to the Ansible Tower server but not indicate if they would have actually made a change to an Ansible Tower object. The AWX Collections modules will now more accurately indicate if they would have changed a Tower object via check\_mode. 
+The collection now also provides better support for idempotency as well as check\_mode. In previous versions using check\_mode, older modules would simply ensure that they could connect to the Ansible Tower server but not indicate if they would have actually made a change to an Ansible Tower object. The AWX Collections modules will now more accurately indicate if they would have changed a Tower object via check\_mode.
 
 ## Using the AWX Collection
 
@@ -32,7 +32,7 @@ ansible-galaxy collection install awx.awx
 
 Once the collection is installed, we can begin writing playbooks to manage your instance of Ansible Tower.
 
-**Note:** In order to communicate with your Red Hat Ansible Tower environment, you need to have an instance of it running, with a dedicated Ansible Tower host address.  
+**Note:** In order to communicate with your Red Hat Ansible Tower environment, you need to have an instance of it running, with a dedicated Ansible Tower host address.
 
 ### Setting Up Authentication
 
@@ -61,7 +61,7 @@ Once you have the AWX Collection installed and your authentication method decide
     - awx.awx
 ```
 
-Even if you are running on a version of Ansible that still ships with the tower\_\* modules, this will cause Ansible to load the modules from the AWXCollection instead of the versions shipped in Ansible Core. The rest of your playbook would look identical to a playbook that did not use the collection. 
+Even if you are running on a version of Ansible that still ships with the tower\_\* modules, this will cause Ansible to load the modules from the AWXCollection instead of the versions shipped in Ansible Core. The rest of your playbook would look identical to a playbook that did not use the collection.
 
 In the example playbook below, the authentication information is not specified in the tasks and would be loaded either from the environment variables or a tower\_cli.cfg file:
 
@@ -182,7 +182,7 @@ During the removal of tower-cli, we attempted to keep the modules as similar as 
 
 It is quite simple and straightforward to get up and running with the AWX Collection.  Amongst other things, collections enable users to store their most frequently-used tasks inside of different playbooks, which can be easily shared as needed.  In a follow-up blog post, we will discuss contribution and development, as well as how to test any new or updated modules you may want to add to the collection.
 
-**Topics:**  
+**Topics:**
 [Ansible content collections](https://www.ansible.com/blog/topic/ansible-content-collections)
 
 ## Reference
@@ -192,6 +192,6 @@ It is quite simple and straightforward to get up and running with the AWX Collec
 * [Ansible Galaxy](https://galaxy.ansible.com/awx/awx?extIdCarryOver=true&sc_cid=701f2000001OH7YAAW)
 * [Generating Diffs with Ansible | The NTC Mag](https://blog.networktocode.com/post/generating-diff-with-ansible/)
 * [Using Ansible as a Hardware Auditing Tool | New Relic](https://newrelic.com/blog/best-practices/ansible-auditing-tool)
-* 
+*
 
 * https://docs.ansible.com/ansible/latest/collections/awx/awx/index.html

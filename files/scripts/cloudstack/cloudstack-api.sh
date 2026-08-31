@@ -63,6 +63,3 @@ echo " SEND URL: $url"
 curl ${url} | xmllint --format -
 
 exit ${?}
-
-
-

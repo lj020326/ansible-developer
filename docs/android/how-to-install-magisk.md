@@ -27,8 +27,8 @@ The result of **Ramdisk** determines whether your device has ramdisk in the boot
 
 If you are using a Samsung device, you can now jump to [its own section](#samsung-devices).
 
-If your device has boot ramdisk, get a copy of the `boot.img` (or `init_boot.img` if exists).  
-If your device does **NOT** have boot ramdisk, get a copy of the `recovery.img`.  
+If your device has boot ramdisk, get a copy of the `boot.img` (or `init_boot.img` if exists).
+If your device does **NOT** have boot ramdisk, get a copy of the `recovery.img`.
 You should be able to extract the file you need from official firmware packages or your custom ROM zip.
 
 Quick recap, at this point, you should have known and prepared:
@@ -44,15 +44,15 @@ Let’s continue to [Patching Images](#patching-images).
 -   Press the **Install** button in the Magisk card
 -   If you are patching a recovery image, check the **“Recovery Mode”** option
 -   Choose **“Select and Patch a File”** in method, and select the boot/init\_boot/recovery image
--   Start the installation, and copy the patched image to your PC using ADB:  
+-   Start the installation, and copy the patched image to your PC using ADB:
     `adb pull /sdcard/Download/magisk_patched_[random_strings].img`
--   Flash the patched boot/init\_boot/recovery image to your device;  
-    for most devices, reboot into fastboot mode and flash with command:  
-    `fastboot flash boot /path/to/magisk_patched_[random_strings].img` or  
-    `fastboot flash init_boot /path/to/magisk_patched_[random_strings].img` or  
-    `fastboot flash recovery /path/to/magisk_patched_[random_strings].img`  
-    
--   (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:  
+-   Flash the patched boot/init\_boot/recovery image to your device;
+    for most devices, reboot into fastboot mode and flash with command:
+    `fastboot flash boot /path/to/magisk_patched_[random_strings].img` or
+    `fastboot flash init_boot /path/to/magisk_patched_[random_strings].img` or
+    `fastboot flash recovery /path/to/magisk_patched_[random_strings].img`
+
+-   (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:
     `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img` (note that it may **wipe your data**)
 -   Reboot and launch Magisk app (you will see a stub Magisk app if you have wiped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
 -   Voila!
@@ -130,8 +130,8 @@ Having KnoxGuard active will prevent you from installing/running Magisk regardle
 -   Press the **Install** button in the Magisk card
 -   If your device does **NOT** have boot ramdisk, check the **“Recovery Mode”** option
 -   Choose **“Select and Patch a File”** in method, and select the `AP` tar file
--   Start the installation, and copy the patched tar file to your PC using ADB:  
-    `adb pull /sdcard/Download/magisk_patched_[random_strings].tar`  
+-   Start the installation, and copy the patched tar file to your PC using ADB:
+    `adb pull /sdcard/Download/magisk_patched_[random_strings].tar`
     **DO NOT USE MTP** as it is known to corrupt large files.
 -   Reboot to download mode. Open Odin on your PC, and flash `magisk_patched.tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `HOME_CSC` because we want to **wipe data**) from the original firmware.
 -   Your device should reboot automatically once Odin finished flashing. **Agree to do a factory reset if asked.**
@@ -168,4 +168,4 @@ Installing using custom recoveries is only possible if your device has boot ramd
 - https://xdaforums.com/t/official-samsung-odin-v4-1-2-1-dc05e3ea-for-linux.4453423/
 - https://xdaforums.com/t/2014-11-10-root-adbd-insecure-v2-00.1687590/
 - https://stackoverflow.com/questions/25271878/android-adbd-cannot-run-as-root-in-production-builds
-- 
+-

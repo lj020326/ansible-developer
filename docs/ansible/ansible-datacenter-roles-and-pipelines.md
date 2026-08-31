@@ -2,9 +2,9 @@
 # Ansible Datacenter Roles and Pipelines
 
 > A collection of high quality roles and playbooks that follow current best practices, a common style and have detailed documentation and User Stories reflecting the use cases.
-> 
+>
 > Roles can be used individually or combined in playbooks to solve common problems such as Cloud Image Factory, Discovery, Migration, Continuous Patching and Compliance, Cloud Provisioning, and Kubernetes/OpenShift deployment and management.
-> 
+>
 
 Document Control
 
@@ -101,4 +101,3 @@ Most linux roles are developed/tested on:
 -   Debian 10
 -   Ubuntu 18.04
 -   Ubuntu 20.04
-

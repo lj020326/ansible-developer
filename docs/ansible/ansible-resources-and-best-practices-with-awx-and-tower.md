@@ -31,13 +31,13 @@ Phew – it was a bit long winded but it means I can add other provisioning meth
 
 ## Passing variables in workflows
 
-In the above workflows, I discovered the **set-stats** option in the [Ansible Tower User Guide: Workflows.](https://docs.ansible.com/ansible-tower/latest/html/userguide/workflows.html) Documentation for set-stats is available at [ansible.builtin.set_stats – Set stats for the current ansible run](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/set_stats_module.html)  
+In the above workflows, I discovered the **set-stats** option in the [Ansible Tower User Guide: Workflows.](https://docs.ansible.com/ansible-tower/latest/html/userguide/workflows.html) Documentation for set-stats is available at [ansible.builtin.set_stats – Set stats for the current ansible run](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/set_stats_module.html)
 How can you use this? Within the job templates that provision AWS EC2 or VMware instances, I can extract data such as hostname, DNS name, IP address or any custom data I want. Using set_stats I set these values and the following jobs in the workflow can reference them – for example adding a hostname to an inventory.
 
 ## Launching workflows from within a workflow
 
-I couldn’t figure this out, but there is a module called tower_workflow_launch which should be able to do this: [awx.awx.tower_workflow_launch – Run a workflow in Ansible Tower](https://docs.ansible.com/ansible/latest/collections/awx/awx/tower_workflow_launch_module.html)  
-The first use case makes sense: from my terminal I can launch a playbook against AWX/Tower and make it launch a workflow.  
+I couldn’t figure this out, but there is a module called tower_workflow_launch which should be able to do this: [awx.awx.tower_workflow_launch – Run a workflow in Ansible Tower](https://docs.ansible.com/ansible/latest/collections/awx/awx/tower_workflow_launch_module.html)
+The first use case makes sense: from my terminal I can launch a playbook against AWX/Tower and make it launch a workflow.
 However, if I am already running a job template under AWX contol and I want it to call a workflow it appears as though I need to provide the credentials to AWX from within that first playbook. Perhaps there are some environment variables I can call that can say ‘connect to parent AWX instance’?
 
 ## How to use existing Vault files in Ansible?
@@ -45,7 +45,7 @@ However, if I am already running a job template under AWX contol and I want it t
 Links: [How to use existing Vault files in Ansible Tower](https://serverfault.com/questions/878320/how-to-use-existing-vault-files-in-ansible-tower) and [Where to put ansible-vault password](https://devops.stackexchange.com/questions/3282/where-to-put-ansible-vault-password) There are a number of different places where you can store secret data – in AWX/Tower itself, within an Ansible Vault or in an external source. Storing credentials within AWX/Tower is a good idea if you intend to run all jobs through AWX/Tower. If you want the flexibility to run jobs on both the CLI and AWX/Tower then using Ansible Vault is a good idea. However, as per the first link you will likely want to store the Vault in the playbook area rather than the inventory area.
 
 > It is not recommended to keep the vault files with the inventory – as this would mean it decrypts the file every time the inventory sync runs. The way I’ve solved this now is by using “vars_files” in the playbook. It looks like this:
-> 
+>
 > https://serverfault.com/questions/878320/how-to-use-existing-vault-files-in-ansible-tower
 
 ```
@@ -55,7 +55,7 @@ Links: [How to use existing Vault files in Ansible Tower](https://serverfault.co
 ```
 
 > In Tower, I pass in the tower_env variable e.g. “dev” or “qa”, which then decrypts the corresponding vault file when a playbook runs – rather then when syncing inventories.
-> 
+>
 > https://serverfault.com/questions/878320/how-to-use-existing-vault-files-in-ansible-tower
 
 Also worth mentioning is the fact that Ansible Vault can be brute-forced by an attacker – [https://github.com/stevenharradine/ansible-vault-brute-force/blob/master/ansible-vault-brute-force.sh](https://github.com/stevenharradine/ansible-vault-brute-force/blob/master/ansible-vault-brute-force.sh) – so make sure any Vault password is of significant strength.
@@ -97,9 +97,9 @@ The example listed suggests you can use the following to set variables according
   when: global_platform == "staging"
 
 - include_vars: prod_environment_vars.yml
-  when: 
-    - global_platform != "test" 
-    - global_platform != "staging" 
+  when:
+    - global_platform != "test"
+    - global_platform != "staging"
 ```
 
 You can use this approach for maintaining other variables. For example, you have some sysctl parameters that should be applied for different versions of database software, such as Oracle.
@@ -171,7 +171,7 @@ Link: [Ansible Tower Question](https://www.reddit.com/r/ansible/comments/d2b3ve/
 
     - name: Call your playbook with the hosts/inventory you just created
       uri:              ##replace 20 with id of the the job template you want
-        url: https://mytowerhost/api/v2/job_templates/20/launch 
+        url: https://mytowerhost/api/v2/job_templates/20/launch
         method: POST
         body_format: json
         headers:
@@ -204,7 +204,7 @@ Link: [Linting your Ansible Playbooks and make a Continuous Integration (CI) sol
 
 ## Satellite 6 / Callback Integration
 
-Link: [Use Satellite 6 as an inventory source](https://www.ansible.com/blog/use-satellite-6-as-an-inventory-source-in-ansible-tower).  
+Link: [Use Satellite 6 as an inventory source](https://www.ansible.com/blog/use-satellite-6-as-an-inventory-source-in-ansible-tower).
 Link: [Connecting Satellite 6 and Ansible Tower](http://100things.wzzrd.com/2017/03/30/Connecting-Satellite-6-and-Ansible-Tower.html).
 
 Linking your AWX/Tower server to Red Hat Satellite 6 is a great way to manage your environment. Callbacks are a nice way to running a Playbook as part of the provisioning process. Even if your servers are not provisioned by Satellite, you can still call playbook from AWX/Tower at first boot via systemd unit file or custom script. (See the related in this post about adding a host to an inventory if it does not already exist). A callback script to setup a systemd unit could look as follows and would typically be included in the %post section of a kickstart file:
@@ -311,7 +311,7 @@ At the London Red Hat forum in 2019 someone asked what is the best practice for 
 If you want the benefits of support, migrating from Ansible AWX to Red Hat Ansible Automation Platform probably makes a lot of sense. However, in a large enterprise you might want to create organisations within Ansible Tower – for example an Operations group that perhaps deploys patches to servers, an Infrastructure group that performs admin on the servers, an Application group that manages the applications that runs on the servers. Each team (Organisation) will have their own inventories, credentials and playbooks. Does that mean that Ansible Tower requires many more licenses to manage these subscriptions? [How are “managed nodes” defined as part of the Red Hat Ansible Automation Platform offering](https://access.redhat.com/articles/3331481) suggests that this is not the case:
 
 > Ansible may manage nodes from multiple different access paths based on the above use cases. In the event that this results in multiple host identifiers for a given host in Ansible inventory, it does not increase the required host entitlements for the customer. That is, a managed host is not “charged” multiple times based upon multiple automation actions or methods targeting that host.
-> 
+>
 > https://access.redhat.com/articles/3331481
 
 ## Visualise and make use of Ansible facts

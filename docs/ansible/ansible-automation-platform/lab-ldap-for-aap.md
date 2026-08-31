@@ -139,4 +139,4 @@ My user role mapping setting: ![User Role Mapping](./img/2022-01-17-sso-user-rol
 ## Reference
 
 * [Lab ldap for aap](https://www.automate.nyc/ansible/lab-ldap-for-aap/)
-* 
+*

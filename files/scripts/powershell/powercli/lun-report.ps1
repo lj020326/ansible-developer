@@ -1,31 +1,31 @@
-﻿## When you are running multi-node vSphere clusters, you probably already had the experience that one or more of 
-## your LUNs were not visible on all nodes. Now you can try to find out which LUN is missing on which node the 
-## hard way through the vSphere client. 
-## 
+﻿## When you are running multi-node vSphere clusters, you probably already had the experience that one or more of
+## your LUNs were not visible on all nodes. Now you can try to find out which LUN is missing on which node the
+## hard way through the vSphere client.
+##
 ## Or you can use the force of PowerCLI and run this script that will report all this in a handy spreadsheet.
 ##
-## To make the script as flexible as possible it should be able to handle any n-node cluster. 
-## And as you some of you might know, the Export-CSV cmdlet has some problems with variable length rows. 
+## To make the script as flexible as possible it should be able to handle any n-node cluster.
+## And as you some of you might know, the Export-CSV cmdlet has some problems with variable length rows.
 ## Luckily there is a handy solution I already used in my yadr – A vDisk reporter post.
 
 param($clusName,$csvName=("C:\data\dettonville\datacenter\" + $clusName + "-LUN.csv"))
 
 function func_log([string] $msg, [System.ConsoleColor] $foregroundColor) {
-		$msg += "`r`n" 
+		$msg += "`r`n"
 		if ($foregroundColor) {
 			Write-Host $msg -ForegroundColor $foregroundColor
 		} else {
-			Write-Host $msg 
+			Write-Host $msg
 		}
-		return $msg 
+		return $msg
 }
 
 function func_logon ([string] $server ) {
 	#connect to vcenter
 	$msg = func_log "Connecting to vCenter - $server ...."
-	$success = Connect-VIServer $server 
+	$success = Connect-VIServer $server
 
-	if ($success) { 
+	if ($success) {
 		$msg += func_log "Connected!" Green
 	}
 	else

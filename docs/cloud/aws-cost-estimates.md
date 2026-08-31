@@ -13,4 +13,3 @@ Amazon EBS root volume: 2 300GB General Purpose SSDs x $0.08 per GB per month | 
 ROSA service fee subtotal | $4,190
 AWS infrastructure fee subtotal | $4,572
 Total estimated annual price** | $8,762
-

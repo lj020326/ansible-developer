@@ -335,7 +335,7 @@ Registered variables are valid on the host for the remainder of the playbook run
 By default, the Ansible reboot module waits 600 seconds. Yes, it is possible to increase Ansible reboot to certain values. The syntax given-below can be used for the same:
 
 ```
-- name: Reboot a Linux system  
+- name: Reboot a Linux system
 reboot:
 reboot_timeout: 1200
 
@@ -427,13 +427,13 @@ Alternatively, take a look at this previous answer [How to run only one task in 
 Finally, when a play fails, it usually gives you something along the lines of:
 
 ```
-PLAY RECAP ******************************************************************** 
+PLAY RECAP ********************************************************************
            to retry, use: --limit @/home/user/site.retry
 ```
 
 Use that `--limit` command and it should retry from the failed task.
 
-Notes/limitations: 
+Notes/limitations:
 
 * The .retry file only contains the failed hosts, it doesn't store where exactly each host failed.
 * As of ansible 2.2.1.0, --start-at-task does not work for tasks defined within roles.
@@ -449,4 +449,3 @@ If you want the task to fail when the 2 conditions are satisfied, change the `fa
     register: result
     failed_when: result is failed and 'ALREADY_ENABLED' not in result.msg
 ```
-

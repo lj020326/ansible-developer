@@ -20,7 +20,7 @@ This scenario shows:
       groups: root
 ```
 
-- Updated site.yml 
+- Updated site.yml
 
 ```
 ---
@@ -42,7 +42,7 @@ This scenario shows:
       upgrade: dist
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
-   
+
   - name: create new user
     tags: always
     user:
@@ -70,7 +70,7 @@ This scenario shows:
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
-    
+
   - name: start apache (Ubuntu)
     tags: ubuntu,apache,apache2
     service:
@@ -78,7 +78,7 @@ This scenario shows:
       state: started
       enabled: yes
     when: ansible_distribution == "Ubuntu"
-    
+
   - name: change email address for admin (Ubuntu)
     tags: ubuntu,apache,apache2
     lineinfile:
@@ -94,7 +94,7 @@ This scenario shows:
       name: apache2
       state: restarted
     when: apache2_service.changed
-    
+
   - name: copy default (index) html file for site
     tags: apache,apache2,httpd
     copy:
@@ -102,8 +102,8 @@ This scenario shows:
       dest: /var/www/html/index.html
       owner: root
       group: root
-      mode: 0644    
-      
+      mode: 0644
+
   - name: install unzip
     package:
       name: unzip
@@ -115,8 +115,8 @@ This scenario shows:
       remote_src: yes
       owner: root
       group: root
-      mode: 0755  
-      
+      mode: 0755
+
 - hosts: database_servers
   become: true
   tasks:
@@ -192,7 +192,7 @@ ansible-playbook --ask-become-pass site.yml
 ```
 sudo ls -l /etc/sudoers.d
 ```
- 
+
 ![image](./img/201951036-f09de25b-bdf2-49fc-b54e-68f223b0e287.png)
 
 ![image](./img/201951673-28afbf0d-8992-4d53-8860-f23a7e2e694c.png)

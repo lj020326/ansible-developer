@@ -64,9 +64,9 @@ This example can also be found on SO: [https://stackoverflow.com/questions/61958
 
 ## How to handle large result sets that exceed AD limit
 
-the limitation of 1000 in the single ldap query is often configured in Active Directory. 
+the limitation of 1000 in the single ldap query is often configured in Active Directory.
 
-Microsoft articles mention that limit per query. 
+Microsoft articles mention that limit per query.
 
 Here’s a link that offers a workaround in your AD environment:
 
@@ -118,4 +118,4 @@ print result
 * https://www.accadius.com/listing-active-directory-users-using-python/
 * [https://stackoverflow.com/questions/6195812/ldap-nested-group-membership](https://stackoverflow.com/questions/6195812/ldap-nested-group-membership)
 * https://olivermarshall.net/why-are-ldap-queries-only-returning-1000-results/
-* 
+*

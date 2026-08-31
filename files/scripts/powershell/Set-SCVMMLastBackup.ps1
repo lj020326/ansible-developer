@@ -1,8 +1,8 @@
 Import-Module -Name "virtualmachinemanager"
-#Paolo Frigo, https://www.scriptinglibrary.com 
+#Paolo Frigo, https://www.scriptinglibrary.com
 
 # SETTINGS
-$BackupRepository = "\\YOUR\REPOSITORY\" 
+$BackupRepository = "\\YOUR\REPOSITORY\"
 $VMList = Get-SCVirtualMachine -VMMServer "scvmm.fqdn"
 
 function Split-VEEAMBackupFile($VMBackupFileName){
@@ -16,13 +16,13 @@ function Split-VEEAMBackupFile($VMBackupFileName){
     $DateString = $VMBackupFileName.Substring($VMNAme.Length+1, 10)
     $TimeString = "$($VMBackupFileName.Substring($VMNAme.Length+12,2)):$($VMBackupFileName.Substring($VMNAme.Length+14,2)):$($VMBackupFileName.Substring($VMNAme.Length+16,2))"
     $Datetime = "$DateString $Timestring" | Get-Date
-    return $VMNAme,$Datetime    
+    return $VMNAme,$Datetime
 }
 function Set-LastBackupProperty
 {
     param(
     [Parameter(Mandatory=$true, Position=0)]
-    [string] $VMName,       
+    [string] $VMName,
     [Parameter(Mandatory=$true, Position=1)]
     [string] $LastBackupTime
     )
@@ -33,9 +33,9 @@ function Set-LastBackupProperty
 $BackupFiles = Get-ChildItem $BackupRepository |Sort-Object Name -Descending | Where-Object {$_.Name -like "*.vbk" -and $_.Length -gt 22MB}|  Select-Object -exp name
 $VeeamFullBackup = @{}
 foreach ($VMBackupFileName in $BackupFiles){
-    $BackupRecord =  Split-VEEAMBackupFile($VMBackupFileName)   
+    $BackupRecord =  Split-VEEAMBackupFile($VMBackupFileName)
     try{
-        $VeeamFullBackup.add($BackupRecord[0],$BackupRecord[1])         
+        $VeeamFullBackup.add($BackupRecord[0],$BackupRecord[1])
     }
     catch{
         #Write-warning "The Backup for $($BackupRecord[0]) has already a more recent backup than the one taken at  $($BackupRecord[1]) "

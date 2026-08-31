@@ -26,4 +26,3 @@ yum remove -y cloudstack-management \
 systemctl daemon-reload
 
 exit ${?}
-

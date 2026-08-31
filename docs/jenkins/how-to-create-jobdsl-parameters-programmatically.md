@@ -14,7 +14,7 @@ params = [
   "sshCredentials": 'git-readonly',
   "environment": "${env.Environment}",
   "configParams": getTFConfigs(
-      repoUrl, 
+      repoUrl,
       "env/${env.AccountName}/${env.AWSRegion}/${env.Environment}")
   ]
 template = libraryResource('dslTemplates/infra.groovy')
@@ -86,7 +86,7 @@ pipelineJob("${serviceName}") {
 Template result
 
 ```
-...  
+...
 definition {
     parameters {
 
@@ -119,4 +119,3 @@ booleanParam('BOOL_PARAM', true, 'This is a boolean param')
 ## Reference
 
 * https://stackoverflow.com/questions/69364938/error-creating-jobdsl-parameters-programatically
-

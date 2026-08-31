@@ -15,15 +15,15 @@ models:
       headers:
         Authorization: "Basic ${OLLAMA_API_KEY}"
 
-  - name: "Qwen 3.5 27B"
-    provider: ollama
-    model: qwen3.5:27b
-    apiBase: "${OLLAMA_API_URL}"
-    roles:
-      - chat
-    requestOptions:
-      headers:
-        Authorization: "Basic ${OLLAMA_API_KEY}"
+#  - name: "Qwen 3.5 27B"
+#    provider: ollama
+#    model: qwen3.5:27b
+#    apiBase: "${OLLAMA_API_URL}"
+#    roles:
+#      - chat
+#    requestOptions:
+#      headers:
+#        Authorization: "Basic ${OLLAMA_API_KEY}"
 
   - name: "Devstral 24B"
     provider: ollama
@@ -46,48 +46,42 @@ models:
       headers:
         Authorization: "Basic ${OLLAMA_API_KEY}"
 
-  # Fast & capable autocomplete
-  - name: Gemma 4 E2B (Fast Draft)
-    provider: llama.cpp
-    apiBase: "${LLAMA_API_URL}"
-    model: gemma-4-E2B-it-Q5_K_M
-    contextLength: 4096
-    roles:
-      - autocomplete
-
-#  # AUTOCOMPLETE: Keep provider set to "ollama"
-#  - name: "Qwen2.5 Coder 7B (Autocomplete)"
-#    provider: ollama
-#    model: qwen2.5-coder:7b
-#    apiBase: "${OLLAMA_API_URL}"
+#  # Fast & capable autocomplete
+#  - name: Gemma 4 E2B (Fast Draft)
+#    provider: llama.cpp
+#    apiBase: "${LLAMA_API_URL}"
+#    model: gemma-4-E2B-it-Q5_K_M
+#    contextLength: 4096
 #    roles:
 #      - autocomplete
-#    requestOptions:
-#      headers:
-#        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  # AUTOCOMPLETE: Keep provider set to "ollama"
+  - name: "Qwen2.5 Coder 7B (Autocomplete)"
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - autocomplete
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
 
 tabAutocompleteModel:
-  name: Gemma 4 E2B (Fast Draft)
-  provider: llama.cpp
-  apiBase: "${LLAMA_API_URL}"
-  model: gemma-4-E2B-it-Q5_K_M
+  name: "Qwen2.5 Coder 7B (Autocomplete)"
+  provider: ollama
+  model: qwen2.5-coder:7b
+  apiBase: "${OLLAMA_API_URL}"
   requestOptions:
     headers:
-      Authorization: "Bearer ${LLAMA_API_KEY}"
-#  name: "Qwen2.5 Coder 7B (Autocomplete)"
-#  provider: ollama
-#  model: qwen2.5-coder:7b
-#  apiBase: "${OLLAMA_API_URL}"
-#  requestOptions:
-#    headers:
-#      Authorization: "Basic ${OLLAMA_API_KEY}"
+      Authorization: "Basic ${OLLAMA_API_KEY}"
 
 tabAutocompleteOptions:
   # This prevents suggestions from popping up immediately as you type
-  debounceDelay: 400
-  disable: false
-#  # Explicitly define which characters SHOULD trigger it (exclude the period)
-#  triggerCharacters: ["{", "[", "("]
+  debounceDelay: 500
+  # Explicitly define which characters SHOULD trigger it (exclude the period)
+  triggerCharacters: ["{", "[", "("]
+  # Alternatively, disable automatic triggering entirely if you prefer manual
+  # disable: true
 
 context:
   - provider: file

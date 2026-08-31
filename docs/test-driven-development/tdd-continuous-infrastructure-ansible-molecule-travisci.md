@@ -5,8 +5,8 @@ The benefits of Test-driven development (TDD) for infrastructure code are undeni
 
 ## Ansible & Molecule – blog series
 
-Part 1: [Test-driven infrastructure development with Ansible & Molecule](./test-driven-infrastructure-ansible-molecule-and-testinfra.md)  
-Part 2: Continuous Infrastructure with Ansible, Molecule & TravisCI  
+Part 1: [Test-driven infrastructure development with Ansible & Molecule](./test-driven-infrastructure-ansible-molecule-and-testinfra.md)
+Part 2: Continuous Infrastructure with Ansible, Molecule & TravisCI
 Part 3: [Continuous cloud infrastructure with Ansible, Molecule & TravisCI on AWS](./tdd-ansible-molecule-travisci-aws.md)
 
 ## What about Continuous Integration in Infrastructure-as-Code?
@@ -129,16 +129,16 @@ Now the prepare-docker-in-docker.yml will be called right before Molecule's `con
       state: latest
       update_cache: true
     become: true
- 
+
     # We need to anticipate the installation of Docker before the role execution...
   - name: use our role to install Docker
     include_tasks: ../../tasks/main.yml
- 
+
   - name: create /etc/docker
     file:
       state: directory
       path: /etc/docker
- 
+
   - name: set storage-driver to vfs via daemon.json
     copy:
       content: |
@@ -146,7 +146,7 @@ Now the prepare-docker-in-docker.yml will be called right before Molecule's `con
           "storage-driver": "vfs"
         }
       dest: /etc/docker/daemon.json
- 
+
   # ...since we need to start Docker in a completely different way
   - name: start Docker daemon inside container see https://stackoverflow.com/a/43088716/4964553
     shell: "/usr/bin/dockerd -H unix:///var/run/docker.sock > dockerd.log 2>&1 &"
@@ -159,8 +159,8 @@ Molecule offers us no phase between `converge` and `verify` where we can execute
 
 Now to successfully run Docker-in-Docker [we need to do three things](https://stackoverflow.com/questions/43085429/run-docker-build-in-ubuntu16-04-docker/43088716#comment93824772_43088716) :
 
-**1\. Run Docker using the `--priviledged` flag** (which should really only be used inside CI environments, [because it grants full access to the host environment](https://hub.docker.com/_/docker/) )  
-2\. **Use the [storage-driver `vfs`](https://docs.docker.com/storage/storagedriver/vfs-driver/#configure-docker-with-the-vfs-storage-driver)** , which is slow & inefficient but it is the only one guaranteed to work regardless of underlying filesystems  
+**1\. Run Docker using the `--priviledged` flag** (which should really only be used inside CI environments, [because it grants full access to the host environment](https://hub.docker.com/_/docker/) )
+2\. **Use the [storage-driver `vfs`](https://docs.docker.com/storage/storagedriver/vfs-driver/#configure-docker-with-the-vfs-storage-driver)** , which is slow & inefficient but it is the only one guaranteed to work regardless of underlying filesystems
 3\. **Start the Docker daemon with** `/usr/bin/dockerd -H unix:///var/run/docker.sock > dockerd.log 2>&1 &` (otherwise we'll [run into errors like](https://stackoverflow.com/a/43088716/4964553) `Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the Docker daemon running?`)
 
 Step **2.** & **3.** are already handled by our prepare-docker-in-docker.yml. To enable the `--priviledged` mode, we need to configure Molecule’s Docker driver inside our molecule.yml:
@@ -182,10 +182,10 @@ platforms:
 In the first article of this blog series we already implemented a suitable test case to verify if a Docker installation was fully successful. Because remember: **Only a valid test exection should be able to convince us that something is really working.** So let's have a look at the last test case inside the example project's test suite docker/molecule/tests/test\_docker.py:
 
 ```python
- 
+
 def test_run_hello_world_container_successfully(host):
     hello_world_ran = host.run("docker run hello-world")
- 
+
     assert 'Hello from Docker!' in hello_world_ran.stdout
 
 ```
@@ -208,14 +208,14 @@ logo sources: [Molecule logo](https://molecule.readthedocs.io/en/latest/) , [Vag
 ---
 sudo: required
 language: python
- 
+
 services:
 - docker
- 
+
 install:
 - pip install molecule
 - pip install docker-py
- 
+
 script:
 - cd docker
 - molecule test

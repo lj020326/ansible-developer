@@ -10,7 +10,7 @@ In a properly secure environment, there would be separate credentials used for e
 ## Running Jobs
 
 One possible idea for running jobs for specific environments is to simply use tags on existing templates.
- 
+
 Say you have N groups (10, 20, 50, etc). and M environments (2, 5, 10, etc).
 It becomes quickly impractical to have a single CICD pipeline or Ansible Tower job template setup to derive all the necessary variables, secrets, and credentials at runtime given this circumstance. There will be many headaches/credential overloading issues that will become problematic in having multiple environment credentials for a single job template and multiply that by N * M.
 
@@ -34,14 +34,14 @@ At a high level, there are two flavors of playbooks:<br>
 * Set up implementation to derive environmental information based on ansible multi-env variable grouping [best practices referenced here](../../../../ansible/how-to-manage-multistage-environments-with-ansible.md).
 
   * Upon playbook execution, set inventory to use the respective environment-specific directory (DEV/TEST/PROD).
-    * In Tower, this can be done by setting the inventory directory used in the job template. 
+    * In Tower, this can be done by setting the inventory directory used in the job template.
 ## Setup ansible to leverage conjur to obtain environment credentials
 
-1. Install [Ansible Conjur Role](https://github.com/cyberark/ansible-conjur-host-identity) and [Lookup Plug-in](https://docs.ansible.com/ansible/latest/collections/cyberark/conjur/conjur_variable_lookup.html) 
-2. Load a Conjur policy that grants the Ansible control machine privileges on secrets 
-3. Run a playbook containing references to secrets stored in Conjur 
-4. Authenticate the control machine to Conjur 
-5. Issue the secrets 
+1. Install [Ansible Conjur Role](https://github.com/cyberark/ansible-conjur-host-identity) and [Lookup Plug-in](https://docs.ansible.com/ansible/latest/collections/cyberark/conjur/conjur_variable_lookup.html)
+2. Load a Conjur policy that grants the Ansible control machine privileges on secrets
+3. Run a playbook containing references to secrets stored in Conjur
+4. Authenticate the control machine to Conjur
+5. Issue the secrets
 6. Playbook fetches secrets from Conjur and executes
 
 ![ansible tower to conjur](./img/ansible-to-conjur.svg)
@@ -108,7 +108,7 @@ machine_credential:
 #  password: "{{ ansible_password }}"
   username: "{{ lookup('cyberark.conjur.conjur_variable', env|upper + '/' + os_version_shortname + '/ansible_user') }}"
   password: "{{ lookup('cyberark.conjur.conjur_variable', env|upper + '/' + os_version_shortname + '/ansible_password') }}"
-  
+
 network_credential:
   username: "{{ lookup('cyberark.conjur.conjur_variable', env|upper + '/ANSIBLE_NET_USERNAME') }}"
   password: "{{ lookup('cyberark.conjur.conjur_variable', env|upper + '/ANSIBLE_NET_PASSWORD') }}"
@@ -178,17 +178,15 @@ ansible_password: "{{ lookup('cyberark.conjur.conjur_variable', env|upper + '/Wi
 
 ## CICD Jenkins POCs
 
-* Setup jenkins pipelines to run ansible playbooks 
-  * Create folders for each environment. 
-  * Setup pipeline for essential idempotent ansible plays (e.g., bootstrap machine OS: windows/linux, bootstrap-docker, etc) 
-  * derive environment and any other key/essential dimensions using the node hierarchy. 
+* Setup jenkins pipelines to run ansible playbooks
+  * Create folders for each environment.
+  * Setup pipeline for essential idempotent ansible plays (e.g., bootstrap machine OS: windows/linux, bootstrap-docker, etc)
+  * derive environment and any other key/essential dimensions using the node hierarchy.
     * use groovy to consistently derive from the node hierarchy key/essential/common ansible pipeline variable values to be passed into the ansible pipeline job. (E.g, environment, region/site, repo branch/etc)
-    * Setup groovy wrapper used by all ansible idempotent leaf nodes to derive all variable values from the node hierarchy from conjur using [jenkins conjur plugin](https://plugins.jenkins.io/conjur-credentials/) and configure [conjur in jenkins ansible wrapper](https://docs.conjur.org/Latest/en/Content/Integrations/jenkins-configure.htm).  
+    * Setup groovy wrapper used by all ansible idempotent leaf nodes to derive all variable values from the node hierarchy from conjur using [jenkins conjur plugin](https://plugins.jenkins.io/conjur-credentials/) and configure [conjur in jenkins ansible wrapper](https://docs.conjur.org/Latest/en/Content/Integrations/jenkins-configure.htm).
   * Setup initial set of ansible plays in each environment node to demonstrate/solidify the concept.
 
 ## Reference
 
 * https://stackoverflow.com/questions/59993825/how-to-use-ansible-tower-login-credentials-into-playbook
 * https://github.com/cyberark/ansible-conjur-collection
-
-

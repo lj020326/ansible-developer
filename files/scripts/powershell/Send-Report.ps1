@@ -1,7 +1,7 @@
-​#Requires -RunAsAdministrator 
+​#Requires -RunAsAdministrator
 #Paolo Frigo, https://www.scriptinglibrary.com
 
-# SETTINGS EMAIL REPORT 
+# SETTINGS EMAIL REPORT
 $MailRecipient = "Recipient Name <email@address.com>"
 $MailSender = "Sender Name <email@address.com>"
 $MailServer = "mail.server.com"
@@ -20,4 +20,4 @@ foreach ($Server in $TargetServers ) {
 }
 #GENERATE EMAIL REPORT
 Send-MailMessage -To "$MailRecipient" -From "$MailSender" -Subject "Reboot time of target servers" -Body "$($ServerList|Out-String)" -SmtpServer "$MailServer"
-exit 0 
+exit 0

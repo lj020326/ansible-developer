@@ -9,11 +9,11 @@ refs:
 
 In case someone runs into this again - we resolved this by recreating the self signed certificates for vCenter Service, Inventory Service and the Web Client Service. Below are the main steps we followed.
 
- 
+
 
 Set up three directories for the three services (vCenter, IS, and WC) and create an openssl.cnf file in each directory that contains the following:
 
- 
+
 ```ini
 [req]
 
@@ -28,7 +28,7 @@ prompt = no
 string_mask = nombstr
 x509_extensions = v3_req
 
- 
+
 
 [ req_distinguished_name ]
 
@@ -61,37 +61,37 @@ Note that I changed the FQDNs and IPs above (e.g., vCenter-IP is the actual IP o
 
 The organizationalUnitName attribute must be set differently for each service - (vCenterServer, vCenterWebClient, vCenterInventoryService).
 
- 
+
 
 Once you have these three config files for the three services create the certs and keys by running the following command in each directory (you may need to change the location of openssl):
 
 "c:\Program Files\VMware\Infrastructure\Inventory Service\bin\openssl.exe" req -nodes -new -x509 -keyout rui.key -out rui.crt -days 3650 -config openssl.cnf
 
- 
+
 
 Now you should have a rui.key and rui.crt file in each of the three directories. You should be able to look at those certs in Windows and see the subjectAltName containing two DNS entries (short and long) and an IP entry.
 
- 
+
 
 Rename the rui.crt file to rui.pem for all three certs.
 
- 
+
 
 Now, download the SSL Certificate Automation Tool 5.5 and closely follow the process from KB 2057340 to replace the certificates with the ones you just created.
 
- 
+
 
 Make sure you edit the ssl-environment.bat file with the locations of the different certs that you previously created, for the different services.
 
- 
+
 
 Be patient . The steps take a while as they restart the different processes and services. After each step the menu to select the next step came back so we could proceed.
 
- 
+
 
 Once we did all this and the certs were successfully updated the migration assistant precheck ran without issues. We have not proceed to the the vCenter upgrade yet, but the assistant was ready for the upgrade step.
 
- 
+
 ```shell
 
 

@@ -10,7 +10,7 @@
 # This script does have a 'partner' script that powers the VMs off, you can
 # grab that script at http://blog.mwpreston.net/shares/
 #
-# Created By: Mike Preston, 2012 - With a whole lot of help from Eric Wright 
+# Created By: Mike Preston, 2012 - With a whole lot of help from Eric Wright
 #                                  (@discoposse)
 #
 # Variables:  $vcenter - The IP/DNS of your vCenter Server
@@ -20,7 +20,7 @@
 #
 #
 # Usage: ./poweronvms.ps1
-#       
+#
 #
 #################################################################################
 
@@ -51,21 +51,21 @@ if (Test-Path $filename)
         Write-Host "." -nonewline
         Sleep 2
         Write-Host "." -nonewline
-        Sleep 2 
+        Sleep 2
     }
-    Write-Host "Service has Started!" -ForegroundColor Green 
+    Write-Host "Service has Started!" -ForegroundColor Green
     #connect to vcenter
     Sleep 5
     Write-Host "Connecting to vCenter Server..." -nonewline
     Sleep 3
     $success = Connect-VIServer $vcenter -username $username -Password $password
-    if ($success) 
-    { 
-        Write-Host "Connected" -ForegroundColor Green 
+    if ($success)
+    {
+        Write-Host "Connected" -ForegroundColor Green
     }
-    else 
-    { 
-        Write-Host "ISSUES, aborting script" -Foregroundcolor Red 
+    else
+    {
+        Write-Host "ISSUES, aborting script" -Foregroundcolor Red
         exit
     }
     Write-Host ""
@@ -76,7 +76,7 @@ if (Test-Path $filename)
         Write-Host "Powering on $iVM ..." -nonewline
         Start-VM $iVM
         Sleep 5
-        Write-Host "DONE" -Foregroundcolor Green   
+        Write-Host "DONE" -Foregroundcolor Green
     }
     Write-Host ""
     Write-Host "Starting the remaining VMs" -ForegroundColor Green
@@ -89,9 +89,9 @@ if (Test-Path $filename)
         if ($myImportantVMs -notcontains $vmName)
         {
             Start-VM $vm.Name
-            Write-Host "Powering on $vmName " 
+            Write-Host "Powering on $vmName "
             sleep 5
-            Write-Host "DONE" 
+            Write-Host "DONE"
         }
         else
         {
@@ -99,13 +99,13 @@ if (Test-Path $filename)
         }
     }
     Write-Host "Power on completed, I will now rename the dump file...." -nonewline
-    $DateStamp = get-date -uformat "%Y-%m-%d@%H-%M-%S"  
+    $DateStamp = get-date -uformat "%Y-%m-%d@%H-%M-%S"
     $fileObj = get-item $fileName
     $extOnly = $fileObj.extension
     $nameOnly = $fileObj.Name.Replace( $fileObj.Extension,'')
     rename-item "$fileName" "$nameOnly-$DateStamp$extOnly"
     Write-Host "DONE" -foregroundcolor green
-    Write-Host "File has been renamed to $nameOnly-$DateStamp$extOnly"   
+    Write-Host "File has been renamed to $nameOnly-$DateStamp$extOnly"
 }
 else
 {

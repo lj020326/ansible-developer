@@ -1,5 +1,5 @@
 ﻿
-Import-Module PowerCLI/DatastoreMod 
+Import-Module PowerCLI/DatastoreMod
 
 Function Restore-EsxNfsDatastores {
 	[CmdletBinding()]
@@ -16,7 +16,7 @@ Function Restore-EsxNfsDatastores {
 		PS C:\> Restore-NfsDatastores
 
 		#>
-		
+
 		Activate-InactiveHostNFSDatastores $vmhost
 	}
 }

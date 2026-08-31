@@ -50,9 +50,9 @@ ok: [localhost] => {
 }
 
 TASK [find vmware datastore name] *******************************************************************************************************************************************
-[DEPRECATION WARNING]: Distribution rhel 8.5 on host localhost should use /usr/libexec/platform-python, but is using /usr/bin/python for backward compatibility with prior 
+[DEPRECATION WARNING]: Distribution rhel 8.5 on host localhost should use /usr/libexec/platform-python, but is using /usr/bin/python for backward compatibility with prior
 Ansible releases. A future Ansible release will default to using the discovered platform python for this host. See https://docs.ansible.com/ansible-
-core/2.11/reference_appendices/interpreter_discovery.html for more information. This feature will be removed in version 2.12. Deprecation warnings can be disabled by 
+core/2.11/reference_appendices/interpreter_discovery.html for more information. This feature will be removed in version 2.12. Deprecation warnings can be disabled by
 setting deprecation_warnings=False in ansible.cfg.
 ok: [localhost]
 
@@ -172,7 +172,7 @@ Just a final point to try to highlight what was happening here. This playbook wi
   - name: print ansible version
     debug:
       var: ansible_version.full
-     
+
   - name: print localhost hostvars
     debug:
       msg: "{{ hostvars['localhost'] }}"
@@ -211,7 +211,7 @@ Note that we don’t have a variable set for **ansible\_python\_interpreter**.
 Running it again without an inventory containing localhost allows Ansible to create the entry for us:
 
 ```shell
-ansible-navigator run show_localhost_vars.yml --eei registry.redhat.io/ansible-automation-platform-21/ee-supported-rhel8:latest -m stdout 
+ansible-navigator run show_localhost_vars.yml --eei registry.redhat.io/ansible-automation-platform-21/ee-supported-rhel8:latest -m stdout
 
 PLAY [localhost] ************************************************************************************************************************************************************
 
@@ -249,10 +249,9 @@ In my case, I just removed localhost from my inventory file. In [Automation Cont
 
 #### See also
 
-- https://cloudautomation.pharriso.co.uk/post/implicit_localhost/  
+- https://cloudautomation.pharriso.co.uk/post/implicit_localhost/
 - [Using the ServiceNow Ansible Spoke](https://cloudautomation.pharriso.co.uk/post/aap_snow_spoke/)
 - [ansible-builder in a disconnected environment](https://cloudautomation.pharriso.co.uk/post/ansible-builder-disconnected/)
 - [Using Molecule for VM provisioning roles](https://cloudautomation.pharriso.co.uk/post/molecule-vm-create/)
 - [Testing Ansible roles with Molecule and VMware](https://cloudautomation.pharriso.co.uk/post/vmware-molecule/)
 - [Filtering hosts with the Satellite inventory plugin for Ansible](https://cloudautomation.pharriso.co.uk/post/foreman_filtering/)
-

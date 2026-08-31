@@ -1,12 +1,12 @@
 #Paolo Frigo, https://www.scriptinglibrary.com
-#This script need to run on the CRM Server 
+#This script need to run on the CRM Server
 #https://support.microsoft.com/en-au/help/907490/how-to-enable-tracing-in-microsoft-dynamics-crm
 
 #Add-PSSnapin Microsoft.Crm.PowerShell
 Param (
-    [Parameter(Mandatory=$true)]    
+    [Parameter(Mandatory=$true)]
     [ValidateSet("ON","OFF")]
-    $Status 
+    $Status
 )
 
 #SETTINGS
@@ -25,6 +25,6 @@ else {
     $setting.Enabled = $False
 }
 
-Set-CrmSetting $setting            
+Set-CrmSetting $setting
 #Get-CrmSetting TraceSettings #Prints out the Settings
 Write-Output "The Crm Tracing is now $Status and the tracing logs will be available on this directory $($setting.Directory)"

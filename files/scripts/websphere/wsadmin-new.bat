@@ -9,7 +9,7 @@ set WAS_HOME=%~dp0
 set WAS_HOME=%WAS_HOME:~0,-1%
 echo %WAS_HOME%
 
-@REM C_PATH is the class path.  Add to it as needed. 
+@REM C_PATH is the class path.  Add to it as needed.
 set SOAP_CONFIG=-Dcom.ibm.SOAP.ConfigURL=file:/%WAS_HOME%\properties\soap.client.props
 set SSL_CONFIG=-Dcom.ibm.SSL.ConfigURL=file:/%WAS_HOME%\properties\ssl.client.props
 set AUTH_CONFIG=-Djava.security.auth.login.config=file:/%WAS_HOME%\properties\wsjaas_client.conf
@@ -24,7 +24,7 @@ set JAVA_HOME=C:\apps\jdk-8u60-windows-x64\jre
 
 echo JAVA_HOME=%JAVA_HOME%
 if not exist %JAVA_HOME%\bin\java.exe (
-  echo Can not find a java.exe 
+  echo Can not find a java.exe
   exit
 )
 
@@ -34,8 +34,8 @@ echo JAVA_EXE=%JAVA_EXE%
 
 set JYTHON_HOME=C:\apps\jython2.7.0
 
-set WAS_LOGGING=-Djava.util.logging.manager=com.ibm.ws.bootstrap.WsLogManager -Djava.util.logging.configureByServer=true 
-set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.traceString=com.ibm.*=all=disabled 
+set WAS_LOGGING=-Djava.util.logging.manager=com.ibm.ws.bootstrap.WsLogManager -Djava.util.logging.configureByServer=true
+set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.traceString=com.ibm.*=all=disabled
 set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.traceFile=%WAS_HOME%\logs\wsadmin.traceout
 set WAS_LOGGING=%WAS_LOGGING% -Dcom.ibm.ws.scripting.validationOutput=%WAS_HOME%\logs\wsadmin.valout
 
@@ -58,5 +58,4 @@ set C_PATH=%C_PATH%;%WAS_LIBS%\ibmkeycert.jar;%WAS_LIBS%\ibmpkcs.jar
 
 @REM set C_PATH=%C_PATH%;%WAS_HOME%\jsoup-1.7.2.jar
 
-%JAVA_EXE% %JAVA_OPTS% %TC% %SOAP_CONFIG% %AUTH_CONFIG% %SSL_CONFIG% %USER_INSTALL_ROOT% %WAS_INSTALL_ROOT% %WAS_LOGGING% -classpath %C_PATH% com.ibm.ws.scripting.WasxShell %* 
-
+%JAVA_EXE% %JAVA_OPTS% %TC% %SOAP_CONFIG% %AUTH_CONFIG% %SSL_CONFIG% %USER_INSTALL_ROOT% %WAS_INSTALL_ROOT% %WAS_LOGGING% -classpath %C_PATH% com.ibm.ws.scripting.WasxShell %*

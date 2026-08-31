@@ -52,4 +52,3 @@ linuxhost053
 This works fine of the complete list is known at the time of running the play.
 
 In most circumstances, packages are installed incrementally by other plays and/or roles.
-

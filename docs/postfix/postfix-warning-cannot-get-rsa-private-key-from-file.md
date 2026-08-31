@@ -145,9 +145,9 @@ So it indeed has been a permissions problem! Didn't know that chown'ing the /etc
 The content of `main.cf` does not necessarily represent your active Postfix configuration. Check the output of `postconf -n` for the following two parameters:
 
 ```
-smtpd_recipient_restrictions = 
-  permit_mynetworks, 
-  permit_sasl_authenticated, 
+smtpd_recipient_restrictions =
+  permit_mynetworks,
+  permit_sasl_authenticated,
   reject_unauth_destination
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 ```

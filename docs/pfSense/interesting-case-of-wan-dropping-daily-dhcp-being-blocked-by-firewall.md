@@ -3,24 +3,24 @@
 
 My pfsense box is dropping the WAN connection daily at random times. When it happens nothing being changed in pfsense with a following DHCP release/renew will fix it. I have to turn off my modem and then turn it back on AND reboot pfsense to regain connectivity.
 
-    
+
     ISP (Spectrum) -> Netgear C6300 (bridged) -> pfsense box -> LAN
 
-    
+
 I have tried a multitude of things so far but nothing has solved the problem as every 12-24 hours pfsense will fail to get internet connectivity. I've verified it's the pfsense box because I can plug a laptop directly into Port 1 of the bridged modem and ping/surf the internet just fine after pfsense goes down.
-    
-I've tried:  
+
+I've tried:
 - Non-standard gateway latency probe intervals/etc
 - Changing firewall mode from 'normal' to 'high latency'
 - Disabling the gateway monitoring (did this today, still monitoring if this will fix it but I would rather have this enabled)
 - Adding a firewall WAN rule allowing a 'blocked' DHCP IP from the log below to 'pass' to the 'firewall (self)' destination
-    
-Notes:  
+
+Notes:
 
 According to my ISP (spectrum) there is no special MAC/static IP/hostname to be entered, it's all through their DHCP
-    
+
 Here is the gateway log sample from the last outage:
-    
+
 ```output
 Feb 16 14:19:07dpingerWAN_DHCP 97.XXX.XXX.X: sendto error: 65
 Feb 16 14:19:10dpingerWAN_DHCP 97.XXX.XXX.X: sendto error: 65
@@ -32,11 +32,11 @@ Feb 16 14:22:00dpingerWAN_DHCP 97.XXX.XXX.X: Alarm latency 0us stddev 0us loss 1
 Feb 16 14:25:33dpingersend_interval 500ms loss_interval 2000ms time_period 60000ms report_interval 0ms data_len 0 alert_interval 1000ms latency_alarm 500ms loss_alarm 20% dest_addr 97.XXX.XXX.X bind_addr 97.XXX.XXX.XXX2 identifier "WAN_DHCP "
 Feb 16 14:25:35dpingersend_interval 500ms loss_interval 2000ms time_period 60000ms report_interval 0ms data_len 0 alert_interval 1000ms latency_alarm 500ms loss_alarm 20% dest_addr 97.XXX.XXX.X bind_addr 97.XXX.XXX.XXX2 identifier "WAN_DHCP "
 Feb 16 14:25:39dpingerWAN_DHCP 97.XXX.XXX.X: Alarm latency 0us stddev 0us loss 100%
-    
+
 ```
-    
+
 Routing log:
-    
+
 ```output
 Feb 16 14:52:07radvd34097sendmsg: Operation not permitted
 Feb 16 14:52:15radvd34097sendmsg: Operation not permitted
@@ -46,31 +46,31 @@ Feb 16 14:52:42radvd34097sendmsg: Operation not permitted
 Feb 16 14:52:47radvd34097sendmsg: Operation not permitted
 Feb 16 14:52:55radvd34097sendmsg: Operation not permitted
 ```
-    
+
 Also in my firewall logs I'm getting some blocking of port 67/68 traffic (DHCP)
-    
+
 ```
 Feb 16 23:01:29WAN  10.209.64.1:67  255.255.255.255:68
 ```
-    
-    
+
+
 Purchased a surfboard 6141 to replace the netgear bridged C6300 and it looks like the problem is fixed so far, it's been 12 hours without a drop.
-    
+
 I have the same problem but it seems to occur every few days for me. Using SG-1000.
-    
+
 - Rebooting modem does not work.
 - The only remedy is rebooting pfsense.
 - Interestingly, the Gateway Status still shows "Online".
 - The latency alarm does not seem to do anything.
-    
+
 From the logs it looks like:
-    
+
 - The ISP is trying to assign a new IP address
 - For some reason that cannot happen
 - Connection "dies" probably because ISP stops routing
-    
+
     Gateway Logs:
-    
+
 ```output
 
 ... LOTS of previous instances of sendto error: 65 and before that 2 days earlier sendto error: 55...
@@ -90,9 +90,9 @@ Apr 16 13:42:02 Heimdall dpinger: send_interval 500ms  loss_interval 2000ms  tim
 Apr 16 13:42:08 Heimdall dpinger: send_interval 500ms  loss_interval 2000ms  time_period 60000ms  report_interval 0ms  data_len 0  alert_interval 1000ms  latency_alarm 500ms  loss_alarm 20%  dest_addr {ISP Secondary Gateway}  bind_addr {Valid WAN IP - 3}  identifier "WAN_PPPOE "
 
 ```
-    
+
 Routing Logs:
-    
+
 ```output
 
 Apr 16 13:10:05 Heimdall miniupnpd[47123]: remove port mapping 58698 TCP because it has expired
@@ -121,7 +121,7 @@ Apr 16 13:36:22 Heimdall miniupnpd[47279]: Listening for NAT-PMP/PCP traffic on 
 Apr 16 13:36:23 Heimdall miniupnpd[47279]: upnp_event_recv: recv(): Connection reset by peer
 
 ```
-    
+
 ## Solution
 
 The solution to these troubles is to do with the link speed negotiation:
@@ -130,16 +130,16 @@ This exact behaviour happened on a connection I'm working with, after I explicit
 
 The link then began going up and down like a yo-yo. If you refresh your browser every few seconds on interfaces>WAN this becomes clear. You do see the ISP's assigned IP come up as it should, but of course, then it drops out. On the cable modem you can also see the interface's link light turn off each time the link is dropped.
 
-The Logs>Gateway shows 2 dpinger entries every second:  
+The Logs>Gateway shows 2 dpinger entries every second:
 
 ```output
-WAN\_DHCP XXX.XXX.XXX.XXX: sendto error: 65  
-WAN\_DHCP XXX.XXX.XXX.XXX: sendto error: 65  
+WAN\_DHCP XXX.XXX.XXX.XXX: sendto error: 65
+WAN\_DHCP XXX.XXX.XXX.XXX: sendto error: 65
 WAN\_DHCP XXX.XXX.XXX.XXX: sendto error: 65
 ```
 
-Until you set the link speed neg:  
-In Logs>Gateway you might see something like  
+Until you set the link speed neg:
+In Logs>Gateway you might see something like
 
 ```output
 Oct 10 14:22:16 dpinger WAN\_DHCP XXX.XXX.XXX.XXX: Alarm latency 9596us stddev 2791us loss 30%
@@ -153,13 +153,13 @@ I tried many settings, finding that neither autoselect or 'autoselect flowcontro
 
 As the current default option works, most people should not see this (bug?). Certainly, no autoselect option works!
 
-Above true for:  
-pfS 2.3.4-RELEASE-p1 (amd64),  
-Intel bge on-board interface,  
+Above true for:
+pfS 2.3.4-RELEASE-p1 (amd64),
+Intel bge on-board interface,
 Netgear 'Telstra Gateway MAX' C6300BD on a DOCSIS 3.0 network
 
 I originally set the link speed in order to save power on two interfaces that don't need to negotiate a 1Gb speed. So much for that great idea ;-)
-    
+
 ## Alternate Solution
 
 I’ve literally tried everything, downgrading to an older version (2.4.5), going back to 2.5.1, back to 2.5.2 even went and upgraded to the 2.6.x DEV version (which I’m still running today.) Try as a may, my internet connection disconnected every 30 minutes on the clock.
@@ -191,7 +191,7 @@ After a while it was clear to me that the timings were incorrect in the new defa
 
 Still not having solved the problem I decided to manually install an older binary version of **dpinger**, which I pulled from the pfSense GitHub repo, this also didn’t solve the WAN connection being dropped by dpinger. Moving on I knew for sure that I was facing a DHCP issue, so I tried replacing the **dhclient-script** and even went to the trouble of using an older binary version of **dhclient** which also did not fix any of my problems.
 
-Eventually I even thought that it was a hardware problem, so I went out and bought a new card (Intel DA520-X2) again, but to my surprise, the problem persisted and my connection kept getting dropped. Eventually I decided to attempt manually refreshing my lease and this finally worked! 
+Eventually I even thought that it was a hardware problem, so I went out and bought a new card (Intel DA520-X2) again, but to my surprise, the problem persisted and my connection kept getting dropped. Eventually I decided to attempt manually refreshing my lease and this finally worked!
 
 Thus, I stumbled upon the solution which I am now sharing with the world as I hope others can benefit from this too.
 
@@ -199,7 +199,7 @@ Thus, I stumbled upon the solution which I am now sharing with the world as I ho
 
 I’ve solved my internet connectivity problems by adding a cronjob in the shell which does a DHCP query on my WAN interfaces every 5 minutes, of every hour, every day, every month, every day of the week as follows:
 
-`*/5 * * * * killall dhclient; dhclient ix0.34; dhclient ix0.4`  
+`*/5 * * * * killall dhclient; dhclient ix0.34; dhclient ix0.4`
 
 It was easy to implement via the shell, I’m assuming you know how to do this, but if not, try to follow these steps after you’ve entered the BSD terminal as the admin user.
 
@@ -229,4 +229,3 @@ My box is directly connected to the ISP by means of a single mode simplex fiber 
 
 - https://forum.netgate.com/topic/111733/interesting-case-of-wan-dropping-daily-dhcp-being-blocked-by-firewall
 - https://www.meteen.info/pfsense-disconnecting-wan/
-

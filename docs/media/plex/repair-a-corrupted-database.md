@@ -15,7 +15,7 @@ The database file will be located at `/Plug-in Support/Databases/com.plexapp.plu
 
 **Warning**: With the instructions below, if you run all of the “Check for Corruption” instructions prior to running the “Run a Repair” instructions, you will receive errors related to steps 2 & 3 of the latter. That is expected and the errors won’t affect anything.
 
-**Related Page**: [Where is the Plex Media Server data directory located?](https://support.plex.tv/articles/202915258-where-is-the-plex-media-server-data-directory-located/)  
+**Related Page**: [Where is the Plex Media Server data directory located?](https://support.plex.tv/articles/202915258-where-is-the-plex-media-server-data-directory-located/)
 **Related Page**: [Restore a Database Backed Up via 'Scheduled Tasks'](https://support.plex.tv/articles/202485658-restore-a-database-backed-up-via-scheduled-tasks/)
 
 ## Plex SQLite

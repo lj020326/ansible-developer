@@ -5,7 +5,6 @@ Supports single-line and multiline shell/INI variable assignments.
 """
 
 import argparse
-import os
 import re
 import sys
 from pathlib import Path
@@ -35,7 +34,9 @@ Examples:
   %(prog)s config.yaml
   %(prog)s -w input.env
   %(prog)s -p 2 -w credentials.ini
-  %(prog)s --exact-match --case-sensitive -w input.yml output.yml
+  %(prog)s -m exact -w input.env
+  %(prog)s -m boundary -p 2 -w credentials.ini
+  %(prog)s --match-type boundary --case-sensitive -w input.yml output.yml
         """,
     )
 
@@ -52,10 +53,11 @@ Examples:
         help="Optional path to output file (used with -w/--write).",
     )
     parser.add_argument(
-        "-s",
-        "--exact-match",
-        action="store_true",
-        help="Disable substring matching. Only redact exact key matches.",
+        "-m",
+        "--match-type",
+        choices=["exact", "boundary", "substring"],
+        default="boundary",
+        help="Matching mode: 'exact' (full key match), 'boundary' (delimited/word-boundary match), 'none' (pure substring match). Default: boundary.",
     )
     parser.add_argument(
         "-c",
@@ -105,23 +107,32 @@ def redact_value(val: str, peek_count: int) -> str:
 
 
 def build_key_regex(
-    keys: List[str], exact_match: bool, case_sensitive: bool
+    keys: List[str], match_type: Optional[str], case_sensitive: bool
 ) -> re.Pattern:
     """
     Compiles a multiline-aware regex pattern that captures single or multi-line assignments.
-    Handles:
-      - Quoted multiline strings: KEY='line1\nline2' or KEY="line1\nline2"
-      - Standard single lines with optional quotes and trailing comments
-    Uses horizontal whitespace ([ \t]*) for prefix/suffix to prevent
-    swallowing newlines on empty assignments (KEY=\n).
+
+    match_type choices:
+      - 'exact': Matches exact key name (e.g. 'key').
+      - 'boundary': Matches keys delimited by word boundaries/underscores/dashes (e.g. 'API_KEY', 'SECRET_PWD').
+      - 'substring': Unrestricted substring match (e.g. 'KEYCLOAK_USER').
     """
     flags = re.MULTILINE if case_sensitive else (re.MULTILINE | re.IGNORECASE)
     escaped_keys = [re.escape(k) for k in keys]
 
-    if exact_match:
+    if match_type == "exact":
         key_pattern = r"(?P<key>" + "|".join(escaped_keys) + r")"
-    else:
+    elif match_type == "boundary":
+        # Match keys bounded by start/end of key, word boundaries, or delimiters (_, -, .)
+        boundary_pattern = "|".join(
+            [r"(?:^|[\b_.-]|\b)" + k + r"(?:[\b_.-]|\b|$)" for k in escaped_keys]
+        )
+        # Target whole variable names containing the boundary match
+        key_pattern = r"(?P<key>[A-Za-z0-9_.-]*?(?:" + boundary_pattern + r")[A-Za-z0-9_.-]*?)"
+    elif match_type == "substring":
         key_pattern = r"(?P<key>\S*?(" + "|".join(escaped_keys) + r")\S*?)"
+    else:
+        raise ValueError(f"Got an invalid match_type ({match_type}).")
 
     # Restrict whitespace to [ \t]* so prefix/suffix never consume \n
     pattern = (
@@ -137,12 +148,12 @@ def build_key_regex(
 def process_env_ini(
     content: str,
     keys: List[str],
-    exact_match: bool,
+    match_type: Optional[str],
     case_sensitive: bool,
     peek_count: int,
 ) -> str:
     """Processes INI/Shell variables, handling single-line and multiline quoted values."""
-    regex = build_key_regex(keys, exact_match, case_sensitive)
+    regex = build_key_regex(keys, match_type, case_sensitive)
 
     def _replace_match(match: re.Match) -> str:
         prefix = match.group("prefix") or ""
@@ -201,22 +212,32 @@ def process_env_ini(
 
 
 def matches_key(
-    key_name: str, keys: List[str], exact_match: bool, case_sensitive: bool
+    key_name: str, keys: List[str], match_type: Optional[str], case_sensitive: bool
 ) -> bool:
-    """Helper to evaluate key names for YAML dictionary traversal."""
+    """Helper to evaluate key names for YAML dictionary traversal based on match_type."""
     if not case_sensitive:
         key_name = key_name.lower()
         keys = [k.lower() for k in keys]
 
-    if exact_match:
+    if match_type == "exact":
         return key_name in keys
-    return any(k in key_name for k in keys)
+    elif match_type == "boundary":
+        for k in keys:
+            pattern = r"(?:^|[_\b.-]|\b)" + re.escape(k) + r"(?:[_\b.-]|\b|$)"
+            if re.search(pattern, key_name):
+                return True
+        return False
+    elif match_type == "substring":
+        # Substring search
+        return any(k in key_name for k in keys)
+    else:
+        raise ValueError(f"Got an invalid match_type ({match_type}).")
 
 
 def process_yaml(
     content: str,
     keys: List[str],
-    exact_match: bool,
+    match_type: Optional[str],
     case_sensitive: bool,
     peek_count: int,
 ) -> str:
@@ -225,12 +246,12 @@ def process_yaml(
         import yaml
     except ImportError:
         # Fallback to line regex processing if PyYAML is not installed
-        return process_env_ini(content, keys, exact_match, case_sensitive, peek_count)
+        return process_env_ini(content, keys, match_type, case_sensitive, peek_count)
 
     def _walk_and_redact(data):
         if isinstance(data, dict):
             for k, v in data.items():
-                if isinstance(k, str) and matches_key(k, keys, exact_match, case_sensitive):
+                if isinstance(k, str) and matches_key(k, keys, match_type, case_sensitive):
                     if isinstance(v, (str, int, float)) and str(v).strip():
                         data[k] = redact_value(str(v), peek_count)
                 else:
@@ -248,7 +269,7 @@ def process_yaml(
         # Fallback to line regex if YAML parsing fails (e.g., template tokens present)
         pass
 
-    return process_env_ini(content, keys, exact_match, case_sensitive, peek_count)
+    return process_env_ini(content, keys, match_type, case_sensitive, peek_count)
 
 
 def determine_target_path(source_path: Path, output_arg: Optional[Path]) -> Path:
@@ -294,7 +315,7 @@ def main():
         redacted_content = process_yaml(
             content,
             DEFAULT_REDACT_KEYS,
-            args.exact_match,
+            args.match_type,
             args.case_sensitive,
             args.peek,
         )
@@ -302,7 +323,7 @@ def main():
         redacted_content = process_env_ini(
             content,
             DEFAULT_REDACT_KEYS,
-            args.exact_match,
+            args.match_type,
             args.case_sensitive,
             args.peek,
         )

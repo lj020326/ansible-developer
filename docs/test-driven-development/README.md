@@ -13,12 +13,12 @@ We all learned hard lessons until most of us agreed on the undeniable benefits o
 
 If you’ve already developed some infrastructure and left this code untouched for a month or two… and then got your hands on it again trying to execute it and just see it failing on things you never saw before – just a thousand libraries, APIs and version upgrades since the last code execution – and everything just stopped working (note:**code that is not automatically and constantly executed and tested will eventually rot sooner or later!**), this should be enough reason to bring Test-driven development and Continuous Integration into the world of infrastructure coding.
 
-To summarize, the Test-driven-development (TDD) process is to 
+To summarize, the Test-driven-development (TDD) process is to
 
-1) divide the problem into parts, 
-2) write a functional test for each part, 
-3) write code for each part, 
-4) see if functional tests passes/fails and 
+1) divide the problem into parts,
+2) write a functional test for each part,
+3) write code for each part,
+4) see if functional tests passes/fails and
 5) refactor code accordingly until success.
 
 Here is a workflow suggested in the book [Test-Driven Development with Python](http://chimera.labs.oreilly.com/books/1234000000754) by Harry Percival (available online for free).
@@ -27,8 +27,8 @@ Here is a workflow suggested in the book [Test-Driven Development with Python](h
 
 ## TDD for infrastructure code development using Ansible, Molecule & TestInfra
 
-Part 1: [Test-driven infrastructure development with Ansible & Molecule](./test-driven-infrastructure-ansible-molecule-and-testinfra.md)  
-Part 2: [Continuous Infrastructure with Ansible, Molecule & TravisCI](tdd-continuous-infrastructure-ansible-molecule-travisci.md)  
+Part 1: [Test-driven infrastructure development with Ansible & Molecule](./test-driven-infrastructure-ansible-molecule-and-testinfra.md)
+Part 2: [Continuous Infrastructure with Ansible, Molecule & TravisCI](tdd-continuous-infrastructure-ansible-molecule-travisci.md)
 Part 3: [Continuous cloud infrastructure with Ansible, Molecule & TravisCI on AWS](tdd-ansible-molecule-travisci-aws.md)
 
 ## Importance of Functional Test Environment
@@ -47,7 +47,7 @@ Another factor to consider is that the feature under development is not necessar
 
 ## Code development is highly iterative in nature
 
-By adopting "test-driven-development" you readily admit code development requires many iterations of "developing functional test cases", "develop functional code", "Test the function", "refactor the code until FT success", repeat cycle for each requested feature set throughout time and include already developed feature tests in next iteration. 
+By adopting "test-driven-development" you readily admit code development requires many iterations of "developing functional test cases", "develop functional code", "Test the function", "refactor the code until FT success", repeat cycle for each requested feature set throughout time and include already developed feature tests in next iteration.
 
 This is the realistic code development paradigm and using a TDD process/approach achieves high level of QA by adopting repeatable and automatable validation test validation criteria and processes used.
 
@@ -71,9 +71,9 @@ This is the realistic code development paradigm and using a TDD process/approach
 - https://www.oreilly.com/library/view/test-driven-development-with/9781491958698/app08.html
 - https://xenonstack.wordpress.com/2018/03/13/test-driven-development-behavior-driven-development-in-golang/
 - https://www.tmap.net/wiki/test-driven-development
-- Agarwal, R., & Umphress, D. (2008). Extreme programming for a single person team. Proceedings of the 46th Annual Southeast Regional Conference (ACM-SE 46), 82–87. New York, NY, USA: ACM. DOI: 10.1145/1593105.1593127 
-- Bhat, T., & Nagappan, N. (2006). Evaluating the efficacy of test-driven development: industrial case studies. 2006 ACM/IEEE international symposium on Empirical software engineering (ISESE), 356–363. New York, NY, USA: ACM. DOI: 10.1145/1159733.1159787 
-- Gupta, A., & Jalote, P. (2007). An Experimental Evaluation of the Effectiveness and Efficiency of the Test Driven Development. First International Symposium on Empirical Software Engineering and Measurement (ESEM), 285–294. DOI: 110.1109/ESEM.2007.41 
-- Olan, M. (2003). Unit testing: test early, test often. Journal of Computing Sciences in Colleges, 19(2), 319–328. Retrieved from ACM Digital Library 
-- Vu, J. H., Frojd, N., Shenkel-Therolf, C., & Janzen, D. S. (2009). Evaluating Test-Driven Development in an Industry-Sponsored Capstone Project. Sixth International Conference on Information Technology: New Generations (ITNG), 229–234. DOI: 10.1109/ITNG.2009.11 
+- Agarwal, R., & Umphress, D. (2008). Extreme programming for a single person team. Proceedings of the 46th Annual Southeast Regional Conference (ACM-SE 46), 82–87. New York, NY, USA: ACM. DOI: 10.1145/1593105.1593127
+- Bhat, T., & Nagappan, N. (2006). Evaluating the efficacy of test-driven development: industrial case studies. 2006 ACM/IEEE international symposium on Empirical software engineering (ISESE), 356–363. New York, NY, USA: ACM. DOI: 10.1145/1159733.1159787
+- Gupta, A., & Jalote, P. (2007). An Experimental Evaluation of the Effectiveness and Efficiency of the Test Driven Development. First International Symposium on Empirical Software Engineering and Measurement (ESEM), 285–294. DOI: 110.1109/ESEM.2007.41
+- Olan, M. (2003). Unit testing: test early, test often. Journal of Computing Sciences in Colleges, 19(2), 319–328. Retrieved from ACM Digital Library
+- Vu, J. H., Frojd, N., Shenkel-Therolf, C., & Janzen, D. S. (2009). Evaluating Test-Driven Development in an Industry-Sponsored Capstone Project. Sixth International Conference on Information Technology: New Generations (ITNG), 229–234. DOI: 10.1109/ITNG.2009.11
 - Williams, L., Maximilien, E. M., & Vouk, M. (2003). Test-driven development as a defect-reduction practice. 14th International Symposium on Software Reliability Engineering (ISSRE), 34–45. DOI: 10.1109/ISSRE.2003.1251029

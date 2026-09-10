@@ -83,12 +83,12 @@ ansible-inventory -i inventory/internal/ --graph output ntp
 ansible-inventory -i inventory/internal/ --list ntp
 ansible-inventory -i inventory/internal/ntp.yml --graph output
 ansible-inventory -i inventory/internal/site1.yml --graph output
-ansible-playbook -i ./inventory display-ntp-servers.yml 
+ansible-playbook -i ./inventory display-ntp-servers.yml
 ansible-playbook -i ./inventory/ display-ntp-servers.yml
 ansible-playbook -i ./inventory/ playbook.yml
-ansible-playbook -i ./inventory/dmz display-ntp-servers.yml 
+ansible-playbook -i ./inventory/dmz display-ntp-servers.yml
 ansible-playbook -i ./inventory/internal display-ntp-servers.yml
-ansible-playbook -i ./inventory/internal display-ntp-servers.yml 
+ansible-playbook -i ./inventory/internal display-ntp-servers.yml
 
 
 ```

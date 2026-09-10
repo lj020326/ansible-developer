@@ -6,11 +6,11 @@ If you’ve been paying attention, you know all about what’s been going down w
 However, if you’re not up to speed on the CentOS drama, let me give you the 15 second commercial version of the news:
 
 -   Red Hat decided to stop supporting the standard release version of CentOS
-    
+
 -   In CentOS’s place will be the rolling release version CentOS Stream
-    
+
 -   The Linux community is up in arms
-    
+
 
 There, you’re caught up.
 
@@ -27,9 +27,9 @@ Let me show you how to do the same.
 ## What you’ll need
 
 -   A running instance of CentOS 8
-    
+
 -   A user with sudo privileges
-    
+
 
 ## How to convert to CentOS Stream
 
@@ -68,4 +68,4 @@ If you are running a Kubernetes cluster with your CentOS 8 server, and you haven
 
 - [Open source](https://www.techrepublic.com/topic/open-source/)
 - [Software](https://www.techrepublic.com/topic/software/)
-- 
+-

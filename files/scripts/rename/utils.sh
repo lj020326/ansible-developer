@@ -166,4 +166,3 @@ function replace_content () {
 
     return 0
 }
-

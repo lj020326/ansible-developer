@@ -73,7 +73,7 @@ ssh_template_file: sshd_config_ubuntu.j2
     group: root
     mode: 0644
   notify: restart_sshd
-```  
+```
 
 ![image](./img/202692366-c606995e-0eb5-4f7b-82ec-7a398750df1b.png)
 
@@ -103,4 +103,3 @@ ansible-playbook site.yml
 ## Reference
 
 - https://www.youtube.com/watch?v=s8F_YWGHeDM&list=PLT98CRl2KxKEUHie1m24-wkyHpEsa4Y70&index=17
-

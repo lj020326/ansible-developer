@@ -3,7 +3,7 @@
 
 An exciting change to the Ansible Automation Platform is the introduction of [execution environments](https://www.redhat.com/en/technologies/management/ansible/automation-execution-environments), which will help our automation run more consistently wherever we need to automate. Instead of having Ansible Controller grab our required roles and collections, we can [build an execution environment](https://developers.redhat.com/ansiblefest/2020/using-ansible-execution-environments) containing the various components we’d like to leverage.
 
-First, let’s get ansible-builder installed: 
+First, let’s get ansible-builder installed:
 
 ```shell
 $ yum -y install ansible-builder
@@ -122,4 +122,3 @@ Stay tuned for [Part 6: Setting Up an Inventory in Ansible Automation Platform](
 ## Reference
 
 * https://blogs.sap.com/2021/12/01/part-v-building-an-execution-environment-for-ansible-automation-platform/
-

@@ -10,12 +10,12 @@ Function Clone-NfsDatastores {
 	.EXAMPLE
 	PS C:\> Clone-NfsDatastores $original_esxhost_name $copy_esxhost_name
 	#>
-	Param ( 
-		[string] 
+	Param (
+		[string]
 		## name of existing server
-		$REFHost, 
-		## name of server to copy to 
-		[string] $NEWHost) 
+		$REFHost,
+		## name of server to copy to
+		[string] $NEWHost)
 
 	#$VISRV = Connect-VIServer (Read-Host "Enter the name of your VI SERVER")
 	#$REFHost = Get-VMHost -Name (Read-Host " Enter name of existing server")

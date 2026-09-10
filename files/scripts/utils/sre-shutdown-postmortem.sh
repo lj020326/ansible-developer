@@ -5,6 +5,7 @@ set -euo pipefail
 
 REPORT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 HOSTNAME=$(hostname)
+GPU_TELEMETRY_LOG="/var/log/gpu-vram-telemetry.log"
 OUTPUT_FILE="/var/log/sre_postmortem_$(date +%Y%m%d_%H%M%S).md"
 
 {
@@ -58,6 +59,32 @@ OUTPUT_FILE="/var/log/sre_postmortem_$(date +%Y%m%d_%H%M%S).md"
     echo '```text'
     free -h
     cat /proc/swaps
+    echo '```'
+
+    echo "## 7. GPU VRAM Utilization Prior to Crash (GPU Tracker Logs)"
+    echo '```text'
+    # Check both potential log file locations
+    ALT_LOG="/var/log/gpu_tracker/gpu-vram-telemetry.log"
+    if [ -f "$GPU_TELEMETRY_LOG" ]; then
+        TARGET_LOG="$GPU_TELEMETRY_LOG"
+    elif [ -f "$ALT_LOG" ]; then
+        TARGET_LOG="$ALT_LOG"
+    else
+        TARGET_LOG=""
+    fi
+
+    if [ -n "$TARGET_LOG" ]; then
+        echo "Reading telemetry log: ${TARGET_LOG}"
+        echo "Last known GPU VRAM state prior to reboot/crash:"
+        echo "--------------------------------------------------"
+        tail -n 25 "$TARGET_LOG"
+        echo "--------------------------------------------------"
+
+        echo "Top suspect processes running prior to shutdown:"
+        tail -n 50 "$TARGET_LOG" | grep -oP 'PID:?\s*\K[0-9]+|process_name:?\s*\K[^|]+|Name:\s*\K[^,]+|ollama|vllm|llama-server|hip|roc' | sort | uniq -c
+    else
+        echo "No GPU telemetry log found at $GPU_TELEMETRY_LOG or$ALT_LOG"
+    fi
     echo '```'
 
 } | tee "${OUTPUT_FILE}"

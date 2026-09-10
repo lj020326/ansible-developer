@@ -35,13 +35,13 @@ ___
 On a Red Hat distribution, the [yum install ansible](http://www.freekb.net/Article?id=2411) command can be used to install Ansible. However, be aware that this will setup Ansible to use Python version 2.7.5. Python 2.7 reached it's end of life support in January of 2020. For this reason, it is preferrable to use PIP to install Ansible. The pip --version can be used to determine if PIP is installed. If PIP is installed, something like this should be displayed. If PIP is not installed, refer to [Installing PIP on Linux CentOS](http://www.freekb.net/Article?id=2233).
 
 > **AVOID TROUBLE**
-> 
+>
 > There are 3 versions of pip
-> 
+>
 > -   pip is used for Python version 2.6 and below
 > -   pip2 is used for Python version 2.7 and above
 > -   pip3 is used for Python version 3
-> 
+>
 > For example, the /usr/bin/pip command (or just pip) would be used for Python version 2.6 and below.
 
 ```shell
@@ -146,7 +146,7 @@ Note that if you include the **--user** flag when installing Ansible (pip instal
 Location: /root/.local/lib/python3.6/site-packages
 ```
 
-  
+
 Note that Ansible does not create a daemon, thus the systemctl command will not be used. Instead, [Ansible uses SSH](http://www.freekb.net/Article?id=2272) to manage remote systems (or a different networking protocol could be used). When installing Ansible using pip (or from source), the config file should return **None**. In this scenario, refer to [Ansible - Configuration file](http://www.freekb.net/Article?id=2242).
 
 ```shell

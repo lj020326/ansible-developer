@@ -1,5 +1,5 @@
 
-Using multiple Ansible YAML-based Inventories  
+Using multiple Ansible YAML-based Inventories
 ===
 
 The following sections will explore use cases when using multiple YAML-based inventory files:
@@ -16,7 +16,7 @@ The following sections will explore use cases when using multiple YAML-based inv
 
 * [Example 6: Using dynamic groups to derive large child groups](#Example-06)
 
-The purpose here is to fully understand how to leverage child group vars especially with respect to deriving the expected behavior for variable merging. 
+The purpose here is to fully understand how to leverage child group vars especially with respect to deriving the expected behavior for variable merging.
 
 The ansible environment used to perform the examples:
 

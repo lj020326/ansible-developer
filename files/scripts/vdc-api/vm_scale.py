@@ -3,7 +3,7 @@
 #   Name: vm_scale.py
 #   Purpose: Scale the service offering of a virtual machine
 #   Requires: class VDCApiCall in the file vdc_api_call.py
-# For download and information: 
+# For download and information:
 #   http://cloudstore.interoute.com/main/knowledge-centre/library/vdc-api-python-scripts
 #
 # Copyright (C) Interoute Communications Limited, 2014
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     # Get the service offering ID- you can find these using the
     # service_offering_get_all.py script
-    print('Remember scaling must be upwards: at least one of the number of CPUs or memory size' + 
+    print('Remember scaling must be upwards: at least one of the number of CPUs or memory size' +
        'must increase and the values cannot decrease')
     service_offering_id = raw_input('Enter the service offering ID' +
                                     ' (from the service_offering_get_all.py' +

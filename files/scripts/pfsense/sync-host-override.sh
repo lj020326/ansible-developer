@@ -8,4 +8,3 @@ echo "Get IP list for ${HOSTNAME} from ${DNS_NAMESERVER}"
 ip_list=$(dig +short "${HOSTNAME}" @${DNS_NAMESERVER} | grep '^[.0-9]*$')
 
 echo "ip_list=${ip_list}"
-

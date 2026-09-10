@@ -6,7 +6,7 @@ function New-SubFolderWithDate {
             ValueFromPipeline = $true)]
         [string]$Prefix
     )
-    $FolderName = "$Prefix-$(Get-Date -Format "yyyyMMdd")" 
+    $FolderName = "$Prefix-$(Get-Date -Format "yyyyMMdd")"
     if (Test-Path $FolderName){
         throw "Folder already exists"
     }
@@ -16,5 +16,5 @@ function New-SubFolderWithDate {
     }
     catch {
         throw "Folder not created"
-    }    
+    }
 }

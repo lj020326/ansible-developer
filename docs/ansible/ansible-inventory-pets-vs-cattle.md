@@ -28,7 +28,7 @@ The most motivating/compelling reason is the last, where dealing with a special 
 
 ## Problems/Issues with command line approach
 
-As can be seen [here](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#ansible-variable-precedence), setting variable values at the command line, squashes all other values for the variable no matter where the variable is specified.  
+As can be seen [here](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#ansible-variable-precedence), setting variable values at the command line, squashes all other values for the variable no matter where the variable is specified.
 
 Some issues/hazards associated with this method include:
 
@@ -85,7 +85,7 @@ For example, global vars for all of production would go in:
     ```yml
     ---
     env: prod
-    
+
     ```
 
 * group_vars/prod/vmware_rhel8_prod.yml:
@@ -94,7 +94,7 @@ For example, global vars for all of production would go in:
     ### CERTS
     ca_cert_bundle: "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
     ca_java_keystore: "/etc/pki/ca-trust/extracted/java/cacerts"
-    
+
     trust_ca_cacert_dir: /etc/pki/ca-trust/source/anchors
     trust_ca_update_trust_cmd: update-ca-trust extract
     root_domain: "example.org"
@@ -149,6 +149,3 @@ E.g., In my master ['site.yml'](../../../../ansible-datacenter/src/master/site.y
 To see group/host vars used in a more realistic way, see [the site.yml playbook here](../../../../ansible-datacenter/src/master/site.yml), the [os_* group var files](../../../../ansible-datacenter/src/master/inventory/group_vars/) and [host settings](../../../../ansible-datacenter/src/master/inventory/host_vars/).
 
 The additional benefits of the group/host vars approach is that one can still have target nodes that have specific/custom needs as well as groups; however, now the specific host variable values are now stored in a git repo with all the benefits of the traceability and persistent inventory tracking.
-
-
-

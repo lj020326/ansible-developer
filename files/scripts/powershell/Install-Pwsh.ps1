@@ -1,5 +1,5 @@
-#requires -runasadministrator 
-#Paolo Frigo, https://www.scriptinglibrary.com 
+#requires -runasadministrator
+#Paolo Frigo, https://www.scriptinglibrary.com
 
 # DOWNLOAD AND INSTALL THE LATEST VERSION OF POWERSHELL
 # BY USING THE MSI INSTALLER IN UNATTENDED/QUIET MODE.

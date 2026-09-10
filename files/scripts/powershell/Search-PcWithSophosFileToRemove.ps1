@@ -2,7 +2,7 @@
 #requires -module ActiveDirectory
 
 # Paolo Frigo, https://www.scriptinglibrary.com
- 
+
 # Find Workstations with temporary files from Sophos To Remove
 
 # SETTINGS
@@ -18,8 +18,8 @@ foreach ($PC in $ComputerList) {
         write-progress -Activity "Searching on $PC" -PercentComplete $(($Counter/$total)*100)
         $SophosTempFiles = Get-ChildItem "\\$($PC)\c$\ProgramData\Sophos\Sophos Anti-Virus\Temp\*`$`$`$"
         if ($SophosTempFiles){
-            Write-Output "$PC has $($SophosTempFiles.count) temp files to remove." 
-        }   
+            Write-Output "$PC has $($SophosTempFiles.count) temp files to remove."
+        }
     }
     $Counter += 1
 }

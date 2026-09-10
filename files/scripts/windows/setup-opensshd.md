@@ -45,9 +45,9 @@ Both OpenSSH components can be installed using Windows Settings on Windows Serve
 To install the OpenSSH components:
 
 1.  Open **Settings**, select **Apps > Apps & Features**, then select **Optional Features**.
-    
+
 2.  Scan the list to see if the OpenSSH is already installed. If not, at the top of the page, select **Add a feature**, then:
-    
+
     -   Find **OpenSSH Client**, then click **Install**
     -   Find **OpenSSH Server**, then click **Install**
 
@@ -197,29 +197,27 @@ ___
 ## Recommended content
 
 -   [OpenSSH Server configuration for Windows](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_server_configuration)
-    
-    Configuration information about OpenSSH Server for Windows Server and Windows.
-    
--   [OpenSSH key management for Windows](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement)
-    
-    OpenSSH Server key management for Windows using the Windows tools or PowerShell.
-    
--   [Windows Terminal SSH](https://docs.microsoft.com/en-us/windows/terminal/tutorials/ssh)
-    
-    In this tutorial, learn how to set up an SSH connection in Windows Terminal.
-    
--   [Overview about OpenSSH for Windows](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_overview)
-    
-    Overview about the OpenSSH tools used by administrators of Linux and other non-Windows for cross-platform management of remote systems.
-    
--   [Run SSH Command](https://docs.microsoft.com/en-us/system-center/orchestrator/standard-activities/run-ssh-command)
-    
-    This articles describes the functionality of Run SSH Command activity.
-    
--   [Vagrant and Hyper-V -- Tips and Tricks](https://docs.microsoft.com/en-us/virtualization/community/team-blog/2017/20170706-vagrant-and-hyper-v-tips-and-tricks)
-    
--   [Disable Hyper-V to run virtualization software - Windows Client](https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/virtualization-apps-not-work-with-hyper-v)
-    
-    Discusses an issue in which virtualization applications don't work together with Hyper-V, Device Guard, and Credential Guard. Provides a resolution.
-    
 
+    Configuration information about OpenSSH Server for Windows Server and Windows.
+
+-   [OpenSSH key management for Windows](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement)
+
+    OpenSSH Server key management for Windows using the Windows tools or PowerShell.
+
+-   [Windows Terminal SSH](https://docs.microsoft.com/en-us/windows/terminal/tutorials/ssh)
+
+    In this tutorial, learn how to set up an SSH connection in Windows Terminal.
+
+-   [Overview about OpenSSH for Windows](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_overview)
+
+    Overview about the OpenSSH tools used by administrators of Linux and other non-Windows for cross-platform management of remote systems.
+
+-   [Run SSH Command](https://docs.microsoft.com/en-us/system-center/orchestrator/standard-activities/run-ssh-command)
+
+    This articles describes the functionality of Run SSH Command activity.
+
+-   [Vagrant and Hyper-V -- Tips and Tricks](https://docs.microsoft.com/en-us/virtualization/community/team-blog/2017/20170706-vagrant-and-hyper-v-tips-and-tricks)
+
+-   [Disable Hyper-V to run virtualization software - Windows Client](https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/virtualization-apps-not-work-with-hyper-v)
+
+    Discusses an issue in which virtualization applications don't work together with Hyper-V, Device Guard, and Credential Guard. Provides a resolution.

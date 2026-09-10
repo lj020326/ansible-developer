@@ -213,7 +213,7 @@ if ($defaultVIServers) {
 		}
 	}
 
-	
+
 }
 if ($noConnection) {
 	[System.Windows.Forms.MessageBox]::Show('You must connect to one or more Virtual Center servers before you can manage the folders on those servers. Please click on the ''Managed Hosts'' node, connect to one or more of the Virtual Center servers you have configured there, and then try again.','Virtual Center connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -490,8 +490,8 @@ if ($defaultVIServers) {
                   | Add-Member -MemberType ScriptProperty -Name NICCount -Value {$this.NetworkAdapters.Count} -PassThru `
                   | Add-Member -MemberType ScriptProperty -Name ParentHost -Value {$this.Host.Name} -PassThru
       }
-     }       
-      
+     }
+
 }
 if ($noConnection) {
       [System.Windows.Forms.MessageBox]::Show('You must connect to one or more hosts before you can manage the virtual machines on those servers. Please click on the ''Managed Hosts'' node, connect to one or more of the servers you have configured there, and then try again.','Connection not established',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -893,7 +893,7 @@ if ($defaultVIServers) {
 		$GuestCapB = 0
 		$GuestFreeB = 0
 		$noConnection = $false
-		
+
 		VMware.VimAutomation.Core\Get-Datastore -Server $managedHost | ForEach-Object {
 			$totCapMB += $_.CapacityMB
 			$totFreeMB += $_.FreeSpaceMB
@@ -908,7 +908,7 @@ if ($defaultVIServers) {
 		$totUsedMB = $totCapMB - $totFreeMB
 		$GuestUsedB = $GuestCapB - $GuestFreeB
 		$reclaimB = ($GuestCapB - ($GuestUsedB/.8))
-		
+
 		$waste = New-Object PSObject
 		$waste.PSObject.TypeNames.Insert(0,"WasteFinder#VmwarePowerPackExtension")
 		$waste `
@@ -1048,9 +1048,9 @@ if ($defaultVIServers) {
 						| Add-Member -MemberType NoteProperty -Name "Virtual Switch" -Value $vSwitch.name -PassThru `
 						| Add-Member -MemberType NoteProperty -Name MACAddress -Value $_.Mac -PassThru `
 						| Add-Member -MemberType NoteProperty -Name key -Value $_.key -PassThru `
-						| Add-Member -MemberType NoteProperty -Name Host -Value $managedHost.Name -PassThru 
+						| Add-Member -MemberType NoteProperty -Name Host -Value $managedHost.Name -PassThru
 				}
-			}	
+			}
 		}
 	}
 }
@@ -1153,9 +1153,9 @@ if ($defaultVIServers) {
 						| Add-Member -MemberType NoteProperty -Name "Virtual Switch" -Value $vSwitch.name -PassThru `
 						| Add-Member -MemberType NoteProperty -Name MACAddress -Value $_.Mac -PassThru `
 						| Add-Member -MemberType NoteProperty -Name key -Value $_.key -PassThru `
-						| Add-Member -MemberType NoteProperty -Name Host -Value $managedHost.Name -PassThru 
+						| Add-Member -MemberType NoteProperty -Name Host -Value $managedHost.Name -PassThru
 				}
-			}	
+			}
 		}
 	}
 }
@@ -1330,7 +1330,7 @@ if ($defaultVIServers) {
 			Get-VMResourceConfiguration -VM $_ | where {$_.MemLimitMB -ne -1 } | ForEach-Object {
 	 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
 				$_ | Add-Member -MemberType NoteProperty -Name VMName -Value $vmName
-				$_ | Add-Member -MemberType scriptProperty -Name "CPU Limit (Mhz)" -Value {if ($this.CpuLimitMhz -eq -1) {"Unlimited"} else {$this.CpuLimitMhz}} 
+				$_ | Add-Member -MemberType scriptProperty -Name "CPU Limit (Mhz)" -Value {if ($this.CpuLimitMhz -eq -1) {"Unlimited"} else {$this.CpuLimitMhz}}
 				$_
 			}
 		}
@@ -1439,14 +1439,14 @@ if ($defaultVIServers) {
 			}
 		}
 	}
-	
+
 	$uniqueUsedDisk = @()
 
 	foreach ($managedHost in $defaultVIServers) {
 			VMware.VimAutomation.Core\Get-Datastore -Server $managedHost | ForEach-Object {
 			$dsName = $_.Name
 			$dsv = $_ | Get-View
-			
+
 			$fqFlags = New-Object VMware.Vim.FileQueryFlags
 			$fqFlags.FileSize = $true
 			$fqFlags.FileType = $true
@@ -1456,7 +1456,7 @@ if ($defaultVIServers) {
 			$searchSpec.matchPattern = "*.vmdk"
 			$dsBrowser = Get-View -Server $managedHost $dsv.browser
 			$rootPath = "["+$dsv.summary.Name+"]"
-			
+
 			## Special thanks to Yasen Kalchev @ VMware for a vSphere fix
 			if ($dsBrowser.Client.Version -eq "Vim4") {
 				$searchSpec = [VMware.Vim.VIConvert]::ToVim4($searchSpec)
@@ -1837,7 +1837,7 @@ $input | ForEach-Object {
               <script><![CDATA[$input | ForEach-Object {
 	$_ | Get-Snapshot | ForEach-Object {
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-		$_ 
+		$_
 	}
 }]]></script>
               <items>
@@ -1955,7 +1955,7 @@ $input | ForEach-Object {
             </container>
             <container id="0ca9f36f-2353-4c75-9604-cf609dae5ef7" name="Port groups" Description="" type="Action@" returntype="VMware.Vim.HostPortGroup#VMwarePowerPackExtension#@@@#VMware.Vim.HostPortGroup#@@@#VMware.Vim.DynamicData#@@@#System.Object" ResultView="Grid" DisplayResults="NestedView">
               <script><![CDATA[$input | ForEach-Object {
-	$vmHost = $_ | Get-VMHost 
+	$vmHost = $_ | Get-VMHost
 	$vmh = $vmHost | Get-View
 	$vmHostID = $_.HostId
 	Get-VirtualPortGroup -VM $_ | ForEach-Object {
@@ -1967,9 +1967,9 @@ $input | ForEach-Object {
 			| Add-Member -MemberType NoteProperty -Name "Name" -Value $_.spec.Name -PassThru `
         	| Add-Member -MemberType NoteProperty -Name "Virtual Switch" -Value $_.spec.VswitchName -PassThru `
          	| Add-Member -MemberType NoteProperty -Name "VLAN ID" -Value $_.spec.VLANID -PassThru `
-			| Add-Member -MemberType NoteProperty -Name VMHostID -Value $vmHostID -PassThru 
+			| Add-Member -MemberType NoteProperty -Name VMHostID -Value $vmHostID -PassThru
    		}
-	
+
 	}
 }]]></script>
               <items>
@@ -2142,7 +2142,7 @@ $input | ForEach-Object {
 	$_ | VMware.VimAutomation.Core\Get-Datastore | ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
 			$_ `
-				| Add-Member -MemberType NoteProperty -Name UsedSpaceMB -Value ($_.CapacityMB - $_.FreeSpaceMB) -PassThru 
+				| Add-Member -MemberType NoteProperty -Name UsedSpaceMB -Value ($_.CapacityMB - $_.FreeSpaceMB) -PassThru
 	}
 }]]></script>
               <ChartPresetID>3f15125e-7563-4607-aba6-a7eb685ffaa0</ChartPresetID>
@@ -2196,7 +2196,7 @@ $input | Get-VMGuest | ForEach-Object {
 	If (($_.HostName) -ne $null) {
 		Get-QADComputer -DNSName $_.HostName
 	}
-} 
+}
 ]]></script>
               <items>
                 <container name="properties_a807f902-4b43-4b22-86d8-724abc4c3d4a">
@@ -2314,7 +2314,7 @@ $PSStandardClusterMembers = [System.Management.Automation.PSMemberInfo[]]@($defa
 $input | ForEach-Object {
 	$_ | Get-Cluster | ForEach-Object {
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-		$view = Get-View -ViewType ClusterComputeResource -Filter @{'Name'=$_.Name} 
+		$view = Get-View -ViewType ClusterComputeResource -Filter @{'Name'=$_.Name}
 		$_ `
 			| Add-Member -MemberType MemberSet -Name PSStandardMembers -Value $PSStandardClusterMembers -PassThru `
 			| Add-Member -MemberType NoteProperty -Name DPMEnabled -Value $view.ConfigurationEx.DpmConfigInfo.Enabled -PassThru `
@@ -2393,8 +2393,8 @@ $input | ForEach-Object {
               <script><![CDATA[$input | ForEach-Object {
 	$_ | Get-VMHost | ForEach-Object {
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-		$_ 
-	}	
+		$_
+	}
 }
 ]]></script>
               <items>
@@ -2425,7 +2425,7 @@ $input | ForEach-Object {
 			| Where-Object {($parent = $_.View.Parent) -and ($parent.Type -eq 'ResourcePool')} `
 			| ForEach-Object {
 				$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-				$_ 
+				$_
 			}
 	}
 }]]></script>
@@ -2622,7 +2622,7 @@ $input | ForEach-Object {
               <script><![CDATA[$input | ForEach-Object {
 	$_ | Get-VM | Get-Snapshot | ForEach-Object {
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-		$_ 
+		$_
 	}
 }
 ]]></script>
@@ -2813,7 +2813,7 @@ $input | ForEach-Object {
               <script><![CDATA[$input | ForEach-Object {
 	$_ | Get-VMHost -NoRecursion | ForEach-Object {
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-		$_ 
+		$_
 	}
 }]]></script>
               <items>
@@ -2844,7 +2844,7 @@ $input | ForEach-Object {
 			| Where-Object {($parent = $_.View.Parent) -and ($parent.Type -eq 'ResourcePool')} `
 			| ForEach-Object {
 				$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-				$_ 
+				$_
 			}
 	}
 }]]></script>
@@ -2957,7 +2957,7 @@ $input | ForEach-Object {
               <script><![CDATA[$input | ForEach-Object {
 	$_ | Get-VM | Get-Snapshot | ForEach-Object {
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-		$_ 
+		$_
 	}
 }]]></script>
               <items>
@@ -3242,7 +3242,7 @@ $input | ForEach-Object {
 			| ForEach-Object {
 				$resourcePoolList += "$managedHost-$($_.Id)"
 				$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-				$_ 
+				$_
 			}
 	}
 }]]></script>
@@ -3355,7 +3355,7 @@ $input | ForEach-Object {
               <script><![CDATA[$input | ForEach-Object {
 	$_ | Get-VM -NoRecursion | Get-Snapshot | ForEach-Object {
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-		$_ 
+		$_
 	}
 }]]></script>
               <items>
@@ -3728,7 +3728,7 @@ $input | ForEach-Object {
 		| Get-ResourcePool -NoRecursion `
 		| ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-			$_ 
+			$_
 		}
 }
 ]]></script>
@@ -3784,7 +3784,7 @@ $input | ForEach-Object {
 		| Get-ResourcePool `
 		| ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-			$_ 		
+			$_
 	}
 }]]></script>
               <items>
@@ -4539,7 +4539,7 @@ if ($defaultVIServers) {
 						$DatastoreName,
 						$ParentPath = ''
 					)
-	
+
 					trap {
 						if ($_.Exception.MethodFault -is [VMware.Vim.FileNotFound]) {
 							continue
@@ -4548,7 +4548,7 @@ if ($defaultVIServers) {
 							continue
 						}
 					}
-	
+
 					$folderSearchSpecification = New-Object VMware.Vim.HostDatastoreBrowserSearchSpec
 					$folderSearchSpecification.details = New-Object VMware.Vim.FileQueryFlags
 					$folderSearchSpecification.details.fileSize = $true
@@ -4579,7 +4579,7 @@ if ($defaultVIServers) {
 						}
 					}
 				}
-	
+
 				$view = $_ | Get-View
 				$datastoreBrowser = Get-View -Id $view.Browser -Server $viServer
 				$datastoreName = $view.Info.Name
@@ -4870,7 +4870,7 @@ $processEntriesScriptBlock = {
 				| Add-Member -MemberType NoteProperty -Name VMHost -Value $vmHost -PassThru `
 				| Add-Member -MemberType NoteProperty -Name FileName -Value $filename -PassThru `
 				| Add-Member -MemberType NoteProperty -Name Message -Value $item -PassThru
-			
+
 		}
 	}
 }
@@ -4884,7 +4884,7 @@ $input | ForEach-Object {
 		} else {
 			Get-Log -VMHost $vmHost -Key $key -Server $managedHost.Name | ForEach-Object -Process $processEntriesScriptBlock
 		}
-	
+
 }#id="aa464422-a8a5-43d5-b292-f9f25a1437dd" name="Log entries..." type="Action@" ]]></script>
               <items>
                 <container id="2b40ee3c-8f2c-4773-bc36-1f4b5ef8dc92" name="properties_a807f902-4b43-4b22-86d8-724abc4c3d4a">
@@ -4910,7 +4910,7 @@ $input | ForEach-Object {
 	$_.Host | ForEach-Object {
 		Get-VMHost -Id "$($_.Type)-$($_.Value)" | ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
-			$_ 
+			$_
 		}
 	}
 }]]></script>
@@ -5161,11 +5161,11 @@ $input | ForEach-Object {
               <script><![CDATA[$input | ForEach-Object {
 	$hostIP = $_.Host
 	$hostID = $_.ID
-	$vmHost = Get-VMHost -Id $hostID -server $_.Host 
+	$vmHost = Get-VMHost -Id $hostID -server $_.Host
 	$vSwitchKey = $_.key
 	$vmh = $vmHost | Get-View
 	$vSwitch = Get-VirtualSwitch -VMHost $vmHost | where {$_.key -eq $vSwitchKey }
-	
+
 	foreach ($Nic in $vSwitch.Nic){
 		$vmh.Config.Network.Pnic | where {$_.device -eq $Nic} | ForEach-Object {
 			$pNicDevId = $_.Pci
@@ -5256,14 +5256,14 @@ $input | ForEach-Object {
 	#$hostName = $_.Host
 	#$viServer = $DefaultVIServers | where {$_.Name -eq $hostName}
 	#$hostIP = $managedHost.Name
-	$vmHostID = $_.id 
+	$vmHostID = $_.id
 	$vmHostName = $_.Name
 	#$vmHost = Get-VMHost -Id $vmHostID -Server $_.Host
 	#$vmh = $vmHost | Get-View
 	$vmh = $_ | Get-View
 	$vmh.Config.Network.Vswitch | ForEach-Object {
 		$pNicKeys = $_.Pnic
-		
+
 		$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
 		$_ `
 			| Add-Member -MemberType NoteProperty -Name VMHost -Value $vmHostName -PassThru `
@@ -5272,7 +5272,7 @@ $input | ForEach-Object {
 			| Add-Member -MemberType NoteProperty -Name "Port Group Count" -Value $_.Portgroup.Length -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Port Count" -Value $_.NumPorts -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Ports Available" -Value $_.NumPortsAvailable -PassThru `
-			| Add-Member -MemberType NoteProperty -Name ID -Value $vmHostID -PassThru 
+			| Add-Member -MemberType NoteProperty -Name ID -Value $vmHostID -PassThru
 	}
 }]]></script>
               <items>
@@ -5311,7 +5311,7 @@ $input | ForEach-Object {
             </container>
             <container id="f12599e2-c585-4911-a0e4-d672b80041be" name="Port Groups" Description="" type="Action@Link" returntype="VMware.Vim.HostPortGroup#VMwarePowerPackExtension#@@@#VMware.Vim.HostPortGroup#@@@#VMware.Vim.DynamicData#@@@#System.Object" ResultView="Grid" RequireSelection="Yes" DisplayResults="NestedView">
               <script><![CDATA[$input | ForEach-Object {
-   	$vmHostID = $_.id 
+   	$vmHostID = $_.id
   	$vmHostName = $_.Name
 	$vmh = $_ | Get-View
 	$vmh.Config.Network.PortGroup | ForEach-Object {
@@ -5321,7 +5321,7 @@ $input | ForEach-Object {
 			| Add-Member -MemberType NoteProperty -Name "Name" -Value $_.spec.Name -PassThru `
         	| Add-Member -MemberType NoteProperty -Name "Virtual Switch" -Value $_.spec.VswitchName -PassThru `
          	| Add-Member -MemberType NoteProperty -Name "VLAN ID" -Value $_.spec.VLANID -PassThru `
-			| Add-Member -MemberType NoteProperty -Name "VMHostID" -Value $vmHostID -PassThru 
+			| Add-Member -MemberType NoteProperty -Name "VMHostID" -Value $vmHostID -PassThru
     }
 }
 ]]></script>
@@ -5350,7 +5350,7 @@ $input | ForEach-Object {
             <container id="d41aa607-dde3-4e64-926d-15fc60148b7d" name="Physical Adapters" Description="" type="Action@Link" returntype="PhysicalNIC#VmwarePowerPackExtension#@@@#System.Management.Automation.PSCustomObject#@@@#System.Object" ResultView="Grid" RequireSelection="Yes" DisplayResults="NestedView">
               <script><![CDATA[$input | ForEach-Object {
 	$hostID = $_.id
-	$vmh = $_ | Get-View 
+	$vmh = $_ | Get-View
 	$vmh.Config.Network.Pnic | ForEach-Object {
 		$pNicDevId = $_.Pci
 		$key = $_.key
@@ -5441,7 +5441,7 @@ $input | ForEach-Object {
             <container id="e90e1066-da0a-4a3f-9a50-e5ed669506b4" name="Port Groups" Description="" type="Action@Link" returntype="VMware.Vim.HostPortGroup#VMwarePowerPackExtension#@@@#VMware.Vim.HostPortGroup#@@@#VMware.Vim.DynamicData#@@@#System.Object" ResultView="Grid" RequireSelection="Yes" DisplayResults="NestedView">
               <script><![CDATA[$input | ForEach-Object {
    	$managedHost = $_.Host
-   	$vmHostID = $_.id 
+   	$vmHostID = $_.id
 	$key = $_.key
   	$vmHost = Get-VMHost -Id $vmHostID -Server $_.Host
 	$vmh = $vmHost | Get-View
@@ -5495,8 +5495,8 @@ $input | ForEach-Object {
    			| Add-Member -MemberType NoteProperty -Name "VMHost" -Value $VMHost -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Promiscuous Mode" -Value $_.AllowPromiscuous -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Mac Address Changes" -Value $_.MacChanges -PassThru `
-			| Add-Member -MemberType NoteProperty -Name "Forged Transmits" -Value $_.ForgedTransmits -PassThru 
-			
+			| Add-Member -MemberType NoteProperty -Name "Forged Transmits" -Value $_.ForgedTransmits -PassThru
+
    }
 }]]></script>
               <items>
@@ -5545,7 +5545,7 @@ $input | ForEach-Object {
 			| Add-Member -MemberType ScriptProperty -Name "Status" -Value {if ($_.Enabled -eq $true) {"Enabled"} else {"Not Enabled"}} -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Average Bandwidth" -Value $_.AverageBandwidth  -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Peak Bandwidth" -Value $_.PeakBandwidth -PassThru `
-			| Add-Member -MemberType NoteProperty -Name "Burst Size" -Value $_.BurstSize -PassThru 
+			| Add-Member -MemberType NoteProperty -Name "Burst Size" -Value $_.BurstSize -PassThru
    }
 }]]></script>
               <items>
@@ -5693,7 +5693,7 @@ $input | ForEach-Object {
    			| Add-Member -MemberType NoteProperty -Name "Port Group" -Value $pgName -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Promiscuous Mode" -Value $_.AllowPromiscuous -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Mac Address Changes" -Value $_.MacChanges -PassThru `
-			| Add-Member -MemberType NoteProperty -Name "Forged Transmits" -Value $_.ForgedTransmits -PassThru 
+			| Add-Member -MemberType NoteProperty -Name "Forged Transmits" -Value $_.ForgedTransmits -PassThru
    }
 }]]></script>
               <items>
@@ -5728,7 +5728,7 @@ $input | ForEach-Object {
 			| Add-Member -MemberType ScriptProperty -Name "Status" -Value {if ($_.Enabled -eq $true) {"Enabled"} else {"Not Enabled"}} -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Average Bandwidth" -Value $_.AverageBandwidth  -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Peak Bandwidth" -Value $_.PeakBandwidth -PassThru `
-			| Add-Member -MemberType NoteProperty -Name "Burst Size" -Value $_.BurstSize -PassThru 
+			| Add-Member -MemberType NoteProperty -Name "Burst Size" -Value $_.BurstSize -PassThru
    }
 }
 ]]></script>
@@ -5806,7 +5806,7 @@ $input | ForEach-Object {
             <container id="27bdd8fe-2b31-4d34-9724-293ce1a56deb" name="Virtual Switches" Description="" type="Action@" returntype="VMware.Vim.HostVirtualSwitch#VmwarePowerPackExtension#@@@#VMware.Vim.HostVirtualSwitch#@@@#VMware.Vim.DynamicData#@@@#System.Object" ResultView="Grid" RequireSelection="Yes" DisplayResults="NestedView">
               <script><![CDATA[$input | ForEach-Object {
 	$hostID = $_.HostID
-	$vmHost = Get-VMHost -Name $_.VMHost 
+	$vmHost = Get-VMHost -Name $_.VMHost
 	$vmh = $vmHost | Get-View
 	$key = $_.key
 	$vmh.Config.Network.Vswitch  | Where-Object {$_.Pnic -contains $key} | ForEach-Object {
@@ -5819,7 +5819,7 @@ $input | ForEach-Object {
 			| Add-Member -MemberType NoteProperty -Name "Port Group Count" -Value $_.Portgroup.Length -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Port Count" -Value $_.NumPorts -PassThru `
 			| Add-Member -MemberType NoteProperty -Name "Ports Available" -Value $_.NumPortsAvailable -PassThru `
-			| Add-Member -MemberType NoteProperty -Name ID -Value $HostID -PassThru 
+			| Add-Member -MemberType NoteProperty -Name ID -Value $HostID -PassThru
 	}
 }]]></script>
               <items>
@@ -5871,18 +5871,18 @@ $input | ForEach-Object {
 	$customFields.Keys | ForEach-Object {
 		$type = "Global"
 		$name = $_
-		
+
 		$customFieldMgr.Field | where { $name -eq $_.Name} | foreach-object {
 			if ($_.ManagedObjectType) {$type = $_.ManagedObjectType}
 		}
-		
+
     	$customAttrib = New-Object psobject
 		$customAttrib.PSObject.TypeNames.Insert(0,"customAttribute#VmwarePowerPackExtension")
-		$customAttrib | Add-Member -MemberType noteproperty -Name Name -Value $_ 
+		$customAttrib | Add-Member -MemberType noteproperty -Name Name -Value $_
 		$customAttrib | Add-Member -MemberType noteproperty -Name Type -Value $type
 		$customAttrib | Add-Member -MemberType noteproperty -Name Value -Value $customFields[$_]
-		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Object" -Value $dcName 
-		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Type" -Value "Datacenter" 
+		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Object" -Value $dcName
+		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Type" -Value "Datacenter"
 		$customAttrib | Add-Member -MemberType NoteProperty -Name Host -Value $managedHost
 		$customAttrib
 	}
@@ -5972,18 +5972,18 @@ if ($noConnection) {
 	$customFields.Keys | ForEach-Object {
 		$type = "Global"
 		$name = $_
-		
+
 		$customFieldMgr.Field | where { $name -eq $_.Name} | foreach-object {
 			if ($_.ManagedObjectType) {$type = $_.ManagedObjectType}
 		}
-		
+
     	$customAttrib = New-Object psobject
 		$customAttrib.PSObject.TypeNames.Insert(0,"customAttribute#VmwarePowerPackExtension")
-		$customAttrib | Add-Member -MemberType noteproperty -Name Name -Value $_ 
+		$customAttrib | Add-Member -MemberType noteproperty -Name Name -Value $_
 		$customAttrib | Add-Member -MemberType noteproperty -Name Type -Value $type
 		$customAttrib | Add-Member -MemberType noteproperty -Name Value -Value $customFields[$_]
-		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Object" -Value $hostName 
-		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Type" -Value "Host" 
+		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Object" -Value $hostName
+		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Type" -Value "Host"
 		$customAttrib | Add-Member -MemberType NoteProperty -Name Host -Value $managedHost
 		$customAttrib
 	}
@@ -6024,25 +6024,25 @@ if ($noConnection) {
 		if ($vm1) {
 			$break
 		}
-	}	
+	}
 	$customFieldMgr = Get-View -Server $viServer (Get-View -Server $viServer ServiceInstance).Content.CustomFieldsManager
 	$vm = $_
 	$customFields = $vm.CustomFields
 	$customFields.Keys | ForEach-Object {
 		$type = "Global"
 		$name = $_
-		
+
 		$customFieldMgr.Field | where { $name -eq $_.Name} | foreach-object {
 			if ($_.ManagedObjectType) {$type = $_.ManagedObjectType}
 		}
-		
+
     	$customAttrib = New-Object psobject
 		$customAttrib.PSObject.TypeNames.Insert(0,"customAttribute#VmwarePowerPackExtension")
-		$customAttrib | Add-Member -MemberType noteproperty -Name Name -Value $_ 
+		$customAttrib | Add-Member -MemberType noteproperty -Name Name -Value $_
 		$customAttrib | Add-Member -MemberType noteproperty -Name Type -Value $type
 		$customAttrib | Add-Member -MemberType noteproperty -Name Value -Value $customFields[$_]
-		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Object" -Value $vmName 
-		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Type" -Value "Virtual Machine" 
+		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Object" -Value $vmName
+		$customAttrib | Add-Member -MemberType noteproperty -Name "Parent Type" -Value "Virtual Machine"
 		$customAttrib
 	}
 }]]></script>
@@ -6086,7 +6086,7 @@ if ($noConnection) {
 		$_ `
 			| Add-Member -MemberType NoteProperty -Name VMName -Value $vmName -PassThru `
 			| Add-Member -MemberType scriptProperty -Name "CPULimit(Mhz)" -Value {if ($this.CpuLimitMhz -eq -1) {"Unlimited"} else {$this.CpuLimitMhz}} -PassThru `
-			| Add-Member -MemberType scriptProperty -Name "MemLimit(MB)" -Value {if ($this.MemLimitMB -eq -1) {"Unlimited"} else {$this.MemLimitMB}} -PassThru 
+			| Add-Member -MemberType scriptProperty -Name "MemLimit(MB)" -Value {if ($this.MemLimitMB -eq -1) {"Unlimited"} else {$this.MemLimitMB}} -PassThru
 	}
 }]]></script>
               <ChartPresetID>a87a5231-89f9-4920-8728-3fa78fc95224</ChartPresetID>
@@ -6202,7 +6202,7 @@ if ($noConnection) {
 			$_ `
 				| Add-Member -MemberType NoteProperty -Name VirtualMachine -Value $vmName -PassThru `
 				| Add-Member -MemberType NoteProperty -Name UsedSpace -Value ($_.Capacity - $_.FreeSpace) -PassThru `
-				| Add-Member -MemberType NoteProperty -Name "Free%" -Value ([Math]::Round((($_.FreeSpace / $_.Capacity)*100),0)) -PassThru 
+				| Add-Member -MemberType NoteProperty -Name "Free%" -Value ([Math]::Round((($_.FreeSpace / $_.Capacity)*100),0)) -PassThru
 		}
 	}
 }]]></script>
@@ -6249,13 +6249,13 @@ $fieldDescriptions = @(
 			(New-FieldDescription -Name 'Name' -HelpMessage 'The name of the custom attribute.' -Type 'System.String' -DefaultValue "" -IsMandatory $true)
 			(New-FieldDescription -Name 'Type' -HelpMessage 'The type of the custom attribute.' -Type $managedObjectTypeNamesEnum -DefaultValue $managedObjectTypeNamesEnum -IsMandatory $true)
 		)
-		
+
 $result = Read-Input -Caption "Create Custom Attribute" -Message "Please choose the name of the attribute, the managed object type to which this attribute will apply and the hosts on which to create the custom attribute." -FieldDescription $FieldDescriptions
 
 
 foreach ($managedHost in $result.Hosts) {
 		$customFieldMgr = Get-View -Server $managedHost (Get-View -Server $managedHost ServiceInstance).Content.CustomFieldsManager
-		
+
 		if ($result.Type -eq "Global"){
 			$customFieldMgr.AddCustomFieldDef($result.Name,$null, $null, $null)
 		}
@@ -6765,7 +6765,7 @@ function GetHostServerImpl($itemHost)
 foreach ($item in $HostName) {
 	$hostObj = GetHostServerImpl($item)
 	if ($hostObj -eq $null) {
-		Connect-VIServer $item 
+		Connect-VIServer $item
 	}
 	if ($hostObj.IsConnected) {
 		if ($cluster = Get-Cluster -Name $Location -Server $hostObj.Name -ErrorAction SilentlyContinue) {
@@ -6824,7 +6824,7 @@ $visio = Visio {
 	DefaultPageDiagramStyle 'Flowchart' -Direction 'Left to Right' -PlacementDepth 'Shallow'
 	DefaultPageConnectorStyle 'Simple' -Spacing '20mm' -Curvature 'Straight'
 	DefaultPageAutoEnlarge $true
-	
+
 	Document {
 		$pageIndex = 1
 		Stencil 'Virtualization Visio Stencil.vss'
@@ -7243,7 +7243,7 @@ foreach ($item in $HostName) {
 	if (-not $viServer)
 	{
 		# toDo: use the stored credentials and update them
-		Connect-VIServer –Server $hostName –Protocol https  
+		Connect-VIServer –Server $hostName –Protocol https
 	}
 	$viServer = $DefaultVIServers | where {$_.Name -eq $hostName}
 	if ($viServer) {
@@ -7251,7 +7251,7 @@ foreach ($item in $HostName) {
 			New-Cluster -Location $datacenter -Name $Name
 		} elseif ($computeResourceFolder = (Get-Folder -Name $Location -Server $managedHost -ErrorAction SilentlyContinue | Where-Object {$_.IsChildTypeComputeResource})) {
 			New-Cluster -Location $computeResourceFolder -Name $Name
-		}		
+		}
 	}
 }]]></script>
               <Types>
@@ -7777,7 +7777,7 @@ foreach ($managedHost in $HostName) {
 	$viServer = $DefaultVIServers | where {$_.Name -eq $managedHost}
 	if (-not $viServer)
 	{
-		Connect-VIServer –Server $hostName –Protocol https 
+		Connect-VIServer –Server $hostName –Protocol https
 		$viServer = $DefaultVIServers | where {$_.Name -eq $managedHost}
 	}
 	if ($viServer) {
@@ -8346,7 +8346,7 @@ function IsThisHostConnected($itemHost)
 
 foreach ($item in $HostName) {
 	if (IsThisHostConnected($item) -eq $false) {
-		Connect-VIServer $item 
+		Connect-VIServer $item
 	}
 	if ($item.IsConnected) {
 		if ($cluster = Get-Cluster -Name $Location -Server $managedHost.Connection -ErrorAction SilentlyContinue) {
@@ -8703,7 +8703,7 @@ if (Test-Path -Path $configXmlPath) {
               </Types>
             </container>
             <container id="6602fcdd-d4d0-4075-a8c1-49d3cfc2d3b1" name="Revert to..." type="Action@" DisplayResults="Refresh">
-              <script><![CDATA[$input | ForEach-Object { 
+              <script><![CDATA[$input | ForEach-Object {
 	$_.VM | Set-VM -Snapshot $_ -RunAsync
 }]]></script>
               <Types>
@@ -8867,7 +8867,7 @@ $input | ForEach-Object {
               <script><![CDATA[$pgArray = @{}
 $pgCount = 0
 $input | ForEach-Object {
-	
+
    $key = $_.key
    $HostID = $_.VMHostID
    $vmHost = Get-VMHost -Id $HostID
@@ -9034,23 +9034,23 @@ $input | ForEach-Object {
 $LinkSpeed = New-Object VMware.Vim.PhysicalNicLinkInfo
 switch (Read-Choice 'Speed/Duplex Settings' 'What would you like the new Speed/Duplex configuration of the selected Physical NICs to be?' 'Auto Negotiate','10-Half','10-Full','100-Half','100-Full','1000-Full' 0) {
 	0 { $LinkSpeed = $null }
-	1 { 
+	1 {
 		$LinkSpeed.SpeedMb = 10
 		$LinkSpeed.Duplex = $False
 	}
-	2 { 
+	2 {
 		$LinkSpeed.SpeedMb = 10
 		$LinkSpeed.Duplex = $True
 	}
-	3 { 
+	3 {
 		$LinkSpeed.SpeedMb = 100
 		$LinkSpeed.Duplex = $False
 	}
-	4 { 
+	4 {
 		$LinkSpeed.SpeedMb = 100
 		$LinkSpeed.Duplex = $True
 	}
-	5 { 
+	5 {
 		$LinkSpeed.SpeedMb = 1000
 		$LinkSpeed.Duplex = $True
 	}
@@ -9953,7 +9953,7 @@ function global:Get-PSResourceString {
 		if (-not $resourceString) {
 			$resourceString = $DefaultValue
 		}
-		
+
 		return $resourceString
 	}
 }
@@ -10099,7 +10099,7 @@ function global:New-Credential {
 		[string]$Username,
 		[System.Security.SecureString]$Password
 	)
-	
+
 	New-Object System.Management.Automation.PSCredential($Username,$Password)
 }
 
@@ -10577,7 +10577,7 @@ function global:Remove-CacheAssociation {
 	param(
 		[string]$AssociatedObjectId = $null
 	)
-	
+
 	$credentialCache = Get-CredentialCache
 	if ($keysToClear = $(if ($AssociatedObjectId) {$credentialCache.ObjectAssociations.Keys -like $AssociatedObjectId} else {$credentialCache.ObjectAssociations.Keys})) {
 		foreach ($item in $keysToClear) {
@@ -10725,7 +10725,7 @@ function global:ConvertTo-WmiFilter {
 		[string[]]$FilterValues,
 		[string[]]$LiteralFilterValues
 	)
-	
+
 	$wmiFilterSet = @()
 	if ($FilterValues.Count) {
 		foreach ($item in $FilterValues) {
@@ -12683,7 +12683,7 @@ function global:Import-VMwarePowerPackConfiguration {
 	param(
 		[string]$Path = "$($Host.PrivateData.UserAppData)\VMware.PowerPack.Config.xml"
 	)
-	
+
 	if (-not (Get-Variable -Name VMwareConfiguration -Scope Global -ErrorAction SilentlyContinue)) {
 		$global:VMwareConfiguration = @{'ManagedHosts'=@()}
 		$global:VMwareConfiguration.PSObject.TypeNames.Clear()
@@ -12942,7 +12942,7 @@ function global:Add-ManagedHost {
 	)
 
 	Initialize-VMwarePowerPackConfiguration
-	
+
 	if (-not $HostId) {
 		return
 	}
@@ -13244,7 +13244,7 @@ function global:Get-AdminConsoleNodeData {
 		$Node = $null
 	)
 	if ($host.Name -ne 'PowerGUIHost') {
-		throw 'Get-AdminConsoleNodeData is only valid when used inside the Admin Console'	
+		throw 'Get-AdminConsoleNodeData is only valid when used inside the Admin Console'
 	} else {
 		if (-not $Node) {
 			$Node = $Host.PrivateData.ConsoleHostFactory.Application.Navigation.CurrentItem
@@ -13263,9 +13263,9 @@ function global:Set-AdminConsoleNodeData {
 		$Node = $null,
 		[System.Management.Automation.PSObject] $AssociatedObject = $null
 	)
-	
+
 	if ($host.Name -ne 'PowerGUIHost') {
-		throw 'Set-AdminConsoleNodeData is only valid when used inside the Admin Console'	
+		throw 'Set-AdminConsoleNodeData is only valid when used inside the Admin Console'
 	} else {
 		if (-not $Node) {
 			$Node = $Host.PrivateData.ConsoleHostFactory.Application.Navigation.CurrentItem
@@ -13453,7 +13453,7 @@ function global:Add-AdminConsoleVMwareSessionsNode {
 		$ComputerName
 	)
 	$viServer = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($viServer)
 	{
 		Get-View SessionManager -Server $viServer | ForEach-Object {$_.SessionList}
@@ -13475,7 +13475,7 @@ function global:Add-AdminConsoleVMwareDatacentersNode {
 		$ComputerName
 	)
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 
 		Get-Datacenter -Server $managedHost | ForEach-Object {
@@ -13501,7 +13501,7 @@ function global:Add-AdminConsoleVMwareFoldersNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 
 		Get-Folder -Server $managedHost | Sort-Object -Property Name | ForEach-Object {
@@ -13533,7 +13533,7 @@ function global:Add-AdminConsoleVMwareClustersNode {
 	$PSStandardClusterMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-Cluster -Server $managedHost | ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
@@ -13573,7 +13573,7 @@ function global:Add-AdminConsoleVMwareHostsNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-VMHost -Server $managedHost | ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
@@ -13599,7 +13599,7 @@ function global:Add-AdminConsoleVMwareResourcePoolsNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-ResourcePool -Server $managedHost | ForEach-Object {
 			$view = $_ | Get-View
@@ -13628,7 +13628,7 @@ function global:Add-AdminConsoleVMwareVirtualMachinesNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		$defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]@('Name','Description','OperatingSystem','IPAddress','DNSName','PowerState','CPUCount','Memory(MB)','HDDCount','NICCount','ParentHost'))
 		$PSStandardVMMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
@@ -13665,7 +13665,7 @@ function global:Add-AdminConsoleVMwareTemplatesNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-Template -Server $managedHost
 	}
@@ -13687,7 +13687,7 @@ function global:Add-AdminConsoleVMwareSnapshotsNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-VM -Server $managedHost | Get-Snapshot | ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
@@ -13713,7 +13713,7 @@ function global:Add-AdminConsoleVMwareNetworksNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-Datacenter -Server $managedHost | ForEach-Object {
 			$view = Get-View -ViewType Datacenter -Filter @{'Name'=$_.Name} -Property Network -Server $managedHost
@@ -13751,7 +13751,7 @@ function global:Add-AdminConsoleVMwareDatastoresNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		VMware.VimAutomation.Core\Get-Datastore -Server $managedHost | ForEach-Object {
 			$_.PSObject.TypeNames.Insert(0,"$($_.PSObject.TypeNames[0])#VmwarePowerPackExtension")
@@ -13778,7 +13778,7 @@ function global:Add-AdminConsoleVMwareFilesNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		VMware.VimAutomation.Core\Get-Datastore -Server $managedHost | ForEach-Object {
 			function Get-DatastoreFiles {
@@ -13852,7 +13852,7 @@ function global:Add-AdminConsoleVMwareTasksNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		VMware.VimAutomation.Core\Get-Task -Server $managedHost
 	}
@@ -13875,9 +13875,9 @@ function global:Add-AdminConsoleVMwareLogFilesNode {
 
 	$defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]@('Host','FileName','Type','Description'))
 	$PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
-	
+
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-VMHost -Server $managedHost | ForEach-Object {
 			Get-LogType -VMHost $(if (Test-VMwareManagementServerByName -ManagedHost $managedHost.Name) {$_} else {$null}) -Server $managedHost `
@@ -13942,7 +13942,7 @@ function global:Add-AdminConsoleVMwareStandaloneHostHierarchyNode {
 	)
 
 	$managedHost = $DefaultVIServers | where {$_.Name -eq $ComputerName}
-	
+
 	if ($managedHost) {
 		Get-VMHost -Server $managedHost | ForEach-Object {
 			Add-AdminConsoleVMwareHostNode -ComputerName $ComputerName -VMHost $_
@@ -13990,7 +13990,7 @@ function global:Add-AdminConsoleVMwareInventoryViewNode {
 		| ForEach-Object {
 			$_.PSObject.TypeNames.Clear()
 			$_.PSObject.TypeNames.Insert(0,'VMwareVirtualCenterView')
-		}	
+		}
 }
 
 function global:Add-AdminConsoleVMwareDatacenterFolderNode {
@@ -14779,92 +14779,92 @@ function global:ConvertFrom-ManagedObjectReference {
 	}
 }
 
-[string[]]$managedObjectTypeNames = @("Alarm", 
+[string[]]$managedObjectTypeNames = @("Alarm",
 "AlarmManager",
 "AuthorizationManager",
-"ClusterComputeResource", 
-"ClusterProfile", 
-"ClusterProfileManager", 
-"ComputeResource", 
-"ContainerView", 
-"CustomFieldsManager", 
-"CustomizationSpecManager", 
-"Datacenter", 
-"Datastore", 
-"DiagnosticManager", 
-"DistributedVirtualPortgroup", 
-"DistributedVirtualSwitch", 
+"ClusterComputeResource",
+"ClusterProfile",
+"ClusterProfileManager",
+"ComputeResource",
+"ContainerView",
+"CustomFieldsManager",
+"CustomizationSpecManager",
+"Datacenter",
+"Datastore",
+"DiagnosticManager",
+"DistributedVirtualPortgroup",
+"DistributedVirtualSwitch",
 "DistributedVirtualSwitchManager",
-"EnvironmentBrowser", 
-"EventHistoryCollector", 
-"EventManager", 
-"ExtensibleManagedObject", 
-"ExtensionManager", 
-"FileManager", 
+"EnvironmentBrowser",
+"EventHistoryCollector",
+"EventManager",
+"ExtensibleManagedObject",
+"ExtensionManager",
+"FileManager",
 "Folder",
-"HistoryCollector", 
-"HostAutoStartManager", 
-"HostBootDeviceSystem", 
-"HostCpuSchedulerSystem", 
-"HostDatastoreBrowser", 
-"HostDatastoreSystem", 
-"HostDateTimeSystem", 
-"HostDiagnosticSystem", 
-"HostFirewallSystem", 
-"HostFirmwareSystem", 
-"HostHealthStatusSystem", 
-"HostKernelModuleSystem", 
-"HostLocalAccountManager", 
-"HostMemorySystem", 
-"HostNetworkSystem", 
-"HostPatchManager", 
-"HostPciPassthruSystem", 
-"HostProfile", 
-"HostProfileManager", 
-"HostServiceSystem", 
-"HostSnmpSystem", 
-"HostStorageSystem", 
-"HostSystem", 
-"HostVirtualNicManager", 
-"HostVMotionSystem", 
-"HttpNfcLease", 
-"InventoryView", 
-"IpPoolManager", 
+"HistoryCollector",
+"HostAutoStartManager",
+"HostBootDeviceSystem",
+"HostCpuSchedulerSystem",
+"HostDatastoreBrowser",
+"HostDatastoreSystem",
+"HostDateTimeSystem",
+"HostDiagnosticSystem",
+"HostFirewallSystem",
+"HostFirmwareSystem",
+"HostHealthStatusSystem",
+"HostKernelModuleSystem",
+"HostLocalAccountManager",
+"HostMemorySystem",
+"HostNetworkSystem",
+"HostPatchManager",
+"HostPciPassthruSystem",
+"HostProfile",
+"HostProfileManager",
+"HostServiceSystem",
+"HostSnmpSystem",
+"HostStorageSystem",
+"HostSystem",
+"HostVirtualNicManager",
+"HostVMotionSystem",
+"HttpNfcLease",
+"InventoryView",
+"IpPoolManager",
 "LicenseAssignmentManager",
-"LicenseManager", 
-"ListView", 
+"LicenseManager",
+"ListView",
 "LocalizationManager",
 "ManagedEntity",
-"ManagedObjectView", 
-"Network", 
-"OptionManager", 
-"OvfManager", 
+"ManagedObjectView",
+"Network",
+"OptionManager",
+"OvfManager",
 "PerformanceManager",
-"Profile", 
-"ProfileComplianceManager", 
-"ProfileManager", 
-"PropertyCollector", 
-"PropertyFilter", 
-"ResourcePlanningManager", 
-"ResourcePool", 
-"ScheduledTask", 
-"ScheduledTaskManager", 
-"SearchIndex", 
-"ServiceInstance", 
-"SessionManager", 
-"Task", 
+"Profile",
+"ProfileComplianceManager",
+"ProfileManager",
+"PropertyCollector",
+"PropertyFilter",
+"ResourcePlanningManager",
+"ResourcePool",
+"ScheduledTask",
+"ScheduledTaskManager",
+"SearchIndex",
+"ServiceInstance",
+"SessionManager",
+"Task",
 "TaskHistoryCollector",
-"TaskManager", 
-"UserDirectory", 
-"View", 
-"ViewManager", 
-"VirtualApp", 
-"VirtualDiskManager", 
-"VirtualizationManager", 
-"VirtualMachine", 
-"VirtualMachineCompatibilityChecker", 
-"VirtualMachineProvisioningChecker", 
-"VirtualMachineSnapshot", 
+"TaskManager",
+"UserDirectory",
+"View",
+"ViewManager",
+"VirtualApp",
+"VirtualDiskManager",
+"VirtualizationManager",
+"VirtualMachine",
+"VirtualMachineCompatibilityChecker",
+"VirtualMachineProvisioningChecker",
+"VirtualMachineSnapshot",
 "VmwareDistributedVirtualSwitch" )
 
 $managedObjectTypeNamesEnum = New-Enum -Name "managedObjectTypeNamesEnum" -Values $managedObjectTypeNames
@@ -14957,7 +14957,7 @@ function global:Test-VMwareManagementServerByName {
 	)
 	$viServer = $DefaultVIServers | where {$_.Name -eq $ManagedHost}
 
-	if ($viServer) 
+	if ($viServer)
 	{
 		#  VirtualCenter 2.5 and 4.0
 		if ($managedHost.ProductLine -contains 'vpx') {
@@ -17869,7 +17869,7 @@ function global:Select-VisioShape {
 				[PSObject] $visioPage        = $_.ContainingPage
 				[PSObject] $visioShape       = $_
 				#endregion
-				
+
 				#region Invoke the ScriptBlock if it was provided.
 				if ($ScriptBlock) {
 					. $ScriptBlock | Out-Null
@@ -19344,14 +19344,14 @@ function global:New-HtmlReport {
 
 	$h2background ="#ad1c18"
 	$h3background = "#ADADAD"
-			
-	if (Get-Item -Path Function::Get-AdminConsoleName -Erroraction SilentlyContinue) { 
+
+	if (Get-Item -Path Function::Get-AdminConsoleName -Erroraction SilentlyContinue) {
 		if ((Get-AdminConsoleName) -match "EcoShell") {
 			$h2background = "#8DC63F"
 			$h3background = "#A5A5A5"
-		} 
+		}
 	}
-	
+
 	function Get-TableCssSettings {
 		param(
 			[string] $Display    = 'none',
@@ -19556,7 +19556,7 @@ $reportContents
 			$process = New-Object System.Diagnostics.Process
 			$process.StartInfo.Filename = 'notepad.exe'
 			$process.StartInfo.Arguments = "`"$($htmFilePath.Replace('Microsoft.PowerShell.Core\FileSystem::',''))`""
-			if (-not $process.Start()) { 
+			if (-not $process.Start()) {
 				throw 'Unable to launch notepad.exe'
 			}
 		}
@@ -19565,7 +19565,7 @@ $reportContents
 		$process = New-Object System.Diagnostics.Process
 		$process.StartInfo.Filename = 'explorer.exe'
 		$process.StartInfo.Arguments = "/select,`"$($htmFilePath.Replace('Microsoft.PowerShell.Core\FileSystem::',''))`""
-		if (-not $process.Start()) { 
+		if (-not $process.Start()) {
 			throw 'Unable to launch explorer.exe'
 		}
 	}
@@ -19654,7 +19654,7 @@ $reportContents
 	}
 	@"
 <div class="filler"></div>
-"@		
+"@
 }
 
 function global:ConvertTo-HtmlReportTable {
@@ -19855,7 +19855,7 @@ function global:Get-VMHostSummary {
 			return
 		}
 		$processObject = $(if ($InputObject) {$InputObject} else {$_})
-		if ($processObject) {	
+		if ($processObject) {
 			$processObject | Get-View | Select-Object -Property Name,@{Name="State";Expression={$_.Summary.Runtime.ConnectionState}},@{Name="Num CPU";Expression={$_.Summary.Hardware.NumCPuPkgs}},@{Name="CPU Cores";Expression={$_.Summary.Hardware.NumCPuCores}},@{Name="Memory";Expression={[math]::truncate($_.Hardware.MemorySize / 1MB)}},@{Name="Num NICs";Expression={$_.Summary.Hardware.NumNics}},@{N="Num HBAs";E={$_.Summary.Hardware.NumHBAs}} | Sort-Object -Property Name
 		}
 	}
@@ -19875,7 +19875,7 @@ function global:Get-VIEventSummary {
 			return
 		}
 		$processObject = $(if ($InputObject) {$InputObject} else {$_})
-		if ($processObject) {	
+		if ($processObject) {
 			$processObject | Get-VIEvent | Where-Object {$_.CreatedTime -gt ((Get-Date).AddDays(-7))} | Select-Object -Property @{Name="Date";Expression={$_.CreatedTime}},@{Name="User Name";Expression={$_.UserName}},@{Name="Event";Expression={$_.FullFormattedMessage}}
 		}
 	}
@@ -20130,7 +20130,7 @@ function global:Out-VReport {
 					Write-Progress -Activity 'Gathering all host information' -Status 'Please wait...' -PercentComplete 100
 					for ($index = 0; $index -lt $objectCollection.Count; $index++) {
 						$vmhost = $objectCollection[$index]
-						$managedHost = $vmhost.Host						
+						$managedHost = $vmhost.Host
 						Write-Progress -Activity 'Processing host information' -Status "$($vmhost.Name) ($($index + 1) of $($objectCollection.Count))" -PercentComplete (100 * ($index + 1) / $objectCollection.Count)
 						$vmhostView = $vmhost | Get-View
 						$vmhostSummary = $vmhostView | Select-Object -Property Name,@{Name='Boot Time';Expression={$_.Summary.Runtime.BootTime}},@{Name='Version';Expression={$_.Config.Product.FullName}},@{Name='Manufacturer';Expression={$_.Hardware.SystemInfo.Vendor}},@{Name='Model';Expression={$_.Hardware.SystemInfo.Model}},@{Name='Memory (MB)';Expression={[Math]::Truncate($_.Hardware.MemorySize / 1MB)}},@{Name='Processor Type';Expression={$_.Hardware.CpuPkg[0].Description}},@{Name='Hyperthreading';Expression={$_.Config.Hyperthread.Active}},@{Name='VMotion Enabled';Expression={$_.Summary.Config.VMotionEnabled}},@{Name='Time Zone';Expression={$_.Config.DateTimeInfo.TimeZone.Name}},@{Name='NTP Servers';Expression={$_.Config.DateTimeInfo.NtpConfig.Server}},@{Name='NTP Client Status';Expression={($_.Config.Service.Service | Where-Object {$_.Key -eq 'ntpd'}).Running}},@{Name='Number of Processors';Expression={$_.Hardware.CpuInfo.NumCpuPackages}},@{Name='Number of HBAs';Expression={$_.Summary.Hardware.NumHBAs}},@{Name='Number of NICs';Expression={$_.Summary.Hardware.NumNics}},@{Name='Number of Virtual Machines';Expression={$_.Vm.Count}}
@@ -20616,7 +20616,7 @@ Add-HtmlReportSection -Title $Title -Level $Level -NoIndent:$($Indent -eq 'None'
 				}
 			}
 		}
-		
+
 	}
 
 

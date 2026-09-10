@@ -16,6 +16,6 @@ $total_mem=(systeminfo | Select-String 'Total Physical Memory:').ToString().Spli
 $processes=get-process $ProcessName| Select-Object PM, CPU, Name, Id #Selected fields for the processes
 
 foreach ($proc in $processes){
-     Add-Content -Value "$($datetime), $($proc.Name), $($proc.ID), $($proc.CPU), $([math]::Round($proc.PM/(1024*1024),2))MB, $($total_mem)" -Path $LogFile 
+     Add-Content -Value "$($datetime), $($proc.Name), $($proc.ID), $($proc.CPU), $([math]::Round($proc.PM/(1024*1024),2))MB, $($total_mem)" -Path $LogFile
 }
 exit 0

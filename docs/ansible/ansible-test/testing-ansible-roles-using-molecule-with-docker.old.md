@@ -27,7 +27,7 @@ Molecule Can also check syntax, idempotency, code quality, etc
 
 Molecule only support Ansible 2.2 or latest version
 
-NOTE: To run ansible role with the molecule in different OS flavour we can use the cloud, vagrant, containerization (Docker)  
+NOTE: To run ansible role with the molecule in different OS flavour we can use the cloud, vagrant, containerization (Docker)
 Here we will use Docker……………………
 
 Let’s Start……………
@@ -91,13 +91,13 @@ cat molecule/default/molecule.yml
 molecule:
   ignore_paths:
     - venv
- 
+
 dependency:
   name: galaxy
 driver:
   name: docker
 lint:
-  name: yamllint    
+  name: yamllint
 platforms:
   - name: centos7
     image: centos/systemd:latest
@@ -179,17 +179,17 @@ Driver defines your platform where your Ansible code will be executed
 
 –> Test matrix
 
-└── default  
-├── lint  
-├── destroy  
-├── dependency  
-├── syntax  
-├── create  
-├── prepare  
-├── converge  
-├── idempotence  
-├── side\_effect  
-├── verify  
+└── default
+├── lint
+├── destroy
+├── dependency
+├── syntax
+├── create
+├── prepare
+├── converge
+├── idempotence
+├── side\_effect
+├── verify
 └── destroy
 
 However, we can change this scenario and sequence by changing molecule.yml file :
@@ -197,10 +197,10 @@ However, we can change this scenario and sequence by changing molecule.yml file 
 ```yaml
 scenario:
   name: default  # optional
-  create_sequence:      # molecule create 
+  create_sequence:      # molecule create
     - create
     - prepare
-  check_sequence:       # molecule check 
+  check_sequence:       # molecule check
     - destroy
     - dependency
     - create
@@ -208,15 +208,15 @@ scenario:
     - converge
     - check
     - destroy
-  converge_sequence:    # molecule converge 
+  converge_sequence:    # molecule converge
     - dependency
     - create
     - prepare
     - converge
-  destroy_sequence:     # molecule destroy 
+  destroy_sequence:     # molecule destroy
     - cleanup
     - destroy
-  test_sequence:        # molecule test 
+  test_sequence:        # molecule test
 #    - lint
     - cleanup
     - dependency
@@ -251,16 +251,16 @@ NOTE: If anyone scenario (action) fails, others will not be executed. this is th
   gather_facts: false
   tasks:
     - name: Install net-tools curl
-      apt: 
+      apt:
         name: ['curl', 'net-tools']
-        state: installed 
+        state: installed
       when: ansible_os_family == "Debian"
 ```
 
 **NOTE:** when we run “molecule converge” below task will be performed :
 
-\====> Create –> create.yml will be called  
-\====> Prepare –> prepare.yml will be called  
+\====> Create –> create.yml will be called
+\====> Prepare –> prepare.yml will be called
 \====> Provisioning –> playbook.yml will be called
 
 **converge:** Run the role inside the test container.
@@ -277,15 +277,15 @@ NOTE: If anyone scenario (action) fails, others will not be executed. this is th
 
 cd /tmp/molecule
 
-tree  
-.  
-└── osm\_nginx  
-└── default  
-├── ansible.cfg  
-├── Dockerfile\_centos\_systemd\_latest  
-├── Dockerfile\_ubuntu\_16\_04  
-├── inventory  
-│ └── ansible\_inventory.yml  
+tree
+.
+└── osm\_nginx
+└── default
+├── ansible.cfg
+├── Dockerfile\_centos\_systemd\_latest
+├── Dockerfile\_ubuntu\_16\_04
+├── inventory
+│ └── ansible\_inventory.yml
 └── state.yml
 
 **state.yml** :- maintain scenario which has been performed .
@@ -347,28 +347,28 @@ cat molecule/default/tests/test\_default.py
 
 ```python
 import os
- 
+
 import testinfra.utils.ansible_runner
- 
+
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
- 
+
 def test_user(host):
     user = host.user("www-data")
     assert user.exists
- 
+
 def test_nginx_is_installed(host):
     nginx = host.package("nginx")
     assert nginx.is_installed
- 
- 
+
+
 def test_nginx_running_and_enabled(host):
   os = host.system_info.distribution
   if os == 'debian':
     nginx1 = host.service("nginx")
     assert nginx1.is_running
     assert nginx1.is_enabled
- 
+
 def test_nginx_is_listening(host):
     assert host.socket('tcp://127.0.0.1:80').is_listening
 ```
@@ -380,4 +380,3 @@ That's all for now.  We have created an environment for Molecule and test cases.
 
 * [https://yamllint.readthedocs.io/en/stable/](https://yamllint.readthedocs.io/en/stable/)
 * [how-to-test-ansible-playbook-role-using-molecule-with-docker/](https://blog.opstree.com/2019/12/24/how-to-test-ansible-playbook-role-using-molecule-with-docker/)
-

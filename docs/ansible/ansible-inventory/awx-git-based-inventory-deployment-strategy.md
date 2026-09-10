@@ -3,12 +3,12 @@
 
 ## Motivation
 
-### AWX Inventory Environment Based approach to CICD based automation code testing/deployment 
+### AWX Inventory Environment Based approach to CICD based automation code testing/deployment
 
 Limiting the AWX/tower plays to specific environments works to enable a proper DEV/QA/PROD CICD git based PRs toolchain to:
 
 1) enable validation testing to develop and validate any plays/roles/collections/modules before promoting to the upper environments.
-2) enable integration testing in a QA environment to validate that any component/platform updates/upgrade/patches work as expected before applying to upper environment 
+2) enable integration testing in a QA environment to validate that any component/platform updates/upgrade/patches work as expected before applying to upper environment
 3) enable a QA environment for a full/robust set of "quality gate checks" upon PR request:
    1) runs lint based code quality checks
    2) run automated regression and new feature testing
@@ -106,15 +106,15 @@ The remaining PoCs would then demonstrate how to enable a single set of env-agno
 
 Upon successful validation testing, can then the release branch can be PR'd into the project inventory SCM master branch to then become the updated PROD configuration using the same exact env-agnostic group configurations.
 
-To enable the env-agnostic groups, there will need to be a root/base dir that sets the env-agnostic groups mapped into each of the respective env directories via symbolic link.  
+To enable the env-agnostic groups, there will need to be a root/base dir that sets the env-agnostic groups mapped into each of the respective env directories via symbolic link.
 
-Then each env directory can have env-specific groups added to map to the specific set of hosts in the hosts.yml located in each of the env dirs.  
+Then each env directory can have env-specific groups added to map to the specific set of hosts in the hosts.yml located in each of the env dirs.
 
 Note that each environment directory has its own hosts.yml to manage the environment specific set of hosts.
 
-The root level 'all.yml' specifies all the env-agnostic groups that are available across all environments which gets symlinked into each of the environment directories.  
+The root level 'all.yml' specifies all the env-agnostic groups that are available across all environments which gets symlinked into each of the environment directories.
 
-Using this approach, testing any group can be done with the same exact group configuration for all environments.  The specific hosts targeted by the groups are then specified in the env-specific 'hosts.yml' file. 
+Using this approach, testing any group can be done with the same exact group configuration for all environments.  The specific hosts targeted by the groups are then specified in the env-specific 'hosts.yml' file.
 
 ## Root Level Inventory Use Case
 
@@ -124,15 +124,14 @@ Since each environment should be managed/changed within the scope of the environ
 
 The root inventory should only apply to AWX 'job templates' that meet the following requirements and/or characteristics:
 
-- The job is 'non-mutable' such that it does not make any change to any host target. 
+- The job is 'non-mutable' such that it does not make any change to any host target.
   * inventory scans and related use-cases usually fit into this case.
   * company audits/compliance checks (e.g., info-security related)
 - The job risk level is minimal such that it can run across multiple environments independent from CICD infosec/requirements
 - The job must run across multiple environments for a specific reason/purpose. Jobs usually fitting this use case are:
   * migration related - e.g., job to migrate/synchronize configuration from env1 to env2
   * promotion related - e.g., job to promote configuration from env1 to env2
-- provisioning new machines into lower environments 
+- provisioning new machines into lower environments
   * Preferred/Better approach would be to perform this from the environment and not at the "Root" level
 
 Basically, limit 'Root' inventory use cases, to the extent possible, to non-mutable plays.
-

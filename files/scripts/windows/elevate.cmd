@@ -36,7 +36,7 @@
   ECHO args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
   ECHO Next >> "%vbsGetPrivileges%"
 
-  if '%cmdInvoke%'=='1' goto InvokeCmd 
+  if '%cmdInvoke%'=='1' goto InvokeCmd
 
   ECHO UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
   goto ExecElevation

@@ -320,4 +320,4 @@ This will let you select any of the following patterns (non exhaustive list):
 ## References
 
 * https://stackoverflow.com/questions/68746910/managing-nested-group-in-ansible-yaml-inventory-files
-* 
+*

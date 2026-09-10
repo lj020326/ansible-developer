@@ -101,7 +101,7 @@ ok: [localhost] => (item=secret.yaml) => {
 }
 
 PLAY RECAP *********************************************************************
-localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 ___
@@ -208,4 +208,4 @@ Both options give
 ## References
 
 * https://stackoverflow.com/questions/68217313/parse-yaml-files-in-ansible
-* 
+*

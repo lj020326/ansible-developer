@@ -34,7 +34,7 @@ stages:
 
 display-ansible-version:    # Job name (sometimes called a Build Step) - Appropriately named to aid the user at runtime
   tags:  # Tags will ensure GitLab choses the correct runner to run this job
-    - controller-system-ee 
+    - controller-system-ee
   stage: Ansible EE Information # Appropriate stage name to help with debugging if required
   environment: dev # environment parameter allows for separation of jobs
   only: # Ensures this is only run on the main branch. (For future branching strategy)
@@ -45,10 +45,10 @@ display-ansible-version:    # Job name (sometimes called a Build Step) - Appropr
 
 display-installed-collections:
   tags:
-    - controller-system-ee 
+    - controller-system-ee
   stage: Ansible EE Information
   environment: dev
-  only: 
+  only:
     - main
   script:
     - echo "Display Collections installed"
@@ -119,15 +119,15 @@ Display Collections installed
 # /usr/share/ansible/collections/ansible_collections
 Collection                          Version
 ----------------------------------- -------
-amazon.aws                          3.2.0  
-ansible.controller                  4.2.0  
-. . .  
-infra.controller_configuration      2.1.6  
-servicenow.itsm                     1.3.3  
-splunk.es                           2.0.0  
-trendmicro.deepsec                  2.0.0  
-vmware.vmware_rest                  2.1.4  
-vyos.vyos                           3.0.0  
+amazon.aws                          3.2.0
+ansible.controller                  4.2.0
+. . .
+infra.controller_configuration      2.1.6
+servicenow.itsm                     1.3.3
+splunk.es                           2.0.0
+trendmicro.deepsec                  2.0.0
+vmware.vmware_rest                  2.1.4
+vyos.vyos                           3.0.0
 section_end:1663749069:step_script
 [0Ksection_start:1663749069:cleanup_file_variables
 [0K[0K[36;1mCleaning up project directory and file based variables[0;m[0;m
@@ -147,7 +147,7 @@ stages:
 
 display-ee-information:    # Job name (sometimes called a Build Step) - Appropriately named to aid the user at runtime
   tags:    # Tags will ensure GitLab choses the correct runner to run this job
-    - controller-system-ee 
+    - controller-system-ee
   stage: Ansible EE Information # Appropriate stage name to help with debugging if required
   environment: dev # environment parameter allows for separation of jobs
   only: # Ensures this is only run on the main branch. (For future branching strategy)
@@ -331,9 +331,9 @@ stages:
   - Ansible EE Information
   - Configure Ansible Controller
 
-display-ee-information:   
+display-ee-information:
   tags:
-    - controller-system-ee 
+    - controller-system-ee
   stage: Ansible EE Information
   environment: dev
   only:
@@ -392,4 +392,4 @@ The ability to manage the base configuration of the automation controller is gre
 ## Reference
 
 * https://www.redhat.com/sysadmin/cicd-gitlab-runner-ansible
-* 
+*

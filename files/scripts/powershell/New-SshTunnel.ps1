@@ -1,8 +1,8 @@
 # Paolo Frigo, https://www.scriptinglibrary.com
 
-# This scripts creates connect a local port to a remote port via an SSH tunnel 
+# This scripts creates connect a local port to a remote port via an SSH tunnel
 
-# SCENARIO:  POOR-MAN'S VPN 
+# SCENARIO:  POOR-MAN'S VPN
 #
 # HOST1 on NETWORKA wants to connect to HOST2 on NETWORKB,
 # HOST2 is not exposed to the internet and there are not port-forwarding configured
@@ -19,9 +19,9 @@ $TargetBox          =   "192.168.1.94"  # HOST2
 $TargetPort         =   "3389"          # RDP
 
 #SSH Server                             #JUMPBOX
-$Username           =   "PaoloF"         
-$MyLinuxBox         =   "mylinuxbox.fqdn-or-Public-IP"   
-$RemotePortForSSH   =   "22"                
+$Username           =   "PaoloF"
+$MyLinuxBox         =   "mylinuxbox.fqdn-or-Public-IP"
+$RemotePortForSSH   =   "22"
 
 
 # DEPENDENCY CHECK

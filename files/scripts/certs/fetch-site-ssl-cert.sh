@@ -21,4 +21,3 @@ FETCH_CERT_DIR=./
 ## ref: https://stackoverflow.com/questions/9450120/openssl-hangs-and-does-not-exit
 echo QUIT | openssl s_client -showcerts -servername ${TARGET_HOST} -connect ${ENDPOINT} | \
   openssl x509 -outform PEM > ${FETCH_CERT_DIR}/${ENDPOINT_NAME}.crt
-

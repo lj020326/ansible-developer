@@ -57,7 +57,7 @@ int LIST_InsertHeadNode(
       {
       rCode=ENOMEM;   /* ENOMEM is defined in errno.h */
       fprintf(stderr, "malloc() failed.\n");
-      goto CLEANUP;                        
+      goto CLEANUP;
       }
 
    /* Initialize the new node's payload. */
@@ -177,7 +177,7 @@ int LIST_InsertTailNode(
 CLEANUP:
 
    return(rCode);
-}      
+}
 
 /*****************************************************************************
 ** Find a node with a payload->name string greater than the I__name string.
@@ -383,14 +383,14 @@ int LIST_Destroy(
    while(*IO_head)
       {
       LIST_NODE_T *delNode = *IO_head;
-   
-      *IO_head = (*IO_head)->next;   
+
+      *IO_head = (*IO_head)->next;
       free(delNode);
       }
-   
+
    return(rCode);
 }
-      
+
 /*****************************************************************************
 ** Program start.
 */
@@ -437,7 +437,7 @@ int main(void)
       fprintf(stderr, "LIST_DeleteNodeByName() reports: %d\n", rCode);
       goto CLEANUP;
       }
-      
+
    rCode=LIST_InsertTailNode(&listHead, "Omega", "[The End]", 29, 3);
    if(rCode)
       {
@@ -475,5 +475,4 @@ CLEANUP:
 - https://stackoverflow.com/questions/23279119/creating-and-understanding-linked-lists-of-structs-in-c
 - http://www.mahonri.info/SO/23279119_LinkedList_101.c
 - https://www.cs.cmu.edu/~guna/15-123S11/Lectures/Lecture09.pdf
-- 
-
+-

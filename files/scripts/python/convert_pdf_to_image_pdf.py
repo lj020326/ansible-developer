@@ -105,7 +105,7 @@ requires the python library 'pdf2image' and 'poppler' to be installed
 ref: https://pdf2image.readthedocs.io/en/latest/installation.html
 
 Examples of use:
-{0} input.pdf 
+{0} input.pdf
 {0} input.pdf custom_output.pdf
 {0} -l DEBUG input.pdf
 '''.format(__scriptName__)

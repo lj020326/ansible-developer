@@ -20,7 +20,7 @@
   Author:         <Name>
   Creation Date:  <Date>
   Purpose/Change: Initial script development
-  
+
 .EXAMPLE
   <Example goes here. Repeat this attribute for more than one example>
 #>
@@ -50,23 +50,23 @@ $sLogFile = Join-Path -Path $sLogPath -ChildPath $sLogName
 
 Function Connect-VMwareServer{
   Param([Parameter(Mandatory=$true)][string]$VMServer)
-  
+
   Begin{
     Log-Write -LogPath $sLogFile -LineValue "Connecting to VMware environment [$VMServer]..."
   }
-  
+
   Process{
     Try{
       $oCred = Get-Credential -Message "Enter credentials to connect to vSphere Server or Host"
       Connect-VIServer -Server $VMServer -Credential $oCred
     }
-    
+
     Catch{
       Log-Error -LogPath $sLogFile -ErrorDesc $_.Exception -ExitGracefully $True
       Break
     }
   }
-  
+
   End{
     If($?){
       Log-Write -LogPath $sLogFile -LineValue "Completed Successfully."
@@ -79,22 +79,22 @@ Function Connect-VMwareServer{
 
 Function <FunctionName>{
   Param()
-  
+
   Begin{
     Log-Write -LogPath $sLogFile -LineValue "<description of what is going on>..."
   }
-  
+
   Process{
     Try{
       <code goes here>
     }
-    
+
     Catch{
       Log-Error -LogPath $sLogFile -ErrorDesc $_.Exception -ExitGracefully $True
       Break
     }
   }
-  
+
   End{
     If($?){
       Log-Write -LogPath $sLogFile -LineValue "Completed Successfully."

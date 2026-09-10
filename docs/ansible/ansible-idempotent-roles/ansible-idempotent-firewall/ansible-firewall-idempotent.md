@@ -121,11 +121,11 @@ As can be seen, this approach is additive in nature.  At any time, ports can be 
 
 ### Downside/Challenges with Additive Approach
 
-The downside to this approach is that for any given inventory host, there is no way to arrive at the current state of the firewall without running all the plays that have been used. 
+The downside to this approach is that for any given inventory host, there is no way to arrive at the current state of the firewall without running all the plays that have been used.
 
-Another downside is that if the plays used to arrive at the final FW state are time-consuming or costly in terms of the tasks needed to be done, it can become untenable to have to re-run all the plays to apply a simple set of firewall changes/updates. 
+Another downside is that if the plays used to arrive at the final FW state are time-consuming or costly in terms of the tasks needed to be done, it can become untenable to have to re-run all the plays to apply a simple set of firewall changes/updates.
 
-E.g., From my experiences, I have playbooks that can take up to 60 minutes to run through in some cases.  It would become unacceptable to run the entire playbook just to add a port for one of the applications defined in the set of plays.  
+E.g., From my experiences, I have playbooks that can take up to 60 minutes to run through in some cases.  It would become unacceptable to run the entire playbook just to add a port for one of the applications defined in the set of plays.
 
 ### Idempotent Firewall Role Requirement
 
@@ -147,11 +147,11 @@ In this case, we create a 'linux', 'webserver', and 'nameserver' group var file 
 
 firewalld_ports__postfix:
   - "25/tcp"
- 
+
 firewalld_ports__httpd:
   - "80/tcp"
   - "443/tcp"
- 
+
 firewalld_ports__veeam:
   - "10006/tcp"
 
@@ -160,7 +160,7 @@ firewalld_ports__veeam:
 ./inventory/group_vars/webserver.yml:
 ```yml
 ---
- 
+
 firewalld_ports__httpd:
   - "80/tcp"
   - "443/tcp"
@@ -226,7 +226,7 @@ firewalld_ports__bind:
   set_fact:
     firewalld_ports: "{{ firewalld_ports|d([]) + lookup('vars', item)|d([]) }}"
   loop: "{{ lookup('varnames','^firewalld_ports__') }}"
-  
+
 - name: "Display firewalld_ports"
   debug:
     var: firewalld_ports
@@ -247,7 +247,7 @@ firewalld_ports__bind:
 That is to say that the role can be used by role implementors in an additive way, but also upon execution, the role will resolve all firewall defined variables such that at any run, the same firewall state will be arrived at in an idempotent manner.
 
 The overall concept is that plays and roles pair up with groups.
-Once that framework is used consistently, everything starts to make sense. 
+Once that framework is used consistently, everything starts to make sense.
 
 For example, for the 'postfix' play and role there would be a 'postfix' group.
 For a 'veeam-agent' play and role there would be a 'veeam-agent' group.
@@ -273,7 +273,7 @@ We assume that there is an ansible-win-firewall role to support updating the fir
   set_fact:
     firewall_win_ports: "{{ firewall_win_ports|d([]) + lookup('vars', item)|d([]) }}"
   loop: "{{ lookup('varnames','^firewall_win_ports__$') }}"
-  
+
 - name: "Display firewall_win_ports"
   debug:
     var: firewall_win_ports
@@ -320,7 +320,7 @@ Using the variable lookup approach, you can do this:
 
 ./inventory/group_vars/mssql.yml:
 ```yaml
-firewall_win_ports__mssql: 
+firewall_win_ports__mssql:
   - port: "11433"
     protocol: "udp"
     program: "mssql"
@@ -354,7 +354,7 @@ For example, a full set of firewall rules for an application can be specified in
 
 ./inventory/group_vars/mssql.yml:
 ```yaml
-firewall_win_rules__mssql: 
+firewall_win_rules__mssql:
   - localport: "11433"
     remoteport: any
     protocol: "udp"
@@ -381,7 +381,7 @@ firewall_win_rules__mssql:
   set_fact:
     firewall_win_rules: "{{ firewall_win_rules|d([]) + lookup('vars', item)|d([]) }}"
   loop: "{{ lookup('varnames','^firewall_win_rules__') }}"
-  
+
 - name: "Display firewall_win_rules"
   debug:
     var: firewall_win_rules
@@ -424,7 +424,7 @@ If there is the need to invoke the firewall role from another role, see the exam
 - name: Setup and run nfs
   include_role:
     name: geerlingguy.nfs
- 
+
 - name: Allow nfs traffic through the firewall
   when: firewalld_enabled | bool
   tags: [ firewall-config-nfs ]
@@ -435,4 +435,3 @@ If there is the need to invoke the firewall role from another role, see the exam
     firewalld_services: "{{ nfs_firewalld_services | d([]) }}"
     firewalld_ports: "{{ nfs_firewalld_ports | d([]) }}"
 ```
-

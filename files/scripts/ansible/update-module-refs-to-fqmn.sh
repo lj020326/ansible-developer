@@ -681,4 +681,3 @@ $1  ansible\.builtin\.set_fact\:
 $1    $3\: $4
 
 ```
-

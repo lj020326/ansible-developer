@@ -24,9 +24,9 @@ Then all I had to do was write a bit of python that would interact with the data
 Two major things caught me out.
 
 1.  Don’t forget to `COMMIT` the data to the database, PowerDNS uses InnoDB on MySQL, so you’ll need to commit the transaction, or bugger all happens.
-    
+
 2.  apparmor on Ubuntu prevents dhcpd from using the exec() syscall. This is easily resolved by setting apparmor from enforcing to complaining for dhcpd.
-    
+
 
 Here’s a couple of bits of code, one is the python updater, and the other shows how this all fits into the dhcpd.conf file.
 

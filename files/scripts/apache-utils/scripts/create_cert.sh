@@ -37,6 +37,3 @@ echo "crt md5:"
 openssl x509 -noout -modulus -in ${CERT_DIR}/test.crt| openssl md5
 echo "key md5:"
 openssl rsa -noout -modulus -in ${CERT_DIR}/test.key| openssl md5
-
-
-

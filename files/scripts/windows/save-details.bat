@@ -1,4 +1,4 @@
-REM Paolo Frigo, https://www.scriptinglibrary.com 
+REM Paolo Frigo, https://www.scriptinglibrary.com
 
 REM THIS SCRIPTS REDIRECTS SYSTEMINFO AND IPCONFIG OUTPUT TO A FILE
 

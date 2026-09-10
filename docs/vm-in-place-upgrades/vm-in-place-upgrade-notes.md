@@ -5,7 +5,7 @@ The following highlights pre-requirements to performing an in-place OS upgrade (
 
 Testing requirements:
 
-1) TEST/QA environment for each respective app/project 
+1) TEST/QA environment for each respective app/project
 
 2) App/Project feature and integration tests are defined for app/project validation regression/interop/integration testing
 
@@ -24,15 +24,15 @@ Testing requirements:
 
 The in-place OS upgrades testing process overview:
 
-1) Validation that each project RHEL7 TEST/QA env passes all tests before migration, 
+1) Validation that each project RHEL7 TEST/QA env passes all tests before migration,
 
 2) prepare pre-upgrade/migration VM snapshots for rollback usage in subsequent steps
 
 3) perform the upgrade/migration in each respective TEST/QA env and
 
-4) verify that all the RHEL package / library requirements for each app/project are met in the OS upgrade process and pass all application tests/validations/verifications thoroughly 
+4) verify that all the RHEL package / library requirements for each app/project are met in the OS upgrade process and pass all application tests/validations/verifications thoroughly
 
-4.1) if not, prepare fix to resolve and rollback the respective VM to the RHEL7 snapshot state and re-run the upgrade/migration 
+4.1) if not, prepare fix to resolve and rollback the respective VM to the RHEL7 snapshot state and re-run the upgrade/migration
 
 4.2) and apply the fix to and validate if the fix fully resolved any upgrade/migration related issues
 
@@ -43,7 +43,7 @@ The in-place OS upgrades testing process overview:
 
 This process enables:
 
-1) ability to have insight of things that will break due to the in-place OS upgrade/migration in lower envs before getting to the PROD env. 
+1) ability to have insight of things that will break due to the in-place OS upgrade/migration in lower envs before getting to the PROD env.
 
 2) set of upgrade/migration related app/project patches/fixes that are required in order to successfully upgrade/migrate to the new OS version.
 
@@ -51,31 +51,30 @@ This process enables:
 
 3.1) ability to test any required component SW upgrades necessary/required for the OS upgrade/migration before getting to PROD and
 
-3.2) any corresponding downstream app/project upgrades/enhancements/configuration updates required in lower env 
+3.2) any corresponding downstream app/project upgrades/enhancements/configuration updates required in lower env
 
 4) insight to any potential interop issues and required updates/fixes between newer component versions and other interfaces
 
-5) ability to add /update any test cases impacted/necessitated by the OS upgrade/migration 
+5) ability to add /update any test cases impacted/necessitated by the OS upgrade/migration
 
-e.g., 
+e.g.,
 
 in formal /stringent PROD environments, there are almost always lower/test envs for each app/project
 
- 
 
-apply the in-place OS upgrade/migration to each lower test env in the prior dev lifecycle iteration. 
 
- 
+apply the in-place OS upgrade/migration to each lower test env in the prior dev lifecycle iteration.
+
+
 
 E.g., perform os-upgrade and testing validation at least 1 iteration/week in advance of the PROD upgrade/migration, but in a well planned/defined project lifecycle setting, this is usually performed at least 2-3 iterations before the actual PROD upgrade to allow enough time to fully shake-out and address any/all corresponding fixes and/or component upgrades and respective testing necessary.
 
- 
+
 
 then perform validation and upgrade/mitigation and resolution for any issues found and re-test the upgrade/migration
 
 after all validations/tests have been passed, then apply the upgrade/migration and respective post upgrade enhancements in the PROD env
 
- 
+
 
 In summary, if treating the in-place OS upgrade/migration procedure as a first-class citizen, the same test-driven-development approach/ process/ treatment / discipline can be vigorously employed/applied as with any app/project enhancement and receive all the residual benefits from such treatment/process; chiefly, with stability and predictability with minimized chances of surprises when upgrading the PROD env.
-

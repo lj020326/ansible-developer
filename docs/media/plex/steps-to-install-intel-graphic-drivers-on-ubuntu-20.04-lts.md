@@ -79,5 +79,4 @@ So, We discussed how to check for currently used drivers and install Intel graph
 
 * https://www.linuxfordevices.com/tutorials/ubuntu/install-intel-graphic-drivers
 * https://packages.ubuntu.com/source/focal/intel-gmmlib
-* 
-
+*

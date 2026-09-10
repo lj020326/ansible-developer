@@ -1,5 +1,5 @@
 ﻿
-Import-Module PowerShellLogging 
+Import-Module PowerShellLogging
 
 function global:Write-Log {
     [CmdletBinding()]
@@ -15,7 +15,7 @@ function global:Write-Log {
     $Prefix = $Prefix.Trim()
 
     if ($Prefix) { $Prefix = "$Prefix " }
-        
+
     $Now = Get-Date -Format 'G'
     $Line = "$Now - $Prefix$Line"
 
@@ -23,7 +23,7 @@ function global:Write-Log {
 
 }
 
-function test-function { 
+function test-function {
 
     Write-Verbose "Testing log"
 
@@ -47,13 +47,13 @@ $logFile = Enable-OutputSubscriber -OnWriteDebug   { Write-Log -Path $logPath -L
 Write-Verbose "After output subscription"
 Write-Verbose -Verbose 'Hello, Verbose world'
 
-$VerbosePreference = 'Continue' 
+$VerbosePreference = 'Continue'
 Write-Verbose "After output subscription and enabling verbose"
 Write-Host 'Hello, world'
 Write-Output 'Hello, Output world'
 
-test-function 
+test-function
 
-$logFile | Disable-OutputSubscriber 
+$logFile | Disable-OutputSubscriber
 
 Get-Content $logPath

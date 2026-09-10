@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Python script for the Interoute Virtual Data Centre API:
 #   Name: disk_offering_get_all.py
-#   Purpose: List all the available disk offerings 
+#   Purpose: List all the available disk offerings
 #   Requires: class VDCApiCall in the file vdc_api_call.py
 # For download and information:
 #   http://cloudstore.interoute.com/main/knowledge-centre/library/vdc-api-python-scripts

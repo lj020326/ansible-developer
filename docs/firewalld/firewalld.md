@@ -15,8 +15,8 @@ When getting the following error:
 internal:0:0-0: Error: No such file or directory
 'python-nftables' failed: internal:0:0-0: Error: No such file or directory
 ```
-	
-	
+
+
 It is usually due to missing table or chain:
 
 ref: https://askubuntu.com/questions/1320012/firewalld-no-such-file-or-directory
@@ -31,19 +31,19 @@ nft add table inet firewalld
 
 If still having issues, then reset the firewalld state the following way:
 
-You may simply delete the files containing the customized zone rules from `/etc/firewalld/zones`. 
-After that, reload `firewalld` with `firewall-cmd --complete-reload`, and it should start using the default settings. 
+You may simply delete the files containing the customized zone rules from `/etc/firewalld/zones`.
+After that, reload `firewalld` with `firewall-cmd --complete-reload`, and it should start using the default settings.
 When you make changes to the zone rules, files will appear again in that directory.
 
-As for `iptables`, you may reset all rules with `iptables -F`. 
-Rebooting works as well, unless you implemented some sort of persistency. 
+As for `iptables`, you may reset all rules with `iptables -F`.
+Rebooting works as well, unless you implemented some sort of persistency.
 Beware that `firewalld` may be configured to use `iptables` as its backend, which means it will add or remove `iptables` rules itself, according to what you specified in its zone rules.
 
 If using iptables and you truly want to delete everything:
 
 ```shell
 rm -rf /etc/firewalld/zones
-## or 
+## or
 rm -fr /usr/etc/firewalld/zones ## depending on your distro
 
 ## AND
@@ -120,7 +120,7 @@ $ grep FINAL_REJECT /var/log/syslog | awk -F[' '] '{$1=$2=$3=$5=$11=""; print $0
 ## verify nothing is rejected - if so, we can now disable the rejected logging from the firewall
 $ firewall-cmd --set-log-denied=off
 ```
-	
+
 Note the DPT and PROTO - this lets you know the destination port and protocol that was attempted and rejected
 
 FYI - needed to open 40073 on ubuntu for vmware esxi to mount:
@@ -138,7 +138,7 @@ nfs_firewalld_exposed_ports:
 $ root@nas02:[administrator]$ firewall-cmd --set-log-denied=all
 $ root@nas02:[administrator]$ firewall-cmd --get-log-denied
 $ root@nas02:[administrator]$ firewall-cmd --set-log-denied=off
-$ 
+$
 $ root@nas02:[administrator]$ firewall-cmd --zone=internal --list-all
 internal (active)
 $ root@nas02:[administrator]$ firewall-cmd --zone=internal --permanent --add-port=445/tcp --add-port=139/tcp --add-port=33979/tcp --add-port=40073/udp --zone=internal
@@ -466,4 +466,3 @@ $ root@admin2:[administrator]$ firewall-cmd --zone=internal --list-all
 internal (active)
 
 ```
-

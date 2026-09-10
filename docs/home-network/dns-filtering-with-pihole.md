@@ -18,7 +18,7 @@ As an example, the following are all valid IP addresses:
 ```
 10.10.10.10
 127.0.0.1   # Often called "localhost" and will exist on a network-capable device even if it is not attached to another network
-8.8.8.8     
+8.8.8.8
 169.254.169.254
 ```
 

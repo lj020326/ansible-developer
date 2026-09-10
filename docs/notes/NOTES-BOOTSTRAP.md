@@ -25,25 +25,25 @@
 
     ```bash
     TARGET_HOST=[hostname or IP]
-    
+
     # Remove the old key(s) from known_hosts
     ssh-keygen -R $TARGET_HOST
-    
+
     # Add the new key(s) to known_hosts (and also hash the hostname/address)
     ssh-keyscan -H $TARGET_HOST >> ~/.ssh/known_hosts
-    
+
     ```
 
     ```bash
     ssh-keygen -R node01.example.int -f ~/.ssh/known_hosts
-    
+
     ansible -i host.ini all -a "grep ^root: /etc/shadow"  -b
     ansible -i inventory all -a "grep ^root: /etc/shadow"  -b
     ```
 
 Additional Notes:
 
-To ping 
+To ping
 
 	ansible -m ping all
 	ansible -i inventory -m ping all
@@ -100,6 +100,6 @@ bootstrap-users.sh ubuntu18
 history | grep bootstrap
 bootstrap-users.sh ubuntu18
 gethist | grep bootstrap | uniq
-gethist | grep bootstrap | uniq >> NOTES.md 
+gethist | grep bootstrap | uniq >> NOTES.md
 
 ```

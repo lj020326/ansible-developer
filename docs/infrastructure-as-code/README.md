@@ -33,7 +33,7 @@ In fact, "DevOps" teams are held to even higher standards, since the infrastruct
 * quality
 * risk
 
-## Infrastructure domains 
+## Infrastructure domains
 
 The infrastructure automation spans infrastructure domains including:
 
@@ -61,12 +61,12 @@ The infrastructure automation spans infrastructure domains including:
     - ssh (linux)
     - ntlm/winrm (windows)
 
-* Hypervisor OS 
+* Hypervisor OS
   - vmware ESX
   - vmware vcenter server appliance (VCSA) (Photon)
   - hyperv (Windows Server 2019)
 
-* Compute Operating Systems (OS) 
+* Compute Operating Systems (OS)
   - redhat (RHEL/LNX)
   - windows (WIN)
 
@@ -89,7 +89,7 @@ The infrastructure automation spans infrastructure domains including:
   - vmware vswitch
   - openstack vswitch
 
-* Container Platforms 
+* Container Platforms
   - Openshift
   - Kubernetes(k8s)
   - Docker swarm
@@ -114,7 +114,7 @@ The infrastructure automation spans infrastructure domains including:
 
 Infrastructure as Code is an automation development framework that seeks to:
 
-### Goal 1: automate routine infrastructure tasks 
+### Goal 1: automate routine infrastructure tasks
 
 The infrastructure automation spans routine tasks including:
 
@@ -129,7 +129,7 @@ The infrastructure automation spans routine tasks including:
 
 Store all code for intended/designed inventory configuration state and execution code in online repository.
 
-Examples here include bitbucket, github, etc... 
+Examples here include bitbucket, github, etc...
 
 ### Goal 3: separate configuration state from runtime execution code
 
@@ -158,7 +158,7 @@ As such, processes are used to design, develop, and test/verify the related auto
 
 At a high level, infrastructure automations usually observe the following patterns:
 
-### Scope 1: Client / Server SW Deployments 
+### Scope 1: Client / Server SW Deployments
 
 Many use cases require network-specific servers/fixtures/assets to be setup to serve/enable clients for respective network groups within an enterprise.
 
@@ -219,15 +219,8 @@ Some example use cases involving servers within networks serving clients machine
 ### Step 7: Using Bootstrap OS Provisioning Plays to create VM OS Templates
 ![Using Bootstrap OS Provisioning Plays to create VM OS Templates](./img/iac-plays-to-bootstrap-os-templates.png)
 
-### Step 8: Running PR Pipelines to Automate Code Feature Testing 
+### Step 8: Running PR Pipelines to Automate Code Feature Testing
 ![Running PR Pipelines to Automate Code Feature Testing](./img/iac-pr-pipelines-to-automate-code-testing.png)
   This will assure that code works as intended enabling high-quality code deployments.
 
 ### Step 9: many more...
-
-
-
-
-
-
-

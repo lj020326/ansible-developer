@@ -174,4 +174,4 @@ But Job DSL is not the only tool in the Jenkins ecosystem that follows the Every
 * https://github.com/jenkinsci/job-dsl-plugin/wiki/Real-World-Examples
 * https://stackoverflow.com/questions/69364938/error-creating-jobdsl-parameters-programatically
 * https://plugins.jenkins.io/job-dsl
-* 
+*

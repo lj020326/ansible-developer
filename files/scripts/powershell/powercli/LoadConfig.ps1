@@ -7,12 +7,12 @@
 ##
 ## at the top of your scripts you can execute:
 ## .\LoadConfig scriptname.config
-## 
+##
 ## and then access settings like so:
-## 
+##
 ## $appSettings["MaxScanDetailRows"]
 ## 500
-## 
+##
 
 param($path = $(throw "You must specify a config file"))
 $global:appSettings = @{}

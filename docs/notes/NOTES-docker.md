@@ -32,4 +32,4 @@ This will export the value stored in the secret to the correct environment varia
 * https://medium.com/@adrian.gheorghe.dev/using-docker-secrets-in-your-environment-variables-7a0609659aab
 * https://stackoverflow.com/questions/48094850/docker-stack-setting-environment-variable-from-secrets
 * https://pythonspeed.com/articles/build-secrets-docker-compose/
-* 
+*

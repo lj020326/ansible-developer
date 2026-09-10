@@ -45,4 +45,3 @@ wt new-tab -p %tab1_profile% --title %tab1_title% --suppressApplicationTitle ; ^
   new-tab -p %tab5_profile% --title %tab5_title% -d %tab5_dir% --suppressApplicationTitle ; ^
   new-tab -p %tab6_profile% --title %tab6_title% -d %tab6_dir% --suppressApplicationTitle ; ^
   focus-tab -t 0
-

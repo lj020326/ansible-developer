@@ -23,10 +23,10 @@ This scenario shows:
   when: ansible_distribution == "Ubuntu"
   notify: restart_apache
  ```
- 
+
  ![image](./img/202517097-3f895a18-af2f-4103-a5af-18632dea71df.png)
 
-  
+
 - All 'roles/web_servers/tasks/main.yml':
 ```
 - name: install apache and php
@@ -76,7 +76,7 @@ This scenario shows:
     mode: 0755
 ```
 
-- Create 'handlers' directory under 'roles/web_servers' and create 'main.yml' 
+- Create 'handlers' directory under 'roles/web_servers' and create 'main.yml'
 
 ```
 - name: restart_apache
@@ -93,7 +93,7 @@ This scenario shows:
 ansible-playbook site.yml
 ```
 
-- Update the mail address to trigger the handler (restart_apache). Unless the task that has notify is changed, it cannot trigger handler task.   
+- Update the mail address to trigger the handler (restart_apache). Unless the task that has notify is changed, it cannot trigger handler task.
 
 ![image](./img/202518007-922c1f40-0c66-4a89-a121-8b1c16d5d30b.png)
 
@@ -104,5 +104,3 @@ ansible-playbook site.yml
 - File/Directory structure:
 
 ![image](./img/202518840-c9aa8a6c-a134-444d-9e00-53d60b1ad7dc.png)
-
-

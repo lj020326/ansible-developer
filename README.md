@@ -16,7 +16,7 @@ $ chmod 600 ~/.vault_pass
 
 ### Run the latest install script from shell
 
-For install from public github: 
+For install from public github:
 
 ```shell
 $ INSTALL_REMOTE_SCRIPT="https://raw.githubusercontent.com/lj020326/ansible-developer/main/install-ansibledev.sh" && bash -c "$(curl -fsSL ${INSTALL_REMOTE_SCRIPT})"
@@ -87,7 +87,7 @@ ljohnson@Lees-MBP:[ansible-developer](main)$ which python3
 ~/.pyenv/shims/python3
 ljohnson@Lees-MBP:[ansible-developer](main)$ python3 -V
 Python 3.11.6
-ljohnson@Lees-MBP:[ansible-developer](main)$ 
+ljohnson@Lees-MBP:[ansible-developer](main)$
 ljohnson@Lees-MBP:[ansible-developer](main)$ which ansible
 ~/.pyenv/shims/ansible
 ljohnson@Lees-MBP:[ansible-developer](main)$ ansible --version
@@ -100,10 +100,10 @@ ansible [core 2.16.2]
   python version = 3.11.6 (main, Jan 18 2024, 13:13:46) [Clang 15.0.0 (clang-1500.0.40.1)] (/Users/ljohnson/.pyenv/versions/3.11.6/bin/python3.11)
   jinja version = 3.1.3
   libyaml = True
-ljohnson@Lees-MBP:[ansible-developer](main)$ 
+ljohnson@Lees-MBP:[ansible-developer](main)$
 ljohnson@Lees-MBP:[ansible-developer](main)$ echo $ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN
 <sensitive-data-here>
-ljohnson@Lees-MBP:[ansible-developer](main)$ 
+ljohnson@Lees-MBP:[ansible-developer](main)$
 ```
 
 ### Check that local copy of `ansible-developer` repo exists
@@ -119,11 +119,11 @@ ljohnson@Lees-MBP:[ansible]$ cd ~
 ljohnson@Lees-MBP:[~]$ cd ~/repos/ansible-developer/
 ## 'cddev' alias does the same
 ljohnson@Lees-MBP:[~]$ cddev
-ljohnson@Lees-MBP:[ansible-developer](main)$ 
+ljohnson@Lees-MBP:[ansible-developer](main)$
 ljohnson@Lees-MBP:[ansible-developer](main)$ git remote -v
 origin	git@github.com:lj020326/ansible-developer.git (fetch)
 origin	git@github.com:lj020326/ansible-developer.git (push)
-ljohnson@Lees-MBP:[ansible-developer](main)$ 
+ljohnson@Lees-MBP:[ansible-developer](main)$
 ljohnson@Lees-MBP:[ansible-developer](main)$ ll
 total 28
 drwxr-xr-x. 5 ljohnson domain users   154 Jan 23 15:35 ./
@@ -136,16 +136,16 @@ lrwxrwxrwx. 1 ljohnson domain users    49 Jan 23 15:35 install-ansibledev-local.
 -rwxr-xr-x. 1 ljohnson domain users 10091 Jan 23 15:35 install.sh*
 -rw-r--r--. 1 ljohnson domain users 10316 Jan 23 15:35 README.md
 lrwxrwxrwx. 1 ljohnson domain users    37 Jan 23 15:35 sync-bashenv.sh -> files/scripts/sync-bashenv.sh*
-ljohnson@Lees-MBP:[ansible-developer](main)$ 
+ljohnson@Lees-MBP:[ansible-developer](main)$
 
 ```
 
 ## To enhance/develop the ansible-developer repo
 
-### Clone the dev repo 
+### Clone the dev repo
 
 ```shell
-$ git clone git@github.com:lj020326/ansible-developer.git 
+$ git clone git@github.com:lj020326/ansible-developer.git
 $ git checkout -b "develop-[developer-initials-here]"
 ## make enahncements/modification
 $ git add .
@@ -153,7 +153,7 @@ $ git commit -m 'enhancements'
 $ git push -u origin develop-[developer-initials-here]
 ```
 
-### Copy the developer bash environment (Config-as-code in developer-repo in developer-specific branch ) 
+### Copy the developer bash environment (Config-as-code in developer-repo in developer-specific branch )
 
 The developer bash environment assumes you are working in one of the following platforms/os-environments:
 1) MacOS bash
@@ -163,14 +163,14 @@ The developer bash environment assumes you are working in one of the following p
 ```shell
 ljohnson@Lees-MBP:[ansible-developer](~)$ cddev
 ljohnson@Lees-MBP:[ansible-developer](main)$ git switch "develop-[developer-initials-here]"
-ljohnson@Lees-MBP:[ansible-developer](develop-lj)$ cp -p files/scripts/bashenv/.bash* ~/ 
+ljohnson@Lees-MBP:[ansible-developer](develop-lj)$ cp -p files/scripts/bashenv/.bash* ~/
 ```
 
 ### Source the bash env
 
 ```shell
 ljohnson@Lees-MBP:[ansible-developer](main)$ . ~/.bashrc
-## or alias '.bash' does same if the ansible-developer env was already loaded 
+## or alias '.bash' does same if the ansible-developer env was already loaded
 ## and want to reload latest env/alias/function definitions
 ljohnson@Lees-MBP:[ansible-developer](main)$ .bash
 ljohnson@Lees-MBP:[ansible-developer](main)$
@@ -193,7 +193,7 @@ $ syncbashenv
 ## view syncbashenv definition
 $ alias syncbashenv
 alias syncbashenv='${ANSIBLE_DEVELOPER_REPO}/sync-bashenv.sh && . ~/.bashrc'
-$ 
+$
 ```
 
 Where `ANSIBLE_DEVELOPER_REPO` is set on the `~/.bash_env` as
@@ -221,7 +221,7 @@ Alias definitions in [files/scripts/bashenv/.bash_aliases](files/scripts/bashenv
 cagetpwd ## get ca pwd for user defined in env var $CYBERARK_ACCOUNT_USERNAME
 syncbashenv  ## perform rsync from repo/files/scripts/bashenv/.bash* to $HOME/ and copy encrypted .bash_secrets to ~/
 
-getsitecertinfo ## pass the site endpoint to get site ssl cert info (e.g., 'getsitecertinfo somesite.example.com 443') 
+getsitecertinfo ## pass the site endpoint to get site ssl cert info (e.g., 'getsitecertinfo somesite.example.com 443')
 
 ll
 la
@@ -316,7 +316,7 @@ get-certs
 get-largest-docker-image-sizes
 
 getbranchhist
-getgitcomment ## create a git comment prefixed with getgitrequestid() result and based on the changes 
+getgitcomment ## create a git comment prefixed with getgitrequestid() result and based on the changes
 getgitrequestid ## extract git comment prefix based on regex of branch
 
 gitbranchdelete
@@ -424,7 +424,7 @@ total size is 32,365  speedup is 355.66
  setting aliases
 .bash_aliases configuring shell aliases...
 .bash_aliases setting aliases for DARWIN env
-[ansible-developer](main)$ 
+[ansible-developer](main)$
 ```
 
 ### `cagetpwd` function to get cyberark password using api
@@ -451,15 +451,23 @@ The following alias definitions assume that the developer has already added the 
 ```shell
 [ansible-developer](main)$ sshtestd1s1
 Last login: Sun Oct 22 15:35:57 2023 from 172.31.0.190
-DEV  [ljohnson@testlinuxd1s1 ~]$ 
+DEV  [ljohnson@testlinuxd1s1 ~]$
 DEV  [ljohnson@testlinuxd1s1 ~]$ exit
 
 [ansible-developer](main)$ sshtestd1s4
 Activate the web console with: systemctl enable --now cockpit.socket
 
 Last login: Fri Oct 27 15:00:19 2023 from 172.21.1.76
-[ljohnson@testlinuxd1s4 ~]$ 
+[ljohnson@testlinuxd1s4 ~]$
 DEV  [ljohnson@testlinuxd1s1 ~]$ exit
-[ansible-developer](main)$ 
+[ansible-developer](main)$
 
 ```
+
+---
+
+## 🛡️ Identity & Maintainer
+* **Maintainer:** Lee Johnson
+* **Contact:** <ljohnson@dettonville.org>
+* **LinkedIn:** https://www.linkedin.com/in/leejjohnson/
+* **System Framework:** [Dettonville Cloud Infrastructure Services](https://dettonville.org)

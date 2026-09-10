@@ -38,7 +38,7 @@ diskutil umount /mount/point
 diskutil umount force /mount/point
 ```
 
-Or 
+Or
 
 ```shell
 fusermount -u /mount/point
@@ -54,7 +54,7 @@ sshfs -odebug,sshfs\_debug,loglevel=debug username@remote:/remote/directory /mou
 
 ## Syncing files/dirs based on file changes
 
-lsyncd seems to be the ideal solution. 
+lsyncd seems to be the ideal solution.
 It combines inotify (kernel builtin function witch watches for file changes in a directory trees) and rsync (cross platform file-syncing-tool).
 
 Example
@@ -85,4 +85,3 @@ lsyncd -rsyncssh /home remotehost.org backup-home/
 * https://github.com/osxfuse/osxfuse/issues/384
 * https://github.com/tormodwill/macSSHFS/discussions/4
 * https://serverfault.com/questions/148665/is-it-possible-to-sync-two-linux-directories-in-real-time
-

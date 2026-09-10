@@ -16,16 +16,16 @@ $BodyTemplate = @"
         "title": "Active Directory: FULLNAME Account Locked-Out",
         "sections": [
             {
-           
+
                 "facts": [
                     {
                         "name": "Username:",
                         "value": "DOMAIN_USERNAME"
-                    },                  
+                    },
                     {
                         "name": "From Server/ Computer:",
                         "value": "CALLERID"
-                    },                
+                    },
                     {
                         "name": "LockoutTime Time:",
                         "value": "LOCKOUTTIME"
@@ -48,8 +48,8 @@ $BodyTemplate = @"
 if (Search-ADAccount -LockedOut){
     foreach ($user in (Search-ADAccount -LockedOut)){
         $Event = get-lockedoutInfo -username $($user.samaccountname) -justPdc $false
-        $body = $BodyTemplate.Replace("DOMAIN_USERNAME",$($user.samaccountname)).Replace("FULLNAME",$user.name).Replace("DATETIME",$(Get-Date)).Replace("CALLERID", $Event.callerid).Replace("DC", $Event.DC).Replace("LOCKOUTTIME", $Event.Time)    
-        Invoke-RestMethod -uri $TeamsChannelUri -Method Post -body $body -ContentType 'application/json'        
+        $body = $BodyTemplate.Replace("DOMAIN_USERNAME",$($user.samaccountname)).Replace("FULLNAME",$user.name).Replace("DATETIME",$(Get-Date)).Replace("CALLERID", $Event.callerid).Replace("DC", $Event.DC).Replace("LOCKOUTTIME", $Event.Time)
+        Invoke-RestMethod -uri $TeamsChannelUri -Method Post -body $body -ContentType 'application/json'
     }
 }
 exit 0

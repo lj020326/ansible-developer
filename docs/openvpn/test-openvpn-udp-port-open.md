@@ -11,4 +11,4 @@ Connection to 192.168.10.12 1194 port [udp/openvpn] succeeded!
 ## Reference
 
 - https://www.quora.com/Can-we-Telnet-UDP-port
-- 
+-

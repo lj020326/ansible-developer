@@ -28,20 +28,20 @@ function Get-LockedOutInfo
     }
     Process
     {
-       
+
         $DClist = (Get-ADDomainController -Filter * )
-       
-        if ($justPDC){            
+
+        if ($justPDC){
              $DClist = $DClist | Where-Object { $_.OperationMasterRoles -contains "PDCEmulator" }
-        }        
+        }
         $results = (@())
-        foreach ($addc in ($DClist| Select-Object -ExpandProperty hostname)){          
-           
+        foreach ($addc in ($DClist| Select-Object -ExpandProperty hostname)){
+
             if (Test-Connection -Quiet -count 1 -ComputerName $addc){
                 $LockoutEvents = Get-WinEvent -ComputerName $addc -FilterHashtable @{Logname="Security";ID=4740} -ErrorAction SilentlyContinue
                 if ($LockoutEvents){
                     $time = $LockoutEvents[0].TimeCreated
-                    $details = $LockoutEvents[0].message            
+                    $details = $LockoutEvents[0].message
                     if ($details -match $username -and $details -match  "Caller Computer Name:\s([a-zA-Z\-0-9]*)"){
                         $results +=( @{
                             'Username' = $username;
@@ -49,13 +49,13 @@ function Get-LockedOutInfo
                             'Time' = $time;
                             'DC'="$addc"
                         })
-                           
+
                     }
                 }
             }
             else {
                 Write-Warning "$addc not reachable"
-            }            
+            }
         }
         return $results
     }

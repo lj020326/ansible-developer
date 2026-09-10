@@ -1,5 +1,5 @@
 
-# Example 3: Playbook using multiple YAML inventories with group requirement sufficiency  
+# Example 3: Playbook using multiple YAML inventories with group requirement sufficiency
 
 In the prior [Example 2](../example2/README.md), with running on the merged inventory, the expected results were that only the appropriate network group would be assigned for each host.
 Instead, we found that all the hosts in both networks have both 'network' groups assigned.
@@ -142,8 +142,8 @@ ok: [web02.qa.net1site1.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -180,8 +180,8 @@ ok: [web02.qa.net1site2.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -219,8 +219,8 @@ ok: [web02.qa.net2site1.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -257,8 +257,8 @@ ok: [web02.qa.net2site2.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -367,14 +367,14 @@ ok: [web02.qa.net2site2.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -384,7 +384,7 @@ Run debug using a group defined set of hosts.
 
 Run for group 'network2'
 ```shell
-ansible -i ./inventory/ network2 -m debug -a var=trace_var 
+ansible -i ./inventory/ network2 -m debug -a var=trace_var
 web01.qa.net2site1.example.int | SUCCESS => {
     "trace_var": "network2/site1/web01.qa.net2site1.example.int"
 }

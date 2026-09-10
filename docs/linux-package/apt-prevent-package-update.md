@@ -70,4 +70,4 @@ To undo this, just do the same and, this time select **Unlock Version**.
 ## Reference
 
 - https://itsfoss.com/prevent-package-update-ubuntu/
-- 
+-

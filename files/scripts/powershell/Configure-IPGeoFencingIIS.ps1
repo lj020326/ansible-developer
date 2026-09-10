@@ -7,7 +7,7 @@ https://www.undocumented-features.com/2018/02/08/implementing-geo-filtering-with
 
 PLEASE NOTE:
 I recommend using the -OnlyExportIPSecurityXML otherwise for thousands of subnets this process
-can take several hours. 
+can take several hours.
 In IIS you’ll also need to update or verify the allow/deny policy of the site (IIS | Sites | <site> | IP Address and Domain Restrictions | Edit Feature Settings and review the value for “Access for unspecified clients”) to DENY
 
 #>

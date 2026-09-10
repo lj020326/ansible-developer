@@ -1,15 +1,15 @@
 ---
-name: Development Workflow
-globs: ["**/*"]
+name: Python Best Practices (ansible-developer)
+globs: ["**/*.py"]
 alwaysApply: true
-description: General coding and TDD standards
+description: Standards for Python scripts in this repo
 ---
 
-# Development Workflow
+# Python Standards
 
-- Adhere to / Follow DRY (Don't Repeat Yourself) patterns where practical
-- Follow Test-Driven Development (TDD) where practical
-- Make small, incremental, reviewable changes
-- Keep existing tests passing before adding new functionality
-- Write clear, self-documenting code
-- Update documentation for any user-facing changes
+- Follow PEP 8 / Google style
+- Use type hints for public functions
+- Prefer `pathlib` over `os.path`
+- Include clear docstrings
+- Add proper error handling and logging
+- Make scripts usable both as modules and CLI tools when appropriate

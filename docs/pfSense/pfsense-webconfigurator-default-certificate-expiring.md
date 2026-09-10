@@ -39,7 +39,7 @@ Now we can go to **Certificates** and create a new one.
 
 ![](./img/pfSense_webConfigurator_Certificate_expiring007.png)
 
-  
+
 Before we can delete the expired certificate and pfSense is using the new one for the WebGUI, we first have to change the certificate under **System -> Advanced** in the **webConfigurator section**.
 
 ![](./img/pfSense_webConfigurator_Certificate_expiring008.png)

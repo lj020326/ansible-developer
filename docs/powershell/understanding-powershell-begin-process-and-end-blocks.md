@@ -26,7 +26,7 @@ function New-WorkDay {
         [string[]]
         $WorkItem
     )
-    
+
     begin {
         Start-Alarm -ErrorAction SilentlyContinue | Exit-Sleep -Force
         Enter-Bathroom
@@ -37,7 +37,7 @@ function New-WorkDay {
         Invoke-Driving -From Home -To Work -ErrorAction Stop
         Start-WorkDay -Hours 8
     }
-    
+
     process {
         foreach($item in $WorkItem){
             switch ($item) {
@@ -47,7 +47,7 @@ function New-WorkDay {
             }
         }
     }
-    
+
     end {
         Stop-WorkDay
         Invoke-Driving -From Work -To Home
@@ -104,11 +104,11 @@ function Example-BeginProcessEnd {
     begin {
        Write-Host 'Calling Begin Block'
     }
-    
+
     process {
         Write-Host "Calling Process Block with $WorkItem variable"
     }
-    
+
     end {
        Write-Host 'Calling End Block'
     }

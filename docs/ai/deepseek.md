@@ -87,17 +87,17 @@ import torch
 
 def test_deepseek():
     tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base")
-    
+
     prompt = "Write a simple Hello World program in Python"
     inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-    
+
     outputs = model.generate(
         **inputs,
         max_length=100,
         num_return_sequences=1,
         temperature=0.7
     )
-    
+
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     print(response)
 
@@ -132,4 +132,3 @@ tegrastats
    - Using a cooling fan
    - Closing unnecessary background processes
    - Regular system updates
-

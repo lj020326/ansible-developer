@@ -1,0 +1,49 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+ci:
+  autoupdate_schedule: quarterly
+#  skip:
+#    - local-ansible-lint
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.(ldif|schema)(\.j2)?$
+      - id: end-of-file-fixer
+        exclude: \.(ldif|schema)(\.j2)?$
+      - id: check-json
+        files: ^(files|tests)/
+        exclude: files/env/dev/vscode
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+        files: ^(files|tests)/
+        exclude: |
+          (?x)^(
+              files/private/|
+              files/scripts/apache-utils/docker/|
+              tests/unit/test_redact\.py
+          )
+      - id: mixed-line-ending
+        files: ^(files|tests)/
+        exclude: \.(ldif|schema)(\.j2)?$
+
+#  - repo: https://github.com/shellcheck-py/shellcheck-py
+#    rev: v0.10.0.1
+#    hooks:
+#      - id: shellcheck
+#        name: Check Shell Scripts (shellcheck)
+##        files: ^(files|tests)/
+#        files: files/scripts
+#        types: [shell]
+#        exclude: "**/archive/"
+#        exclude: |
+#          (?x)(
+#              archive/
+#              ^files/private/|
+#              ^files/scripts/apache-utils/docker/|
+#              ^tests/unit/test_redact\.py
+#          )

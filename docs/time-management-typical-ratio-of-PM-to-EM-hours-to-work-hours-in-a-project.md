@@ -64,6 +64,4 @@ Also, the time amount depends very much on complexity of your project. I disting
 
 - [How can a new PM manage a failing project in a few hours per week?](https://pm.stackexchange.com/q/6549/4271)
 - https://pm.stackexchange.com/questions/8509/what-is-the-typical-ratio-of-pm-em-hours-to-work-hours-in-a-project
-- 
-
-
+-

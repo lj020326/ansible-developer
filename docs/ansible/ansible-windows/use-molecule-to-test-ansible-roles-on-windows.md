@@ -6,9 +6,9 @@ The goal is to test Ansible roles for Windows with Molecule, using SSH public ke
 **Versions used**
 
 ```output
-Molecule: 3.3  
-Driver: Openstack  
-Target OS: Windows Server 2019  
+Molecule: 3.3
+Driver: Openstack
+Target OS: Windows Server 2019
 OpenSSH: Win32-OpenSSH v8.1.0.0p1-Beta
 ```
 
@@ -34,7 +34,7 @@ winrm set winrm/config/service/auth @{Basic="true";CredSSP="true"}
 $result = sc.exe config WinRM start= auto
 ```
 
-Next, we’ll run an Ansible role on the server, to setup Win32-OpenSSH.  
+Next, we’ll run an Ansible role on the server, to setup Win32-OpenSSH.
 We’ll use the [existing role](https://galaxy.ansible.com/jborean93/win_openssh) from Ansible galaxy for this.
 
 ```shell
@@ -79,7 +79,7 @@ Take a snapshot/image of this instance, we’ll use this image to launch an inst
 
 **Molecule**
 
-Within your Ansible role dir, initiate a new Molecule scenario.  
+Within your Ansible role dir, initiate a new Molecule scenario.
 This will create a molecule directory with a default scenario.
 
 ```shell
@@ -104,7 +104,7 @@ provisioner:
     ansible_shell_type: powershell
 ```
 
-Edit _prepare.yml_ and insert any tasks you want to run, before testing your actual roles will start. Remove the _Install python for Ansible_ task in this file, this won’t work on Windows.  
+Edit _prepare.yml_ and insert any tasks you want to run, before testing your actual roles will start. Remove the _Install python for Ansible_ task in this file, this won’t work on Windows.
 
 For example, I install chocolatey in this stage:
 
@@ -122,7 +122,7 @@ For example, I install chocolatey in this stage:
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 ```
 
-Almost ready to run Molecule, but we need to load the Openstack & Molecule variables first.  
+Almost ready to run Molecule, but we need to load the Openstack & Molecule variables first.
 Download your Openstack RC file, and create a file for the Molecule variables:
 
 ```shell
@@ -135,9 +135,9 @@ Load variables from both files:
 source ~/ansible/openrc.shsource ~/ansible/molecule.sh
 ```
 
-All ready to run molecule on your role now.  
-_test_ will launch the full molecule test sequence  
-_create_ will only create your Openstack instance  
+All ready to run molecule on your role now.
+_test_ will launch the full molecule test sequence
+_create_ will only create your Openstack instance
 _login_ will create the instance and logon
 
 Read more information on the different Molecule stages [here](https://molecule.readthedocs.io/en/latest/).
@@ -152,7 +152,7 @@ molecule test
 
 **CI integration**
 
-You can integrate Molecule in your CI/CD, for example Gitlab.  
+You can integrate Molecule in your CI/CD, for example Gitlab.
 Create a Docker image with all the requirements we made in the previous steps, and use it like this:
 
 ```yaml

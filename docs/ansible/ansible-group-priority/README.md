@@ -52,8 +52,8 @@ With group vars defined in:
 
 There is a concept of group depth in Ansible (at least in recent versions). In this example, group variables for host `bot2` will be populated in the following order:
 
-depth 0: group `all`, `all.yml` (missing here, ignoring)  
-depth 1: group `bots`, `bots.yml`  
+depth 0: group `all`, `all.yml` (missing here, ignoring)
+depth 1: group `bots`, `bots.yml`
 depth 2: group `bots-b`, `bots-b.yml`
 
 You can see details for the [host group vars processing order](https://github.com/ansible/ansible/blob/stable-2.13/lib/ansible/plugins/vars/host_group_vars.py#L72) and the [combine_vars utility function it uses](https://github.com/ansible/ansible/blob/stable-2.13/lib/ansible/utils/vars.py#L81) in the source code.
@@ -85,7 +85,7 @@ In this example, if both groups have the same priority, the result would normall
 
 ## Example Use Cases Covered
 
-The purpose of the following examples is to understand how to leverage child group vars especially with respect to deriving the expected behavior for variable merging. 
+The purpose of the following examples is to understand how to leverage child group vars especially with respect to deriving the expected behavior for variable merging.
 The examples will explore common group prioritization use cases:
 
 * [Example 1: Test with child groups having same depth](./example1/README.md)
@@ -118,4 +118,3 @@ ansible [core 2.12.3]
   jinja version = 3.1.0
   libyaml = True
 ```
-

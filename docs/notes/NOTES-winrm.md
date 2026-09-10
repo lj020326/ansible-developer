@@ -12,7 +12,7 @@ pip install pywinrm
 
 ### Enable winRM [^2]
 
-First enable winRM on windows workstation machine(s). 
+First enable winRM on windows workstation machine(s).
 
 Assuming we have powershell >=v7.0:
 
@@ -54,7 +54,7 @@ If you get the below response, then the WinRM connection is successful.
 
 ```
 PS C:\Users\Administrator> Test-WSMan -ComputerName Test1-Win2k12
-wsmid               :    http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd  
+wsmid               :    http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd
 ProtocolVersion     :    http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd
 ProductVendor       :    Microsoft Corporation
 ProductVersion      :    OS: 0.0.0 SP: 0.0 Stack: 3.0
@@ -76,7 +76,7 @@ powershell.exe -ExecutionPolicy ByPass -File .\ConfigureRemotingForAnsible.ps1 -
 The newly created ansible user cert will be written to $env:TMP.
 
 
-## 
+##
 
 Using the option to disable/skip CA Check as described [here](https://adamtheautomator.com/winrm-ssl/)
 
@@ -123,4 +123,3 @@ PS WSMan:\localhost\Client>
 [^4]: [Verifying WinRM Connectivity](http://www.dhruvsahni.com/verifying-winrm-connectivity)
 
 [^5]: [How to Set up PSRemoting with WinRM and SSL [Step by Step]](https://adamtheautomator.com/winrm-ssl/)
-

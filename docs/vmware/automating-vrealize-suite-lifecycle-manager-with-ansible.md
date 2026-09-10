@@ -560,4 +560,3 @@ I am also looking for collaborators on this project, so if you would like to con
 ## References
 
 * https://www.simplygeek.co.uk/2019/06/22/automating-vrealize-suite-lifecycle-manager-vidm-and-vrealize-automation-with-ansible-part-1-setting-up-the-environment/
-

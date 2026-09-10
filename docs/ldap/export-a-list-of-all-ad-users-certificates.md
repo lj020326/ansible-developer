@@ -28,9 +28,9 @@ You can try the PS script below.
   } | Export-Csv -NoTypeInformation $path\certs.csv
 
 ```
-  
 
-Here is the result:  
+
+Here is the result:
 ![87553-display1.png](./img/87553-display1.png)
 
 
@@ -38,7 +38,7 @@ Here is the result:
 
 After lots of test in my lab, I can get the result as below.
 
-1.Here is my OU named LAPS1, there are three users in it.  
+1.Here is my OU named LAPS1, there are three users in it.
 
 ![86047-ps2.png](./img/86047-ps2.png)
 
@@ -46,11 +46,11 @@ After lots of test in my lab, I can get the result as below.
 
 ```powershell
  $ou = "ou=laps1,dc=b,dc=local"
- $path ="C:\certs" 
+ $path ="C:\certs"
  get-aduser -SearchBase $ou -Filter * -Properties usercertificate |ForEach-Object{
   $_|select -ExpandProperty usercertificate | ForEach-Object{
       [System.Security.Cryptography.X509Certificates.X509Certificate2]$_  | select -Property Serialnumber, EnhancedKeyUsageList, notafter, notbefore, issuer, subject
-    
+
  } | Export-Csv -NoTypeInformation $path\$($_.name)_certs.csv
  }
 ```
@@ -59,15 +59,15 @@ After lots of test in my lab, I can get the result as below.
 
 **Tip:Please change the OU name and domain name and export path based on your AD environment.**
 
-3.We can see one csv file for one user  
+3.We can see one csv file for one user
 ![86017-ps5.png](./img/86017-ps5.png)
 
-4.For example: we can see cert list for daisy11 and daisy22.  
-Daisy 11  
+4.For example: we can see cert list for daisy11 and daisy22.
+Daisy 11
 ![85999-ps3.png](./img/85999-ps3.png)
 
-Daisy22  
-![86000-ps4.png](./img/86000-ps4.png)  
+Daisy22
+![86000-ps4.png](./img/86000-ps4.png)
 You can try the PS command in your AD environment.
 
 
@@ -77,22 +77,22 @@ We can run PS script below.
 
 ```powershell
  $ou = "ou=laps1,dc=b,dc=local"
- $path ="C:\certs" 
+ $path ="C:\certs"
  get-aduser -SearchBase $ou -Filter * -Properties usercertificate |ForEach-Object{
   $_|select -ExpandProperty usercertificate | ForEach-Object{
       [System.Security.Cryptography.X509Certificates.X509Certificate2]$_  | select -Property Serialnumber, EnhancedKeyUsageList, notafter, notbefore, issuer, subject
-    
+
  }
- } | Export-Csv -NoTypeInformation $path\certs.csv 
+ } | Export-Csv -NoTypeInformation $path\certs.csv
 
 ```
 
 Tip: Change the last line.
 
-The result (all users certificates within the OU in the same Excel file):  
+The result (all users certificates within the OU in the same Excel file):
 ![86722-vv1.png](./img/86722-vv1.png)
 
 ## Reference
 
 * https://docs.microsoft.com/en-us/answers/questions/349196/export-a-list-of-all-ad-users-certificates-from-ea.html
-* 
+*

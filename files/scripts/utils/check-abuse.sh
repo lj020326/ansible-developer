@@ -12,7 +12,7 @@ if [[ $NETWORK == "" ||  $API_KEY == "" ]]; then
         exit 1
 fi
 # NOTES
-# If you want use this script as a custom Nagios Check copy it on 
+# If you want use this script as a custom Nagios Check copy it on
 # /usr/local/nagios/libexec/ and use the exit values that are commented out below
 
 AbuseIPCheck=$(curl -s -G https://api.abuseipdb.com/api/v2/check-block \
@@ -23,7 +23,7 @@ AbuseIPCheck=$(curl -s -G https://api.abuseipdb.com/api/v2/check-block \
 
 if [ "$AbuseIPCheck" != [] ]; then
         echo "CRITICAL: $AbuseIPCheck";
-        #exit 2 #Comment out for Nagios 
+        #exit 2 #Comment out for Nagios
 else
         echo "OK";
         #exit 0 #Comment out for Nagios

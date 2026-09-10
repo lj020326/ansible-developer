@@ -9,7 +9,7 @@ connect-azuread
 # CHECK THE DETAILS OF YOUR AAD TENANT
 # Get-AzureADTenantDetail -All $true
 
-# GET THE AAD SECURITY GROUPS OF YOUR USERS 
+# GET THE AAD SECURITY GROUPS OF YOUR USERS
 # Replace the 2 UserPrincipalName of your e.g.  john.doe@contoso.com
 $USERS = "UPN_OF_USER_A", "UPN_OF_USER_B"
 

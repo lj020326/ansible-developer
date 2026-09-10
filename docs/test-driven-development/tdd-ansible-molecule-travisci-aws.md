@@ -5,8 +5,8 @@ By implementing Test-driven development and Continuous Integration for infrastru
 
 ## Ansible & Molecule – blog series
 
-Part 1: [Test-driven infrastructure development with Ansible & Molecule](./test-driven-infrastructure-ansible-molecule-and-testinfra.md)  
-Part 2: [Continuous Infrastructure with Ansible, Molecule & TravisCI](tdd-continuous-infrastructure-ansible-molecule-travisci.md)  
+Part 1: [Test-driven infrastructure development with Ansible & Molecule](./test-driven-infrastructure-ansible-molecule-and-testinfra.md)
+Part 2: [Continuous Infrastructure with Ansible, Molecule & TravisCI](tdd-continuous-infrastructure-ansible-molecule-travisci.md)
 Part 3: Continuous cloud infrastructure with Ansible, Molecule & TravisCI on AWS
 
 ## What about the cloud?
@@ -43,7 +43,7 @@ Compared to the Docker or Vagrant scenarios, Molecule generated a few files more
 ```yaml
 scenario:
   name: ec2
- 
+
 driver:
   name: ec2
 platforms:
@@ -51,7 +51,7 @@ platforms:
     image: ami-a5b196c0
     instance_type: t2.micro
     vpc_subnet_id: subnet-6456fd1f
- 
+
 provisioner:
   name: ansible
   lint:
@@ -59,11 +59,11 @@ provisioner:
     enabled: false
   playbooks:
     converge: ../playbook.yml
- 
+
 lint:
   name: yamllint
   enabled: false
- 
+
 verifier:
   name: testinfra
   directory: ../tests/
@@ -96,7 +96,7 @@ The command `molecule init scenario` also generated the `create.yml`. As this is
   vars:
     ssh_user: ubuntu
     ssh_port: 22
- 
+
     security_group_name: molecule
     security_group_description: Security group for testing Molecule
     security_group_rules:
@@ -113,7 +113,7 @@ The command `molecule init scenario` also generated the `create.yml`. As this is
         from_port: 0
         to_port: 0
         cidr_ip: '0.0.0.0/0'
- 
+
     keypair_name: molecule_key
     keypair_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/ssh_key"
   tasks:
@@ -123,21 +123,21 @@ The command `molecule init scenario` also generated the `create.yml`. As this is
         description: "{{ security_group_name }}"
         rules: "{{ security_group_rules }}"
         rules_egress: "{{ security_group_rules_egress }}"
- 
+
     ...
- 
+
     - name: Create keypair
       ec2_key:
         name: "{{ keypair_name }}"
       register: keypair
- 
+
     - name: Persist the keypair
       copy:
         dest: "{{ keypair_path }}"
         content: "{{ keypair.key.private_key }}"
         mode: 0600
       when: keypair.changed
- 
+
     - name: Create molecule instance(s)
       ec2:
         key_name: "{{ keypair_name }}"
@@ -156,7 +156,7 @@ The command `molecule init scenario` also generated the `create.yml`. As this is
       with_items: "{{ molecule_yml.platforms }}"
       async: 7200
       poll: 0
- 
+
     - name: Wait for instance(s) creation to complete
       async_status:
         jid: "{{ item.ansible_job_id }}"
@@ -231,7 +231,7 @@ Therefore we have to **figure out the correct VPC subnet ID of our region.** For
 
 ```shell
 $ aws ec2 describe-subnets
- 
+
 {
     "Subnets": [
         {
@@ -259,7 +259,7 @@ Having the correct ID, we can head over to our molecule.yml and edit the `vpc_su
 ```yaml
 scenario:
   name: aws-ec2-ubuntu
- 
+
 driver:
   name: ec2
 platforms:
@@ -284,7 +284,7 @@ As you may notice, **there are several possible AMIs left.** In our case, we nee
 ```yaml
 scenario:
   name: aws-ec2-ubuntu
- 
+
 driver:
   name: ec2
 platforms:
@@ -367,34 +367,34 @@ logo sources: [Molecule logo](https://molecule.readthedocs.io/en/latest/) , [Vag
 ```yaml
 sudo: required
 language: python
- 
+
 env:
 - EC2_REGION=eu-central-1
- 
+
 services:
 - docker
- 
+
 install:
 - pip install molecule
 - pip install docker-py
- 
+
 # install AWS related packages
 - pip install boto boto3
 - pip install --upgrade awscli
- 
+
 # configure AWS CLI
 - aws configure set aws_access_key_id $AWS_ACCESS_KEY
 - aws configure set aws_secret_access_key $AWS_SECRET_KEY
 - aws configure set default.region $DEPLOYMENT_REGION
 # show AWS CLI config
 - aws configure list
- 
+
 script:
 - cd docker
- 
+
 # Molecule Testing Travis-locally with Docker
 - molecule test
- 
+
 # Molecule Testing on AWS EC2
 - molecule create --scenario-name aws-ec2-ubuntu
 - molecule converge --scenario-name aws-ec2-ubuntu
@@ -417,17 +417,17 @@ Sadly there’s [a flaw while using the AWS connectivity library boto on TravisC
 
 ```shell
         ...
-            "  File \"/tmp/ansible_ec2_payload_y3lfWH/__main__.py\", line 552, in <module>", 
-            "  File \"/home/travis/virtualenv/python2.7.14/lib/python2.7/site-packages/boto/__init__.py\", line 1216, in <module>", 
-            "    boto.plugin.load_plugins(config)", 
+            "  File \"/tmp/ansible_ec2_payload_y3lfWH/__main__.py\", line 552, in <module>",
+            "  File \"/home/travis/virtualenv/python2.7.14/lib/python2.7/site-packages/boto/__init__.py\", line 1216, in <module>",
+            "    boto.plugin.load_plugins(config)",
             "AttributeError: 'module' object has no attribute 'plugin'"
         ]
     }
- 
+
     PLAY RECAP *********************************************************************
-    localhost                  : ok=6    changed=4    unreachable=0    failed=1   
- 
-ERROR: 
+    localhost                  : ok=6    changed=4    unreachable=0    failed=1
+
+ERROR:
 The command "molecule --debug create --scenario-name aws-ec2-ubuntu" exited with 2.
 
 ```
@@ -437,7 +437,7 @@ To fix this, there are **two changes needed** inside our [.travis.yml](https://g
 ```yaml
 sudo: false
 language: python
- 
+
 env:
 - EC2_REGION=eu-central-1 BOTO_CONFIG="/dev/null"
 ...

@@ -17,7 +17,7 @@ volvo:
   aaa: "Authorization"
   zzz: 341
   anchr_val: &anchor_val famous_val
-  
+
 lambo:
   <<: *anchor_struct
   mykey:
@@ -54,7 +54,7 @@ volvo:
   aaa: "Authorization"
   zzz: 341
   anchr_val: &anchor_val famous_val
-  
+
 lambo:
   <<: *anchor_struct
   mykey:
@@ -143,7 +143,7 @@ elem2:
 elem1:
   <<: *anchor_struct
   zzz: zorglub
-  newmsg: 
+  newmsg:
     <<: *newmsg
     msg: "msg2"
   myStruct:
@@ -181,7 +181,7 @@ elem1:
   anchor_val: *anchor_val
   myStruct:
     <<: *anchor_struct
-  newmsg: 
+  newmsg:
     <<: *newmsg
     msg: "msg2"
   www: web
@@ -237,7 +237,7 @@ elem2:
 elem1:
   <<: *anchor_struct
   zzz: zorglub
-  newmsg: 
+  newmsg:
     <<: *newmsg
     msg: "msg2"
   myStruct:
@@ -273,7 +273,7 @@ elem1:
   anchor_val: *anchor_val
   myStruct:
     <<: *anchor_struct
-  newmsg: 
+  newmsg:
     <<: *newmsg
     msg: "msg2"
   www: web
@@ -335,7 +335,7 @@ def recursive_sort_mappings(s):
     if isinstance(s, list):
         for elem in s:
             recursive_sort_mappings(elem)
-        return 
+        return
     if not isinstance(s, dict):
         return
     for key in sorted(s, reverse=True):
@@ -419,10 +419,10 @@ Third you need the merge key to move to the top of mapping if it is somewhere el
 from ruamel.yaml.comments import merge_attrib
 
 def recursive_sort_mappings(s, level=0):
-    if isinstance(s, list): 
+    if isinstance(s, list):
         for elem in s:
             recursive_sort_mappings(elem, level=level+1)
-        return 
+        return
     if not isinstance(s, dict):
         return
     merge = getattr(s, merge_attrib, [None])[0]
@@ -450,4 +450,4 @@ And then the diff no longer gives output.
 - https://stackoverflow.com/questions/40226610/ruamel-yaml-equivalent-of-sort-keys#40227545
 - https://stackoverflow.com/questions/49613901/sort-yaml-file-with-comments
 - https://github.com/maxx27/pyyaml-sort/blob/main/comments_sort.py
-- 
+-

@@ -22,4 +22,3 @@ Dependencies
 Install dependencies:
 
     pip install -r requirement.txt
-

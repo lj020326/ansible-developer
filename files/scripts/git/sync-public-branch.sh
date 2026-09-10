@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2026.5.25"
+VERSION="2026.8.1"
 
 GIT_DEFAULT_BRANCH=main
 GIT_PUBLIC_BRANCH=public
@@ -166,7 +166,7 @@ log_trace()          { _log_message "${LOG_TRACE}"          "$1" "${2:-}"; }
 log_info()           { _log_message "${LOG_INFO}"           "$1" "${2:-}"; }
 log_success()        { _log_message "${LOG_SUCCESS}"        "$1" "${2:-}"; }
 log_failed()         { _log_message "${LOG_FAILED}"         "$1" "${2:-}"; }
-log_warn()        { _log_message "${LOG_WARN}"           "$1" "${2:-}"; }
+log_warn()           { _log_message "${LOG_WARN}"           "$1" "${2:-}"; }
 log_error()          { _log_message "${LOG_ERROR}"          "$1" "${2:-}"; }
 
 function ohai()  { printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$*"; }
@@ -222,7 +222,13 @@ function squash_commits() {
         fi
         local first_today=$(git log --since=midnight --pretty=format:%H --reverse | head -n 1)
         log_info "Squashing existing daily commits into one..."
-        git reset --soft "${first_today}^"
+
+        # Check if first_today has a parent
+        if git rev-parse --verify "${first_today}^" >/dev/null 2>&1; then
+            git reset --soft "${first_today}^"
+        else
+            git update-ref -d HEAD
+        fi
     else
         # --- MODE: DEFAULT (Squash into last existing commit with age check) ---
         if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
@@ -252,7 +258,17 @@ function squash_commits() {
 
         if [ "$create_new" -eq 0 ]; then
             log_info "Squashing changes into last existing commit..."
-            git reset --soft HEAD^
+
+            # Check total commit count to prevent 'HEAD^' error on single-commit repositories
+            local commit_count
+            commit_count=$(git rev-list --count HEAD)
+
+            if [ "$commit_count" -gt 1 ]; then
+                git reset --soft HEAD^
+            else
+                log_info "Single commit detected; softening HEAD via ref update..."
+                git update-ref -d HEAD
+            fi
         else
             log_info "Creating a new history entry..."
         fi
@@ -564,7 +580,6 @@ function execute_eval_command() {
 #    echo "${COMMAND_RESULT}"
     abort "$(printf "Failed during: %s" "${RUN_COMMAND}")"
   fi
-
 }
 
 function is_installed() {

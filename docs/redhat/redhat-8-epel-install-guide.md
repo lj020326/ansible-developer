@@ -16,7 +16,7 @@ Software Requirements and Linux Command Line Conventions
 | System | Rhel/CentOS |
 | Software | No specific software is needed to follow this tutorial |
 | Other | Administrative privileges to install and configure the repository |
-| Conventions | **#** – requires given [linux commands](chrome-extension://pcmpcfapbekmbjjkdalcgopdkipoggdi/linux-commands) to be executed with root privileges either directly as a root user or by use of `sudo` command  
+| Conventions | **#** – requires given [linux commands](chrome-extension://pcmpcfapbekmbjjkdalcgopdkipoggdi/linux-commands) to be executed with root privileges either directly as a root user or by use of `sudo` command
 **$** – requires given [linux commands](chrome-extension://pcmpcfapbekmbjjkdalcgopdkipoggdi/linux-commands) to be executed as a regular non-privileged user |
 
 ## Installing the configuration package
@@ -168,4 +168,4 @@ Although it’s been a while since the release of Red Hat Enterprise Linux 8, th
 ## Reference
 
 * https://linuxconfig.org/redhat-8-epel-install-guide
-* 
+*

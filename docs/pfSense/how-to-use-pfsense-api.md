@@ -20,7 +20,7 @@ If using the api_token method, generate token in System > API.
 
 Then run the curl test:
 ```shell
-curl -k --proxy localhost:9090 -H "Authorization: CLIENT_ID_HERE CLIENT_TOKEN_HERE" -X GET https://pfsense.johnson.int/api/v1/system/arp 
+curl -k --proxy localhost:9090 -H "Authorization: CLIENT_ID_HERE CLIENT_TOKEN_HERE" -X GET https://pfsense.johnson.int/api/v1/system/arp
 ```
 
 

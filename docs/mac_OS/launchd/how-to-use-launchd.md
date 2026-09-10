@@ -1,7 +1,7 @@
 
 # How to set up a scheduled rsync job
 
-Create plist file 
+Create plist file
 
 /Library/LaunchDaemons/org.example.rsync.plist:
 ```xml
@@ -72,7 +72,7 @@ launchctl load /Library/LaunchDaemons/org.example.rsync.plist
 launchctl start /Library/LaunchAgents/org.example.rsync.plist
 launchctl start org.example.rsync
 launchctl stop org.example.rsync
-launchctl stop /Library/LaunchDaemons/org.example.rsync.plist 
+launchctl stop /Library/LaunchDaemons/org.example.rsync.plist
 launchctl unload /Library/LaunchAgents/org.example.rsync.plist
 launchctl unload /Library/LaunchDaemons/org.example.rsync.plist
 tail -30 /var/log/com.apple.xpc.launchd/launchd.log
@@ -84,4 +84,4 @@ tail -30 /var/log/com.apple.xpc.launchd/launchd.log
 
 * https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html
 * https://blog.codeleak.pl/2020/05/macos-sync-files-between-two-volumes.html
-* 
+*

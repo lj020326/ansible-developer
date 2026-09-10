@@ -3,7 +3,7 @@
 
 Below might be the quickest Ansible Navigator tutorial going (for the tutorial itself, you should feel totally free to jump right to the “[Steps](#steps)“), that with even a tiny bit of practice should make you blazingly-fast in developing and testing your Ansible playbooks and roles on the command line, even when compared to the Ansible community’s traditional (and fairly quick in their own right) methods.
 
-(For those who may be interested in learning more about _why_ Ansible Navigator was created and exactly _how_ it builds upon many of the great features of established tools like `ansible-playbook` and the rest of the _ansible-*_ toolbox, you can check out the longer “Background” which immediately follows. 
+(For those who may be interested in learning more about _why_ Ansible Navigator was created and exactly _how_ it builds upon many of the great features of established tools like `ansible-playbook` and the rest of the _ansible-*_ toolbox, you can check out the longer “Background” which immediately follows.
 
 ## Background
 
@@ -64,7 +64,7 @@ cd ~
 sudo yum install python39 -y
 python3.9 -m venv navdemo
 source navdemo/bin/activate
-pip3 install --upgrade pip 
+pip3 install --upgrade pip
 pip3 install ansible ansible-navigator
 which ansible # SHOULD BE: ~/navdemo/bin/ansible
 which ansible-navigator # SHOULD BE: ~/navdemo/bin/ansible-navigator
@@ -75,10 +75,10 @@ which ansible-navigator # SHOULD BE: ~/navdemo/bin/ansible-navigator
 A pretty simple test `~/inventory` file might look like:
 
 ```shell
-(navdemo) [vagrant@rhel8 ~]$ cat inventory 
+(navdemo) [vagrant@rhel8 ~]$ cat inventory
 locahost ansible_connection=local
 
-(navdemo) [vagrant@rhel8 ~]$ 
+(navdemo) [vagrant@rhel8 ~]$
 ```
 
 ## Create an `ansible-navigator.yml` config file
@@ -141,4 +141,4 @@ The above commands cover a pretty wide range of Ansible Navigator features, allo
 ## References
 
 - https://levelupla.io/a-blazingly-fast-ansible-navigator-tutorial/
-- 
+-

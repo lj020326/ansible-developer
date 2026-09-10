@@ -18,7 +18,7 @@ Function Init-PowerCLI {
 	# This script adds some helper functions and sets the appearance. You can pick and choose parts of this file for a fully custom appearance.
 	#. "C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Scripts\Initialize-VIToolkitEnvironment.ps1"
 	. "C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Scripts\Initialize-PowerCLIEnvironment.ps1"
-	Import-Module PowerCLI/DatastoreMod 
+	Import-Module PowerCLI/DatastoreMod
 }
 
 Function Restore-Esx2NfsDatastores {
@@ -30,7 +30,7 @@ Function Restore-Esx2NfsDatastores {
 	PS C:\> Restore-NfsDatastores
 
 	#>
-	
+
 	$vmhost = "esx2.johnson.local"
 	Activate-InactiveHostNFSDatastores $vmhost
 }
@@ -51,7 +51,7 @@ Function Restore-EsxNfsDatastores {
 		PS C:\> Restore-NfsDatastores
 
 		#>
-		
+
 		Activate-InactiveHostNFSDatastores $vmhost
 	}
 }
@@ -65,7 +65,7 @@ Function Restore-NfsDatastores {
 	PS C:\> Restore-NfsDatastores
 
 	#>
-	
+
 	$vcenter = "vcenter50.johnson.local"
 	Activate-InactiveNFSDatastores $vcenter
 }

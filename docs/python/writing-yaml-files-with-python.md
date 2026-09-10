@@ -23,7 +23,7 @@ employees:
     annual salary (USD): 20000
 ```
 
-This yaml file is the python equivalent of a dictionary with one key _“_employees” that contains a list of two elements.  
+This yaml file is the python equivalent of a dictionary with one key _“_employees” that contains a list of two elements.
 Each element in the nested list contains the three same keys: “name”, “job title” and “annual salary (USD)”.
 
 One of the cool things about yaml files is being able to annotate them with comments using the “#” symbol
@@ -32,7 +32,7 @@ One of the cool things about yaml files is being able to annotate them with comm
 employees:
   # Start with CEO
   - name: Jeffrey Bezos  # Goes by Jeff
-    job title: CEO # ...entrepreneur, born in 1964... 
+    job title: CEO # ...entrepreneur, born in 1964...
     annual salary (USD): 1000000000000  # This is too much
   # List of factory workers below
   - name: John Smith
@@ -99,8 +99,8 @@ from ruamel.yaml.comments import \
 from ruamel.yaml.tokens import CommentToken
 from ruamel.yaml.error import CommentMark
 # Globals
-# Number of spaces for an indent 
-INDENTATION = 2 
+# Number of spaces for an indent
+INDENTATION = 2
 # Used to reset comment objects
 tsRESET_COMMENT_LIST = [None, [], None, None]
 
@@ -194,8 +194,8 @@ We can use the `yaml_set_start_comment` attribute which will add a comment above
 ```python
 shopping_list.yaml_set_start_comment("Shopping Lists for date: "
                                      "23 Oct 2021")
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 
 ```
@@ -227,8 +227,8 @@ shopping_list.get("Shopping List").\
     yaml_set_comment_before_after_key(key="eggs",
                                       before="Please don't forget "
                                              "eggs!")
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 ```
 
@@ -258,8 +258,8 @@ Ugh, this isn’t ideal! That comment should be indented. Let’s delete it and 
 ```python
 shopping_list.get("Shopping List").ca.\
     items["eggs"] = deepcopy(RESET_COMMENT_LIST)
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 
 ```
@@ -293,8 +293,8 @@ shopping_list.get("Shopping List").\
         before="Don't forget the eggs",
         indent=object_depth*INDENTATION
     )
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 
 ```
@@ -330,8 +330,8 @@ shopping_list.get("Shopping List").\
         after="Please don't forget eggs!",
         after_indent=object_depth*INDENTATION
     )
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 ```
 
@@ -366,8 +366,8 @@ shopping_list.get("Shopping List").\
         key="litres",
         comment="2 litres is too much milk!"
     )
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 
 ```
@@ -406,8 +406,8 @@ shopping_list.get("Shopping List").\
         before="Last Resorts",
         indent=object_depth*INDENTATION
     )
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 
 ```
@@ -440,11 +440,11 @@ shopping_list.get("Shopping List").\
     get("milk").\
     get("brands").\
     yaml_add_eol_comment(
-        key=1, 
+        key=1,
         comment="Too creamy"
     )
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 
 ```
@@ -479,8 +479,8 @@ Only the first two elements in the values for the items attribute are used in a 
 
 ## Manually adding in a CommentToken object
 
-We need to set the first element of the items to be our desired comment.  
-When manually adding in a `CommentToken` object, we prefix with `\ #` and end with a new line character `\n`.  
+We need to set the first element of the items to be our desired comment.
+When manually adding in a `CommentToken` object, we prefix with `\ #` and end with a new line character `\n`.
 We initialise the `start_mark` parameter with a minimal `CommentMark` object and set the `end_mark` parameter to `None`.
 
 ```python
@@ -490,8 +490,8 @@ shopping_list.get("Shopping List").\
     items[1][0] = CommentToken(value=" # Too creamy\n",
                                start_mark=CommentMark(0),
                                end_mark=None)
-print(yaml_dump(shopping_list, 
-                indent=INDENTATION, 
+print(yaml_dump(shopping_list,
+                indent=INDENTATION,
                 block_seq_indent=INDENTATION))
 ```
 
@@ -546,26 +546,26 @@ ruamel.yaml documentation: [https://yaml.readthedocs.io/en/latest/](https://yaml
 
 CommentToken Objects Structures:
 
--   CommentedMap:  
-    0: Comments set with`yaml_set_start_comment` method.  
-    1: Comments set from `yaml_set_comment_before_after_key` method with `before`parameter.  
-    2: Comments set from `yaml_set_eol_comment`  
+-   CommentedMap:
+    0: Comments set with`yaml_set_start_comment` method.
+    1: Comments set from `yaml_set_comment_before_after_key` method with `before`parameter.
+    2: Comments set from `yaml_set_eol_comment`
     3: Comments set from `yaml_set_comment_before_after_key` method with `after`parameter.
--   CommentedSeq:  
-    0: Comments set from `yaml_set_eol_comment`  
-    1: Comments set from `yaml_set_comment_before_after_key` method with `before`parameter.  
-    2: Not Used  
+-   CommentedSeq:
+    0: Comments set from `yaml_set_eol_comment`
+    1: Comments set from `yaml_set_comment_before_after_key` method with `before`parameter.
+    2: Not Used
     3: Not Used
 
 ## References:
 
 - https://towardsdatascience.com/writing-yaml-files-with-python-a6a7fc6ed6c3
-\[1\]: [https://yaml.org/about.html](https://yaml.org/about.html)  
-\[2\]: [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html)  
-\[3\]: [https://www.commonwl.org/user\_guide/02-1st-example/index.html](https://www.commonwl.org/user_guide/02-1st-example/index.html)  
-\[4\]: [https://www.home-assistant.io/docs/configuration/yaml/](https://www.home-assistant.io/docs/configuration/yaml/)  
-\[5\]: [https://sourceforge.net/p/ruamel-yaml/tickets/400/](https://sourceforge.net/p/ruamel-yaml/tickets/400/)  
-\[6\]: [https://sourceforge.net/p/ruamel-yaml/tickets/402/](https://sourceforge.net/p/ruamel-yaml/tickets/402/)  
-\[7\]: [https://sourceforge.net/p/ruamel-yaml/tickets/404/](https://sourceforge.net/p/ruamel-yaml/tickets/404/)  
-\[8\]: [https://github.com/yaml/pyyaml/issues/31](https://github.com/yaml/pyyaml/issues/31)  
+\[1\]: [https://yaml.org/about.html](https://yaml.org/about.html)
+\[2\]: [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html)
+\[3\]: [https://www.commonwl.org/user\_guide/02-1st-example/index.html](https://www.commonwl.org/user_guide/02-1st-example/index.html)
+\[4\]: [https://www.home-assistant.io/docs/configuration/yaml/](https://www.home-assistant.io/docs/configuration/yaml/)
+\[5\]: [https://sourceforge.net/p/ruamel-yaml/tickets/400/](https://sourceforge.net/p/ruamel-yaml/tickets/400/)
+\[6\]: [https://sourceforge.net/p/ruamel-yaml/tickets/402/](https://sourceforge.net/p/ruamel-yaml/tickets/402/)
+\[7\]: [https://sourceforge.net/p/ruamel-yaml/tickets/404/](https://sourceforge.net/p/ruamel-yaml/tickets/404/)
+\[8\]: [https://github.com/yaml/pyyaml/issues/31](https://github.com/yaml/pyyaml/issues/31)
 \[9\]: [https://github.com/yaml/pyyaml/issues/46](https://github.com/yaml/pyyaml/issues/46)

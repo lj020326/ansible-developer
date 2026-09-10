@@ -197,7 +197,7 @@ To check each of them run: (until you find the problematic one)
 This is how it looked on my machine:
 
 ```
-> get State:/Network/Service/forticlientsslvpn/DNS 
+> get State:/Network/Service/forticlientsslvpn/DNS
 > d.show
 <dictionary> {
   ServerAddresses : <array> {

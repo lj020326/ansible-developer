@@ -159,27 +159,27 @@ If none of the above fix it, try this:
 
 1.  **Go to the website that maintains the failed package. In most cases, this will be [Launchpad.net](https://launchpad.net/ "Launchpad.net") (for Ubuntu flavors, go [here](https://launchpad.net/ubuntu/ "Ubuntu Packages at Launchpad")); users of Debian distros (inc. Ubuntu) can download source code packages from [Debian.org](https://www.debian.org/distrib/packages "Download Debian Source Codes from Debian.org") and a lot of packages for all distros are maintained through [Gna](http://gna.org/ "Download Free Software from Gna"). If you’re really stuck, Google it;**
 2.  **Search for the failed package then re-download it and re-install it. First try the deb package that is pre-built for your OS version then, if that doesn’t work, download the source code and build it from scratch;**
-    
+
     1.  Most packages ship with installation instructions written in a Readme or Installation file (it’s important to read them). Most build with either
-    
+
     ```
     ./configure
     make
     make install
     ```
-    
+
     1.  else
-    
+
     ```
     python setup.py install
     ```
-    
+
     1.  Ensure any shared libraries are properly registered
-    
+
     ```
     sudo ldconfig
     ```
-    
+
 
 **If you struggle to install the downloaded source code you can read this [Linux Software Installation EasyGuide](https://journalxtra.com/2010/03/linux-software-installation-easyguide/ "Linux Software Installation EasyGuide"). The downside to installing from source code (i.e not through Apt, Aptitude, Yum or dpkg) is that your regular package manager will not know that the software has been installed. Just re-install it through your regular package manager once it is functioning properly.**
 
@@ -198,19 +198,19 @@ sudo mv status.bckup > /var/lib/dpkg/status
 ```
 
 1.  **edit your dpkg status file**
-    
+
     1.  KDE Users
-    
+
     ```
     kdesudo kate /var/lib/dpkg/status
     ```
-    
+
     1.  Gnome users
-    
+
     ```
     gksu gedit /var/lib/dpkg/status
     ```
-    
+
 2.  **search for the problem package(s) by name (press Ctrl+F),**
 3.  **edit the line that reads**
 
@@ -239,19 +239,19 @@ sudo apt-get install YOUR-APP
 ```
 
 1.  **If the problem persists, re-edit /var/lib/dpkg/status but this time search for the failed package by name and delete its details from**
-    
+
     ```
     Package....
     ```
-    
+
     **to**
-    
+
     ```
     Description....
     ```
-    
+
     **Delete from the open line above package to the open line below its description that leads on to the next package’s details. Here is an example of the complete package listing for ‘lsb-core’:**
-    
+
     ```
     Package: lsb-core
     Status: install ok installed
@@ -286,9 +286,9 @@ sudo apt-get install YOUR-APP
     Original-Maintainer: Chris Lawrence <lawrencc@debian.org>
     Python-Version: all
     ```
-    
+
     That whole section would be deleted were lsb-core an issue on your system.
-    
+
 2.  **When you update your package list you will notice that those packages with their details removed from dpkg’s status file will not now show as installed by dpkg. Rest assured, those packages are still installed/semi-installed but dpkg is no longer aware of them. At this point you can choose to either ‘re-install’ the badly installed package or just leave it hanging on your system as an undetected badly installed package which you should try to re-install at a later time. I recommend you try to re-install immediately. If you leave it as an undetected package, dpkg will not automatically update it and will try to re-install it should it be a dependency of other packages that you later try to install.**
 
 If none of those steps fix it then the likelihood is that nothing will but search the net before you decide to re-install your operating system.

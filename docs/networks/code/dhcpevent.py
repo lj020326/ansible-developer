@@ -63,4 +63,3 @@ if (len(sys.argv) > 1):
         # pp.pprint(cursor.__dict__)
         db.commit()
         db.close()
-

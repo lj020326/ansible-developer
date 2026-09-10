@@ -67,7 +67,7 @@ I hope you’ve installed docker in your computer. If not follow the official do
 4.  **Earth:** Our planet, used for a network name.
 5.  **Moon:** Our moon, used as a network node (container service).
 
-First, we need to have a `docker-compose.yaml` file to get started.  
+First, we need to have a `docker-compose.yaml` file to get started.
 In this tutorial, we will create the following "**Mars**" network by the end of the process.
 
 ![](./img/1*ODrqIUrGuUScTL2gjuPqNQ.png)
@@ -124,8 +124,8 @@ We add `-d` at the end of the command to run all the containers in detach mode. 
 ```shell
 $ docker compose ps
 NAME                IMAGE               COMMAND             SERVICE             CREATED             STATUS              PORTS
-deimos              busybox             "sleep infinity"    deimos              17 hours ago        Up 17 hours         
-phobos              busybox             "sleep infinity"    phobos              17 hours ago        Up 17 hours         
+deimos              busybox             "sleep infinity"    deimos              17 hours ago        Up 17 hours
+phobos              busybox             "sleep infinity"    phobos              17 hours ago        Up 17 hours
 ```
 
 Now you should be able to see two running containers.
@@ -229,9 +229,9 @@ It will then execute the specified command `/bin/sh` inside that container, whic
 Just for the sake of easiness, I extracted the below part from the previous output. **The results might vary for you, so please keep that in mind.**
 
 ```shell
-"Containers": 
+"Containers":
 {
-"687a21b31cf4715391f3858e86c4c43c4a254359faa4aa05bf002194e036e5d0": 
+"687a21b31cf4715391f3858e86c4c43c4a254359faa4aa05bf002194e036e5d0":
   {
     "Name": "phobos",
     "EndpointID": "8039fdaa2c7bdb87b2afbb2fad48bed9aa1b42d9e1c3f7ce1f31773a70c32e31",
@@ -239,7 +239,7 @@ Just for the sake of easiness, I extracted the below part from the previous outp
     "IPv4Address": "172.18.0.3/16",
     "IPv6Address": ""
   },
-"9fa4b494b685eb3557cbeca86c40cb4dbabf9a6bd4b8a6e62e36f9f6fe2b50ea": 
+"9fa4b494b685eb3557cbeca86c40cb4dbabf9a6bd4b8a6e62e36f9f6fe2b50ea":
   {
     "Name": "deimos",
     "EndpointID": "e529ce9c375d41d7c9717f9abb3820a553d39da327f3b79126f0eafc0ef81cd3",
@@ -357,8 +357,8 @@ Before going to connect them to **Mars Network**, run the command `docker compos
 ```
 $ docker compose down
 [+] Running 2/2
- ✔ Container deimos  Removed    10.3s 
- ✔ Container phobos  Removed  
+ ✔ Container deimos  Removed    10.3s
+ ✔ Container phobos  Removed
 ```
 
 Let’s add “**phobos**” and “**deimos**” to the Mars network. To do that, update the `docker-compose.yaml` file with the following code snippet:
@@ -391,9 +391,9 @@ Then run the command `docker compose up -d` again in the terminal inside your pr
 ```shell
 $ docker compose up -d
 [+] Running 3/3
- ✔ Network mars      Created  0.1s 
- ✔ Container phobos  Started  0.6s 
- ✔ Container deimos  Started  
+ ✔ Network mars      Created  0.1s
+ ✔ Container phobos  Started  0.6s
+ ✔ Container deimos  Started
 ```
 
 Now, If you run `docker network ls` command, You’ll see our newly created mars network there (Terminal 6.0).
@@ -491,8 +491,8 @@ services:
     networks:
       - mars
   moon:
-    container_name: moon 
-    image: busybox 
+    container_name: moon
+    image: busybox
     command: sleep infinity
     networks:
       - earth
@@ -501,7 +501,7 @@ networks:
     name: mars
     driver: bridge
   earth:
-    name: earth 
+    name: earth
     driver: bridge
 ```
 
@@ -512,9 +512,9 @@ networks:
 ```shell
 $ docker compose ps
 NAME                IMAGE               COMMAND             SERVICE             CREATED             STATUS              PORTS
-deimos              busybox             "sleep infinity"    deimos              7 seconds ago       Up 5 seconds        
-moon                busybox             "sleep infinity"    moon                7 seconds ago       Up 5 seconds        
-phobos              busybox             "sleep infinity"    phobos              7 seconds ago       Up 5 seconds    
+deimos              busybox             "sleep infinity"    deimos              7 seconds ago       Up 5 seconds
+moon                busybox             "sleep infinity"    moon                7 seconds ago       Up 5 seconds
+phobos              busybox             "sleep infinity"    phobos              7 seconds ago       Up 5 seconds
 ```
 
 4. RUN `docker network ls` to list all the docker networks. You’ll see that our **mars** & **earth** networks listed there.
@@ -675,7 +675,7 @@ Containers connected to a user-defined bridge network are isolated from other ne
 
 ## Host Network Explanation (Only works on Linux)
 
-⚠️ Note: [Host network driver only works on Linux Hosts](https://docs.docker.com/network/network-tutorial-host/#prerequisites:~:text=The%20host%20networking%20driver%20only%20works%20on%20Linux%20hosts%2C%20and%20is%20not%20supported%20on%20Docker%20Desktop%20for%20Mac%2C%20Docker%20Desktop%20for%20Windows%2C%20or%20Docker%20EE%20for%20Windows%20Server.)  
+⚠️ Note: [Host network driver only works on Linux Hosts](https://docs.docker.com/network/network-tutorial-host/#prerequisites:~:text=The%20host%20networking%20driver%20only%20works%20on%20Linux%20hosts%2C%20and%20is%20not%20supported%20on%20Docker%20Desktop%20for%20Mac%2C%20Docker%20Desktop%20for%20Windows%2C%20or%20Docker%20EE%20for%20Windows%20Server.)
 ✅ 1st Part will work in any OS.
 
 Before going to talk about host networks, Let’s see how we mapped our container ports to the host machine’s ports previously in a default bridge network.
@@ -766,7 +766,7 @@ docker compose up -d
 ```shell
 $ docker compose ps
 NAME                IMAGE               COMMAND                  SERVICE             CREATED             STATUS              PORTS
-hello_world         nginx               "/docker-entrypoint.…"   web                 31 seconds ago      Up 29 seconds       
+hello_world         nginx               "/docker-entrypoint.…"   web                 31 seconds ago      Up 29 seconds
 ```
 
 6. But if you access the [http://localhost/](http://localhost/) or [http://127.0.0.1](http://127.0.0.1/)/ in your computer, You’ll be able to access the same page that we’ve accessed before in port 8000.
@@ -879,7 +879,7 @@ services:
 tree .
 .
 ├── src                # source directory. (.html/.js/.css)
-│   ├── index.html          # html page 
+│   ├── index.html          # html page
 └── docker-compose.yml
 ```
 
@@ -902,4 +902,4 @@ In conclusion, this article has focused on two fundamental Docker networking mod
 - https://stackoverflow.com/questions/70061849/error-pool-overlaps-with-other-one-on-this-address-space
 - https://stackoverflow.com/questions/56515128/error-pool-overlaps-with-other-one-on-this-address-space-when-starting-my-proje
 - https://straz.to/2021-09-08-docker-address-pools/
-- 
+-

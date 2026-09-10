@@ -83,15 +83,15 @@ They act as a sort of abstraction layer and will help you in keeping things orga
 Continuing this analogue for managing a web server, imagine a role called `apache`, it manages all things related to it:
 
 -   repository setup
-    
+
 -   installation
-    
+
 -   configuration file creation
-    
+
 -   service startup
-    
+
 -   restarting during changes
-    
+
 
 Actual usage is through a playbook called `webservers.yml`, which imports the `apache` role to handle the things above.
 
@@ -119,7 +119,7 @@ Playbooks can be arranged in a variety of ways. They can be group-related, for e
 
 With the last one running some one-off tasks that help you ensure that a certain OpenSSL version is deployed across all of the servers. Some might argue that tags can be used for the same effect, but I think having a playbook for an occasion is much clearer.
 
-Tags become hard to manage, especially when used in abundance inside roles. Tags in the role tasks combined with [dynamic includes or static imports](https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html#tag-inheritance) lead to hard to grok flows and if using third party roles, you need to start using [include with apply](https://docs.ansible.com/ansible/latest/modules/include_role_module.html#parameter-apply) and it’s just going to end in tears. 
+Tags become hard to manage, especially when used in abundance inside roles. Tags in the role tasks combined with [dynamic includes or static imports](https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html#tag-inheritance) lead to hard to grok flows and if using third party roles, you need to start using [include with apply](https://docs.ansible.com/ansible/latest/modules/include_role_module.html#parameter-apply) and it’s just going to end in tears.
 
 Create explicit playbooks and roles with explicit and separated task files and keep your sanity for the years to come. Grouping sets of tasks inside a role to separate task files adds reusability too. You can execute a set of tasks multiple times with different variables.
 
@@ -205,29 +205,29 @@ In other words, don’t spread the variables everywhere. Their end values are ha
 I usually try to keep to these (in rising order of precedence):
 
 1.  defaults/ in a role
-    
+
     1.  Read without special tasks automatically
-        
+
     2.  A good place to document the input variables of the role with sane default values
-        
+
 2.  group\_vars/
-    
+
     1.  The usual suspect when finding out what a variable’s value is in any given environment and group of servers
-        
+
     2.  Using host\_vars/ only if really necessary
-        
+
 3.  vars: set to a task
-    
+
     1.  Mostly for dynamic includes, when calling same include\_task / include\_role multiple times with varying input
-        
+
     2.  Also useful for clarity’s sake on the `template` module, to pass some modified variables to the template file while keeping most of the logic outside of the template
-        
+
 4.  set\_fact:
-    
+
     1.  For more dynamic things / variable definitions gathered during runtime
-        
+
     2.  For example a `json_query` on some environment variable that is in the “wrong” format
-        
+
 
 ## Writing tasks
 
@@ -443,7 +443,7 @@ Here’s a very simple example to illustrate the scenario:
     when: type == 'flavorB'
     some_task_here:
       input: B
-    
+
   - name: Do something here
     when: type == 'flavorC'
     some_task_here:
@@ -457,7 +457,7 @@ Here’s a very simple example to illustrate the scenario:
 ```
 
 This occurs quite frequently in many playbooks and introduces the repitition of the task for each case of 'flavor' in this case.
-The multiple repetitions can become especially problematic whenever a change necessitates propagation to all. 
+The multiple repetitions can become especially problematic whenever a change necessitates propagation to all.
 
 A simple but useful technique to avoid this is by using group vars.
 
@@ -514,7 +514,7 @@ Now the task can be rewritten as simply:
 ```
 
 This eliminates the need for the multiple when statements and makes the task far more manageable, readable, enhanceable, and supportable.
-This also highlights the power of using groups in ansible. 
+This also highlights the power of using groups in ansible.
 
 To see groups used in a more realistic way, see [the inventory example here](inventory-pets-vs-cattle.md).
 
@@ -574,21 +574,21 @@ Hopefully, there was a thing or two that helps you. Either when starting out or 
 **TL;DR:**
 
 1.  Use descriptive names and concentrate on the readability of your playbooks and roles
-    
+
 2.  Divide your implementation into roles and make them work independently with sane defaults
-    
+
 3.  Aim for reusability through roles and separated task files
-    
+
 4.  Don’t over-use tags
-    
+
 5.  Prefer explicit to implicit, in imports and the use of become
-    
+
 6.  Think about how you handle dependencies
-    
+
 7.  Ensure third party role quality before pulling it in as a dependency
-    
+
 8.  Organize your playbooks in a meaningful way
-    
+
 9.  Try to limit the precedence levels in your variables and keep them simple
-    
+
 10.  Test your playbooks and roles

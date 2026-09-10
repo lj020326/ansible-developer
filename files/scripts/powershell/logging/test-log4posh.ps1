@@ -1,20 +1,20 @@
 ﻿<#
 .SYNOPSIS
-		This script demonstrates how to use the Log4Posh module.  
-		Log4Posh logs messages using log4net framework and redirects all 
+		This script demonstrates how to use the Log4Posh module.
+		Log4Posh logs messages using log4net framework and redirects all
 		existing write-* messages to the log4net logger.
 
 .DESCRIPTION
-		This script demonstrates using log4net framework and redirect all 
-		existing write-* streams to the log4net logger.  
+		This script demonstrates using log4net framework and redirect all
+		existing write-* streams to the log4net logger.
 
-		It uses the PowerShellLogging module by David Wyatt in order to subscribe to 
+		It uses the PowerShellLogging module by David Wyatt in order to subscribe to
 		all write-* streams in order to log to the log4net logger.
 
-		This is useful for retrofitting existing code with the log4net framework. 
-		There is minimal impact to existing code-base, since no changes are required to 
-		existing write-* streams.  The existing error/warning/verbose/output streams 
-		will automatically be directed to the log4net handlers defined in write-log4net. 
+		This is useful for retrofitting existing code with the log4net framework.
+		There is minimal impact to existing code-base, since no changes are required to
+		existing write-* streams.  The existing error/warning/verbose/output streams
+		will automatically be directed to the log4net handlers defined in write-log4net.
 
 		The log4net configuration is configured in the log4net config file
 
@@ -24,11 +24,11 @@
 .OUTPUT
          log file
 
-.PARAMETER 
+.PARAMETER
 		none
 #>
 
-Import-Module Log4Posh 
+Import-Module Log4Posh
 
 ##
 ## begin script
@@ -38,9 +38,9 @@ write-output "starting log4net test"
 write-output "suppress standard powershell verbose/warn/debug output streams"
 write-output "will use the log4net output stream from coloredconsoleappender instead"
 write-output "the only posh output stream left logging will be write-output"
-$WarningPreference = 'SilentlyContinue' 
-$VerbosePreference = 'SilentlyContinue' 
-$DebugPreference = 'SilentlyContinue' 
+$WarningPreference = 'SilentlyContinue'
+$VerbosePreference = 'SilentlyContinue'
+$DebugPreference = 'SilentlyContinue'
 
 if ((-not (Get-Variable -Name PSScriptRoot -ValueOnly -ErrorAction SilentlyContinue)) -and
     ($scriptBlockFile = $MyInvocation.MyCommand.ScriptBlock.File)) {
@@ -50,7 +50,7 @@ if ((-not (Get-Variable -Name PSScriptRoot -ValueOnly -ErrorAction SilentlyConti
 ### set the locations for the log4net dll and configuration file used in the Init
 $logSettings = @{
 			loggerName = "root";
-			log4netDllPath = "$PSScriptRoot\log4net\log4net.dll"; 
+			log4netDllPath = "$PSScriptRoot\log4net\log4net.dll";
 			logConfigFilePath = "$PSScriptRoot\log4net\logConfig.xml"}
 
 write-output "enable Log4Posh"
@@ -88,7 +88,7 @@ $global:logger.Logger.level = [log4net.Core.Level]::Trace
 write-output "testing log4net writes with log level set to trace"
 Test-LogSomething
 
-Disable-Log4Posh 
+Disable-Log4Posh
 
 Write-Output "content of dynamic Log4Posh logging in ($logFileName):"
 Get-Content $logFileName

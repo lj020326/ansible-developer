@@ -109,7 +109,7 @@ How to cleanup duplicate host keys on server and client:
 	Another option where host has multiple keys:
 
 	```
-	cat known_hosts | cut -f1 -d' ' | sort | uniq -c | \ 
+	cat known_hosts | cut -f1 -d' ' | sort | uniq -c | \
 	sed '/^ *1 /d' | awk '{print $2}' | while read line; do \
 	ssh-keygen -R $line; ssh-keyscan $line; \
 	done
@@ -126,27 +126,27 @@ How to run ssh proxy to access private server:
 
 	Local Port Forwarding: Make Remote Resources Accessible on Your Local System
 
-	Local port forwarding allows you to access local network resources that aren’t exposed to the Internet. 
-	For example, let's say you want to access a database server at your office from your home. 
+	Local port forwarding allows you to access local network resources that aren’t exposed to the Internet.
+	For example, let's say you want to access a database server at your office from your home.
 
 	To use local forwarding, connect to the SSH server normally, but also supply the -L argument. The syntax is:
 
 		ssh -L local_port:remote_address:remote_port username@server.com
-	
-	For example, lets say the database server at your office is located at 192.168.1.111 on the office network. 
-	You have access to the offices SSH server at ssh.youroffice.com, and your user account on the SSH server is bob . 
+
+	For example, lets say the database server at your office is located at 192.168.1.111 on the office network.
+	You have access to the offices SSH server at ssh.youroffice.com, and your user account on the SSH server is bob .
 	In that case, your command would look like this:
 
 		ssh -L 8888:192.168.1.111:1234 bob@ssh.youroffice.com
 
-	After running that command, youd be able to access the database server at port 8888 at localhost. 
-	So, if the database server offered web access, you could plug http://localhost:8888 into your web browser to access it. 
+	After running that command, youd be able to access the database server at port 8888 at localhost.
+	So, if the database server offered web access, you could plug http://localhost:8888 into your web browser to access it.
 
 
 
 	ref: https://www.systutorials.com/proxy-using-ssh-tunnel/
-		
-	We can access a sshd server sshd_server and we want to use it as a socks5 proxy server. 
+
+	We can access a sshd server sshd_server and we want to use it as a socks5 proxy server.
 	It is simple by using ssh:
 
 		ssh -D 8080 username@sshd_server
@@ -154,7 +154,7 @@ How to run ssh proxy to access private server:
 	or, to allow remote hosts to use the socks5 proxy too,
 
 		ssh -g -D 8080 username@sshd_server
-	
+
 
 	To scp/ssh through jump server:
 
@@ -177,10 +177,10 @@ How to install sshpass on macOS:
 
 	## https://bitsanddragons.wordpress.com/2021/05/27/avoid-typing-ssh-passwords-with-sshpass-on-macos/
 	## https://gist.github.com/arunoda/7790979
-	
+
 	brew install hudochenkov/sshpass/sshpass
-	
-	
+
+
 To turn off strict host key checking:
 
 	https://askubuntu.com/questions/87449/how-to-disable-strict-host-key-checking-in-ssh
@@ -199,7 +199,7 @@ How to use password in commandline with ansible ssh:
 
 		$ansible-playbook -i hosts -v -b -c paramiko --ask-pass myplaybook.yml
 
-	Yet another way is to set it as a playbook option, 
+	Yet another way is to set it as a playbook option,
 
 		connection: paramiko_ssh
 
@@ -232,7 +232,7 @@ Reset ssh key:
 	# Host 192.168.0.221 found: line 85
 	/home/Lee/.ssh/known_hosts updated.
 	Original contents retained as /home/Lee/.ssh/known_hosts.old
-	
+
 	Lee@LJLAPTOP:[ansible-datacenter](master)$ ssh-keyscan -H 192.168.0.221
 	|1|Ys9s03+muLyE9nyw8BDSGv/ZBtA=|Lytm5odOP/IljfyWjZe8ij3lDc0= ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP1l49xh08lYFjeHS/72FbZix1uRGODH+RKUSfQwtQ9s
 	# 192.168.0.221:22 SSH-2.0-OpenSSH_8.2p1 Ubuntu-4
@@ -243,4 +243,3 @@ Reset ssh key:
 	# 192.168.0.221:22 SSH-2.0-OpenSSH_8.2p1 Ubuntu-4
 	Lee@LJLAPTOP:[ansible-datacenter](master)$
 	```
-

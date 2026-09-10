@@ -3,7 +3,7 @@
 #   Name: vm_deploy.py
 #   Purpose: Deploy a virtual machine
 #   Requires: class VDCApiCall in the file vdc_api_call.py
-# For download and information: 
+# For download and information:
 #   https://github.com/Interoute/VDC-API-examples-Python
 #
 # Copyright (C) Interoute Communications Limited, 2016

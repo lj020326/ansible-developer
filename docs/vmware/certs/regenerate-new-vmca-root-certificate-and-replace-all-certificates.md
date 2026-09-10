@@ -30,16 +30,16 @@ You must know the following information when you run vSphere Certificate Manager
 ## Procedure
 
 1.  Log in to the vCenter Server and start the vSphere Certificate Manager.
-    
+
     ```
     <p>/usr/lib/vmware-vmca/bin/certificate-manager</p>
     ```
-    
+
 2.  Select option 4, Regenerate a new VMCA Root Certificate and replace all certificates.
 3.  Respond to the prompts.
-    
+
     Certificate Manager generates a new VMCA root certificate based on your input and replaces all certificates on the system where you are running Certificate Manager. The replacement process is complete after Certificate Manager has restarted the services.
-    
+
 4.  To replace the machine SSL certificate, run vSphere Certificate Manager with option 3, Replace Machine SSL certificate with VMCA Certificate.
 5.  To replace the solution user certificates, run Certificate Manager with option 6, Replace Solution user certificates with VMCA certificates.
 

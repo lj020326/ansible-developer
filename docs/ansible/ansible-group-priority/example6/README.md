@@ -21,7 +21,7 @@ Then modify the playbook to set the group_by key to 'cluster' for all hosts as f
 Confirm that the new value 'cluster' should now appear for the variable 'test' for both hosts.
 
 ```output
-ansible-playbook -i ./example6/hosts.ini ./example6/playbook.yml 
+ansible-playbook -i ./example6/hosts.ini ./example6/playbook.yml
 
 PLAY [Run play] **********************************************************************************************************************************************************************************************************************************************************
 
@@ -38,14 +38,14 @@ ok: [host2] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-host1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-host2                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+host1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+host2                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 Confirm that the results are as expected for the yaml inventory:
 
 ```output
-ansible-playbook -i ./example6/hosts.yml ./example6/playbook.yml 
+ansible-playbook -i ./example6/hosts.yml ./example6/playbook.yml
 
 PLAY [Run play] **********************************************************************************************************************************************************************************************************************************************************
 
@@ -62,8 +62,8 @@ ok: [host2] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-host1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-host2                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+host1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+host2                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 While the INI inventory is as expected, the YAML inventory does not result as expected since the host2 did not appear with the 'test' variable set to 'cluster'.
@@ -71,16 +71,16 @@ While the INI inventory is as expected, the YAML inventory does not result as ex
 
 ### AWX Testing - same results
 
-Running this test case example in AWX for both hosts.ini and hosts.yml yields the same results.  
+Running this test case example in AWX for both hosts.ini and hosts.yml yields the same results.
 
 * [AWX Example 6 Playbook using hosts.ini test results](./example6/awx_job_results.hosts-ini.txt)
 * [AWX Example 6 Playbook using hosts.yml test results](./example6/awx_job_results.hosts-yml.txt)
 
 
-### TODO 
+### TODO
 Need to understand why group_by works for the INI but does not work for the YAML based inventory.
 
-The variable set method [set_variable used in the group.py source](https://github.com/ansible/ansible/blob/97e574fe6ea7a73ef8e42140e8be32c8cdbcaece/lib/ansible/inventory/group.py#L244) uses the [util method combine_vars](https://github.com/ansible/ansible/blob/97e574fe6ea7a73ef8e42140e8be32c8cdbcaece/lib/ansible/utils/vars.py#L81). 
+The variable set method [set_variable used in the group.py source](https://github.com/ansible/ansible/blob/97e574fe6ea7a73ef8e42140e8be32c8cdbcaece/lib/ansible/inventory/group.py#L244) uses the [util method combine_vars](https://github.com/ansible/ansible/blob/97e574fe6ea7a73ef8e42140e8be32c8cdbcaece/lib/ansible/utils/vars.py#L81).
 
 In turn, the combine_vars method uses the method [merge_hash](https://github.com/ansible/ansible/blob/97e574fe6ea7a73ef8e42140e8be32c8cdbcaece/lib/ansible/utils/vars.py#L96).
 
@@ -92,5 +92,4 @@ In conclusion, from the testing done, the variable merge path behavior is consis
 
 The exception occurs when using ansible group_by and key child groups with the YAML inventory noted in [Example 6](#Example-06).
 
-If the use case involving ansible group_by and key child groups is desired and/or essential to your group variable method of use, then it is essential to use the INI inventory and avoid using the YAML inventory plugin for those specific cases until the inconsistent behavior is resolved by the ansible dev team. 
-
+If the use case involving ansible group_by and key child groups is desired and/or essential to your group variable method of use, then it is essential to use the INI inventory and avoid using the YAML inventory plugin for those specific cases until the inconsistent behavior is resolved by the ansible dev team.

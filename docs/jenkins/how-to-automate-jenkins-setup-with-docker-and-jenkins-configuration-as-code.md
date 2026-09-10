@@ -339,4 +339,4 @@ Although you have configured the basic settings of Jenkins using JCasC, the new 
 * https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-job-configuration-using-job-dsl
 * https://stackoverflow.com/questions/32111825/jenkins-how-to-set-authorization-on-project-basis
 * https://plugins.jenkins.io/job-dsl
-* 
+*

@@ -22,7 +22,7 @@ Describe "New-SubFolderWithDate Integration-Tests" -tags "integration-tests" {
         $prefix = "ABCDEF123"
         $FolderName = "$prefix-$(Get-Date -Format "yyyyMMdd")"
         if ($(Test-Path $FolderName) -eq $false){
-            New-SubfolderWithDate -prefix $prefix       
+            New-SubfolderWithDate -prefix $prefix
             Test-Path $FolderName
             Remove-Item $FolderName
         }

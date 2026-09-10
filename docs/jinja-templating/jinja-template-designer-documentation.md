@@ -39,11 +39,11 @@ The following example shows the default configuration settings. An application d
 There are a few kinds of delimiters. The default Jinja delimiters are configured as follows:
 
 -   `{% ... %}` for [Statements](https://jinja.palletsprojects.com/en/latest/templates/#list-of-control-structures)
-    
+
 -   `{{ ... }}` for [Expressions](https://jinja.palletsprojects.com/en/latest/templates/#expressions) to print to the template output
-    
+
 -   `{# ... #}` for [Comments](https://jinja.palletsprojects.com/en/latest/templates/#comments) not included in the template output
-    
+
 
 [Line Statements and Comments](https://jinja.palletsprojects.com/en/latest/templates/#line-statements) are also possible, though they don’t have default prefix characters. To use them, set `line_statement_prefix` and `line_comment_prefix` when creating the [`Environment`](https://jinja.palletsprojects.com/en/latest/api/#jinja2.Environment "jinja2.Environment").
 
@@ -77,20 +77,20 @@ Implementation
 For the sake of convenience, `foo.bar` in Jinja does the following things on the Python layer:
 
 -   check for an attribute called `bar` on `foo` (`getattr(foo, 'bar')`)
-    
+
 -   if there is not, check for an item `'bar'` in `foo` (`foo.__getitem__('bar')`)
-    
+
 -   if there is not, return an undefined object.
-    
+
 
 `foo['bar']` works mostly the same with a small difference in sequence:
 
 -   check for an item `'bar'` in `foo`. (`foo.__getitem__('bar')`)
-    
+
 -   if there is not, check for an attribute called `bar` on `foo`. (`getattr(foo, 'bar')`)
-    
+
 -   if there is not, return an undefined object.
-    
+
 
 This is important if an object has an item and attribute with the same name. Additionally, the `attr()` filter only looks up attributes.
 
@@ -133,7 +133,7 @@ To comment-out part of a line in a template, use the comment syntax which is by 
 
 In the default configuration:
 
--   a single trailing newline is stripped if present 
+-   a single trailing newline is stripped if present
 -   other whitespace (spaces, tabs, newlines etc.) is returned unchanged
 
 If an application configures Jinja to `trim_blocks`, the first newline after a template tag is removed automatically (like in PHP). The `lstrip_blocks` option can also be set to strip tabs and spaces from the beginning of a line to the start of a block. (Nothing will be stripped if there are other characters before the start of the block.)
@@ -497,16 +497,16 @@ Note how `extends` is passed the variable with the template object that was pass
 When generating HTML from templates, there’s always a risk that a variable will include characters that affect the resulting HTML. There are two approaches:
 
 1.  manually escaping each variable; or
-    
+
 2.  automatically escaping everything by default.
-    
+
 
 Jinja supports both. What is used depends on the application configuration. The default configuration is no automatic escaping; for various reasons:
 
 -   Escaping everything except for safe values will also mean that Jinja is escaping variables known to not include HTML (e.g. numbers, booleans) which can be a huge performance hit.
-    
+
 -   The information about the safety of a variable is very fragile. It could happen that by coercing safe and unsafe values, the return value is double-escaped HTML.
-    
+
 
 ### Working with Manual Escaping
 
@@ -521,9 +521,9 @@ If manual escaping is enabled, it’s **your** responsibility to escape variable
 When automatic escaping is enabled, everything is escaped by default except for values explicitly marked as safe. Variables and expressions can be marked as safe either in:
 
 1.  The context dictionary by the application with `markupsafe.Markup`
-    
+
 2.  The template, with the `|safe` filter.
-    
+
 
 If a string that you marked safe is passed through other Python code that doesn’t understand that mark, it may get lost. Be aware of when your data is marked safe and how it is processed before arriving at the template.
 
@@ -1421,11 +1421,11 @@ Return a copy of the string with each line indented by 4 spaces. The first line 
 Parameters:
 
 -   **width** – Number of spaces, or a string, to indent by.
-    
+
 -   **first** – Don’t skip indenting the first line.
-    
+
 -   **blank** – Don’t skip indenting empty lines.
-    
+
 
 Changelog
 
@@ -1556,9 +1556,9 @@ Return the largest item from the sequence.
 Parameters:
 
 -   **case\_sensitive** – Treat upper and lower case strings as distinct.
-    
+
 -   **attribute** – Get the object with the max value of this attribute.
-    
+
 
 jinja-filters.min(_value: 't.Iterable\[V\]'_, _case\_sensitive: [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.12)") \= False_, _attribute: [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.12)") | [int](https://docs.python.org/3/library/functions.html#int "(in Python v3.12)") | NoneType \= None_) → 't.Union\[V, Undefined\]'
 
@@ -1572,9 +1572,9 @@ Return the smallest item from the sequence.
 Parameters:
 
 -   **case\_sensitive** – Treat upper and lower case strings as distinct.
-    
+
 -   **attribute** – Get the object with the min value of this attribute.
-    
+
 
 jinja-filters.pprint(_value: Any_) → [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.12)")
 
@@ -1649,11 +1649,11 @@ jinja-filters.round(_value: [float](https://docs.python.org/3/library/functions.
 Round the number to a given precision. The first parameter specifies the precision (default is `0`), the second the rounding method:
 
 -   `'common'` rounds either up or down
-    
+
 -   `'ceil'` always rounds up
-    
+
 -   `'floor'` always rounds down
-    
+
 
 If you don’t specify a method `'common'` is used.
 
@@ -1757,11 +1757,11 @@ Sort an iterable using Python’s [`sorted()`](https://docs.python.org/3/library
 Parameters:
 
 -   **reverse** – Sort descending instead of ascending.
-    
+
 -   **case\_sensitive** – When sorting strings, sort upper and lower case separately.
-    
+
 -   **attribute** – When sorting objects or dicts, an attribute or key to sort by. Can use dot notation like `"address.city"`. Can be a list of attributes like `"age,name"`.
-    
+
 
 The sort is stable, it does not change the relative order of elements that compare equal. This makes it is possible to chain sorts on different attributes and ordering.
 
@@ -1831,9 +1831,9 @@ The returned string is safe to render in HTML documents and `<script>` tags. The
 Parameters:
 
 -   **value** – The object to serialize to JSON.
-    
+
 -   **indent** – The `indent` parameter passed to `dumps`, for pretty-printing the value.
-    
+
 
 Changelog
 
@@ -1874,9 +1874,9 @@ The unique items are yielded in the same order as their first occurrence in the 
 Parameters:
 
 -   **case\_sensitive** – Treat upper and lower case strings as distinct.
-    
+
 -   **attribute** – Filter objects with unique values for this attribute.
-    
+
 
 jinja-filters.upper(_s: [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.12)")_) → [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.12)")
 
@@ -1909,17 +1909,17 @@ Works on `http://`, `https://`, `www.`, `mailto:`, and email addresses. Links wi
 Parameters:
 
 -   **value** – Original text containing URLs to link.
-    
+
 -   **trim\_url\_limit** – Shorten displayed URL values to this length.
-    
+
 -   **nofollow** – Add the `rel=nofollow` attribute to links.
-    
+
 -   **target** – Add the `target` attribute to links.
-    
+
 -   **rel** – Add the `rel` attribute to links.
-    
+
 -   **extra\_schemes** – Recognize URLs that start with these schemes in addition to the default behavior. Defaults to `env.policies["urlize.extra_schemes"]`, which defaults to no extra schemes.
-    
+
 
 Changelog
 
@@ -1942,15 +1942,15 @@ Wrap a string to the given width. Existing newlines are treated as paragraphs to
 Parameters:
 
 -   **s** – Original text to wrap.
-    
+
 -   **width** – Maximum length of wrapped lines.
-    
+
 -   **break\_long\_words** – If a word is longer than `width`, break it across lines.
-    
+
 -   **break\_on\_hyphens** – If a word contains hyphens, it may be split across lines.
-    
+
 -   **wrapstring** – String to join each wrapped line. Defaults to `Environment.newline_sequence`.
-    
+
 
 Changelog
 
@@ -2405,15 +2405,15 @@ Added in version 3.1: A context can be passed to the `trans` tag to use `pgettex
 It’s possible to translate strings in expressions with these functions:
 
 -   `_(message)`: Alias for `gettext`.
-    
+
 -   `gettext(message)`: Translate a message.
-    
+
 -   `ngettext(singluar, plural, n)`: Translate a singular or plural message based on a count variable.
-    
+
 -   `pgettext(context, message)`: Like `gettext()`, but picks the translation based on the context string.
-    
+
 -   `npgettext(context, singular, plural, n)`: Like `npgettext()`, but picks the translation based on the context string.
-    
+
 
 You can print a translated string like this:
 

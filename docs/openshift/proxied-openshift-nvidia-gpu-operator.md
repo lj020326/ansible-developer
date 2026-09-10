@@ -164,4 +164,4 @@ nvidia-driver-daemonset-xdz8s              1/1     Running    0          5m42s
 
 * https://liveaverage.com/blog/proxied-openshift-nvidia-gpu-operator/
 * https://github.com/liveaverage/packer-ocp4-vsphere-upi
-* 
+*

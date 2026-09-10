@@ -24,8 +24,8 @@ You can find out how to either map the submodule to its external source or remov
 To create the mapping reference, enter the following into your .gitmodules file in the root of your repository (if you haven't already, create it):
 
 ```
-[submodule "path_to_submodule"] 
-  path = path_to_submodule 
+[submodule "path_to_submodule"]
+  path = path_to_submodule
   url = git://url-of-source/
 ```
 

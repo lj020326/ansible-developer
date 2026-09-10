@@ -36,7 +36,7 @@ _Warning: You should never amend commits that have been pushed up to a public/sh
 ## [Dangit, I need to change the message on my last commit!](https://dangitgit.com/en#change-last-commit-message)
 
 ```git
-git commit --amend 
+git commit --amend
 # follow prompts to change the commit message
 ```
 

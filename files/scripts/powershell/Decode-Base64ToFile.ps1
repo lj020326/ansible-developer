@@ -5,10 +5,10 @@ function Decode-Base64ToFile{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$True)]
-        [string] 
+        [string]
         $outputfile,
         [Parameter(Mandatory=$True)]
-        [string] 
+        [string]
         $base64string
     )
     [System.IO.File]::WriteAllText($outputfile, [System.Text.Encoding]::Utf8.GetString([System.Convert]::FromBase64String($base64string)))
@@ -17,7 +17,7 @@ function Decode-Base64ToFile{
 
 #[System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes([System.IO.File]::ReadAllText("hello.txt")))
 
-#Hello, World! 
+#Hello, World!
 $base64 = "SGVsbG8sIFdvbHJkIQ0K"
 $outputfile = "hello.txt"
 

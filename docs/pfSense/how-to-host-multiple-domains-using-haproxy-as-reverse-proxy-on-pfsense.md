@@ -172,18 +172,18 @@ The mechanism to allow multiple domains to be served by a single frontend is cal
 -   **SSL Offloading**:
     -   **SNI Filter**: empty
     -   **Certificate:**
-        
+
         -   _Select the certificate of your pfSense webConfigurator_ (will be the default certificate)
-        
+
         -   **Add ACL for certificate CommonName**: checked
         -   **Add ACL for certificate Subject Alternative Names**: checked
     -   **OSCP:** unchecked
     -   ****Additional certificates****:
-        
+
         -   _Click down arrow to add an entry_
             -   _Select the ACME Certificate_
             -   _Repeat this step for each domain you will host_
-        
+
         -   **Add ACL for certificate CommonName**: checked
         -   **Add ACL for certificate Subject Alternative Names**: checked
     -   **Advanced ssl options**: empty
@@ -257,16 +257,16 @@ That is all there is to it. From now on, whoever tries to visit any of your doma
 
 On a Windows machine, you can open a browser, say Mozilla Firefox or Microsoft Edge, and type the domain name (not the IP). you will notice that “mydomain.com” will be redirected to “https://mydomain.com” and “www.mydomain.net” will be redirected to “https://www.mydomain.net”. You should also notice that no warning will be shown because the SSL certificate will match the domain name.
 
-On a Linux machine, another test that you can do is using _openssl_ tool to check whether the certificate is properly served to a particular domain name: For such, type “_openssl s\_client -servername mydomain.com -host 10.20.100.2 -port 443 < /dev/null | grep subject=CN_  
+On a Linux machine, another test that you can do is using _openssl_ tool to check whether the certificate is properly served to a particular domain name: For such, type “_openssl s\_client -servername mydomain.com -host 10.20.100.2 -port 443 < /dev/null | grep subject=CN_
 The answer should be something like:
 
-_depth=2 C = US, O = Internet Security Research Group, CN = ISRG Root X1  
-verify return:1  
-depth=1 C = US, O = Let’s Encrypt, CN = R3  
-verify return:1  
-depth=0 CN = mydomain.com  
-verify return:1  
-DONE  
+_depth=2 C = US, O = Internet Security Research Group, CN = ISRG Root X1
+verify return:1
+depth=1 C = US, O = Let’s Encrypt, CN = R3
+verify return:1
+depth=0 CN = mydomain.com
+verify return:1
+DONE
 subject=CN = mydomain.com_
 
 Finally, on a machine without a GUI, you can use a command-line browser, such as w3m. An example would be _“w3m mydomain.com”_. If everything is working, at the bottom of the browse, you should see something like _“Viewing\[SSL\]”_, which means that the connection is secure.
@@ -276,4 +276,4 @@ That is it, have fun!
 ## Reference
 
 - https://geekistheway.com/2022/10/17/how-to-host-multiple-domains-using-haproxy-as-reverse-proxy-on-pfsense/
-- 
+-

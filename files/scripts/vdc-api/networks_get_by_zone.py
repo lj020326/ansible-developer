@@ -3,7 +3,7 @@
 #   Name: networks_get_by_zone.py
 #   Purpose: List available networks in a specific zone
 #   Requires: class VDCApiCall in the file vdc_api_call.py
-# For download and information: 
+# For download and information:
 #   http://cloudstore.interoute.com/main/knowledge-centre/library/vdc-api-python-scripts
 #
 # Copyright (C) Interoute Communications Limited, 2014
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     # (1) Get the zone ID
     zone_id = raw_input('ID of the zone?:')
- 
+
     # (2) contents of the request
     request = {
      'zoneid': zone_id
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # (3) send the request to the API server
     result = api.listNetworks(request)
- 
+
     # (4) print out selected parts of the response data
     for network in result['network']:
         print('%s: %s (gateway: %s, cidr: %s)' % (

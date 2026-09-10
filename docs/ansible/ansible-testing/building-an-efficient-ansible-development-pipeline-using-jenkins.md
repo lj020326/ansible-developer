@@ -58,7 +58,7 @@ pipeline {
                 failure {
                     echo 'GIT checkout failed :('
                 }
-               
+
             }
         }
         /* End Pull Ansible code from GIT */
@@ -134,4 +134,4 @@ Implementing this automation saves a substantial amount of time compared to manu
 ## Reference
 
 - https://medium.com/@alexandru.raul/building-an-efficient-ansible-development-pipeline-using-jenkins-8830a0a19de0
-- 
+-

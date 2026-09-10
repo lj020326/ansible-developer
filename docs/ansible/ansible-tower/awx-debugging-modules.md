@@ -3,7 +3,7 @@
 
 ## Debugging modules on AWX control node
 
-Log onto the tower control node 
+Log onto the tower control node
 
 ```shell
 ## log into tower

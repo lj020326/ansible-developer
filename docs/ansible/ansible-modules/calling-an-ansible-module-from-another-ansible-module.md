@@ -17,24 +17,24 @@ tasks:
   ls_server_module:
     name: ex
     other_args:
-    creds: 
+    creds:
 - name: create VNIC Ether
   vnic_ether_module:
     name: ex_child
     parent: ex
-    other_args: 
-    creds: 
+    other_args:
+    creds:
 - name: create VNIC Ether If (VLAN)
   vnic_ether_if_module:
     name: ex_child_child
     parent: ex_child
-    creds: 
+    creds:
 - name: create VNIC Ether
   vnic_ether_module:
     name: ex_child_2
     parent: ex
-    other_args: 
-    creds: 
+    other_args:
+    creds:
 ```
 
 ### Desired
@@ -45,7 +45,7 @@ tasks:
   spt_module:
     name: ex
     other_args:
-    creds: 
+    creds:
     LAN:
       VNIC:
       - name: ex_child
@@ -93,4 +93,4 @@ _Code is not tested (bugs, typos possible)._
 ## Reference
 
 * [Stack Overflow - Calling an Ansible Module from another Ansible Module](https://stackoverflow.com/questions/46893066/calling-an-ansible-module-from-another-ansible-module)
-* 
+*

@@ -25,12 +25,12 @@ According to creator Jamie Cameron it runs like this:
 
 ```shell
 #RH
-$ /usr/libexec/webmin/install-module.pl 
+$ /usr/libexec/webmin/install-module.pl
 # Debian-Ubuntu
 $ /usr/share/webmin/install-module.pl
 ```
 
-Example module download and install 
+Example module download and install
 
 ```shell
 $ wget https://download.webmin.com/download/modules/disk-usage-1.2.wbm.gz
@@ -40,4 +40,4 @@ $ sudo /usr/share/webmin/install-module.pl disk-usage-1.2.wbm.gz
 ## Reference
 
 - https://unix.stackexchange.com/questions/523052/how-to-install-a-webmin-module-by-command-line-bash
-- 
+-

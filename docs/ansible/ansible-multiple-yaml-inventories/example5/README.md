@@ -76,13 +76,13 @@ Each site.yml inventory will be setup similar to the following with the "[dmz|in
 ```yaml
 all:
   hosts:
-    admin01.qa.site[1|2].example.[dmz|int]: 
+    admin01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/admin01.qa.site[1|2].example.[dmz|int]
-    admin02.qa.site[1|2].example.[dmz|int]: 
+    admin02.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/admin01.qa.site[1|2].example.[dmz|int]
-    app01.qa.site[1|2].example.[dmz|int]: 
+    app01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/app01.qa.site[1|2].example.[dmz|int]
-    app02.qa.site[1|2].example.[dmz|int]: 
+    app02.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/app01.qa.site[1|2].example.[dmz|int]
     web01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/web01.qa.site[1|2].example.[dmz|int]
@@ -137,8 +137,8 @@ all:
     ## 'network_client' group is only used in the internal inventory
     ##    to separate the ntp-clients from the servers
     ##
-    ## For the DMZ environment, all machines are ntp-clients 
-    ##    and have the same ntp_servers config  
+    ## For the DMZ environment, all machines are ntp-clients
+    ##    and have the same ntp_servers config
     ##    to common external/publicly-hosted ntp-servers
     ##
     network_client:
@@ -173,7 +173,7 @@ All ntp clients in the 'network_internal' group will have the __ntp_servers__ va
 
 ### Internal Network NTP Client Configuration
 
-For the internal network inventory, the 'ntp_client_internal' group is defined with the parent group of 'ntp_client'.  The 'ntp_client_internal' group has its child group set to the inventory defined group 'network_client'.  
+For the internal network inventory, the 'ntp_client_internal' group is defined with the parent group of 'ntp_client'.  The 'ntp_client_internal' group has its child group set to the inventory defined group 'network_client'.
 
 [inventory/internal/ntp.yml](./inventory/internal/ntp.yml):
 ```yaml
@@ -504,7 +504,7 @@ ntp_peers: |
     {{ host }},
     {% endfor %}
   ]
-  
+
 ntp_local_stratum_enabled: yes
 
 ntp_leapsectz_enabled: yes
@@ -839,13 +839,13 @@ Maintaining such a group configuration can be problematic.
 
 E.g., Say the following parameters are given:
 
-* A 'network' (parent) group has 100, 1000, or lets say __N machines__ and 
+* A 'network' (parent) group has 100, 1000, or lets say __N machines__ and
 * A subset 'network_server' group only has a far less _finite number_ of instances, say 2, 4, or __M machines__
 * A derived 'network_client' defined as the parent group of __N machines__ minus the server group of __M machines__.
 
-So given an inventory with a 'network' group of 1000 machines, and a 'network_server' group of 4 machines, then the 'network_client' group would have 996 machines. 
+So given an inventory with a 'network' group of 1000 machines, and a 'network_server' group of 4 machines, then the 'network_client' group would have 996 machines.
 
-Maintaining a 'network_client' group for multiple use-cases would have to re-define the child group of __(N - M) machines__. 
+Maintaining a 'network_client' group for multiple use-cases would have to re-define the child group of __(N - M) machines__.
 
 This can present risks since then each 'network_client' group is almost the same size as the parent 'network_server' group and exposes risks of maintaining synchronization of the group.
 

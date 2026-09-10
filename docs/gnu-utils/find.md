@@ -47,4 +47,4 @@ find $LOCATION -name $REQUIRED_FILES -type f -mmin +360 -delete
 * https://unix.stackexchange.com/questions/367992/find-files-in-the-order-of-timestamp
 * https://stackoverflow.com/questions/39216204/linux-delete-directories-which-are-older-than-x-days
 * https://stackoverflow.com/questions/249578/how-to-delete-files-older-than-x-hours
-* 
+*

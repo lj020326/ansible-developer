@@ -100,9 +100,9 @@ Your new CA certificate file for publishing is at:
 You now have two important files — `~/easy-rsa/pki/ca.crt` and `~/easy-rsa/pki/private/ca.key` — which make up the public and private components of a Certificate Authority.
 
 -   `ca.crt` is the CA’s public certificate file. Users, servers, and clients will use this certificate to verify that they are part of the same web of trust. Every user and server that uses your CA will need to have a copy of this file. All parties will rely on the public certificate to ensure that someone is not impersonating a system and performing a [Man-in-the-middle attack](https://en.wikipedia.org/wiki/Man-in-the-middle_attack).
-    
+
 -   `ca.key` is the private key that the CA uses to sign certificates for servers and clients. If an attacker gains access to your CA and, in turn, your `ca.key` file, you will need to destroy your CA. This is why your `ca.key` file should **only** be on your CA machine and that, ideally, your CA machine should be kept offline when not signing certificate requests as an extra security measure.
-    
+
 
 With that, your CA is in place and it is ready to be used to sign certificate requests, and to revoke certificates.
 

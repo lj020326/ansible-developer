@@ -5,11 +5,11 @@
 .SYNOPSIS
 Reset-WindowsUpdate.ps1 - Resets the Windows Update components
 
-.DESCRIPTION 
+.DESCRIPTION
 This script will reset all of the Windows Updates components to DEFAULT SETTINGS.
 
 .OUTPUTS
-Results are printed to the console. Future releases will support outputting to a log file. 
+Results are printed to the console. Future releases will support outputting to a log file.
 
 .NOTES
 Written by: Ryan Nemeth
@@ -129,6 +129,6 @@ Write-Host "12) Forcing discovery..."
 usoclient ScanInstallWait
 usoclient StartInstall
 
-#REM SHUTDOWNWITHUPDATES /r /f 
+#REM SHUTDOWNWITHUPDATES /r /f
 
 Write-Host "Process complete. Please reboot your computer."

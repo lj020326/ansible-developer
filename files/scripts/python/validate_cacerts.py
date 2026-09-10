@@ -38,12 +38,12 @@ if __name__ == "__main__":
     execname = get_executable_name()
     scriptname = get_script_name()
     argv = argv[1:]
-    
+
     params = {
         "endpoint_host": ["--host", "-H"],
         "endpoint_port": ["--port", "-P"]
     }
-    
+
     if "--help" in argv or "-h" in argv:
         print(f"({scriptname}) is a very simple python curl based ssl validator.")
         print()

@@ -15,55 +15,55 @@ This scenario shows:
 - Install on Linux, Windows and MacOs: https://multipass.run/install
 - After installing, we can create VMs on our local machine.
 
-``` 
+```
 # creating controlnode, managed nodes (node1, node2, etc.)
 # -c => cpu, -m => memory, -d => disk space
-multipass launch --name controlnode -c 2 -m 2G -d 10G   
+multipass launch --name controlnode -c 2 -m 2G -d 10G
 multipass launch --name node1 -c 2 -m 2G -d 10G
 multipass launch --name node2 -c 2 -m 2G -d 10G
 multipass list
-``` 
+```
 
 ![image](./img/201082045-b90b645b-c6b5-4d8f-9bd6-4bb09c0f0ea7.png)
 
 - Connect VMs by opening shells
 
-``` 
+```
 # get shell on controlnode
 multipass shell controlnode
 # get shell on node1, on different terminal
 multipass shell node1
 # get shell on node2, on different terminal
 multipass shell node2
-``` 
+```
 
 ![image](./img/201082458-97b41058-5389-4301-b1e2-06a1b9d3a4ba.png)
 
-``` 
+```
 sudo apt update
 sudo apt install net-tools
 # to see IPs
 ifconfig
-``` 
+```
 
 - Create ssh public key on control plane
 - Copy the public key from control plane
 
-``` 
+```
 > on controlnode
 ssh-keygen (no password, enter 3 times)
 cat ~/.ssh/id_rsa.pub (copy the value)
-``` 
+```
 
 ![image](./img/201083201-8e0a9bfb-8001-429e-881f-d38a7c970015.png)
 
 - Paste copied public key (control plane) into the authorized_keys in each managed nodes.
 
-``` 
+```
 cd .ssh (on each workers)
-nano authorized_keys 
+nano authorized_keys
 > Paste keys from controlnode (hence managed nodes know the controlnode IP and public key, controlnode can connect it)
-``` 
+```
 
 ![image](./img/201083610-d4141690-d5d7-4f9c-90ba-dbfb6743b2d1.png)
 
@@ -79,7 +79,7 @@ multipass list
 
 ```
 ssh <IP>
-or 
+or
 ssh <username>@<IP>
 ```
 

@@ -18,7 +18,7 @@ IP Address : 192.168.1.50
 
 **Prerequisites**
 
-In order to continue, please make sure that you have installed and configured LDAP server properly. 
+In order to continue, please make sure that you have installed and configured LDAP server properly.
 
 Make sure that you have added the hostname in the **/etc/hosts file** as shown below:
 
@@ -35,7 +35,7 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ```
 
-For the testing purpose, I did a fresh installation of both Ubuntu 22.04 Server and Windows 10 Professional.  Using an already installed OS might not be worked as you expected. Though tested under Ubuntu, it should work on Debian too. This post is not a full-fledged how-to, but should meet minimal ldap+samba configuration requirements. 
+For the testing purpose, I did a fresh installation of both Ubuntu 22.04 Server and Windows 10 Professional.  Using an already installed OS might not be worked as you expected. Though tested under Ubuntu, it should work on Debian too. This post is not a full-fledged how-to, but should meet minimal ldap+samba configuration requirements.
 
 **LDAP Authentication**
 
@@ -388,7 +388,7 @@ Enter your Samba username and password which you have created in the earlier ste
 Oops!! Error!! You may get an error like as shown below if you have Windows 7 OS client.
 
 ```output
-"The specified domain either does not exist or could not be contacted" 
+"The specified domain either does not exist or could not be contacted"
 ```
 
 ![Windows 7 [Running] - Oracle VM VirtualBox_013](./img/Windows-7-Running-Oracle-VM-VirtualBox_013.png)
@@ -457,4 +457,4 @@ Restart the Windows OS machine and you will able to login to Samba domain now.
 ## Reference
 
 * https://www.unixmen.com/setup-samba-domain-controller-with-openldap-backend-in-ubuntu-13-04/
-* 
+*

@@ -162,7 +162,7 @@ How to create ca cert chain with intermediate certs:
     openssl genrsa -aes256 -out leaf.key 4096
     openssl req -new -key leaf.key -out leaf.csr -config leaf.conf
     openssl x509 -req -days 3000 -in leaf.csr -CA int.crt -CAkey int.key -set_serial 01 -out leaf.crt
-	
+
     cat ca.crt int.crt leaf.crt > all.crt
     ```
 
@@ -187,18 +187,18 @@ Now, Chain Of Trust is working fine:
 1) Verify root CA
 
     ```shell
-    openssl verify ca.crt 
+    openssl verify ca.crt
     ca.crt: OK
-    #openssl verify rootcert.pem 
+    #openssl verify rootcert.pem
     #rootcert.pem: OK
     ```
 
 2) Verify intermediate CA
 
     ```shell
-    openssl verify int.crt 
+    openssl verify int.crt
     int.crt: OK
-    #openssl verify scert.pem 
+    #openssl verify scert.pem
     #scert.pem: OK
     ```
 
@@ -209,12 +209,12 @@ Now, Chain Of Trust is working fine:
     leaf.crt: OK
     #openssl verify -CAfile scert.pem ccert.pem
     #ccert.pem: OK
-    ## 
-    ## Warning, the certificate chain verification commands above are more permissive that you might expect! 
-    ## By default, in addition to checking the given CAfile, they also check for any matching CAs in the system's certs directory 
-    ## e.g. /etc/ssl/certs. 
+    ##
+    ## Warning, the certificate chain verification commands above are more permissive that you might expect!
+    ## By default, in addition to checking the given CAfile, they also check for any matching CAs in the system's certs directory
+    ## e.g. /etc/ssl/certs.
     ## To prevent this behavior and make sure you're checking against your particular CA cert, also pass a -CApath option with a non-existant directory
-    ## E.g., 
+    ## E.g.,
     ## openssl verify -CApath nosuchdir -CAfile scert.pem ccert.pem
     ##
     ```
@@ -236,19 +236,19 @@ Now, Chain Of Trust is working fine:
     ```
 
     Display cert chain info:
-	
+
     ```shell
     root@admin2:[johnson.int]$ openssl crl2pkcs7 -nocrl -certfile nas2.chain.pem | openssl pkcs7 -print_certs -noout
 
     subject=C = US, ST = New York, L = CSH, O = Johnsonville Internal, OU = Mostly Impractical, CN = nas2
     issuer=C = US, ST = New York, L = CSH, O = Johnsonville Internal, OU = Mostly Impractical, CN = johnson.int
-	
+
     subject=C = US, ST = New York, L = CSH, O = Johnsonville Internal, OU = Mostly Impractical, CN = johnson.int
     issuer=C = US, ST = New York, L = New York, O = Dettonville LLC, OU = Research, CN = Dettonville LLC
-	
+
     subject=C = US, ST = New York, L = New York, O = Dettonville LLC, OU = Research, CN = Dettonville LLC
     issuer=C = US, ST = New York, L = New York, O = Dettonville LLC, OU = Research, CN = Dettonville LLC
-	
+
     root@admin2:[johnson.int]$
     ```
 

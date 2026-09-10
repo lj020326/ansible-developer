@@ -1,0 +1,135 @@
+name: Global Config
+version: 1.0.0
+schema: v1
+
+models:
+  # =========================================================================
+  # Primary vLLM Backends (gpu01)
+  # =========================================================================
+  # Default model for Chat, Edit, and Apply actions
+  - name: "Qwen 3.8 27B NVFP4 (vLLM Coder)"
+    provider: openai
+    model: qwen-coder
+    apiBase: "${VLLM_API_URL:-https://vllm.llm-gb10.johnson.int/v1}"
+    roles:
+      - chat
+      - edit
+      - apply
+    requestOptions:
+      headers:
+        Authorization: "Bearer ${VLLM_API_KEY}"
+
+  # Secondary vLLM model for execution & reasoning
+  - name: "Nemotron 3.5 30B (vLLM Execution)"
+    provider: openai
+    model: nemotron-lightning
+    apiBase: "https://vllm-exec.llm-gb10.johnson.int/v1"
+    roles:
+      - chat
+      - edit
+    requestOptions:
+      headers:
+        Authorization: "Bearer ${VLLM_API_KEY}"
+
+  # =========================================================================
+  # Fallback / Secondary Ollama Backends
+  # =========================================================================
+  - name: "Qwen 3.5 27B (GB10)"
+    provider: ollama
+    model: qwen3.5:27b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - chat
+      - edit
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  - name: "DeepSeek R1 14B"
+    provider: ollama
+    model: deepseek-r1:14b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - chat
+      - edit
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+#  - name: "Qwen 3.5 27B"
+#    provider: ollama
+#    model: qwen3.5:27b
+#    apiBase: "${OLLAMA_API_URL}"
+#    roles:
+#      - chat
+#    requestOptions:
+#      headers:
+#        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  - name: "Devstral 24B"
+    provider: ollama
+    model: devstral:24b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - chat
+      - edit
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+  - name: "Nomic Embed Text"
+    provider: ollama
+    model: nomic-embed-text:latest
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - embed
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+#  # Fast & capable autocomplete
+#  - name: Gemma 4 E2B (Fast Draft)
+#    provider: llama.cpp
+#    apiBase: "${LLAMA_API_URL}"
+#    model: gemma-4-E2B-it-Q5_K_M
+#    contextLength: 4096
+#    roles:
+#      - autocomplete
+
+  # Qwen2.5 Coder 1.5b on Ollama for lightweight tab autocomplete
+  - name: "Qwen2.5 Coder 1.5b (Autocomplete)"
+    provider: ollama
+    model: qwen2.5-coder:1.5b
+    apiBase: "${OLLAMA_API_URL}"
+    roles:
+      - autocomplete
+    requestOptions:
+      headers:
+        Authorization: "Basic ${OLLAMA_API_KEY}"
+
+# Default model explicitly assigned for Tab Autocomplete engine
+tabAutocompleteModel:
+  name: "Qwen2.5 Coder 1.5b (Autocomplete)"
+  provider: ollama
+  model: qwen2.5-coder:1.5b
+  apiBase: "${OLLAMA_API_URL}"
+  requestOptions:
+    headers:
+      Authorization: "Basic ${OLLAMA_API_KEY}"
+
+tabAutocompleteOptions:
+  # This prevents suggestions from popping up immediately as you type
+  debounceDelay: 500
+  # Explicitly define which characters SHOULD trigger it (exclude the period)
+  triggerCharacters: ["{", "[", "("]
+  # Alternatively, disable automatic triggering entirely if you prefer manual
+  # disable: true
+
+context:
+  - provider: file
+  - provider: code
+  - provider: codebase
+  - provider: terminal
+  - provider: diff
+
+allowAnonymousTelemetry: false

@@ -26,7 +26,7 @@ $IPStats=@{}
 $PrivateNtwk="10.0"
 
 Function Parse-LogEntry{
-    [CmdletBinding()]    
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
         [string]

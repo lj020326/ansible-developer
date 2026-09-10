@@ -20,9 +20,9 @@ I run a lot of heavy program analysis workload on few remote Linux boxes, so my 
 **episode4**: errrr, I think I have randomly tried a few things and looked few stackoverflow posts and it is not going anywhere with hope, so I need to troubleshoot it step by step; of course, the 1st step is to summon our best friend, debug logs (a.k.a verbose); adding -vvv to ssh give me the titled error:
 
 > debug1: Offering public key: debug3: send packet: type 50
-> 
+>
 > debug2: we sent a publickey packet, wait for reply
-> 
+>
 > debug3: receive packet: type 51
 
 okay, that is something, so I did send out my public key and the server did reject it; that is informative, but, but not so useful…:(
@@ -36,7 +36,7 @@ changing the steps a bit to suit Ubuntu instead of Centos:
 1.  Enable logging for the sshd daemon: sudo vi /etc/ssh/sshd_config
 2.  Under logging uncomment:
 
-SyslogFacility AUTH  
+SyslogFacility AUTH
 LogLevel INFO
 
 1.  Change LogLevel from INFO to DEBUG
@@ -87,4 +87,3 @@ Still, what has triggered the changes there regarding ln 56? anyone?
 
 - https://medium.com/ci-cd-devops/ssh-receive-packet-type-51-154288e46609
 - https://chemicloud.com/kb/article/ssh-authentication-refused-bad-ownership-or-modes-for-directory/
-

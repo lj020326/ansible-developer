@@ -1,7 +1,7 @@
 ## LAB: Roles
 
 This scenario shows:
-- how to create roles 
+- how to create roles
 
 ### Prerequisite
 
@@ -121,7 +121,7 @@ mkdir database_servers/tasks
       - libapache2-mod-php
     state: latest
   when: ansible_distribution == "Ubuntu"
-  
+
 - name: start apache (Ubuntu)
   tags: ubuntu,apache,apache2
   service:
@@ -129,7 +129,7 @@ mkdir database_servers/tasks
     state: started
     enabled: yes
   when: ansible_distribution == "Ubuntu"
-  
+
 - name: change email address for admin (Ubuntu)
   tags: ubuntu,apache,apache2
   lineinfile:
@@ -145,7 +145,7 @@ mkdir database_servers/tasks
     name: apache2
     state: restarted
   when: apache2_service.changed
-  
+
 - name: copy default (index) html file for site
   tags: apache,apache2,httpd
   copy:
@@ -153,8 +153,8 @@ mkdir database_servers/tasks
     dest: /var/www/html/index.html
     owner: root
     group: root
-    mode: 0644    
-    
+    mode: 0644
+
 - name: install unzip
   package:
     name: unzip
@@ -166,7 +166,7 @@ mkdir database_servers/tasks
     remote_src: yes
     owner: root
     group: root
-    mode: 0755  
+    mode: 0755
 ```
 
 - Create directory 'roles/web_servers/files' and files in the 'files' directory
@@ -189,4 +189,3 @@ ansible-playbook site.yml
 ```
 
 ![image](./img/202458341-cd28db4c-4ba2-4b0b-8edd-0b245d4f6f07.png)
-

@@ -3,7 +3,7 @@ Terraform Deployments with Ansible - Part 2
 ===
 
 > In this series
-> 
+>
 > 1.  [Motivation & Ansible 101](./terraform-deployments-with-ansible-part-1.md "Terraform & Ansible")
 > 2.  Terraform & Ansible
 
@@ -115,7 +115,7 @@ The task `TF tasks` will import the tasks present in the file **tf-tasks.yml**. 
 - name: Init Terraform
   shell: |
     cd {{ playbook_dir }}/tf;
-    terraform init    
+    terraform init
   when: (operation == "init")
   register: init
 
@@ -129,7 +129,7 @@ The task `TF tasks` will import the tasks present in the file **tf-tasks.yml**. 
     cd {{ playbook_dir }}/tf;
     terraform workspace new {{ env }}
     terraform workspace select {{ env }}
-    terraform plan -var-file=env.tfvars -out=plan.tfplan;    
+    terraform plan -var-file=env.tfvars -out=plan.tfplan;
   when: (operation == "create-plan")
   register: create_plan
 
@@ -142,7 +142,7 @@ The task `TF tasks` will import the tasks present in the file **tf-tasks.yml**. 
   shell: |
     cd {{ playbook_dir }}/tf;
     terraform workspace select {{ env }}
-    terraform apply plan.tfplan    
+    terraform apply plan.tfplan
   when: (operation == "create")
   register: create
 
@@ -156,7 +156,7 @@ The task `TF tasks` will import the tasks present in the file **tf-tasks.yml**. 
     cd {{ playbook_dir }}/tf;
     terraform workspace new {{ env }}
     terraform workspace select {{ env }}
-    terraform destroy -var-file=env.tfvars -auto-approve    
+    terraform destroy -var-file=env.tfvars -auto-approve
   when: (operation == "destroy")
   register: destroy
 
@@ -171,15 +171,15 @@ An interesting aspect of the script is that it supports [conditional execution](
 Here is what each task in the playbook does:
 
 1.  **Substitute tfvars**: This task copies the Jinja2 template **templates/tfvars.j2** to **{{ playbook_dir }}/tf/env.tfvars** after transforming the values of the variables. `{{ playbook_dir }}` is an inbuilt variable whose value is the path to the playbook file’s directory. In our case, it will be the path to the folder containing the playbook file **cluster.yml**.
-    
+
 2.  **Init Terraform**: When the value of the parameter `operation` is set to **init**, this task will initialize Terraform, and the subsequent task will display the output of initialization on the console.
-    
+
 3.  **Create resources - Plan**: This task will compute the required changes to the infrastructure, and the next task will display the computed changes on the console. You might have noticed that we have used Terraform workspaces in this task. Since we have one state file configured for the Terraform backend, it will be overwritten whenever you reuse the state for a different environment (**production** and **staging**). [Terraform workspaces](https://www.terraform.io/docs/state/workspaces.html) create a separation between states based on a key, which, in our case, is the name of the environment.
-    
+
 4.  **Create resources**: This task will create the resources based on the plan file generated in the previous step. The subsequent task will print the status of the operation to the console.
-    
+
 5.  **Destroy resources**: This task will destroy the infrastructure. Please note that we have configured this step to execute without approval, and hence you should not use it in its current form on production.
-    
+
 
 Let’s now define the Jinja template, tfvars.j2, that we used in the playbook’s first task. Create a file named tfvars.j2 in the templates folder and add the following code to it.
 
@@ -251,7 +251,7 @@ location='australiaeast'
 if ! command -v az >/dev/null; then
     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 fi
- 
+
 # Authenticate using service principal on CI
 az login
 az account set --subscription $1
@@ -379,4 +379,3 @@ Terraform destroy - staging
 ## Conclusion
 
 We discussed how we could combine Ansible and Terraform and use a little bit of magic of Jinja templates to generate .tfvar files for Terraform dynamically. You must have noticed that this approach is quite flexible and not dependent on Terraform. You can use the same approach to simplify your [Azure ARM templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview) as well.
-

@@ -55,5 +55,3 @@ openssl pkcs12 -in $CERT_DIR/certificate.p12 -noout -info -passin "pass:${PASSWD
 echo "****"
 echo "Create package with certs"
 tar -zcvf certs.tgz "${CERT_DIR}"
-
-

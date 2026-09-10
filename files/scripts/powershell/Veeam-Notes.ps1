@@ -52,4 +52,3 @@ $BACKUP_SUMMARY = Get-ChildItem $nas | Select-Object NAME, LastWriteTime,  @{N='
 
 #Send an email
 Send-MailMessage  -subject $emailsubject -BodyAsHtml "$BACKUP_SUMMARY" -From $email_notify_from -to $email_notify_to -SmtpServer $mailserver -port $smtpport
-

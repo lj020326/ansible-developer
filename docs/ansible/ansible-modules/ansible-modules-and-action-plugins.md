@@ -52,7 +52,7 @@ if __name__ == '__main__':
     args = module.params
     # [..] check for early return reasons
 
-    orig_file = _normalize_dirpath(args['path'])        
+    orig_file = _normalize_dirpath(args['path'])
     backup_dir = _normalize_dirpath(args['backup_dir'])
     timestamp = create_timestamp()
     backup_file = create_backup_filename(backup_dir, orig_file, timestamp)
@@ -79,12 +79,12 @@ But:
 -   One still have to specify the backup directory for each execution of the module.
 -   We would like to share the same timestamp for all executions of the module within the same playbook run.
 
-A solution would be to define the backup directory as a variable, and to have the module read this variable. Similarly, the module could write the generated timestamp into a variable that it would read upon further executions.  
+A solution would be to define the backup directory as a variable, and to have the module read this variable. Similarly, the module could write the generated timestamp into a variable that it would read upon further executions.
 Unfortunately, modules can’t read or write variables. All they can access is the facts of the target machine they are executed on. That led us to action plugins.
 
 ## Action Plugins
 
-As explained on [Ansible’s Google Group](https://groups.google.com/forum/#!searchin/ansible-project/action$20plugin$20vs$20module/ansible-project/wNSJ4g-f4F8/xlpijLcRNSUJ): “action\_plugins are a special type of module, or a compliment to existing modules. action\_plugins get run on the ‘master’ instead of on the target, for modules like file/copy/template, some of the work needs to be done on the master before it executes things on the target. The action plugin executes first and can then execute (or not) the normal module”.  
+As explained on [Ansible’s Google Group](https://groups.google.com/forum/#!searchin/ansible-project/action$20plugin$20vs$20module/ansible-project/wNSJ4g-f4F8/xlpijLcRNSUJ): “action\_plugins are a special type of module, or a compliment to existing modules. action\_plugins get run on the ‘master’ instead of on the target, for modules like file/copy/template, some of the work needs to be done on the master before it executes things on the target. The action plugin executes first and can then execute (or not) the normal module”.
 For instance, the [copy action plugin](https://github.com/ansible/ansible/blob/stable-1.9/lib/ansible/runner/action_plugins/copy.py) calls (`_execute_module`) the [copy module](https://github.com/ansible/ansible-modules-core/blob/stable-1.9/files/copy.py).
 
 Custom action plugins must be placed under the [configured `action_plugins` path](http://docs.ansible.com/intro_configuration.html#action-plugins), or alongside playbooks under `./action_plugins`.
@@ -234,4 +234,4 @@ The complete implementation can be found on [Github](https://github.com/lj020326
 ## Reference
 
 - [ansible-modules-and-action-plugins](http://ndemengel.github.io/2015/01/20/ansible-modules-and-action-plugins/)
-- 
+-

@@ -102,11 +102,11 @@ As you've seen, the process of renaming "master" to "main" isn't terribly compli
 
 Keep in mind your toolchain.
 
-The settings for your 
+The settings for your
 (1) online repo configuration for the HEAD branch location (bitbucket, gitea, gitlab, etc) will likely need to be updated to reflect the new HEAD branch location
 (2) as well as any CI/CD tools, such as GitHub Actions, Azure DevOps / Atlassian Bamboo / GitLab CI pipelines, etc.  You must check these tools thoroughly to make sure any specific "origin/master" branch settings that need to be updated in those settings/configurations.
 
 ## Reference
 
 - https://www.git-tower.com/learn/git/faq/git-rename-master-to-main/
-- 
+-

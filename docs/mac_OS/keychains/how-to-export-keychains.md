@@ -7,13 +7,13 @@
 This is just about [how](https://gist.github.com/rwest/1583781) I did it a many years ago, this is that script update for [Yosemite 10.11.5](https://gist.github.com/TaergLee/50934395f0dafbb7f7cb "here") - but I've not tested it.
 
 1.  A script that saves each item in the Keychain to text:
-    
+
     ```
     security dump-keychain -d login.keychain > keychain.txt
     ```
-    
+
 2.  A second AppleScript item that clicks on the "Allow" button that the 1st script triggers when reading the item out of the KeyChain.
-    
+
 
 \[Edit: July 2016\] This has been updated to 10.11.5 note as some have reported locking up their Mac with the 0.2 delay, I've limited the script to only process 200 results at a time, thus if you have 1050 keychain items, you'll need to run this script 6 time in the ScriptEditor, you'll also have to allow the ScriptEditor to be enabled in the Accessibility section in the security preferences in :
 
@@ -57,19 +57,19 @@ To enable AppleScript to interact with dialogue box the System Preferences -> Se
 I wrote a python script that converts the keychain dump to an Excel file and thought I share it with you. I choose Excel over CSV or TSV because a lot of people have it installed and it just works by double clicking on the file. You may of course modify the script to print any other format. I did this on OS X 10.11 El Capitan, but should work on older OS' as well.
 
 1.  Since I do not like storing my passwords plaintext on my hard drive, I created an encrypted container using the Disk Utility app. Simply open Disk Utility (press cmd+Space, type "disk"). In the app, press cmd+N for new image, change the name to SEC, change encryption to 256-Bit AES and save it under SEC in a directory of you choice. Then mount the volume by doubleclicking on the file (or using Disk Utility).
-    
+
 2.  Create a new file named keychain.py in the secure container and paste the code below.
-    
+
 3.  Now open Terminal.app and change directory to the mounted encrypted volume: `cd /Volumes/SEC`
-    
+
 4.  We need the python package manager for installing the Excel module (you will be prompted for your password): `sudo easy_install pip`
-    
+
 5.  We need to install the Python Excel module: `sudo pip install xlwt`
-    
+
 6.  Now export the passwords using one of the other answers to this question. I just did `security dump-keychain -d > keychain.txt` and spam clicked on the Allow button while holding the mouse with my other hand.
-    
+
 7.  The last step is to convert the txt file to a readable Excel sheet using the python script: `python keychain.py keychain.txt keychain.xls`
-    
+
 
 ```python
 #!/usr/bin/env python
@@ -114,7 +114,7 @@ regex = re.compile(
 
 # Dictionary used by the clean function (Apple is not always right about the
 # types of the field)
-field2type = { 
+field2type = {
     "name": "blob",
     "hex8": "blob",
     "acct": "blob",
@@ -122,7 +122,7 @@ field2type = {
     "cdat": "timedate",
     "crtr": "uint32",
     "cusi": "sint32",
-    "desc": "blob", 
+    "desc": "blob",
     "gena": "blob",
     "icmt": "blob",
     "invi": "sint32",
@@ -134,7 +134,7 @@ field2type = {
     "ptcl": "blob",
     "scrp": "sint32",
     "sdmn": "blob",
-    "srvr": "blob", 
+    "srvr": "blob",
     "svce": "blob",
     "type": "blob",
     "data": "simple",
@@ -235,7 +235,7 @@ print "Saved {0} passwords to '{1}'".format(i-1, sys.argv[2])
 
 ### Modified Python to export to csv using Pandas
 
-And here is a modified version of the above python script to create a csv file for Firefox import. 
+And here is a modified version of the above python script to create a csv file for Firefox import.
 On MacOs it needs a `pip install pandas` before running.
 
 ```python
@@ -286,7 +286,7 @@ regex = re.compile(
 
 # Dictionary used by the clean function (Apple is not always right about the
 # types of the field)
-field2type = { 
+field2type = {
     "name": "blob",
     "hex8": "blob",
     "acct": "blob",
@@ -294,7 +294,7 @@ field2type = {
     "cdat": "timedate",
     "crtr": "uint32",
     "cusi": "sint32",
-    "desc": "blob", 
+    "desc": "blob",
     "gena": "blob",
     "icmt": "blob",
     "invi": "sint32",
@@ -306,7 +306,7 @@ field2type = {
     "ptcl": "blob",
     "scrp": "sint32",
     "sdmn": "blob",
-    "srvr": "blob", 
+    "srvr": "blob",
     "svce": "blob",
     "type": "blob",
     "data": "simple",
@@ -377,18 +377,18 @@ for match in regex.finditer(buffer):
             pass
         else:
             continue
-            
+
         datstr = clean("cdat", match)
         mo = re.match(r"(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z000", datstr)
         if mo:
             dstr = mo.group(1)+" "+mo.group(2)+" "+mo.group(3)+" "+mo.group(4)+" "+mo.group(5)+" "+mo.group(6)
             epoch = int( (datetime.datetime(int(mo.group(1)), int(mo.group(2)), int(mo.group(3)), int(mo.group(4)), int(mo.group(5)), int(mo.group(6))) - datetime.datetime(1970,1,1) ).total_seconds())
-            
+
         record = {"url": url + "://"+ clean("srvr", match),
                   "username" : clean("acct", match),
                   "password" : clean("data", match),
                   "httpRealm": "",
-                  "formActionOrigin": url + "://"+ clean("srvr", match), 
+                  "formActionOrigin": url + "://"+ clean("srvr", match),
                   "guid": "",
                   "timeCreated":         epoch,
                   "timeLastUsed":        epoch,
@@ -406,19 +406,19 @@ print "Saved {0} passwords to '{1}'".format(i-1, sys.argv[2])
 I wrote a python script that converts the keychain dump to an Excel file and thought I share it with you. I choose Excel over CSV or TSV because a lot of people have it installed and it just works by double clicking on the file. You may of course modify the script to print any other format. I did this on OS X 10.11 El Capitan, but should work on older OS' as well.
 
 1.  Since I do not like storing my passwords plaintext on my hard drive, I created an encrypted container using the Disk Utility app. Simply open Disk Utility (press cmd+Space, type "disk"). In the app, press cmd+N for new image, change the name to SEC, change encryption to 256-Bit AES and save it under SEC in a directory of you choice. Then mount the volume by doubleclicking on the file (or using Disk Utility).
-    
+
 2.  Create a new file named keychain.py in the secure container and paste the code below.
-    
+
 3.  Now open Terminal.app and change directory to the mounted encrypted volume: `cd /Volumes/SEC`
-    
+
 4.  We need the python package manager for installing the Excel module (you will be prompted for your password): `sudo easy_install pip`
-    
+
 5.  We need to install the Python Excel module: `sudo pip install xlwt`
-    
+
 6.  Now export the passwords using one of the other answers to this question. I just did `security dump-keychain -d > keychain.txt` and spam clicked on the Allow button while holding the mouse with my other hand.
-    
+
 7.  The last step is to convert the txt file to a readable Excel sheet using the python script: `python keychain.py keychain.txt keychain.xls`
-    
+
 
 .
 
@@ -465,7 +465,7 @@ regex = re.compile(
 
 # Dictionary used by the clean function (Apple is not always right about the
 # types of the field)
-field2type = { 
+field2type = {
     "name": "blob",
     "hex8": "blob",
     "acct": "blob",
@@ -473,7 +473,7 @@ field2type = {
     "cdat": "timedate",
     "crtr": "uint32",
     "cusi": "sint32",
-    "desc": "blob", 
+    "desc": "blob",
     "gena": "blob",
     "icmt": "blob",
     "invi": "sint32",
@@ -485,7 +485,7 @@ field2type = {
     "ptcl": "blob",
     "scrp": "sint32",
     "sdmn": "blob",
-    "srvr": "blob", 
+    "srvr": "blob",
     "svce": "blob",
     "type": "blob",
     "data": "simple",

@@ -2,9 +2,9 @@
 ##
 ## Init-Log4net - Initialize log4net logger
 ##
-## pass $configSettings hash for external file dependencies: 
-## 1) log4netDllPath - path for log4net.dll 
-## 2) logConfigFilePath - path for log4net config file 
+## pass $configSettings hash for external file dependencies:
+## 1) log4netDllPath - path for log4net.dll
+## 2) logConfigFilePath - path for log4net config file
 ##
 function Configure-Log4net([hashtable] $configSettings) {
 	Add-Type -Assembly System.Configuration
@@ -15,7 +15,7 @@ function Configure-Log4net([hashtable] $configSettings) {
 	if ( -not (test-path $log4netDllPath) ) {
 		throw "Log4net library cannot be found on the path $log4netDllPath"
 	}
-	
+
 	[System.Reflection.Assembly]::LoadFrom($log4netDllPath) | Out-Null
 
 	#Reset
@@ -31,6 +31,6 @@ function Configure-Log4net([hashtable] $configSettings) {
 		$logger = $LogManager::GetLogger("PowerShell")
 		Write-Verbose "Log4net Logger is configured"
 	}
-	
+
 	return $logger
 }

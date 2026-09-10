@@ -426,16 +426,16 @@ rootdir: D:\Blog-Codes\phone-number-validator
 plugins: requests-mock-1.10.0
 collected 8 items
 
-tests/test_validator.py::test_valid_phone_number PASSED                                                     [ 12%] 
-tests/test_validator.py::test_invalid_phone_number PASSED                                                   [ 25%] 
-tests/test_validator.py::test_api_call_failure PASSED                                                       [ 37%] 
+tests/test_validator.py::test_valid_phone_number PASSED                                                     [ 12%]
+tests/test_validator.py::test_invalid_phone_number PASSED                                                   [ 25%]
+tests/test_validator.py::test_api_call_failure PASSED                                                       [ 37%]
 tests/test_validator.py::test_phone_number_without_country_code PASSED                                      [ 50%]
-tests/test_validator.py::test_phone_number_with_unsupported_country_code PASSED                             [ 62%] 
-tests/test_validator.py::test_invalid_api_key PASSED                                                        [ 75%] 
-tests/test_validator.py::test_invalid_phone_number_type PASSED                                              [ 87%] 
-tests/test_validator.py::test_empty_phone_number PASSED                                                     [100%] 
+tests/test_validator.py::test_phone_number_with_unsupported_country_code PASSED                             [ 62%]
+tests/test_validator.py::test_invalid_api_key PASSED                                                        [ 75%]
+tests/test_validator.py::test_invalid_phone_number_type PASSED                                              [ 87%]
+tests/test_validator.py::test_empty_phone_number PASSED                                                     [100%]
 
-=============================================== 8 passed in 0.05s ================================================ 
+=============================================== 8 passed in 0.05s ================================================
 ```
 
 ## How to Publish the Package
@@ -506,4 +506,4 @@ ___
 ## Reference
 
 - https://www.freecodecamp.org/news/how-to-build-and-publish-python-packages-with-poetry/
-- 
+-

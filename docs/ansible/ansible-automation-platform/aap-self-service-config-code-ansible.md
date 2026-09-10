@@ -43,9 +43,9 @@ stages:
   - Configure Ansible Controller
 
 
-display-ee-information:   
+display-ee-information:
   tags:
-    - controller-system-ee 
+    - controller-system-ee
   stage: Ansible EE Information
   environment: dev
   only:
@@ -231,4 +231,4 @@ This model creates a reliable CaC approach to managing organizations within the 
 ## Reference
 
 * https://www.redhat.com/sysadmin/self-service-config-code-ansible
-* 
+*

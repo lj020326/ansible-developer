@@ -1,5 +1,5 @@
 ---
-name: Documentation Standards
+name: Documentation Standards (ansible-developer)
 globs: ["**/*.md", "README.md", "docs/**/*"]
 alwaysApply: true
 description: Documentation style guide

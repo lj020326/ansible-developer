@@ -116,7 +116,7 @@ function main() {
     logDebug "response[0]=${response}"
 
     if [[ "${?}" != "0" ]]; then exit 1; fi
-  
+
     response=$(getManifestList "${response}" "${url}")
     logDebug "response[1]=${response}"
 

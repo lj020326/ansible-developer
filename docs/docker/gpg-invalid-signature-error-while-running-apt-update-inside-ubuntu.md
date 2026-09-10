@@ -34,7 +34,7 @@ FYI, The machine has the following docker version on it- `Docker version 19.03.1
 ### Comments
 
 -   checkout duplicate on askubuntu [apt update throws signature error in ubuntu 20 04 container on arm](https://askubuntu.com/questions/1263284/apt-update-throws-signature-error-in-ubuntu-20-04-container-on-arm)
-    
+
 -   same issue occurred with php8 docker container
 
 ## Solution
@@ -48,4 +48,4 @@ As mentioned in [comment](https://stackoverflow.com/questions/64439278/gpg-inval
 ## Reference
 
 - https://stackoverflow.com/questions/64439278/gpg-invalid-signature-error-while-running-apt-update-inside-arm32v7-ubuntu20-04
-- 
+-

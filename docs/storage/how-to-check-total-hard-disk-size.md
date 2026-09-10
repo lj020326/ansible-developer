@@ -50,7 +50,7 @@ $ df -a
 
 ![DF Terminal Command To Check Hard Disk Size in GB](./img/DF-Terminal-Command-To-Check-Hard-Disk-Size-in-GB.jpeg)
 
-### **2. Print Readable Data To Check Hard Disk Size in Ubuntu** 
+### **2. Print Readable Data To Check Hard Disk Size in Ubuntu**
 
 ___
 
@@ -171,7 +171,7 @@ $ df -h -t ext4
 ___
 
 
-If you want to display free disk space in human readable output with sizes in M/G then use this command to check free file space on file system. For that you have to type command like this: 
+If you want to display free disk space in human readable output with sizes in M/G then use this command to check free file space on file system. For that you have to type command like this:
 
 Code:
 ```shell
@@ -180,14 +180,14 @@ $ df -h
 $ df -k
 ```
 
-The command shows the following output:  
+The command shows the following output:
 
-> Filesystem Size Used Avail Use% Mounted on  
-> /dev/md3 1.8T 205G 1.5T 13% 
-> /tmpfs 16G 100K 16G 1% /dev/shm  
-> /dev/md1 496M 73M 398M 16% /boot  
+> Filesystem Size Used Avail Use% Mounted on
+> /dev/md3 1.8T 205G 1.5T 13%
+> /tmpfs 16G 100K 16G 1% /dev/shm
+> /dev/md1 496M 73M 398M 16% /boot
 > /dev/md2 5.0G 1.1G 4.0G 22% /tmp
-> 
+>
 
 In this command –h option is for “human readable” output. From this command you can check the free disk space with suffixes : Byte, Kilobyte, Megabyte, Gigabyte, Terabyte and Petabyte.
 
@@ -248,4 +248,4 @@ $ du -sm Pictures/* | sort -nr
 
 * https://www.ubuntupit.com/how-to-check-total-hard-disk-size-in-ubuntu-terminal/
 * https://hoststud.com/resources/how-to-check-free-disk-space-on-centos-7.255/
-* 
+*

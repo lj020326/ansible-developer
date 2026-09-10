@@ -3,7 +3,7 @@
 #
 # This is a complete update to my previous shutdown script.  No longer do we
 # loop through the esx hosts and shut down VMs per host.  We now just shut them
-# all down up front.  Also, no more $vmstoleaveon variable.  I'm assuming here 
+# all down up front.  Also, no more $vmstoleaveon variable.  I'm assuming here
 # that your vCenter is not virtual.  If it is you can most likely grab version
 # 1 of this script and take the code to leave the vCenter host till last.  Maybe
 # someday I'll get around to updating it to merge the two...but for now, this is
@@ -12,10 +12,10 @@
 # This script does have a 'partner' script that powers the VMs back on, you can
 # grab that script at http://blog.mwpreston.net/shares/
 #
-# Created By: Mike Preston, 2012 - With a whole lot of help from Eric Wright 
+# Created By: Mike Preston, 2012 - With a whole lot of help from Eric Wright
 #                                  (@discoposse)
 #
-# Variables:  $mysecret - a secret word to actually make the script run, stops 
+# Variables:  $mysecret - a secret word to actually make the script run, stops
 #                         the script from running when double click DISASTER
 #             $vcenter - The IP/DNS of your vCenter Server
 #             $username/password - credentials for your vCenter Server
@@ -52,8 +52,8 @@ Write-Host "be setup to run during the startup of this machine ($vcenter). " -Fo
 Write-Host "This will ensure that your VMs are powered back on once power is restored!" -Foregroundcolor yellow
 Sleep 5
 
-if ($keyword -ne $mysecret) 
-{ 
+if ($keyword -ne $mysecret)
+{
     Write-Host "You haven't passed the proper detonation sequence...ABORTING THE SCRIPT" -ForegroundColor red
     exit
 }
@@ -75,12 +75,12 @@ Get-VM -Location $cluster | where-object {$_.PowerState -eq "PoweredOn" } | Sele
 
 #change DRS Automation level to partially automated...
 Write-Host "Changing cluster DRS Automation Level to Partially Automated" -Foregroundcolor green
-Get-Cluster $cluster | Set-Cluster -DrsAutomation PartiallyAutomated -confirm:$false 
+Get-Cluster $cluster | Set-Cluster -DrsAutomation PartiallyAutomated -confirm:$false
 #change the HA Level
 Write-Host ""
 Write-Host "Disabling HA on the cluster..." -Foregroundcolor green
 Write-Host ""
-Get-Cluster $cluster | Set-Cluster -HAEnabled:$false -confirm:$false 
+Get-Cluster $cluster | Set-Cluster -HAEnabled:$false -confirm:$false
 
 #get VMs again (we will do this again instead of parsing the file in case a VM was powered in the nanosecond that it took to get here.... :)
 Write-Host ""
@@ -89,7 +89,7 @@ Write-Host ""
 $poweredonguests = Get-VM -Location $cluster | where-object {$_.PowerState -eq "PoweredOn" }
 
 #and now, let's start powering off some guests....
-ForEach ( $guest in $poweredonguests ) 
+ForEach ( $guest in $poweredonguests )
 {
     Write-Host "Processing $guest ...." -ForegroundColor Green
     Write-Host "Checking for VMware tools install" -Foregroundcolor Green
@@ -103,7 +103,7 @@ ForEach ( $guest in $poweredonguests )
     {
        write-host "VMware tools detected.  I will attempt to gracefully shutdown $guest"
        $vmshutdown = $guest | shutdown-VMGuest -Confirm:$false
-    }   
+    }
 }
 
 #Lets wait a minute or so for shutdowns to complete
@@ -118,7 +118,7 @@ Write-Host "Beginning Phase 2 - anything left on....night night..." -ForegroundC
 Write-Host ""
 #get our list of guests still powered on...
 $poweredonguests = Get-VM -Location $cluster | where-object {$_.PowerState -eq "PoweredOn" }
-ForEach ( $guest in $poweredonguests ) 
+ForEach ( $guest in $poweredonguests )
 {
     Write-Host "Processing $guest ...." -ForegroundColor Green
     #no checking for toosl, we just need to blast it down...

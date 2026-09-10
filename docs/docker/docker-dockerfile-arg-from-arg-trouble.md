@@ -3,7 +3,7 @@
 
 Using a dynamic [Dockerfile](https://docs.docker.com/engine/reference/builder/) can have great benefits when used in your CI/CD pipeline. You can use the `ARG` statement in your `Dockerfile` to pass in a variable at build time. Even use a variable in the `FROM` statement! Dockerfile ARG FROM ARG. That will make more sense later.
 
-This post is about [Container virtualization technology](https://rancher.com/learning-paths/what-are-containers/), and problems when building a container image using [Docker Engine](https://www.docker.com/products/container-runtime).  
+This post is about [Container virtualization technology](https://rancher.com/learning-paths/what-are-containers/), and problems when building a container image using [Docker Engine](https://www.docker.com/products/container-runtime).
 For some background on a dynamic Dockerfile, check out [Jeff Geerling’s post](https://www.jeffgeerling.com/blog/2017/use-arg-dockerfile-dynamic-image-specification).
 
 One problem I’ve come across with this, is the `Dockerfile` `ARG` variable usage isn’t intuitive. It is actually kind of weird. And I’m not alone on this! There’s lots of feedback in [GitHub Issue #34129](https://github.com/moby/moby/issues/34129).
@@ -18,14 +18,14 @@ FROM myimage:$TAG # <------ This works!
 LABEL BASE_IMAGE="myimage:$TAG" # <------ Does not work!
 ```
 
-The `FROM` above will use the `TAG` passed in from a build-arg, or default to use the string “latest”.  
+The `FROM` above will use the `TAG` passed in from a build-arg, or default to use the string “latest”.
 But the `LABEL` won’t work. The `TAG` portion will be empty!
 
 This was tested with the most recent version of Docker Engine (version: 19.03.5).
 
 ## How Does it Work?
 
-To use a variable in the `FROM` section, you need to put the `ARG` before the `FROM`. So far so good. But, now let’s use that variable again after the `FROM`? No you can’t. It’s not there. Unless you use another `ARG` statement after the `FROM`.  
+To use a variable in the `FROM` section, you need to put the `ARG` before the `FROM`. So far so good. But, now let’s use that variable again after the `FROM`? No you can’t. It’s not there. Unless you use another `ARG` statement after the `FROM`.
 
 Wait, it gets more weird. Any `ARG` before the FIRST `FROM`, can be used in any `FROM` (for multi-stage builds). In fact the `ARG` must be above the first `FROM` even if you only want to use it in a later `FROM`. Wow, that’s a lot of `ARG`s and `FROM`s. The `ARG` is kind of “global” but only if you declare it again inside the build stage.
 
@@ -76,9 +76,9 @@ The `BUILDER_TAG` and `BASE_TAG` will be used in the `FROM` statements. `BASE_TA
 
 ## Conclusion
 
-Remember that `ARG`s at the top of the `Dockerfile` can be used in the `FROM` statements. They are “global” only if you declare the `ARG` again in each build stage (after `FROM` (and before the next `FROM` if using a multi-stage build)).  
+Remember that `ARG`s at the top of the `Dockerfile` can be used in the `FROM` statements. They are “global” only if you declare the `ARG` again in each build stage (after `FROM` (and before the next `FROM` if using a multi-stage build)).
 
-You can remember it this way: `Dockerfile` `ARG` `FROM` `ARG`  
+You can remember it this way: `Dockerfile` `ARG` `FROM` `ARG`
 But, after wasting an hour on this, it was more like: Dockerfile _Arrggh!_ FROM _Arrggh!_
 
 You can use something like this in your CI/CD, for automatic docker image building.

@@ -16,7 +16,7 @@ So, my second attempt at resolving this (first proper attempt) involved carrying
    raw: whoami
    register: connect_test
    changed_when: false
- 
+
  - name: Set passed host connection fact
    set_fact:
      passed_connection: true
@@ -25,7 +25,7 @@ So, my second attempt at resolving this (first proper attempt) involved carrying
 
 Here, I check you can ssh onto the server using ‘raw’ (in case it’s a server without Python installed).    The next step sets a fact called ‘passed\_connection’ as true.    There’s a when condition here checking if the return code of the raw command was zero, but it’s not actually needed – if the raw command fails the playbook won’t move onto this step for the failed host, it’ll just move onto the next host in the list.
 
-This approach also worked when delegating to another host – so doing an nslookup of the inventory host from the host the playbook is running from – 
+This approach also worked when delegating to another host – so doing an nslookup of the inventory host from the host the playbook is running from –
 
 ```yml
 - name: Check DNS name resolves for inventory hostname
@@ -33,16 +33,16 @@ This approach also worked when delegating to another host – so doing an nslook
   ignore_errors: true
   register: dns_lookup
   delegate_to: localhost
- 
+
 - name: Set dns_resolves fact
   set_fact:
     dns_resolves: true
-  when: dns_lookup.rc == 0 
+  when: dns_lookup.rc == 0
 ```
 
 This example is slightly different to the first in that ‘ignore\_errors’ is set to true – this means that even if it fails it will still move onto the next task, which sets the dns\_resolves fact to true; however if it has failed, this fact won’t be set because the when condition \*is\* used this time around.
 
-  
+
 Once the facts are set for our successful hosts, we then need to make use of them.   My idea was to have a play that ran at the end of all my other tasks that read the facts and used them to create lists of the status of each host.    I accomplished this using a combination of jinja2 and set_fact like this –
 
 ```yml
@@ -54,13 +54,13 @@ Once the facts are set for our successful hosts, we then need to make use of the
    delegate_facts: true
    delegate_to: localhost
    run_once: true
- 
+
 - set_fact:
      unsuccessful_hosts: "{{ ansible_play_hosts_all|difference(ansible_play_hosts)}}"
    delegate_facts: true
    delegate_to: localhost
    run_once: true
- 
+
 - set_fact:
      failed_hosts: "{{ hostvars['localhost']['unsuccessful_hosts']|difference(hostvars['localhost']['unreachable_hosts'])}}"
    delegate_facts: true
@@ -68,11 +68,11 @@ Once the facts are set for our successful hosts, we then need to make use of the
    run_once: true
 ```
 
-Not particularly elegant at all – the first set_fact involves looping through all the hosts in the inventory, looking at whether they have certain facts set and if so using jinja2 to add them to lists, which are in turn set as a fact on localhost using a combination of delegate\_to, delegate\_facts and run\_once.   
+Not particularly elegant at all – the first set_fact involves looping through all the hosts in the inventory, looking at whether they have certain facts set and if so using jinja2 to add them to lists, which are in turn set as a fact on localhost using a combination of delegate\_to, delegate\_facts and run\_once.
 
 The second set_fact attempts to determine what hosts failed by looking at the difference between which hosts are left in the play_hosts group and how many were originally in the play (ansible\_play_hosts\_all) – this list includes all hosts that failed to connect and those that failed to complete some operation during the playbook run.
 
-The final set_fact operation works out which hosts were reachable, but still failed.  This information was then written to a report for later analysis.   
+The final set_fact operation works out which hosts were reachable, but still failed.  This information was then written to a report for later analysis.
 
 All this is ok, but its a lot of complex, hard to follow code that doesn’t really accomplish what I wanted to.
 
@@ -85,7 +85,7 @@ name: check ssh
 ping:
 register: ping_check
 ignore_errors: true
- 
+
 add_host:
   host: "{{ inventory_hostname }}"
   groups: "failed_ping"
@@ -120,7 +120,7 @@ Here’s the playbook in full –
   tasks:
    - set_fact:
        connection: "{% if inventory_hostname == \"localhost\" -%}local{% else -%}ssh{%- endif %}"
- 
+
    - name: Check hostname resolves
      shell: "nslookup {{ inventory_hostname }}"
      delegate_to: localhost
@@ -128,17 +128,17 @@ Here’s the playbook in full –
      become: false
      ignore_errors: true
      register: resolve_check
- 
+
    - name: set_success_fact
      set_fact:
        resolve_check_status: passed
      when: resolve_check.failed != true
- 
+
    - name: set_failure_fact
      set_fact:
        resolve_check_status: failed
      when: resolve_check.failed == true
- 
+
 - hosts: localhost
   gather_facts: no
   become: false
@@ -147,7 +147,7 @@ Here’s the playbook in full –
        hostname: "{{ item }}"
        groups: "resolve_check_{{ hostvars[item]['resolve_check_status'] }}"
      with_items: "{{ groups['all'] }}"
- 
+
 - hosts: localhost
   gather_facts: no
   become: false
@@ -159,7 +159,7 @@ Here’s the playbook in full –
    - name: number of hosts passed dns
      debug:
        msg: "{{ groups['resolve_check_passed'] }}"
- 
+
    - name: number of hosts failed dns
      debug:
        msg: "{{ groups['resolve_check_failed'] }}"

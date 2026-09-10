@@ -5,7 +5,7 @@ In the prior [Example 3](../example3/README.md), we found the method to merge mu
 
 Now we will look to apply plays that can target machines in the merged inventory with 'role-based' inventory groups.
 
-E.g., the following scenario will discuss a simple NTP client/server based playbook to apply across the merged inventory. 
+E.g., the following scenario will discuss a simple NTP client/server based playbook to apply across the merged inventory.
 
 ## Overview
 
@@ -54,13 +54,13 @@ Each site.yml inventory will be setup similar to the following with the "[dmz|in
 ```yaml
 all:
   hosts:
-    admin01.qa.site[1|2].example.[dmz|int]: 
+    admin01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/admin01.qa.site[1|2].example.[dmz|int]
-    admin02.qa.site[1|2].example.[dmz|int]: 
+    admin02.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/admin01.qa.site[1|2].example.[dmz|int]
-    app01.qa.site[1|2].example.[dmz|int]: 
+    app01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/app01.qa.site[1|2].example.[dmz|int]
-    app02.qa.site[1|2].example.[dmz|int]: 
+    app02.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/app01.qa.site[1|2].example.[dmz|int]
     web01.qa.site[1|2].example.[dmz|int]:
       trace_var: site[1|2]/web01.qa.site[1|2].example.[dmz|int]
@@ -203,9 +203,9 @@ gateway_ipv4=192.168.221.1
 gateway_ipv4_network_cidr=192.168.221.0/16
 ```
 
-The 'ntp_client' group is defined with the children group of 'environment_test'.  
+The 'ntp_client' group is defined with the children group of 'environment_test'.
 
-Note that the 'ntp_client' group includes the 8 admin machines already included in the 'ntp_server' group.  This overlap can be addressed by making sure that the 'ntp_server' group is excluded for the respective plays that only mean to target the 'ntp_client' machines.  This will be demonstrated in the following verifications section. 
+Note that the 'ntp_client' group includes the 8 admin machines already included in the 'ntp_server' group.  This overlap can be addressed by making sure that the 'ntp_server' group is excluded for the respective plays that only mean to target the 'ntp_client' machines.  This will be demonstrated in the following verifications section.
 
 We will now run through several ansible CLI tests to verify that the correct machines result for each respective limit used.
 

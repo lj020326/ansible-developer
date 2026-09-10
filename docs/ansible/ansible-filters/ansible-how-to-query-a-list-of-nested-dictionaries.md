@@ -207,5 +207,3 @@ If _"without subPath"_ means _"all members without subPath"_ the task below give
 ## Reference
 
 * https://stackoverflow.com/a/66219344
-
-

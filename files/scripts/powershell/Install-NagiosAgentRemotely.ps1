@@ -7,7 +7,7 @@ Paolo Frigo, https://scriptinglibrary.com
    This script allow you to install remotely the NSCP++ agent for Nagios to a target windows computer (server/workstation).
    Included in the installation process is also the deployment of a custom configuration file and the custom powershell scripts for whitebox monitoring.
 .EXAMPLE
-    install-nagiosagentremotely  
+    install-nagiosagentremotely
 #>
 
 

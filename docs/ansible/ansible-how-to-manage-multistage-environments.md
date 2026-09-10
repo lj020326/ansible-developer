@@ -368,4 +368,3 @@ In this article, we’ve explored the flexibility that Ansible provides for mana
 ## Reference
 
 * [How to Manage Multistage Environments with Ansible](https://www.digitalocean.com/community/tutorials/how-to-manage-multistage-environments-with-ansible)
-

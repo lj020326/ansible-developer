@@ -66,7 +66,7 @@ The **VPS** needs to open TCP port 22, 25, 587, 465, 143, 993, 110, 995, 80 and 
 **Debian/Ubuntu:**
 
 ```
-sudo apt install ufw 
+sudo apt install ufw
 
 sudo ufw allow 22,25,587,465,143,993,110,995,80,443/tcp
 
@@ -142,9 +142,9 @@ Then add the following lines in the NAT table, above the COMMIT line. This tells
 # Port Forwarding
 -A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 25 -j DNAT --to-destination <span>10.10.10.2</span>:25
 -A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 587 -j DNAT --to-destination <span>10.10.10.2</span>:587
--A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 465 -j DNAT --to-destination <span>10.10.10.2</span>:465 
+-A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 465 -j DNAT --to-destination <span>10.10.10.2</span>:465
 -A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 143 -j DNAT --to-destination <span>10.10.10.2</span>:143
--A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 993 -j DNAT --to-destination <span>10.10.10.2</span>:993 
+-A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 993 -j DNAT --to-destination <span>10.10.10.2</span>:993
 -A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 110 -j DNAT --to-destination <span>10.10.10.2</span>:110
 -A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span> -p tcp --dport 995 -j DNAT --to-destination <span>10.10.10.2</span>:995
 -A PREROUTING -i <span>enp3s0</span> -d <span>12.34.56.78</span>  -p tcp --dport 80 -j DNAT --to-destination <span>10.10.10.2</span>:80
@@ -182,7 +182,7 @@ sudo iptables -L -t nat
 Sample output:
 
 ```
-target     prot opt source               destination         
+target     prot opt source               destination
 DNAT       tcp  --  anywhere             12.34.56.78  tcp dpt:smtp to:10.10.10.2:25
 DNAT       tcp  --  anywhere             12.34.56.78  tcp dpt:submission to:10.10.10.2:587
 DNAT       tcp  --  anywhere             12.34.56.78  tcp dpt:submissions to:10.10.10.2:465
@@ -194,17 +194,17 @@ DNAT       tcp  --  anywhere             12.34.56.78  tcp dpt:http to:10.10.10.2
 DNAT       tcp  --  anywhere             12.34.56.78  tcp dpt:https to:10.10.10.2:443
 
 Chain INPUT (policy ACCEPT)
-target     prot opt source               destination         
+target     prot opt source               destination
 
 Chain OUTPUT (policy ACCEPT)
-target     prot opt source               destination         
+target     prot opt source               destination
 
 Chain POSTROUTING (policy ACCEPT)
-target     prot opt source               destination         
+target     prot opt source               destination
 MASQUERADE  all  --  10.10.10.0/24          anywhere
 ```
 
-**CentOS/Rocky Linux/Alma Linux  
+**CentOS/Rocky Linux/Alma Linux
 **
 
 Run the following commands on the VPS. Replace 12.34.56.78 with your VPS public IP address. `10.10.10.2` is the mail server private IP address.

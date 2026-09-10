@@ -9,7 +9,7 @@
 		if (-not $Datastore) {
 			$Datastore = Get-Datastore
 		}
-		Foreach ($ds in $Datastore) {  
+		Foreach ($ds in $Datastore) {
 			if ($ds.ExtensionData.info.Vmfs) {
 				$hostviewDSDiskName = $ds.ExtensionData.Info.vmfs.extent[0].diskname
 				if ($ds.ExtensionData.Host) {
@@ -24,9 +24,9 @@
 							if ($device.canonicalName -eq $hostviewDSDiskName) {
 								$hostviewDSAttachState = ""
 								if ($device.operationalState[0] -eq "ok") {
-									$hostviewDSAttachState = "Attached"							
+									$hostviewDSAttachState = "Attached"
 								} elseif ($device.operationalState[0] -eq "off") {
-									$hostviewDSAttachState = "Detached"							
+									$hostviewDSAttachState = "Detached"
 								} else {
 									$hostviewDSAttachState = $device.operationalstate[0]
 								}
@@ -38,7 +38,7 @@
 								$AllInfo += $Info
 							}
 						}
-						
+
 					}
 				}
 			}

@@ -68,9 +68,9 @@ Let's just run it ourselves manually.
 ![](./img/job_dsl2/Build1.png)
 
 -   Look at the build result to see a link to the new Job which has been created by the running of your DSL script in the Seed Job. You should see this in the section called "Generated Jobs". (If you don't see it, you probably have Auto-Refresh disabled. Enable it, or just refresh the page and then you'll see the new job.)
-    
+
 -   Follow this link to your new Job. You can run this new script-generated Job manually or wait the 15 minutes for the scm trigger to kick in.
-    
+
 
 (Note: if you have a new Jenkins server, you might be missing the Git plugin or a Maven installation which Jenkins knows about. That could cause this job to fail when run. If you need to add these, be sure to re-run the Seed Job to make sure the Scripted Job is configured correctly - it won't be if you ran without all the necessary plugins installed in Jenkins.)
 
@@ -117,4 +117,4 @@ That's it. Now you know how to make Seed Jobs, which can create a multitude of S
 * https://stackoverflow.com/questions/35898020/job-dsl-to-create-pipeline-type-job
 * https://github.com/jenkinsci/job-dsl-plugin/wiki/Real-World-Examples
 * https://plugins.jenkins.io/job-dsl
-* 
+*

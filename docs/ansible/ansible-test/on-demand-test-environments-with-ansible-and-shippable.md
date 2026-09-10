@@ -76,41 +76,41 @@ at the end of step 1, you should have two images published in your docker regist
 the **shippable.yml** file can be committed in one of the app repositories or to a separate repository. we have used a different repository, [devops-recipes/on\_demand\_test\_environments](https://github.com/devops-recipes/on-demand-test-environments) , in our sample. the repository containing your jobs and resources ymls is called a [sync repository](http://docs.shippable.com/platform/tutorial/workflow/crud-syncrepo/) and represents your workflow configuration.
 
 ```yaml
-resources: 
-###---------------------------------------------------------------# 
-###----------------------- build/ci resources --------------------# 
-###---------------------------------------------------------------# 
-# back-end image 
-  - name: vote_be_odte 
-    type: image 
-    # replace dr-dockerhub with your docker registry integration name 
-    integration: dr-dockerhub pointer: 
-    # replace devopsrecipes/vote_be with your repository 
-      sourcename: "devopsrecipes/vote_be" 
-      seed: 
-      # specify the latest tag of the image in your docker registry 
-        versionname: "master.2" 
+resources:
+###---------------------------------------------------------------#
+###----------------------- build/ci resources --------------------#
+###---------------------------------------------------------------#
+# back-end image
+  - name: vote_be_odte
+    type: image
+    # replace dr-dockerhub with your docker registry integration name
+    integration: dr-dockerhub pointer:
+    # replace devopsrecipes/vote_be with your repository
+      sourcename: "devopsrecipes/vote_be"
+      seed:
+      # specify the latest tag of the image in your docker registry
+        versionname: "master.2"
 
-# front-end image 
-  - name: vote_fe_odte 
-    type: image 
-    # replace dr-dockerhub with your docker registry integration name 
-    integration: dr-dockerhub 
-    pointer: 
-    # replace devopsrecipes/vote_fe with your repository 
-      sourcename: "devopsrecipes/vote_fe" 
-    seed: 
-    # specify the latest tag of the image in your docker registry 
+# front-end image
+  - name: vote_fe_odte
+    type: image
+    # replace dr-dockerhub with your docker registry integration name
+    integration: dr-dockerhub
+    pointer:
+    # replace devopsrecipes/vote_fe with your repository
+      sourcename: "devopsrecipes/vote_fe"
+    seed:
+    # specify the latest tag of the image in your docker registry
     versionname: "master.3"
 
-# docker options to expose port 80 on the front-end container and link the redis container 
-  - name: vote_fe_options_odte 
-    type: dockeroptions 
-    version: 
-      memory: 128 
-      portmappings: 
-        - "80:5000/tcp" 
-      links: 
+# docker options to expose port 80 on the front-end container and link the redis container
+  - name: vote_fe_options_odte
+    type: dockeroptions
+    version:
+      memory: 128
+      portmappings:
+        - "80:5000/tcp"
+      links:
         - vote_be_odte:redis
 ```
 
@@ -121,34 +121,34 @@ resources:
 add the following to your shippable.yml file and commit it.
 
 ```yaml
-jobs: 
+jobs:
 #---------------------------------------------------------------#
 #------------------- build/ci with shippable ci ----------------#
 #---------------------------------------------------------------#
 
-# ci job definition. the image that is pushed to docker hub is specified in an out image resource. 
-# this image resource becomes an in to the manifest job and triggers the manifest job whenever 
-# a new image version (tag) is created. 
+# ci job definition. the image that is pushed to docker hub is specified in an out image resource.
+# this image resource becomes an in to the manifest job and triggers the manifest job whenever
+# a new image version (tag) is created.
 
-  - name: vote_be_runci 
-    type: runci 
-    steps: 
-      - out: vote_be_odte 
+  - name: vote_be_runci
+    type: runci
+    steps:
+      - out: vote_be_odte
 
-  - name: vote_fe_runci 
-    type: runci 
-    steps: 
-      - out: vote_fe_odte 
+  - name: vote_fe_runci
+    type: runci
+    steps:
+      - out: vote_fe_odte
 
-# application service definition 
+# application service definition
 
-  - name: create_app_man_odte 
-    type: manifest 
-    steps: 
-       - in: vote_fe_odte 
-       - in: vote_fe_options_odte 
-         applyto: 
-           - vote_fe_odte 
+  - name: create_app_man_odte
+    type: manifest
+    steps:
+       - in: vote_fe_odte
+       - in: vote_fe_options_odte
+         applyto:
+           - vote_fe_odte
        - in: vote_be_odte
 ```
 
@@ -163,13 +163,13 @@ we templatize the ansible configuration files to make them flexible.the configur
 here we use the scripts\_repo\_odte\_state environment variable to point to the root of the repository when the playbook is run in a shippable node.
 
 ```ini
-[defaults] 
-# update, as needed, for your scenario 
-host_key_checking=false 
-inventory = ${scripts_repo_odte_state}/infra/provision-ecs-ansible/inventory/ 
+[defaults]
+# update, as needed, for your scenario
+host_key_checking=false
+inventory = ${scripts_repo_odte_state}/infra/provision-ecs-ansible/inventory/
 
-[ssh_connection] 
-# for running on ubuntu 
+[ssh_connection]
+# for running on ubuntu
 control_path=%(directory)s/%%h-%%r
 ```
 
@@ -178,19 +178,19 @@ control_path=%(directory)s/%%h-%%r
 all the variables used by ansible modules to create the cluster are defined as placeholders. these placeholders are replaced at runtime by values defined in a [params](http://docs.shippable.com/platform/workflow/resource/params/#params) resource.
 
 ```yaml
-ec2_instance_type: "${ec2_instance_type}" 
-ec2_image: "${ec2_image}" 
-ec2_keypair: "${ec2_keypair}" 
-ec2_user_data: "#!/bin/bash \n echo ecs_cluster=\"${ecs_cluster_name}\" >> /etc/ecs/ecs.config" 
-ec2_region: "${ec2_region}" 
-ec2_tag_role: "${ec2_tag_role}" 
-ec2_tag_type: "${ec2_tag_type}" 
-ec2_volume_size: ${ec2_volume_size} 
-ec2_count: ${ec2_count} 
-state_res_name: "${state_res_name}" 
-ec2_security_group: "${test_public_sg_id}" 
-ec2_subnet_ids: ["${test_public_sn_01_id}","${test_public_sn_02_id}"] 
-ec2_tag_environment: "${environment}" 
+ec2_instance_type: "${ec2_instance_type}"
+ec2_image: "${ec2_image}"
+ec2_keypair: "${ec2_keypair}"
+ec2_user_data: "#!/bin/bash \n echo ecs_cluster=\"${ecs_cluster_name}\" >> /etc/ecs/ecs.config"
+ec2_region: "${ec2_region}"
+ec2_tag_role: "${ec2_tag_role}"
+ec2_tag_type: "${ec2_tag_type}"
+ec2_volume_size: ${ec2_volume_size}
+ec2_count: ${ec2_count}
+state_res_name: "${state_res_name}"
+ec2_security_group: "${test_public_sg_id}"
+ec2_subnet_ids: ["${test_public_sn_01_id}","${test_public_sn_02_id}"]
+ec2_tag_environment: "${environment}"
 ecs_cluster_name: "${ecs_cluster_name}"
 
 ```
@@ -199,79 +199,79 @@ ecs_cluster_name: "${ecs_cluster_name}"
 #### c. define ansible configuration in the shippable.yml file
 
 ```yaml
-resources: 
+resources:
 
-#---------------------------------------------------------------# 
-#-------------------- common infra resources -------------------# 
-#---------------------------------------------------------------# 
+#---------------------------------------------------------------#
+#-------------------- common infra resources -------------------#
+#---------------------------------------------------------------#
 
-# ansible scripts repository 
-  - name: scripts_repo_odte 
-    type: gitrepo 
-    integration: "dr-github" 
-    pointer: 
-      sourcename: "devops-recipes/on-demand-test-environments" 
-      branch: master 
+# ansible scripts repository
+  - name: scripts_repo_odte
+    type: gitrepo
+    integration: "dr-github"
+    pointer:
+      sourcename: "devops-recipes/on-demand-test-environments"
+      branch: master
 
-# aws integration that sets up the aws cli environment used by ansible playbook 
-  - name: aws_cli_config_odte 
-    type: cliconfig 
-    integration: dr-aws-keys 
-    pointer: 
-      region: us-east-1 
+# aws integration that sets up the aws cli environment used by ansible playbook
+  - name: aws_cli_config_odte
+    type: cliconfig
+    integration: dr-aws-keys
+    pointer:
+      region: us-east-1
 
-# secops approved ami 
-  - name: ami_sec_approved_odte 
-    type: params 
-    version: 
-      params: 
-        ami_id: "ami-9eb4b1e5" 
+# secops approved ami
+  - name: ami_sec_approved_odte
+    type: params
+    version:
+      params:
+        ami_id: "ami-9eb4b1e5"
 
-#---------------------------------------------------------------# 
-#----------------------- test vpc resources --------------------# 
-#---------------------------------------------------------------# 
+#---------------------------------------------------------------#
+#----------------------- test vpc resources --------------------#
+#---------------------------------------------------------------#
 
-# test environment config 
-  - name: test_conf_odte 
-    type: params 
-    version: 
-      params: 
-        ec2_region: "us-east-1" 
-        ec2_tag_role: "dr-on-demand-test-environments" 
-        ec2_tag_type: "ecs-container-instance" 
-        ec2_volume_size: 30 
-        ec2_count: 1 
-        state_res_name: "test_info_odte" 
-        ecs_cluster_name: "test_env_ecs_odte" 
-        environment: "test" 
-        ec2_instance_type: "t2.large" 
-        ec2_image: "ami-9eb4b1e5" 
-        ec2_keypair: "ambarish-useast1" 
+# test environment config
+  - name: test_conf_odte
+    type: params
+    version:
+      params:
+        ec2_region: "us-east-1"
+        ec2_tag_role: "dr-on-demand-test-environments"
+        ec2_tag_type: "ecs-container-instance"
+        ec2_volume_size: 30
+        ec2_count: 1
+        state_res_name: "test_info_odte"
+        ecs_cluster_name: "test_env_ecs_odte"
+        environment: "test"
+        ec2_instance_type: "t2.large"
+        ec2_image: "ami-9eb4b1e5"
+        ec2_keypair: "ambarish-useast1"
 
-# test vpc info 
-  - name: test_vpc_conf_odte 
-    type: params 
-    version: 
-      params: 
-        test_vpc_id: "vpc-a36912da" 
-        test_public_sg_id: "sg-c30fc8b6" 
-        test_public_sn_01_id: "subnet-34378e50" 
-        test_public_sn_02_id: "subnet-34378e50" 
-        region: "us-east-1" 
+# test vpc info
+  - name: test_vpc_conf_odte
+    type: params
+    version:
+      params:
+        test_vpc_id: "vpc-a36912da"
+        test_public_sg_id: "sg-c30fc8b6"
+        test_public_sn_01_id: "subnet-34378e50"
+        test_public_sn_02_id: "subnet-34378e50"
+        region: "us-east-1"
 
-# output of test ecs provisioning 
-  - name: test_info_odte 
-    type: params 
-    version: 
-      params: 
-        seed: "initial_version" 
+# output of test ecs provisioning
+  - name: test_info_odte
+    type: params
+    version:
+      params:
+        seed: "initial_version"
 
-# reference to ecs test cluster 
-  - name: test_env_ecs_odte 
-  type: cluster 
-  integration: "dr-aws-keys" 
-  pointer: 
-     sourcename : "test_env_ecs_odte" 
+# reference to ecs test cluster
+  - name: test_env_ecs_odte
+  type: cluster
+  integration: "dr-aws-keys"
+  pointer:
+     sourcename : "test_env_ecs_odte"
      region: "us-east-1"
 
 ```
@@ -283,96 +283,96 @@ after the cluster is created, we use shippable platform resources and api to per
 the ansible-ecs-provision playbook calls two roles to provision the ecs cluster.
 
 ```yaml
---- 
-### provision aws ecs cluster 
-- hosts: localhost 
-  connection: local 
-  gather_facts: false 
-  user: root 
-  pre_tasks: 
-    - include_vars: group_vars/ecs-cluster-vars.yml 
-  roles: 
-    - ecs-cluster-provision 
-    - ec2-container-inst-provision 
-  post_tasks: 
-    - name: refresh hosts inventory list 
+---
+### provision aws ecs cluster
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  user: root
+  pre_tasks:
+    - include_vars: group_vars/ecs-cluster-vars.yml
+  roles:
+    - ecs-cluster-provision
+    - ec2-container-inst-provision
+  post_tasks:
+    - name: refresh hosts inventory list
       meta: refresh_inventory
 ```
 
 - ecs-cluster-provision
 
 ```yaml
---- 
-# update shippable resource state with this job number 
-- name: run cmd 
-  shell: | 
-    shipctl post_resource_state "" versionname "build-${build_number}" 
+---
+# update shippable resource state with this job number
+- name: run cmd
+  shell: |
+    shipctl post_resource_state "" versionname "build-${build_number}"
 
-# provision ecs cluster 
-- name: create ecs cluster 
-  ecs_cluster: 
-    name: "" 
-    state: present 
-  register: ecs 
+# provision ecs cluster
+- name: create ecs cluster
+  ecs_cluster:
+    name: ""
+    state: present
+  register: ecs
 
-# update shippable resource state with provisioned cluster_arn 
-- name: run cmd 
-  shell: | 
-    shipctl put_resource_state "" cluster_arn "" 
+# update shippable resource state with provisioned cluster_arn
+- name: run cmd
+  shell: |
+    shipctl put_resource_state "" cluster_arn ""
     shipctl put_resource_state "" test_ecs_cluster_id ""
 ```
 
 - ec2-container-inst-provision
 
 ```yaml
---- 
-- name: provision instances with tag 
-  local_action: 
-    module: ec2 
-    key_name: "" 
-    group_id: "" 
-    instance_type: "" 
-    instance_profile_name: "ecsinstancerole" 
-    image: "" 
-    user_data: "" 
-    vpc_subnet_id: "" 
-    region: "" 
-    instance_tags: '{"name":"","role":"","type":"","environment":""}' 
-    assign_public_ip: yes 
-    wait: true 
-    exact_count: "" 
-    count_tag: 
-      role: "" 
-    volumes: 
-      - device_name: /dev/xvda 
-      volume_type: gp2 
-      volume_size: "" 
-      delete_on_termination: true 
-   register: ec2 
+---
+- name: provision instances with tag
+  local_action:
+    module: ec2
+    key_name: ""
+    group_id: ""
+    instance_type: ""
+    instance_profile_name: "ecsinstancerole"
+    image: ""
+    user_data: ""
+    vpc_subnet_id: ""
+    region: ""
+    instance_tags: '{"name":"","role":"","type":"","environment":""}'
+    assign_public_ip: yes
+    wait: true
+    exact_count: ""
+    count_tag:
+      role: ""
+    volumes:
+      - device_name: /dev/xvda
+      volume_type: gp2
+      volume_size: ""
+      delete_on_termination: true
+   register: ec2
 
-- add_host: 
-    name: "{{item.public_ip}}" 
-    groups: tag_type_,tag_environment_ 
-    ec2_region: "" 
-    ec2_tag_name: "" 
-    ec2_tag_role: "" 
-    ec2_tag_type: "" 
-    ec2_tag_environment: "" 
-    ec2_ip_address: "{{item.public_ip}}" 
-  with_items: "" 
+- add_host:
+    name: "{{item.public_ip}}"
+    groups: tag_type_,tag_environment_
+    ec2_region: ""
+    ec2_tag_name: ""
+    ec2_tag_role: ""
+    ec2_tag_type: ""
+    ec2_tag_environment: ""
+    ec2_ip_address: "{{item.public_ip}}"
+  with_items: ""
 
-- name: wait for the instances to boot by checking the ssh port 
-  wait_for: host={{item.public_ip}} port=22 delay=15 timeout=300 state=started 
-  with_items: "" 
+- name: wait for the instances to boot by checking the ssh port
+  wait_for: host={{item.public_ip}} port=22 delay=15 timeout=300 state=started
+  with_items: ""
 
-# update shippable resource state 
-  - name: run cmd 
-    shell: | 
-      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}" 
-      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}" 
-      shipctl put_resource_state "" "region" "" 
-      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}" 
-      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}" 
+# update shippable resource state
+  - name: run cmd
+    shell: |
+      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}"
+      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}"
+      shipctl put_resource_state "" "region" ""
+      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}"
+      shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}"
     with_items: ""
 
 ```
@@ -384,60 +384,60 @@ the ansible-ecs-provision playbook calls two roles to provision the ecs cluster.
 add the following to shippable.yml file and commit it.
 
 ```yaml
---- 
-- name: provision instances with tag 
-  local_action: 
-    module: ec2 
-    key_name: "" 
-    group_id: "" 
-    instance_type: "" 
-    instance_profile_name: "ecsinstancerole" 
-    image: "" 
-    user_data: "" 
-    vpc_subnet_id: "" 
-    region: "" 
-    instance_tags: '{"name":"","role":"","type":"","environment":""}' 
-    assign_public_ip: yes 
-    wait: true 
-    exact_count: "" 
-    count_tag: 
-      role: "" 
-    volumes: 
-       - device_name: /dev/xvda 
-         volume_type: gp2 
-         volume_size: "" 
-         delete_on_termination: true 
-   register: ec2 
+---
+- name: provision instances with tag
+  local_action:
+    module: ec2
+    key_name: ""
+    group_id: ""
+    instance_type: ""
+    instance_profile_name: "ecsinstancerole"
+    image: ""
+    user_data: ""
+    vpc_subnet_id: ""
+    region: ""
+    instance_tags: '{"name":"","role":"","type":"","environment":""}'
+    assign_public_ip: yes
+    wait: true
+    exact_count: ""
+    count_tag:
+      role: ""
+    volumes:
+       - device_name: /dev/xvda
+         volume_type: gp2
+         volume_size: ""
+         delete_on_termination: true
+   register: ec2
 
-- add_host: 
-    name: "{{item.public_ip}}" 
-    groups: tag_type_,tag_environment_ 
-    ec2_region: "" 
-    ec2_tag_name: "" 
-    ec2_tag_role: "" 
-    ec2_tag_type: "" 
-    ec2_tag_environment: "" 
-    ec2_ip_address: "{{item.public_ip}}" 
-  with_items: "" 
+- add_host:
+    name: "{{item.public_ip}}"
+    groups: tag_type_,tag_environment_
+    ec2_region: ""
+    ec2_tag_name: ""
+    ec2_tag_role: ""
+    ec2_tag_type: ""
+    ec2_tag_environment: ""
+    ec2_ip_address: "{{item.public_ip}}"
+  with_items: ""
 
-- name: wait for the instances to boot by checking the ssh port 
-  wait_for: host={{item.public_ip}} port=22 delay=15 timeout=300 state=started 
-  with_items: "" 
+- name: wait for the instances to boot by checking the ssh port
+  wait_for: host={{item.public_ip}} port=22 delay=15 timeout=300 state=started
+  with_items: ""
 
-- name: display ecs cluster 
-  debug: 
-    msg: "{{item}}" 
-  with_items: "" 
+- name: display ecs cluster
+  debug:
+    msg: "{{item}}"
+  with_items: ""
 
-# update shippable resource state 
-- name: run cmd 
-  shell: | 
-    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}" 
-    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}" 
-    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_dns" "{{item.public_dns_name}}" 
-    shipctl put_resource_state "" "region" "" 
-    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}" 
-    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}" 
+# update shippable resource state
+- name: run cmd
+  shell: |
+    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}"
+    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}"
+    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_dns" "{{item.public_dns_name}}"
+    shipctl put_resource_state "" "region" ""
+    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_public_ip" "{{item.public_ip}}"
+    shipctl put_resource_state "" "inst_{{item.ami_launch_index}}_id" "{{item.id}}"
   with_items: ""
 
 ```
@@ -450,21 +450,21 @@ add the following to shippable.yml file and commit it.
 add the following to the shippable.yml file and commit it.
 
 ```yaml
-jobs: 
+jobs:
 
-##---------------------------------------------------------------# 
-##-------------------- app release automation -------------------# 
-##---------------------------------------------------------------# 
+##---------------------------------------------------------------#
+##-------------------- app release automation -------------------#
+##---------------------------------------------------------------#
 
-# deploy to test environment 
-  - name: deploy_app_test_odte 
-    type: deploy 
-    steps: 
-      - in: create_app_man_odte 
-        switch: off 
-      - in: prov_test_vpc_odte 
-      - in: test_env_ecs_odte 
-        switch: off 
+# deploy to test environment
+  - name: deploy_app_test_odte
+    type: deploy
+    steps:
+      - in: create_app_man_odte
+        switch: off
+      - in: prov_test_vpc_odte
+      - in: test_env_ecs_odte
+        switch: off
       - task: managed
 
 ```
@@ -477,27 +477,27 @@ add the **`deploy_app_test_odte`** job to your **shippable.yml** file. this job 
 it is a [runsh](http://docs.shippable.com/platform/workflow/job/runsh/) job that lets you run any shell script. since it needs to run after the application is deployed in the workflow, test\_env\_ecs\_odte is specified as an input. in addition, we also provide the manifest job as an input to the job.
 
 ```yaml
-jobs: 
+jobs:
 
-# run system integration testing 
-  - name: sit_odte 
-    type: runsh 
-    steps: 
-      - in: scripts_repo_odte 
-        switch: off 
-      - in: deploy_app_test_odte 
-      - task: 
-        # run tests 
-        - script: | 
-            pushd $(shipctl get_resource_state "scripts_repo_odte")/tests 
-              params_json=$(shipctl get_resource_version_key test_info_odte params) 
-              cluster_dns=$(echo $params_json | jq -r .inst_0_public_dns) 
-              echo "ecs cluster dns: "$cluster_dns 
-              ./run-tests.sh $cluster_dns 
-            popd 
-  on_success: 
-    - script: echo "success" 
-  on_failure: 
+# run system integration testing
+  - name: sit_odte
+    type: runsh
+    steps:
+      - in: scripts_repo_odte
+        switch: off
+      - in: deploy_app_test_odte
+      - task:
+        # run tests
+        - script: |
+            pushd $(shipctl get_resource_state "scripts_repo_odte")/tests
+              params_json=$(shipctl get_resource_version_key test_info_odte params)
+              cluster_dns=$(echo $params_json | jq -r .inst_0_public_dns)
+              echo "ecs cluster dns: "$cluster_dns
+              ./run-tests.sh $cluster_dns
+            popd
+  on_success:
+    - script: echo "success"
+  on_failure:
     - script: echo "failure"
 
 ```
@@ -510,42 +510,42 @@ jobs:
 it is a [runsh](http://docs.shippable.com/platform/workflow/job/runsh/) job that lets you run any shell script. since it needs to run after the system integrations tests are run, sit\_odte is specified as an input.
 
 ```yaml
-jobs: 
+jobs:
 
-#---------------------------------------------------------------# 
-#----------------------- deprov test infra----------------------# 
-#---------------------------------------------------------------# 
+#---------------------------------------------------------------#
+#----------------------- deprov test infra----------------------#
+#---------------------------------------------------------------#
 
-# deprov test infra with ansible 
-  - name: deprov_test_infra_odte 
-    type: runsh 
-    steps: 
-      - in: sit_odte 
-      - in: aws_cli_config_odte 
-        switch: off 
-      - in: test_vpc_conf_odte 
-        switch: off 
-      - in: test_conf_odte 
-        switch: off 
-      - in: test_info_odte 
-        switch: off 
-      - in: scripts_repo_odte 
-        switch: off 
-      - in: ami_sec_approved_odte 
-        switch: off 
-      - task: 
-        - script: shipctl replace 
-            $scripts_repo_odte_state/infra/provision-ecs-ansible/ansible.cfg 
-            $scripts_repo_odte_state/infra/provision-ecs-ansible/group_vars/ecs-cluster-vars.yml 
-        - script: sudo pip install boto3 
-        - script: | 
-            cd $scripts_repo_odte_state/infra/provision-ecs-ansible 
-            ansible-playbook -v ansible-ecs-terminate.yml 
-    on_success: 
-      - script: echo "success" 
-    on_failure: 
+# deprov test infra with ansible
+  - name: deprov_test_infra_odte
+    type: runsh
+    steps:
+      - in: sit_odte
+      - in: aws_cli_config_odte
+        switch: off
+      - in: test_vpc_conf_odte
+        switch: off
+      - in: test_conf_odte
+        switch: off
+      - in: test_info_odte
+        switch: off
+      - in: scripts_repo_odte
+        switch: off
+      - in: ami_sec_approved_odte
+        switch: off
+      - task:
+        - script: shipctl replace
+            $scripts_repo_odte_state/infra/provision-ecs-ansible/ansible.cfg
+            $scripts_repo_odte_state/infra/provision-ecs-ansible/group_vars/ecs-cluster-vars.yml
+        - script: sudo pip install boto3
+        - script: |
+            cd $scripts_repo_odte_state/infra/provision-ecs-ansible
+            ansible-playbook -v ansible-ecs-terminate.yml
+    on_success:
+      - script: echo "success"
+    on_failure:
       - script: echo "failure"
- 
+
 ```
 
 #### b. commit shippable.yml and create a sync repo in your shippable account
@@ -556,7 +556,7 @@ your pipeline should now look like this in the [spog](http://docs.shippable.com/
 
 ![](https://blog.shippable.com/hs-fs/hubfs/pipelin1.png?t=1512969437836&width=640&name=pipelin1.png)
 
-  
+
 different sections of the pipeline expanded.
 
 ![](https://blog.shippable.com/hs-fs/hubfs/pipeline2.png?t=1512969437836&width=640&name=pipeline2.png)
@@ -571,7 +571,7 @@ right click on create\_app\_man\_odtein the [spog](http://docs.shippable.com/pla
 
 ![](https://blog.shippable.com/hs-fs/hubfs/trigger.png?t=1512969437836&width=640&name=trigger.png)
 
-####   
+####
 screenshot of the manifest job
 
 ##### ![](https://blog.shippable.com/hs-fs/hubfs/manifest.png?t=1512969437836&width=640&name=manifest.png)
@@ -586,7 +586,7 @@ screenshot of the manifest job
 
 ![](https://blog.shippable.com/hs-fs/hubfs/screen%20shot%202017-11-30%20at%205.41.07%20pm.png?t=1512969437836&width=640&name=screen%20shot%202017-11-30%20at%205.41.07%20pm.png)
 
-####   
+####
 screenshot of the deploy job
 
 #### ![](https://blog.shippable.com/hs-fs/hubfs/deploy-2.png?t=1512969437836&width=640&name=deploy-2.png)

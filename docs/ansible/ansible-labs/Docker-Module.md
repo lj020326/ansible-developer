@@ -13,9 +13,9 @@ This scenario shows:
 ### Steps
 
 - Create docker_play.yml (nano docker_play.yml)
-- This file provides to install Docker, pull ubuntu image 
+- This file provides to install Docker, pull ubuntu image
 
-``` 
+```
 ---
 - hosts: all
   become: true
@@ -58,7 +58,7 @@ This scenario shows:
       apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu focal stable
         state: present
-        
+
     - name: Update apt and install docker-ce
       tags: install
       apt:
@@ -104,7 +104,7 @@ This scenario shows:
       shell:
         "docker images"
       register: image_info
-      
+
     - name: docker images result
       tags: image_ls
       debug:
@@ -122,14 +122,14 @@ This scenario shows:
       docker_container:
         name: "{{ default_container_name }}{{ item }}"
         state: absent
-      with_sequence: count={{ container_count }}  
-``` 
+      with_sequence: count={{ container_count }}
+```
 
 - Run following command to run all, but we should use tags to run specific commands:
 
 ```
 ansible-playbook docker_play.yml
-``` 
+```
 
 ![image](./img/203569878-7eec129a-82ce-47a4-90b4-2f11a08337f5.png)
 
@@ -166,7 +166,7 @@ ansible-playbook docker_play.yml --tags image_ls
 ansible-playbook docker_play.yml --tags stop
 ```
 
-- To remove docker containers: 
+- To remove docker containers:
 
 ```
 ansible-playbook docker_play.yml --tags remove
@@ -177,7 +177,7 @@ ansible-playbook docker_play.yml --tags remove
 
 ### Sample Docker Tasks:
 
-- Sample Docker Tasks are taken from here: 
+- Sample Docker Tasks are taken from here:
   - https://docs.ansible.com/ansible/2.9/modules/docker_container_module.html#docker-container-module
 
 ```

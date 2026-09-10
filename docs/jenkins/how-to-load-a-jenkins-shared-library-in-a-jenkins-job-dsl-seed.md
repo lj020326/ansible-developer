@@ -10,7 +10,7 @@ def gitCredentialsId      = 'github-jenkins'
 def jobsRepoName          = 'https://github.com/my-jobs-repo.git'
 def sharedLibraryRepoName = 'https://github.com/shared-library-repo.git'
 
-properties([    
+properties([
    pipelineTriggers([githubPush()])
 ])
 
@@ -22,10 +22,10 @@ pipeline {
             steps {
 
                 checkout([
-                    $class: 'GitSCM', 
-                    branches: [[name: '*/main']], 
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
                     doGenerateSubmoduleConfigurations: false,
-                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'shared-library']], 
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'shared-library']],
                     submoduleCfg: [],
                     userRemoteConfigs: [[credentialsId:  gitCredentialsId, url: sharedLibraryRepoName ]]
                     ])
@@ -46,4 +46,3 @@ So in your groovy scripts you can simply use import without @Library annotation
 
 * https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-job-configuration-using-job-dsl
 * https://devops.stackexchange.com/questions/11833/how-do-i-load-a-jenkins-shared-library-in-a-jenkins-job-dsl-seed#11862
-

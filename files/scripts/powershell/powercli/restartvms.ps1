@@ -1,13 +1,13 @@
 ﻿#################################################################################
 # Restart VMs (restartvms.ps1)
 #
-# This script resets, or if not vmtools equipped, restarts the running VMS on 
-# a chosen esxi host 
+# This script resets, or if not vmtools equipped, restarts the running VMS on
+# a chosen esxi host
 #
-# Created By: Lee Johnson, 2015 - With a whole lot of help from Mike Preston & Eric Wright 
+# Created By: Lee Johnson, 2015 - With a whole lot of help from Mike Preston & Eric Wright
 #                                  (@discoposse)
 #
-# Variables:  $mysecret - a secret word to actually make the script run, stops 
+# Variables:  $mysecret - a secret word to actually make the script run, stops
 #                         the script from running when double click DISASTER
 #             $vcenter - The IP/DNS of your vCenter Server
 #             $username/password - credentials for your vCenter Server
@@ -26,32 +26,32 @@
 param($keyword)
 
 function func_log([string] $msg, [System.ConsoleColor] $foregroundColor) {
-		$msg += "`r`n" 
+		$msg += "`r`n"
 		if ($foregroundColor) {
 			Write-Host $msg -ForegroundColor $foregroundColor
 		} else {
-			Write-Host $msg 
+			Write-Host $msg
 		}
-		return $msg 
+		return $msg
 }
 
 function func_sendReport ( [string]$report ) {
-	#Send out an email with the names  
-	$emailFrom = "admin@dettonville.org"  
-	$emailTo = "admin@dettonville.org"  
-	$subject = "List of restarted servers"  
-	$smtpServer = "mail1.johnson.local"  
-	$smtp = new-object Net.Mail.SmtpClient($smtpServer)  
-	$smtp.Send($emailFrom, $emailTo, $subject, $report)  
+	#Send out an email with the names
+	$emailFrom = "admin@dettonville.org"
+	$emailTo = "admin@dettonville.org"
+	$subject = "List of restarted servers"
+	$smtpServer = "mail1.johnson.local"
+	$smtp = new-object Net.Mail.SmtpClient($smtpServer)
+	$smtp.Send($emailFrom, $emailTo, $subject, $report)
 }
 
 
 function func_logon ([string] $server ) {
 	#connect to vcenter
 	$msg = func_log "Connecting to vCenter - $server ...."
-	$success = Connect-VIServer $server 
+	$success = Connect-VIServer $server
 
-	if ($success) { 
+	if ($success) {
 		$msg += func_log "Connected!" Green
 	}
 	else
@@ -72,11 +72,11 @@ function func_restartvms([object[]]$vmlist) {
 		$msg += func_log "no VMs to restart"
 		return $msg
 	}
-	
+
 	func_log "and now, let's restart guests...."
-	ForEach ( $guest in $vmlist ) 
+	ForEach ( $guest in $vmlist )
 	{
-		$msg += func_log "Processing $guest - checking for VMware tools install..." Green 
+		$msg += func_log "Processing $guest - checking for VMware tools install..." Green
 	    $guestinfo = get-view -Id $guest.ID
 	    if ($guestinfo.config.Tools.ToolsVersion -eq 0)
 	    {
@@ -88,7 +88,7 @@ function func_restartvms([object[]]$vmlist) {
 			Restart-VMGuest $guest -Confirm:$false
 	    }
 	}
-	
+
 	# track restart VM status to completion or timeout
 	$runningTasks = $taskTab.Count
 
@@ -96,11 +96,11 @@ function func_restartvms([object[]]$vmlist) {
 	$timer.Start()
 
 	# wait 1 minute max
-	$timeout = 2 * 60 
-	
+	$timeout = 2 * 60
+
 	while($runningTasks -gt 0){
 		$CurrentTime = $timer.Elapsed
-		$timeElapsed = ([int] $CurrentTime.TotalSeconds).ToString() 
+		$timeElapsed = ([int] $CurrentTime.TotalSeconds).ToString()
 		$msg += func_log "waited $timeElapsed seconds" Yellow
 		Get-Task | % {
 			$guest = $taskTab[$_.Id]
@@ -126,7 +126,7 @@ function func_restartvms([object[]]$vmlist) {
 	while ((Get-VM $vmlist | where-object {$_.PowerState -ne "PoweredOn" -and $vmlist -notcontains $_.Name } ) )
 	{
 		$CurrentTime = $timer.Elapsed
-		$timeElapsed = ([int] $CurrentTime.TotalSeconds).ToString() 
+		$timeElapsed = ([int] $CurrentTime.TotalSeconds).ToString()
 		$msg += func_log "waited $timeElapsed seconds for power on" Yellow
 		# wait up to timeout seconds - then break
 		if ( $CurrentTime.TotalSeconds -ge $timeout) {
@@ -138,7 +138,7 @@ function func_restartvms([object[]]$vmlist) {
 
 	$timer.Stop()
 
-	$timeElapsed = ([int] $timer.Elapsed.TotalSeconds).ToString() 
+	$timeElapsed = ([int] $timer.Elapsed.TotalSeconds).ToString()
 	$msg += func_log "All VMs started after $timeElapsed seconds!" Green
 
 	return $msg
@@ -164,8 +164,8 @@ Write-Host "This script will restart all of the VMs and hosts located on $vmhost
 Write-Host ""
 Sleep 5
 
-#if ($keyword -ne $mysecret) 
-#{ 
+#if ($keyword -ne $mysecret)
+#{
 #    Write-Host "You haven't passed the proper detonation sequence...ABORTING THE SCRIPT" -ForegroundColor red
 #    exit
 #}
@@ -174,11 +174,11 @@ Sleep 5
 $msg += func_logon $vcenter
 Write-Host ""
 
-#get VMs 
+#get VMs
 Write-Host ""
 $msg += func_log "Retrieving a list of powered on guests...." Green
 Write-Host ""
-$poweredonguests = Get-VMHost $vmhost | Get-VM | where-object {$_.PowerState -eq "PoweredOn" -and $_.name -notlike "samba*"} 
+$poweredonguests = Get-VMHost $vmhost | Get-VM | where-object {$_.PowerState -eq "PoweredOn" -and $_.name -notlike "samba*"}
 
 $msg += func_log "now, let's start restarting some guests...."
 $msg += func_restartvms $poweredonguests
@@ -188,7 +188,7 @@ $msg += func_log "All VMs restarted except samba"
 $msg += func_log "Shutting down samba..."
 Write-Host ""
 
-$poweredonguests = Get-VMHost $vmhost | Get-VM | where-object {$_.PowerState -eq "PoweredOn" -and $_.name -like "samba*"} 
+$poweredonguests = Get-VMHost $vmhost | Get-VM | where-object {$_.PowerState -eq "PoweredOn" -and $_.name -like "samba*"}
 
 $msg += func_log "now, let's start restarting samba1 guests...."
 $msg += func_restartvms $poweredonguests

@@ -1,7 +1,7 @@
 
 # Example 5: playbook using inventory
 
-For the next example, use the inventory from example 4. 
+For the next example, use the inventory from example 4.
 
 Then setup the following [playbook](./example5/playbook.yml):
 
@@ -18,7 +18,7 @@ Then setup the following [playbook](./example5/playbook.yml):
 Confirm that the results are as expected:
 
 ```output
-ansible-playbook -i ./example5/hosts.ini ./example5/playbook.yml 
+ansible-playbook -i ./example5/hosts.ini ./example5/playbook.yml
 
 PLAY [Run play] **********************************************************************************************************************************************************************************************************************************************************
 
@@ -31,14 +31,14 @@ ok: [host2] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-host1                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-host2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+host1                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+host2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 Confirm that the results are as expected for the yaml inventory:
 
 ```output
-ansible-playbook -i ./example5/hosts.yml ./example5/playbook.yml 
+ansible-playbook -i ./example5/hosts.yml ./example5/playbook.yml
 
 PLAY [Run play] **********************************************************************************************************************************************************************************************************************************************************
 
@@ -51,8 +51,8 @@ ok: [host2] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-host1                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-host2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+host1                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+host2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 Looks good since both results are as expected.

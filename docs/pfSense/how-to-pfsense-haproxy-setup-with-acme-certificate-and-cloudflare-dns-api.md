@@ -16,12 +16,12 @@ Things you will need:
 
 1.  Log into pfsense and select System -> Package Manager.
 2.  Select the “Available Packages” tab.
-3.  Find “acme” and “haproxy” and install both. 
+3.  Find “acme” and “haproxy” and install both.
 4.  Once installed they will appear on the Installed Packages tab.![](./img/install-1024x683.png)
 
 ## Change PFSense web port
 
-1.  Since we are going to use port 443 for our proxy, we need to change the default PFSense web port. 
+1.  Since we are going to use port 443 for our proxy, we need to change the default PFSense web port.
 2.  Go to System -> Advanced![](./img/pfchange-1024x464.png)
 3.  Under “TCP Port” change this to another port, I use 1234. Remember once changed you need to use this port to login. So I will use https://10.0.0.1:1234
 
@@ -51,24 +51,24 @@ Things you will need:
 14.  Enter a name and description if you like. ![](./img/pf10-1024x477.png)
 15.  Now under “Domain SAN list” select DNS-Cloudflare![](./img/pf11-1024x737.png)
 16.  Enter your Domain Name in the box Eg. spacedino.rocks. You can also use a subdomain Eg. I could use local.spacedino.rocks
-17.  Enter your Cloudflare Account email and then the Zone ID, Account ID, API Key (Global Key) and the API token we created earlier. 
+17.  Enter your Cloudflare Account email and then the Zone ID, Account ID, API Key (Global Key) and the API token we created earlier.
 18.  We also need to restart the Proxy when the Cert is updated, under Actions List select “Add” and enter _/usr/local/etc/rc.d/haproxy.sh restart![](./img/pf12-1024x290.png)_
 19.  Now Select “Save”
 20.  On the certificate page, select Issue/Renew to get a cert. You should see a success text block come up after a few seconds and the date will update. ![](./img/pf13-1024x523.png)
-21.  Thats it for the Cert! You now have a certificate for your domain that will auto renew. 
+21.  Thats it for the Cert! You now have a certificate for your domain that will auto renew.
 
 ## Setup HA Proxy
 
 1.  Go to Services -> HAProxy. Select the “Backend” tab and press “Add”
 2.  This is where we setup our internal web sever that we want to proxy to. My server is a web server on 10.0.0.7 port 80. Enter a name for the server, then press the down arrow under “server list”. Now enter your internal server IP and port. If it is secure enter 443 and tick “Encrypt(SSL)”, do not tick “SSL Check” as it would be a self-signed certificate on your server and cause an error.  ![](./img/ha1-1024x832.png)
 3.  Scroll down to Health Checking and select “None” ![](./img/ha2-1024x123.png)
-4.  Scroll to the bottom and press save. 
-5.  Now select “Front End” from the top tabs. This is where we setup the front-end proxy and have it redirect with our certificate to the back-end server. 
+4.  Scroll to the bottom and press save.
+5.  Now select “Front End” from the top tabs. This is where we setup the front-end proxy and have it redirect with our certificate to the back-end server.
 6.  Select “Add” and enter a name. Now under listen address you can select where request will come from. I am only going to accept requests from my LAN so I will select LAN Address(IPv4) and enter port 443. Don’t forget to tick “SSL Offloading”. If you want this to be accessible from the internet you can also add WAN Address(IPv4). You will also need to open port 443 for external access. ![](./img/ha3-1024x826.png)
 7.  Now scroll down to “Access Control list”. Press the little down arrow and enter a name, change expression to “Host Matches” and enter the domain name you want in the “Value field”. I will enter spacedino.rocks![](./img/ha4-1024x777.png)
-8.  Now under “Actions” press the little down arrow and select “Use backend”. Now enter the name of the rule you made in the previous step, make sure it is exactly the same. Select the Backend from the dropdown, you will likely only have one option from earlier. 
+8.  Now under “Actions” press the little down arrow and select “Use backend”. Now enter the name of the rule you made in the previous step, make sure it is exactly the same. Select the Backend from the dropdown, you will likely only have one option from earlier.
 9.  Lastly Scroll to “SSL Offloading”. Here, change the certificate to the one we created earlier. ![](./img/ha5-1024x687.png)
-10.  Now press save. 
+10.  Now press save.
 
 ## Setup Local DNS
 
@@ -94,4 +94,4 @@ For external access you will need to do things like:
 ## Reference
 
 - https://jarrodstech.net/how-to-pfsense-haproxy-setup-with-acme-certificate-and-cloudflare-dns-api/
-- 
+-

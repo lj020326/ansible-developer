@@ -3,14 +3,14 @@ How to run pacman install silently / without confirmations:
 
     ## ref: https://bbs.archlinux.org/viewtopic.php?id=121792
     ## pacman -S --help | grep confirm
-    
+
     pacman -S --noconfirm
 
 
 How to run install using package/requirements file
 
     ## ref: https://unix.stackexchange.com/questions/587630/how-to-install-packages-with-pacman-from-a-list-contained-in-a-text-file
-    
+
     cat input_file | cut "-d " -f1 |  xargs pacman -S --noconfirm
 
     cat save/pacman-python-upgrade-fix.txt | xargs pacman -S --noconfirm
@@ -36,7 +36,7 @@ This script checks to make sure that the ssh-agent key manager is running and ha
 
 	See the news https://www.msys2.org/news/#2020-06-29-new-packagers
 
-	## Try 
+	## Try
 	pacman-key --init
 	pacman-key --populate
 
@@ -85,33 +85,33 @@ pacman -U pacman-mirrors-20150722-1-any.pkg.tar.xz
 ## another possibility for installing mingw
 https://sourceforge.net/projects/mingw/files/Installer/mingw-get/
 
-## To install mingw-get, visit the MinGW files repository at: 
-## http://sourceforge.net/projects/mingw/files 
-## then, from the "Installer" folder, download and run mingw-get-setup.exe, 
-## and select your choices from the options presented [*], to install mingw-get. 
+## To install mingw-get, visit the MinGW files repository at:
+## http://sourceforge.net/projects/mingw/files
+## then, from the "Installer" folder, download and run mingw-get-setup.exe,
+## and select your choices from the options presented [*], to install mingw-get.
 
 
 ## get too many connection timeout messages - in the form of "too slow"
-## so config pacman to use external wget using the Xfer command 
+## so config pacman to use external wget using the Xfer command
 ## add the following line in the pacman.conf
 XferCommand = /usr/bin/wget --timeout=20 --tries=3 -c -O %o %u
 
 ## to install msys2
 ## see: http://blog.johannesmp.com/2015/09/01/installing-clang-on-windows-pt3/
 
-## Download and install MSYS2 64 bit: Download Link 
+## Download and install MSYS2 64 bit: Download Link
 ## you'd never need to download the 32 bit version, since the 64 bit version can install 32 bit packages
-## After the installer completes and the MSYS2 shell appears 
-## to re-open it, the batch file is located in C:\msys64\msys2_shell.bat. 
+## After the installer completes and the MSYS2 shell appears
+## to re-open it, the batch file is located in C:\msys64\msys2_shell.bat.
 ## We Need to update its packages:
-## 1) First, update the core packages: 
+## 1) First, update the core packages:
 pacman --needed -Sy bash pacman pacman-mirrors msys2-runtime
 
 ## IMPORTANT: close the shell and re-open it here before doing anything else.
-## 2) Now we can update all packages with: 
+## 2) Now we can update all packages with:
 pacman -Su
 
-## 3) Install the 32 bit version of MinGW-w64 and Clang (currently gcc is version 5.2.0 and clang is version 3.6.2): 
+## 3) Install the 32 bit version of MinGW-w64 and Clang (currently gcc is version 5.2.0 and clang is version 3.6.2):
 pacman -S mingw-w64-x86_64-clang mingw-w64-i686-clang
 
 ## and more:
@@ -120,7 +120,7 @@ pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-extra-cma
 
 ## to install/reinstall msys2
 ## see: https://sourceforge.net/p/msys2/wiki/MSYS2%20re-installation/
-## also: 
+## also:
 ## 1. Run your existing MSYS2 installation via msys2_shell.bat.
 ## 2. Make a list of installed packages:
 
@@ -128,7 +128,7 @@ pacman -Qqe | xargs echo > /c/packages.txt ; exit
 
 ## 3. Rename your msys?? folder to msys??.old.
 ## 4. Run the installer (or untar the base package, run msys2_shell.bat, then exit it).
-## 5. To save server bandwidth and your time, move your old cached packages directory to the new installation. 
+## 5. To save server bandwidth and your time, move your old cached packages directory to the new installation.
 ## 	In Explorer, remove the empty msys??\var\cache\pacman\pkg folder, then replace it with msys??.old\var\cache\pacman\pkg.
 ## 6. Run the new MSYS2 installation via msys2_shell.bat.
 ## 7. Update the package databases:
@@ -136,7 +136,7 @@ pacman -Sy
 ## 8. Update the core packages:
 pacman --needed -S bash pacman pacman-mirrors msys2-runtime
 
-## 9. If any packages got updated during step 8, you MUST restart MSYS2, otherwise you can get fork errors in the next step. 
+## 9. If any packages got updated during step 8, you MUST restart MSYS2, otherwise you can get fork errors in the next step.
 ## 	You need to exit all MSYS2 shells (and if using MSYS2 32bit, run autorebase.bat) then re-launch msys2_shell.bat.
 ## 10. Re-install your old packages, by entering:
 pacman -S --needed --force $(cat /c/packages.txt)
@@ -168,13 +168,13 @@ pacman -S git tar binutils autoconf make \
 ## how to install mingw 64 bit g++ toolchain
 ## see: http://stackoverflow.com/questions/30069830/how-to-install-mingw-w64-and-msys2
 ## Install a toolchain
-## 
+##
 ## a) for 32-bit:
-## 
+##
 pacman -S mingw-w64-i686-gcc
 
 ## b) for 64-bit:
-## 
+##
 pacman -S mingw-w64-x86_64-gcc
 
 ## install any libraries/tools you may need. You can search the repositories by doing
@@ -182,13 +182,13 @@ pacman -S mingw-w64-x86_64-gcc
 pacman -Ss package_name_of_something_i_want_to_install
 
 ## Open a MinGW-w64 shell:
-## 
+##
 ## a) To build 32-bit things, open the "MinGW-w64 32-bit Shell"
-## 
+##
 ## b) To build 64-bit things, open the "MinGW-w64 64-bit Shell"
-## 
+##
 ## Verify that the compiler is working by doing
-## 
+##
 
 gcc -v
 

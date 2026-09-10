@@ -36,4 +36,3 @@ for i in ${FULL_IMAGE_LIST}
 do
   echo ${i}
 done
-

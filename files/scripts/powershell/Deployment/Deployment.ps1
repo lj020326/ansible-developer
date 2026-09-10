@@ -8,7 +8,7 @@ if ($(Test-Path $ConfigFile) -eq $false){
 }
 
 $config = Get-Content $ConfigFile | ConvertFrom-Json
- 
+
 Write-Output "[$($config.environment.type)] $($config.project.name) - Version: $($config.info.version)"
 
 if ($config.environment.type -eq "TEST"){

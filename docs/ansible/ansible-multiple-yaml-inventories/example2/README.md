@@ -93,7 +93,7 @@ all:
             web-q1.example.int: {}
             web-q2.example.int: {}
         ungrouped: {}
-    
+
 ```
 
 Each of the respective inventory files:
@@ -167,8 +167,8 @@ ok: [web02.qa.net1site1.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -207,8 +207,8 @@ ok: [web02.qa.net1site2.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -248,8 +248,8 @@ ok: [web02.qa.net2site1.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -288,8 +288,8 @@ ok: [web02.qa.net2site2.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -406,14 +406,14 @@ ok: [web02.qa.net2site2.example.int] => {
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************************************************************************
-web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+web01.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web01.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web01.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web01.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net1site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site1.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+web02.qa.net2site2.example.int : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -427,4 +427,3 @@ Instead, we found that all the hosts in both networks have both 'network' groups
 This is not the intended or expected behavior.
 
 The [next example](../example3/README.md) will look to solve this.
-

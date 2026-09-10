@@ -16,7 +16,7 @@ Ansible is an agentless open-source automation tool including configuration mana
 
 ```
 ---
-- name: Install and Start Apache # Name of the playbook 
+- name: Install and Start Apache # Name of the playbook
   hosts: webservers # Host group name
   tasks:
     # Play to install apache with yum module
@@ -36,7 +36,7 @@ Ansible playbook to install and configure Apache
 Over time the complexity of playbooks can begin hard to read and complex to maintain. In addition, you can have some redundant blocks reused in multiple playbooks. This is where the role concept comes into action by providing an independent component that is reusable.  A role has its own structure and clearly defined objective :
 
 ```
-$ ansible-galaxy init apache                                                 
+$ ansible-galaxy init apache
 - apache was created successfully
 $ $ tree apache
 my-role
@@ -72,11 +72,11 @@ The role is usable in playbooks in this way :
 ---
 - name: Install and Configure Apache Web Servers
   hosts: webservers
-  roles: 
+  roles:
     - role: apache
       vars:
         version: 2.4.48
-        
+
 ```
 
 Integration of Apache role inside a playbook
@@ -482,7 +482,7 @@ INFO     Running default > create
 PLAY [Create] ********************************************************************************************************************************************************************************************
 
 TASK [Log into a Docker registry] ************************************************************************************************************************************************************************
-skipping: [localhost] => (item={'dockerfile': '../common/Dockerfile.j2', 'image': 'php:7.2-apache', 'name': 'wordpress', 'privileged': True}) 
+skipping: [localhost] => (item={'dockerfile': '../common/Dockerfile.j2', 'image': 'php:7.2-apache', 'name': 'wordpress', 'privileged': True})
 
 TASK [Check presence of custom Dockerfiles] **************************************************************************************************************************************************************
 ok: [localhost] => (item={'dockerfile': '../common/Dockerfile.j2', 'image': 'php:7.2-apache', 'name': 'wordpress', 'privileged': True})

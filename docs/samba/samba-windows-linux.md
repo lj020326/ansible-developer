@@ -146,4 +146,4 @@ Accessing a Samba share on Linux and Windows is easy. With this basic setup, you
 * https://github.com/mrlesmithjr/ansible-openldap
 * https://www.digitalocean.com/community/tutorials/how-to-manage-and-use-ldap-servers-with-openldap-utilities
 * https://cwiki.apache.org/confluence/display/DIRxINTEROP/Configuring+LDAP-backed+Winbind+IDMAP
-* 
+*

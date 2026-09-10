@@ -144,9 +144,9 @@ openstack server set --property RestartOnFail=True admin-cirros-1
 
 ## OPTIONAL:
 ## running init-runonce will:
-## 1) load a cirrus image and 
+## 1) load a cirrus image and
 ## 2) create public and demo networks / subnets
-## 3) create a router to connect the 2 networks 
+## 3) create a router to connect the 2 networks
 ## 4) create security groups to allow ingress network activity to specific ports
 ## 5) generates ssh key if not already present in ~/.ssh/id_rsa
 ## 6) add the public key as a nova compute public key
@@ -154,7 +154,7 @@ openstack server set --property RestartOnFail=True admin-cirros-1
 ## 8) add default flavors, if they don't already exist
 ## 9) displays openstack command to start a new compute server instance using the newly loaded cirrus image
 ##
-## ref: https://github.com/openstack/kolla-ansible/blob/master/tools/init-runonce 
+## ref: https://github.com/openstack/kolla-ansible/blob/master/tools/init-runonce
 run-remote.sh scripts/kolla-ansible/init-runonce.sh
 
 run-remote.sh openstack server create --image cirros --flavor m1.tiny --key-name mykey --network demo-net demo1
@@ -309,26 +309,26 @@ Useful commands:
 
     ref: https://sudomakeinstall.com/uncategorized/openstack-ansible-kolla-on-centos-7-with-python-virtual-env
 
-/usr/share/kolla-ansible/tools/cleanup-containers 
-venv/share/kolla-ansible/tools/cleanup-containers 
+/usr/share/kolla-ansible/tools/cleanup-containers
+venv/share/kolla-ansible/tools/cleanup-containers
 
-    used to remove deployed containers from the system. 
-    This can be useful when you want to do a new clean deployment. 
-    It will preserve the registry and the locally built images in the registry, 
-    but will remove all running Kolla containers from the local Docker daemon. 
+    used to remove deployed containers from the system.
+    This can be useful when you want to do a new clean deployment.
+    It will preserve the registry and the locally built images in the registry,
+    but will remove all running Kolla containers from the local Docker daemon.
     It also removes the named volumes.
 
-/usr/share/kolla-ansible/tools/cleanup-host 
-venv/share/kolla-ansible/tools/cleanup-host 
+/usr/share/kolla-ansible/tools/cleanup-host
+venv/share/kolla-ansible/tools/cleanup-host
 
-    used to remove remnants of network changes triggered on the Docker host when the neutron-agents containers are launched. 
+    used to remove remnants of network changes triggered on the Docker host when the neutron-agents containers are launched.
     This can be useful when you want to do a new clean deployment, particularly one changing the network topology.
 
-/usr/share/kolla-ansible/tools/cleanup-images --all 
+/usr/share/kolla-ansible/tools/cleanup-images --all
 
     used to remove all Docker images built by Kolla from the local Docker cache.
 
-kolla-ansible -i INVENTORY deploy 
+kolla-ansible -i INVENTORY deploy
 
     used to deploy and start all Kolla containers.
 
@@ -337,27 +337,27 @@ kolla-ansible -i inventory/hosts-openstack.ini destroy --yes-i-really-really-mea
 
     used to clean up containers and volumes in the cluster.
 
-kolla-ansible -i INVENTORY mariadb_recovery 
+kolla-ansible -i INVENTORY mariadb_recovery
 
     used to recover a completely stopped mariadb cluster.
 
-kolla-ansible -i INVENTORY prechecks 
+kolla-ansible -i INVENTORY prechecks
 
     used to check if all requirements are meet before deploy for each of the OpenStack services.
 
-kolla-ansible -i INVENTORY post-deploy 
+kolla-ansible -i INVENTORY post-deploy
 
     used to do post deploy on deploy node to get the admin openrc file.
 
-kolla-ansible -i INVENTORY pull 
+kolla-ansible -i INVENTORY pull
 
     used to pull all images for containers.
 
-kolla-ansible -i INVENTORY reconfigure 
+kolla-ansible -i INVENTORY reconfigure
 
     used to reconfigure OpenStack service.
 
-kolla-ansible -i INVENTORY genconfig 
+kolla-ansible -i INVENTORY genconfig
 
     this regenerates config from included custom configs
     used when making custom config changes
@@ -365,10 +365,10 @@ kolla-ansible -i INVENTORY genconfig
     After adding your custom configs, you then need to:
 
         1) kolla-ansible reconfigure (Apply change and restart required containers)
-        2) kolla-ansible genconfig 
+        2) kolla-ansible genconfig
         3) restart the containers manually
 
-    for changes into the hosts volume, if you do a 
+    for changes into the hosts volume, if you do a
         1) reconfigure
         2) upgrade
         3) deploy
@@ -378,11 +378,11 @@ kolla-ansible -i INVENTORY genconfig
 
     ref: https://ask.openstack.org/en/question/113699/kolla-ansible-how-to-managemodify-configuration-files/
 
-kolla-ansible -i INVENTORY upgrade 
+kolla-ansible -i INVENTORY upgrade
 
     used to upgrade existing OpenStack Environment.
 
-kolla-ansible -i INVENTORY check 
+kolla-ansible -i INVENTORY check
 
     used to do post-deployment smoke tests
 
@@ -403,7 +403,7 @@ To run kolla-ansible equivalent command using ansible-playbook:
 #            /home/administrator/repos/ansible/ansible-datacenter/venv/share/kolla-ansible/ansible/site.yml  \
             /opt/openstack/share/kolla-ansible/ansible/site.yml  \
             --verbose
- 
+
 
 After instance is deployed, try testing:
 
@@ -536,8 +536,8 @@ $
 ping -c 1 google.com
 ^C
 exit
-root@node01:[network-scripts]$ 
-root@node01:[network-scripts]$ 
+root@node01:[network-scripts]$
+root@node01:[network-scripts]$
 root@node01:[network-scripts]$ ip route add 10.0.0.0/24 dev cloudbr1
 root@node01:[network-scripts]$ ping 10.0.0.130
 
@@ -676,7 +676,7 @@ patch-tun
 qg-5406b94d-35
 qr-1acb5c57-98
 tap2656db8c-83
-root@node01:[network-scripts]$ 
+root@node01:[network-scripts]$
 
 
 
@@ -1033,7 +1033,7 @@ yum reinstall pam
 ```
 
 ```bash
-run-remote.sh 
+run-remote.sh
 run-remote.sh ansible -i inventory/hosts.ini all -m ping
 run-remote.sh ansible -i inventory/hosts.ini openstack -m ping
 run-remote.sh ansible -m ping all
@@ -1065,7 +1065,7 @@ run-remote.sh kolla-ansible -i inventory/hosts-openstack.ini stop --yes-i-really
 run-remote.sh openstack server create --image cirros --flavor m1.tiny --key-name mykey --network demo-net demo1
 run-remote.sh scripts/kolla-ansible/init-runonce.sh
 
-gethist | grep run-remote | sort -n | uniq >> NOTES-ANSIBLE.md 
+gethist | grep run-remote | sort -n | uniq >> NOTES-ANSIBLE.md
 ```
 
 Pre-install deployment tools install/setup:
@@ -1097,7 +1097,7 @@ echo "ansible_python_interpreter: /opt/openstack/bin/python" >> /etc/kolla/globa
 kolla-genpwd
 ```
 
-refs: 
+refs:
 
     https://docs.openstack.org/project-deploy-guide/kolla-ansible/latest/quickstart.html
     https://sudomakeinstall.com/uncategorized/openstack-ansible-kolla-on-centos-7-with-python-virtual-env
@@ -1111,4 +1111,3 @@ To get the current config:
 Run ping:
 
     run-remote.sh ansible -i inventory/hosts-openstack.ini openstack -m ping
-

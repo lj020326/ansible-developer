@@ -4,7 +4,7 @@ iscsi playbook
 
 	centos:
 	https://github.com/OndrejHome/ansible.iscsiadm
-	
+
 	ubuntu:
 	https://github.com/debops/ansible-iscsi
 
@@ -56,7 +56,7 @@ ISCSI setup/testing notes/history:
   472  cd ansible-datacenter/
   478  iscsiadm --mode session -P 3 | grep -i -e attached -e target
   506  cd ansible-datacenter/
-  511  history | grep ansible >> NOTES.md 
+  511  history | grep ansible >> NOTES.md
 
 
 ## from node01
@@ -180,16 +180,16 @@ ISCSI setup/testing notes/history:
   374  ll
   375  cd nodes/
   376  ll
-  381  cdrepos 
+  381  cdrepos
   385  cdrepos
   386  ll
   387  ll sudoWork/
   407  cdansible
-  409  systemctl list-unit-files | grep enabled | sort 
+  409  systemctl list-unit-files | grep enabled | sort
   422  netstat -tanp | grep LISTEN
-  423  replay.sh 
+  423  replay.sh
   435  cdansible
-  436  emacs bootstrap.yml 
+  436  emacs bootstrap.yml
   437  ansible-playbook -v -i inventory/hosts.ini bootstrap.yml
   444  ansible -i inventory/hosts.ini all -m ping -b -v
   445  ansible-playbook -v -i inventory/hosts.ini bootstrap.yml
@@ -200,12 +200,12 @@ ISCSI setup/testing notes/history:
   450  ansible-playbook -v -i inventory/hosts.ini bootstrap.yml
   451  gitpull
   452  ansible-playbook -v -i inventory/hosts.ini bootstrap.yml
-  453  emacs bootstrap.yml 
+  453  emacs bootstrap.yml
   454  cdansible
   455  gitpull
   456  gitpull
   457  ansible-playbook -v -i inventory/hosts.ini bootstrap.yml
-  458  ansible-playbook -v -i inventory/hosts.ini site.yml 
+  458  ansible-playbook -v -i inventory/hosts.ini site.yml
   459  D
   460  gitpull
   461  exit
@@ -218,7 +218,7 @@ ISCSI setup/testing notes/history:
   468   ssh-keygen -f "/home/administrator/.ssh/known_hosts" -R node01.example.int
   469  ssh deployer@node01.example.int
   470  ansible-playbook -v -i inventory/hosts.ini bootstrap.yml
-  471  ansible-playbook -v -i inventory/hosts.ini 
+  471  ansible-playbook -v -i inventory/hosts.ini
   472  ansible-playbook -vvv -i inventory/hosts.ini site.yml
   473  ssh deployer@node01.example.int
   474  ansible -i inventory.cfg all -a "grep ^root: /etc/shadow"
@@ -226,7 +226,7 @@ ISCSI setup/testing notes/history:
   476  ansible -i inventory/hosts.ini all -a "grep ^root: /etc/shadow" -v
   477  ansible -i inventory/hosts.ini all -a "grep ^root: /etc/shadow" -vvv
   478  ansible -i inventory/hosts.ini all -a "grep ^root: /etc/shadow" -b -vvv
-  479  cat ~/.ansible.cfg 
+  479  cat ~/.ansible.cfg
   480  history | grep ansible | grep boot
   481  ansible-playbook -vvv -i inventory/hosts.ini site.yml
   482  gitpull
@@ -249,8 +249,7 @@ ISCSI setup/testing notes/history:
   499  gitpull
   500  ansible-playbook -vvv -i inventory/hosts.ini site.yml
   501  cdansible
-  502  history | tail -200 >> NOTES.md 
+  502  history | tail -200 >> NOTES.md
 
 
 ```
-

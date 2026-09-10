@@ -31,7 +31,7 @@
 #   jq
 #   cut
 #   grep
-#   curl 
+#   curl
 ######
 
 COOKIES=cookies.txt
@@ -100,7 +100,7 @@ if [ $? = 0 ]; then
         jq -r '.entries[] | .log?' $LOGFILE
 
         if [ "$completed" = "true" ]; then
-          while :; do          
+          while :; do
             # Check the execution status
             curl -s -X GET \
                  -b "$COOKIES" \

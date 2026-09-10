@@ -140,4 +140,3 @@ Be sure to upgrade to [the latest Git version](https://github.blog/2020-10-19-gi
 ## Reference
 
 - https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
-

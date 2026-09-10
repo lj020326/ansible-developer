@@ -1,12 +1,12 @@
 ﻿##
-## This script will write to 2 log files 
+## This script will write to 2 log files
 ## the first log will append all "write-" log messages as specified in the write-log path argument
 ## the second log will be configured and written to as per the log4net config file
 ##
 ## This behavior can be modified to write to just one file by modifying the Write-Log method accordingly
 ##
 
-Import-Module PowerShellLogging 
+Import-Module PowerShellLogging
 
 function global:Write-Log4net {
     [CmdletBinding()]
@@ -22,28 +22,28 @@ function global:Write-Log4net {
     $Prefix = $Prefix.Trim()
 
     if ($Prefix) { $Prefix = "$Prefix " }
-        
+
     $Now = Get-Date -Format 'G'
     $Line = "$Now - $Prefix$Line"
 
 #    Add-Content -Path $Path -Value $Line
 
-	switch ($LogLevel) { 
+	switch ($LogLevel) {
 		"Error" {$global:logger.Error($Line);}
 		"Warning" {$global:logger.Warn($Line);}
 		"Info" {$global:logger.Info($Line);}
 		"Debug" {$global:logger.Debug($Line);}
         default {"Unknown loglevel: $LogLevel"}
-    }	
+    }
 
 }
 
 ##
 ## Init-Log4net - Initialize log4net logger
 ##
-## pass $configSettings hash for external file dependencies: 
-## 1) log4netDllPath - path for log4net.dll 
-## 2) logConfigFilePath - path for log4net config file 
+## pass $configSettings hash for external file dependencies:
+## 1) log4netDllPath - path for log4net.dll
+## 2) logConfigFilePath - path for log4net config file
 ##
 function Configure-Log4net([hashtable] $configSettings) {
 	Add-Type -Assembly System.Configuration
@@ -55,7 +55,7 @@ function Configure-Log4net([hashtable] $configSettings) {
 	if ( -not (test-path $log4netDllPath) ) {
 		throw "Log4net library cannot be found on the path $log4netDllPath"
 	}
-	
+
 	[System.Reflection.Assembly]::LoadFrom($log4netDllPath) | Out-Null
 
 	#Reset
@@ -74,7 +74,7 @@ function Configure-Log4net([hashtable] $configSettings) {
 		$xmlConfigurator = [log4net.Config.XmlConfigurator]::ConfigureAndWatch($configFile)
 		$logger = $LogManager::GetLogger("PowerShell")
 #		$logger = $LogManager::GetLogger($Host.GetType())
-#		[log4net.ILog] $logger = $LogManager::GetLogger($Host.GetType()) 
+#		[log4net.ILog] $logger = $LogManager::GetLogger($Host.GetType())
 #		$appender.Threshold = [log4net.Core.Level]::Info
 		Write-Verbose "Log4net Logger is configured"
 	}
@@ -86,11 +86,11 @@ function Configure-Log4net([hashtable] $configSettings) {
 #	# determines the log statements that show up
 #	$Appender.Threshold = [log4net.Core.Level]::Info
 #	$Log = [log4net.LogManager]::GetLogger($Host.GetType())
-	
+
 	return $logger
 }
 
-function test-function { 
+function test-function {
 
     Write-Verbose "Testing log"
 
@@ -107,7 +107,7 @@ if ((-not (Get-Variable -Name PSScriptRoot -ValueOnly -ErrorAction SilentlyConti
 }
 
 ## set the locations for the log4net dll and configuration file used in the Init
-$logSettings = @{"log4netDllPath" = "$PSScriptRoot\log4net\log4net.dll" 
+$logSettings = @{"log4netDllPath" = "$PSScriptRoot\log4net\log4net.dll"
 				"logConfigFilePath" = "$PSScriptRoot\log4net\logConfig.xml"}
 
 write-output "load and configure log4net"
@@ -181,9 +181,9 @@ Write-Verbose "Verbose After loglevel change to all"
 Write-Output "Output After loglevel change to all"
 Write-Debug "Debug After loglevel change to all"
 
-test-function 
+test-function
 
-$logFile | Disable-OutputSubscriber 
+$logFile | Disable-OutputSubscriber
 
 Write-Output "content of dynamic log4net logging:"
 Get-Content $global:logger.Logger.Appenders.File

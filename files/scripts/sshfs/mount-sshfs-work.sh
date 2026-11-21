@@ -15,19 +15,19 @@ mount_share() {
   #SSH_DEBUG_OPTS=",debug,sshfs_debug,loglevel=debug"
   SSH_OPTS="kill_on_unmount,reconnect,allow_other,defer_permissions,direct_io,volname=work_sshfs_mount"
   SSH_OPTS+=",IdentityFile=${SSH_ID_FILE}"
-  if [[ ! -z ${SSH_DEBUG_OPTS} ]]; then
+  if [[ -n "${SSH_DEBUG_OPTS}" ]]; then
     SSH_OPTS+=",${SSH_DEBUG_OPTS}"
   fi
 
   SSHFS_EXEC="/usr/local/bin/sshfs"
   mountCmd="${SSHFS_EXEC} -o ${SSH_OPTS} ${SSH_SOURCE} ${SSH_DEST}"
-  echo ${mountCmd}
+  echo "${mountCmd}"
   ${mountCmd}
 
 }
 
 MOUNT_EXISTS=0
-if mount | grep ${DEST_DIR} > /dev/null; then
+if mount | grep "${DEST_DIR}" > /dev/null; then
   MOUNT_EXISTS=1
 fi
 

@@ -19,7 +19,7 @@ APP_NAME=map-build-$BUILD_VERSION
 HOST_NAME=$APP_NAME-dev
 
 ## Log into PCF endpoint - Provided via Jenkins Plugin
-cf login -u $CF_USER -p $CF_PASSWORD -o $CF_ORG -s $CF_SPACE -a $API --skip-ssl-validation
+cf login -u "$CF_USER" -p "$CF_PASSWORD" -o "$CF_ORG" -s "$CF_SPACE" -a "$API" --skip-ssl-validation
 
 # ^^^^^^^^^^^^^^^^^^^^ Commands for Jenkins Script ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -44,11 +44,11 @@ cf login -u $CF_USER -p $CF_PASSWORD -o $CF_ORG -s $CF_SPACE -a $API --skip-ssl-
 
 DEPLOYED_APP_NAME=$(cf apps | grep 'map-build-' | cut -d" " -f1)
 if [ -n "$DEPLOYED_APP_NAME" ]; then
- cf unmap-route $DEPLOYED_APP_NAME $DOMAIN -n map-dev
- cf delete $DEPLOYED_APP_NAME -r -f
+ cf unmap-route "$DEPLOYED_APP_NAME" "$DOMAIN" -n map-dev
+ cf delete "$DEPLOYED_APP_NAME" -r -f
 fi
-cf push $APP_NAME -p artifacts/pcfdemo.war -m 1GB -n $HOST_NAME -i 1 -t 180 --no-start
-cf bind-service $APP_NAME myRabbit
-cf map-route $APP_NAME $DOMAIN -n map-dev
-cf start $APP_NAME
+cf push "$APP_NAME" -p artifacts/pcfdemo.war -m 1GB -n "$HOST_NAME" -i 1 -t 180 --no-start
+cf bind-service "$APP_NAME" myRabbit
+cf map-route "$APP_NAME" "$DOMAIN" -n map-dev
+cf start "$APP_NAME"
 cf lo

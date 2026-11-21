@@ -2,24 +2,27 @@
 
 ## ref: http://www.cubicrace.com/2016/03/log-tracing-mechnism-for-shell-scripts.html
 
-source ./logger.sh
+SCRIPT_DIR="$(dirname "$0")"
 
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/logger.sh"
+
+# shellcheck disable=SC2034
 SCRIPT_LOG="./log/demo.log"
 
 SCRIPTENTRY
 updateUserDetails(){
     ENTRY
-    logDebug "Username: $1, Key: $2"
-    logInfo "User details updated for $1"
+    log_debug "Username: $1, Key: $2"
+    log_info "User details updated for $1"
     EXIT
 }
 
-logInfo "Updating user details..."
+log_info "Updating user details..."
 updateUserDetails "cubicrace" "3445"
+rc="$?"
 
-rc=2
-
-if [ ! "$rc" = "0" ]
+if [ "${rc}" -ne 0 ]
 then
     ERROR "Failed to update user details. RC=$rc"
 fi

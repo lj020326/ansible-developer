@@ -23,27 +23,48 @@ repos:
         files: ^(files|tests)/
         exclude: |
           (?x)^(
-              files/private/|
-              files/scripts/apache-utils/docker/|
-              tests/unit/test_redact\.py
+            (.*/)?archive/|
+            files/private/|
+            files/scripts/apache-utils/docker/|
+            files/scripts/ansible/vault_scrambler\.py|
+            files/scripts/ansible/tests/unit/test_vault_scrambler\.py|
+            files/scripts/python/tests/unit/test_redact\.py
           )
       - id: mixed-line-ending
         files: ^(files|tests)/
         exclude: \.(ldif|schema)(\.j2)?$
 
-#  - repo: https://github.com/shellcheck-py/shellcheck-py
-#    rev: v0.10.0.1
-#    hooks:
-#      - id: shellcheck
-#        name: Check Shell Scripts (shellcheck)
-##        files: ^(files|tests)/
-#        files: files/scripts
-#        types: [shell]
+  - repo: local
+    hooks:
+      - id: clean-test-build-files
+        name: clean up test and build files
+        entry: >-
+          bash -c '
+          find . -type f \( -name ".package_dir.*.yml" \
+            -o -name "*.pyc" -o -name "*.pyo" \) -delete;
+          find . -type d \( -name "__pycache__" \
+            -o -name ".pytest_cache" -o -name ".tox" \
+            -o -name "build" -o -name "dist" -o -name "*.egg-info" \) \
+            -exec rm -rf {} + 2>/dev/null || true
+          '
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        name: Check Shell Scripts (shellcheck)
+        args: [-x]
+#        files: ^(files|tests)/
+#        files: ^files/scripts/(ansible|python)/
+        files: ^files/scripts/
+        types: [shell]
 #        exclude: "**/archive/"
-#        exclude: |
-#          (?x)(
-#              archive/
-#              ^files/private/|
-#              ^files/scripts/apache-utils/docker/|
-#              ^tests/unit/test_redact\.py
-#          )
+        exclude: |
+          (?x)(
+            (.*/)?archive/|
+            ^files/private/|
+            ^files/scripts/apache-utils/docker/
+          )

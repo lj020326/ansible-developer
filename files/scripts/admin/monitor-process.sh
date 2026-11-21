@@ -12,15 +12,12 @@ if [ $# == 1 ]; then
     process_list=$1
 fi
 
-for p in $process_list
-do
-#  echo "checking if process $p is running..."
-  pgrep $p
-  if [ $? -ne 0 ]
-  then
-    echo "process $p is NOT running -> restarting..."
-    systemctl restart $p
-  else
-    echo "process $p is running, no restart required..."
-  fi
+for p in $process_list; do
+    #  echo "checking if process $p is running..."
+    if ! pgrep "$p" >/dev/null 2>&1; then
+        echo "process $p is NOT running -> restarting..."
+        systemctl restart "$p"
+    else
+        echo "process $p is running, no restart required..."
+    fi
 done

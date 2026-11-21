@@ -29,7 +29,8 @@ explode_ansible_role() {
     fi
 
     # Determine role name from the full_role_path
-    local role_name=$(basename "$full_role_path")
+    local role_name
+    role_name=$(basename "$full_role_path")
 
     # Define paths for the new role's components
     local tasks_dir="${full_role_path}/tasks"
@@ -101,4 +102,4 @@ explode_ansible_role() {
     echo "Ansible role '${role_name}' created successfully at ${full_role_path}."
 }
 
-explode_ansible_role "${@}"
+explode_ansible_role "${*}"

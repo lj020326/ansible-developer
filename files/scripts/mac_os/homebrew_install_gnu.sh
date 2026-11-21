@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # see https://www.topbug.net/blog/2013/04/14/install-and-use-gnu-command-line-tools-in-mac-os-x/
 # ref: https://gist.github.com/xuhdev/8b1b16fb802f6870729038ce3789568f
 

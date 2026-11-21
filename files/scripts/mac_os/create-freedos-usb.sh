@@ -38,6 +38,9 @@ FIRMWARE_PAYLOAD+=("${HOME}/Downloads/software/firmware/supermicro/bios/X10SDVF4
 ## ref: https://stackoverflow.com/questions/4632028/how-to-create-a-temporary-directory
 TEMP_DIR=$(mktemp -d -t "${SCRIPT_NAME_PREFIX}_XXXXXX" -p "${HOME}/tmp")
 
+current_command=""
+last_command=""
+
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
@@ -66,7 +69,8 @@ function reverse_array() {
     # Get the value associated with the current key
     VALUE="${ARRAY_SOURCE_REF[$KEY]}"
     # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
-    REVERSED_ARRAY_REF[$VALUE]="$KEY"
+    # shellcheck disable=SC2034
+    REVERSED_ARRAY_REF[VALUE]="$KEY"
   done
 }
 
@@ -76,37 +80,37 @@ reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 #LOG_LEVEL=${LOG_DEBUG}
 LOG_LEVEL=${LOG_INFO}
 
-function logError() {
-  if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
+function log_error() {
+  if [ "$LOG_LEVEL" -ge "$LOG_ERROR" ]; then
   	logMessage "${LOG_ERROR}" "${1}"
   fi
 }
-function logWarn() {
-  if [ $LOG_LEVEL -ge $LOG_WARN ]; then
+function log_warn() {
+  if [ "$LOG_LEVEL" -ge "$LOG_WARN" ]; then
   	logMessage "${LOG_WARN}" "${1}"
   fi
 }
-function logInfo() {
-  if [ $LOG_LEVEL -ge $LOG_INFO ]; then
+function log_info() {
+  if [ "$LOG_LEVEL" -ge "$LOG_INFO" ]; then
   	logMessage "${LOG_INFO}" "${1}"
   fi
 }
 function logTrace() {
-  if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
+  if [ "$LOG_LEVEL" -ge "$LOG_TRACE" ]; then
   	logMessage "${LOG_TRACE}" "${1}"
   fi
 }
-function logDebug() {
-  if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
+function log_debug() {
+  if [ "$LOG_LEVEL" -ge "$LOG_DEBUG" ]; then
   	logMessage "${LOG_DEBUG}" "${1}"
   fi
 }
 function abort() {
-  logError "$@"
+  log_error "$@"
   exit 1
 }
 function fail() {
-  logError "$@"
+  log_error "$@"
   exit 1
 }
 
@@ -166,10 +170,10 @@ function setLogLevel() {
 function add_freedos_payload() {
 
   ## ref: https://youtu.be/lcNsvIXI2iM?si=YNbwwps4WDFYBFX0
-  logInfo "Adding image payload (firmware, etc)"
+  log_info "Adding image payload (firmware, etc)"
 
 #  PARTITION2_MOUNT_POINT=$(diskutil info ${FREEDOS_DISK_PARTITION2} | grep 'Mount Point' | cut -d ':' -f 2 | sed 's/^ *//g' | sed 's/ *$//g')
-#  logInfo "PARTITION2_MOUNT_POINT => ${FREEDOS_DISK_PARTITION2_MOUNT_POINT}"
+#  log_info "PARTITION2_MOUNT_POINT => ${FREEDOS_DISK_PARTITION2_MOUNT_POINT}"
 
   declare -a PAYLOAD_COMMAND_ARRAY
 
@@ -180,12 +184,12 @@ function add_freedos_payload() {
 
   for FIRMWARE_PAYLOAD_ITEM in "${FIRMWARE_PAYLOAD[@]}"; do
     PAYLOAD_COMMAND_ARRAY+=("cp -pr ${FIRMWARE_PAYLOAD_ITEM} ${TEMP_DIR}")
-    logDebug "${PAYLOAD_CMD}"
+    log_debug "${PAYLOAD_CMD}"
   done
 
   for PAYLOAD_COMMAND in "${PAYLOAD_COMMAND_ARRAY[@]}"; do
 
-    logInfo "PAYLOAD_COMMAND => ${PAYLOAD_COMMAND}"
+    log_info "PAYLOAD_COMMAND => ${PAYLOAD_COMMAND}"
     if [ $QUIET_MODE -eq 1 ]; then
       eval "${PAYLOAD_COMMAND} > /dev/null 2>&1"
     else
@@ -195,7 +199,7 @@ function add_freedos_payload() {
 
     if [[ $RETURN_STATUS -eq 0 ]]; then
       if [ $QUIET_MODE -eq 0 ]; then
-        logInfo "SUCCESS => [${PAYLOAD_COMMAND}]"
+        log_info "SUCCESS => [${PAYLOAD_COMMAND}]"
       fi
     else
       fail "FAILED => [${PAYLOAD_COMMAND}] returned [${RETURN_STATUS}]"
@@ -204,7 +208,7 @@ function add_freedos_payload() {
 
   #UNMOUNT_CMD="umount ${TEMP_DIR}"
   UNMOUNT_CMD="diskutil unmount ${TEMP_DIR}"
-  logInfo "${UNMOUNT_CMD}"
+  log_info "${UNMOUNT_CMD}"
   eval "${UNMOUNT_CMD}"
 }
 
@@ -251,14 +255,14 @@ function create_freedos_usb() {
   fi
 
   if [ $QUIET_MODE -eq 0 ]; then
-    logInfo "About to run:"
-    logInfo "==================================="
+    log_info "About to run:"
+    log_info "==================================="
 
     IFS=$'\n'
     echo "${COMMAND_ARRAY[*]}"
 
     ## https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
-    read -p "Confirm write image ${FREEDOS_IMAGE_PATH} to ${FREEDOS_DISK_PATH}? " -n 1 -r
+    read -rp "Confirm write image ${FREEDOS_IMAGE_PATH} to ${FREEDOS_DISK_PATH}? " -n 1 -r
     echo    # (optional) move to a new line
     if [[ ! $REPLY =~ ^[Yy]$ ]]
     then
@@ -268,7 +272,7 @@ function create_freedos_usb() {
 
   for COMMAND in "${COMMAND_ARRAY[@]}"; do
 
-    logInfo "COMMAND => ${COMMAND}"
+    log_info "COMMAND => ${COMMAND}"
 
     if [ $QUIET_MODE -eq 1 ]; then
       eval "${COMMAND} > /dev/null 2>&1"
@@ -279,7 +283,7 @@ function create_freedos_usb() {
 
     if [[ $RETURN_STATUS -eq 0 ]]; then
       if [ $QUIET_MODE -eq 0 ]; then
-        logInfo "SUCCESS => [${COMMAND}]"
+        log_info "SUCCESS => [${COMMAND}]"
       fi
     else
       fail "FAILED => [${COMMAND}] returned [${RETURN_STATUS}]"
@@ -290,6 +294,22 @@ function create_freedos_usb() {
     add_freedos_payload
   fi
 
+}
+
+function isInstalled() {
+    command -v "${1}" >/dev/null 2>&1 || return 1
+}
+
+function checkRequiredCommands() {
+    missingCommands=""
+    for currentCommand in "$@"
+    do
+        isInstalled "${currentCommand}" || missingCommands="${missingCommands} ${currentCommand}"
+    done
+
+    if [[ -n "${missingCommands}" ]]; then
+        fail "checkRequiredCommands(): Please install the following commands required by this script:${missingCommands}"
+    fi
 }
 
 function usage() {
@@ -334,14 +354,16 @@ function main() {
   shift $((OPTIND-1))
 
   if [[ "$EUID" = 0 ]]; then
-    logDebug "(1) set to root"
+    log_debug "(1) set to root"
   else
-    logError "****************************"
-    logError "** user is not root!"
-    logError "**   This script must be run as root or with sudo, see usage below:"
-    logError ""
+    log_error "****************************"
+    log_error "** user is not root!"
+    log_error "**   This script must be run as root or with sudo, see usage below:"
+    log_error ""
     usage 2
   fi
+
+  checkRequiredCommands diskutil
 
   create_freedos_usb
 

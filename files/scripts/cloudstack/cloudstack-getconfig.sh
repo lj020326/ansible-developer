@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 echo "SCRIPT_DIR=[${SCRIPT_DIR}]"
 
-source ${SCRIPT_DIR}/.env
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/.env"
 
-configFile=~/cloudstack-config.txt
+configFile=${HOME}/cloudstack-config.txt
 
 echo "archiving last config"
 snap_date=$(date +%Y%m%d_%H%M)
 
-if [ -e ${configFile} ]; then
-  mv ${configFile} ${configFile}.${snap_date}
+if [ -e "${configFile}" ]; then
+    mv "${configFile}" "${configFile}"."${snap_date}"
 fi
 
 #echo "clearing out last config"
@@ -34,45 +35,47 @@ physicalNetworkIdList=$(cs listPhysicalNetworks | jq -r '.physicalnetwork|.[]|.i
 
 listTrafficTypeCommandList=()
 
-for physicalNetworkId in ${physicalNetworkIdList}
-do
-  listTrafficTypeCommandList+=("listTrafficTypes physicalnetworkid=${physicalNetworkId}")
+for physicalNetworkId in ${physicalNetworkIdList}; do
+    listTrafficTypeCommandList+=("listTrafficTypes physicalnetworkid=${physicalNetworkId}")
 done
 
-apiCommandList="
-listNetworks
-listNetworkServiceProviders
-listPhysicalNetworks
-${listTrafficTypeCommandList[@]}
-listPods
-listSecurityGroups
-listVirtualRouterElements
-listVlanIpRanges
-listVPCs
-listZones
-"
+apiCommandList=(
+    "listNetworks"
+    "listNetworkServiceProviders"
+    "listPhysicalNetworks"
+    "${listTrafficTypeCommandList[@]}"
+    "listPods"
+    "listSecurityGroups"
+    "listVirtualRouterElements"
+    "listVlanIpRanges"
+    "listVPCs"
+    "listZones"
+)
 
 #apiCommandList=( $(eval echo ${apiCommandList[@]}) )
 #apiCommandList=("${apiCommandList[@]//\'/}")
 
 run_api_command() {
 
-  api_command="${@}"
-#  api_command="${1}"
-#  api_command="${api_command[@]//\"/}"
+    api_command="${*}"
+    #  api_command="${1}"
+    #  api_command="${api_command[@]//\"/}"
 
-  echo "api_command=${api_command}"
-  echo "**********************" >> $configFile
-  echo "${api_command}" >> $configFile
-  eval "cs ${api_command}" >> $configFile
+    echo "api_command=${api_command}"
+    {
+        echo "**********************"
+        echo "${api_command}"
+        eval "cs ${api_command}"
+    } >>"$configFile"
 
 }
 
+rc=0
 IFS=$'\n'
-for apiCommand in ${apiCommandList}
-do
-  echo "apiCommand=${apiCommand}"
-  run_api_command ${apiCommand}
+for apiCommand in "${apiCommandList[@]}"; do
+    echo "apiCommand=${apiCommand}"
+    run_api_command "${apiCommand}"
+    rc="$?"
 done
 
-exit ${?}
+exit "${rc}"

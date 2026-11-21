@@ -1,7 +1,9 @@
-
-log_prefix_bashenv=".bash_env"
+log_prefix_bashenv=".bash_env:"
 
 echo "${log_prefix_bashenv} setting environment vars"
+
+export SHELL_SESSION_FILE=0
+export SHELL_SESSION_HISTORY=0
 
 #export ADD_GNUTOOLS_BASH_PATH=0
 
@@ -29,6 +31,9 @@ export PYTHON2_BIN_DIR=$PYTHON2_HOME
 export PYTHON3_HOME=/usr/bin
 export PYTHON3_BIN_DIR=$PYTHON3_HOME
 
+## go
+export GOPROXY=https://proxy.golang.org,direct
+
 ## ref: https://www.jeffgeerling.com/blog/running-ansible-within-windows
 #ANSIBLE=/opt/ansible
 #export PATH=$PATH:$ANSIBLE/bin
@@ -50,26 +55,37 @@ SSH_KEY_GITHUB=~/.ssh/id_rsa
 #export DOCKER_BUILDKIT=1
 export DOCKER_BUILDKIT=0
 
+PLATFORM_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+
+case "${PLATFORM_OS}" in
+linux*) PLATFORM=LINUX ;;
+darwin*) PLATFORM=DARWIN ;;
+cygwin*) PLATFORM=CYGWIN ;;
+mingw64*) PLATFORM=MINGW64 ;;
+mingw32*) PLATFORM=MINGW32 ;;
+msys*) PLATFORM=MSYS ;;
+*) PLATFORM="UNKNOWN:${PLATFORM_OS}" ;;
+esac
+
+echo "${log_prefix_bashenv} PLATFORM=[${PLATFORM}]"
+
 if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     echo "${log_prefix_bashenv} setting environment for MSYS/MINGW platform"
 
-    ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
-    export JAVA_HOME=$(/usr/libexec/java_home)
-
     export GIT_SSH=/usr/bin/ssh
 
-#    export CMAKE_C_COMPILER=/c/apps/msys64/mingw64/bin/gcc
-#    export CMAKE_CXX_COMPILER=/c/apps/msys64/mingw64/bin/g++
-#    export CC=/c/apps/msys64/mingw64/bin/gcc
-#    export CXX=/c/apps/msys64/mingw64/bin/g++
+    #    export CMAKE_C_COMPILER=/c/apps/msys64/mingw64/bin/gcc
+    #    export CMAKE_CXX_COMPILER=/c/apps/msys64/mingw64/bin/g++
+    #    export CC=/c/apps/msys64/mingw64/bin/gcc
+    #    export CXX=/c/apps/msys64/mingw64/bin/g++
     export CMAKE_C_COMPILER=/usr/bin/gcc
     export CMAKE_CXX_COMPILER=/usr/bin/g++
 
-	## always use /usr/bin unless explicitly overridden in shell
-#	if [[ "${PLATFORM}" =~ ^(MINGW64)$ ]]; then
-#		export CMAKE_C_COMPILER=/mingw64/bin/gcc
-#		export CMAKE_CXX_COMPILER=/mingw64/bin/g++
-#	fi
+    ## always use /usr/bin unless explicitly overridden in shell
+    #	if [[ "${PLATFORM}" =~ ^(MINGW64)$ ]]; then
+    #		export CMAKE_C_COMPILER=/mingw64/bin/gcc
+    #		export CMAKE_CXX_COMPILER=/mingw64/bin/g++
+    #	fi
     export CC=${CMAKE_C_COMPILER}
     export CXX=${CMAKE_CXX_COMPILER}
 
@@ -106,12 +122,12 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     export GOROOT=/mingw64/lib/go
     export GOPATH=/mingw64
 
-#    #export JAVA_HOME=/c/apps/java/jre8
-##    [[ -z $JAVA_HOME ]] && export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
-##    export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
-##    export JAVA_HOME=/c/apps/Java/jre1.6
-#    export JAVA_HOME=/c/apps/Java/jre1.8.0_231
-#    export M2_HOME=/c/apps/apache-maven-3.5.2
+    #    #export JAVA_HOME=/c/apps/java/jre8
+    ##    [[ -z $JAVA_HOME ]] && export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
+    ##    export JAVA_HOME=/c/apps/Java/jdk1.8.0_231
+    ##    export JAVA_HOME=/c/apps/Java/jre1.6
+    #    export JAVA_HOME=/c/apps/Java/jre1.8.0_231
+    #    export M2_HOME=/c/apps/apache-maven-3.5.2
     export M2_HOME=/c/apps/apache-maven-3.6.3
 
     export JYTHON_HOME=/c/apps/jython/jython2.7.0
@@ -122,14 +138,14 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
 
     export VSCODE_BINDIR="${HOME}/AppData/Local/Programs/Microsoft VS Code/bin"
 
-#    export EDITOR=/c/apps/notepad++/notepad++.exe
+    #    export EDITOR=/c/apps/notepad++/notepad++.exe
 
     echo "${log_prefix_bashenv} setting PATH for MSYS/MINGW platform"
     ## set user path
-#    export PATH=/usr/bin:/usr/local/bin
+    #    export PATH=/usr/bin:/usr/local/bin
     export PATH=/usr/local/bin:/usr/bin
     if [[ "${PLATFORM}" =~ ^(MINGW64)$ ]]; then
-      export PATH=/usr/local/bin:/mingw64/bin:/usr/bin
+        export PATH=/usr/local/bin:/mingw64/bin:/usr/bin
     fi
 
     export PATH+=:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
@@ -148,8 +164,8 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     ## maven
     export PATH+=:$M2_HOME/bin
 
-#    export PATH+=:$MONGODB/bin
-#    export PATH+=:$JYTHON_HOME/bin
+    #    export PATH+=:$MONGODB/bin
+    #    export PATH+=:$JYTHON_HOME/bin
 
     ## Chocolatey
     export PATH+=:$CHOCOLATEYINSTALL/bin
@@ -166,7 +182,7 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
     export PATH+=:$DIG_HOME/bin
 
     #export PATH+=:~/.minishift/cache/oc/v1.4.1
-#    export PATH+=:$MINGW_HOME/bin
+    #    export PATH+=:$MINGW_HOME/bin
     export PATH+=":${VSCODE_BINDIR}"
 
     ## MINIKUBE
@@ -175,27 +191,38 @@ if [[ "${PLATFORM}" =~ ^(MSYS|MINGW64|MINGW32)$ ]]; then
 elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     echo "${log_prefix_bashenv} setting environment for DARWIN platform"
 
+    # macOS Terminal.app session directory fallback fix
+    export SHELL_SESSION_DIR="${SHELL_SESSION_DIR:-$HOME/.bash_sessions}"
+
+    # Prevent relative "0" path assignment from creating ./0 files
+    if [ "$SHELL_SESSION_FILE" = "0" ] || [[ "$SHELL_SESSION_FILE" != /* ]]; then
+        mkdir -p "$SHELL_SESSION_DIR"
+        export SHELL_SESSION_FILE="$SHELL_SESSION_DIR/${TERM_SESSION_ID:-session}"
+    fi
+
     export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-#    export MallocStackLogging=0
-#    export MallocStackLoggingNoCompact=1
+    #    export MallocStackLogging=0
+    #    export MallocStackLoggingNoCompact=1
 
     ## ref: https://stackoverflow.com/questions/11936685/how-to-obtain-the-location-of-cacerts-of-the-default-java-installation
     ## ref: https://dev.to/rithvik78/change-the-default-java-version-on-macos-3jee
-#    export JAVA_HOME=$(/usr/libexec/java_home)
+    #    export JAVA_HOME=$(/usr/libexec/java_home)
     JAVA_VERSION_DEFAULT="1.8"
-#    export JAVA_HOME=$(/usr/libexec/java_home -v${JAVA_VERSION_DEFAULT})
+    #    export JAVA_HOME=$(/usr/libexec/java_home -v${JAVA_VERSION_DEFAULT})
+    # shellcheck disable=SC2155
+    export JAVA_HOME=$(/usr/libexec/java_home)
 
     ## this is required for jvm clients that required using system cert chain
     ## ref: https://stackoverflow.com/a/41371938/2791368
-#    export JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStoreType=KeychainStore -Djavax.net.ssl.trustStore=/Library/Keychains/System.keychain"
+    #    export JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStoreType=KeychainStore -Djavax.net.ssl.trustStore=/Library/Keychains/System.keychain"
 
     ## ref: https://apple.stackexchange.com/questions/371997/suppressing-the-default-interactive-shell-is-now-zsh-message-in-macos-catalina
     export BASH_SILENCE_DEPRECATION_WARNING=1
     export VSCODE_SETTINGS_DIR="${HOME}/Library/Application\ Support/Code/User"
 
     ## set user path
-# 	export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-  	export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+    # 	export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
     ## ref: https://code.visualstudio.com/docs/setup/mac#_alternative-manual-instructions
     export PATH+=":/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
@@ -206,19 +233,46 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     ## ref: https://www.topbug.net/blog/2013/04/14/install-and-use-gnu-command-line-tools-in-mac-os-x/
     ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
     ## ref: https://formulae.brew.sh/formula/findutils
-    export PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}"
-    export MANPATH+=":${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnuman"
-#    export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:${PATH}"
-#    export PATH="${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin:${PATH}"
-#    export PATH="${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin:${PATH}"
+    #    export PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}"
+    #    export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:${PATH}"
+    #    export PATH="${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin:${PATH}"
+    #    export PATH="${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin:${PATH}"
+
+    if [ -d "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin" ]; then
+        export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:${PATH}"
+        export MANPATH+=":${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnuman"
+    fi
+
+    ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
+    # Reset/Empty the .bash_path file that holds GNU paths
+    [[ -f "${HOME}/.bash_path" ]] && mv "${HOME}/.bash_path" "${HOME}/.bash_path.orig"
+
+    # Build PATH variable script in "${HOME}/.bash_path"
+    #    for i in "${HOMEBREW_PREFIX}"/Cellar/*/*/bin; do
+    #      echo 'export PATH="'$i':$PATH"' >> "${HOME}/.bash_path"
+    #    done
+    for i in "${HOMEBREW_PREFIX}"/Cellar/*/*/libexec/gnubin; do
+        echo 'export PATH="'$i':$PATH"' >>"${HOME}/.bash_path"
+    done
+    for i in "${HOMEBREW_PREFIX}"/Cellar/*/*/share/man; do
+        echo 'export MANPATH="'$i':$MANPATH"' >>"${HOME}/.bash_path"
+    done
+    for i in "${HOMEBREW_PREFIX}"/Cellar/*/*/libexec/gnuman; do
+        echo 'export MANPATH="'$i':$MANPATH"' >>"${HOME}/.bash_path"
+    done
+
+    if [[ "${ADD_GNUTOOLS_BASH_PATH-1}" -eq 1 && -f "${HOME}/.bash_path" ]]; then
+        echo "${log_prefix_bashenv} sourcing .bash_path"
+        source "${HOME}/.bash_path"
+    fi
 
     ## ref: https://stackoverflow.com/questions/52509602/cant-compile-c-program-on-a-mac-after-upgrade-to-mojave
-#    export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
+    #    export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
 
     ## ref: https://emacsformacosx.com/tips
     ## ref: https://stackoverflow.com/questions/23148787/why-emacsclient-cant-find-socket-after-executing-emacs-daemon/26471957
-#     export EMACS_SERVER_FILE="~/.emacs.d/server"
-#    export EMACS_SERVER_FILE="/tmp/emacs1000"
+    #     export EMACS_SERVER_FILE="~/.emacs.d/server"
+    #    export EMACS_SERVER_FILE="/tmp/emacs1000"
 
     export PYTHON3_HOME=/usr/local/bin
 
@@ -227,24 +281,24 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     # sources /etc/bash.bashrc).
     ## ref: https://www.buildahomelab.com/2022/04/26/how-to-install-ansible-with-pipenv-pyenv/
     if [ -z "$BASH_COMPLETION_LOADED" ]; then
-      export BASH_COMPLETION_LOADED=1
-      if ! shopt -oq posix; then
-        if [ -f /usr/share/bash-completion/bash_completion ]; then
-          . /usr/share/bash-completion/bash_completion
-        elif [ -f /etc/bash_completion ]; then
-          . /etc/bash_completion
-        elif [ -f /usr/local/etc/profile.d/bash_completion.sh ]; then
-          . /usr/local/etc/profile.d/bash_completion.sh
+        export BASH_COMPLETION_LOADED=1
+        if ! shopt -oq posix; then
+            if [ -f /usr/share/bash-completion/bash_completion ]; then
+                . /usr/share/bash-completion/bash_completion
+            elif [ -f /etc/bash_completion ]; then
+                . /etc/bash_completion
+            elif [ -f /usr/local/etc/profile.d/bash_completion.sh ]; then
+                . /usr/local/etc/profile.d/bash_completion.sh
+            fi
         fi
-      fi
     fi
-#    if ! shopt -oq posix; then
-#      if [ -f /usr/share/bash-completion/bash_completion ]; then
-#        . /usr/share/bash-completion/bash_completion
-#      elif [ -f /etc/bash_completion ]; then
-#        . /etc/bash_completion
-#      fi
-#    fi
+    #    if ! shopt -oq posix; then
+    #      if [ -f /usr/share/bash-completion/bash_completion ]; then
+    #        . /usr/share/bash-completion/bash_completion
+    #      elif [ -f /etc/bash_completion ]; then
+    #        . /etc/bash_completion
+    #      fi
+    #    fi
 
     ## ref: https://devqa.io/brew-install-java/
     export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
@@ -261,55 +315,31 @@ elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
     ## ref: https://docs.kics.io/latest/documentation/
     export KICS_QUERIES_PATH=/usr/local/opt/kics/share/kics/assets/queries
 
-    ## ref: https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities#69332
-    # Reset/Empty the .bash_path file that holds GNU paths
-    [[ -f "${HOME}/.bash_path" ]] && mv "${HOME}/.bash_path" "${HOME}/.bash_path.orig"
-
-    # Build PATH variable script in "${HOME}/.bash_path"
-#    for i in /usr/local/Cellar/*/*/bin; do
-#      echo 'export PATH="'$i':$PATH"' >> "${HOME}/.bash_path"
-#    done
-    for i in /usr/local/Cellar/*/*/libexec/gnubin; do
-      echo 'export PATH="'$i':$PATH"' >> "${HOME}/.bash_path"
-    done
-    for i in /usr/local/Cellar/*/*/share/man; do
-      echo 'export MANPATH="'$i':$MANPATH"' >> "${HOME}/.bash_path"
-    done
-    for i in /usr/local/Cellar/*/*/libexec/gnuman; do
-      echo 'export MANPATH="'$i':$MANPATH"' >> "${HOME}/.bash_path"
-    done
-
-    if [[ "${ADD_GNUTOOLS_BASH_PATH-1}" -eq 1 && -f "${HOME}/.bash_path" ]]; then
-        echo "${log_bash} sourcing .bash_path"
-        source "${HOME}/.bash_path"
-    fi
-
     # Flyline - enhanced Bash experience
     # Force Flyline out of debug/simulation fallback
     export FLYLINE_DEBUG=0
     export FLYLINE_SIMULATION=0
+    export FLYLINE_DISABLED=1
 
     # Flyline - enhanced Bash experience
-    if [ -z "${FLYLINE_DISABLED}" ]; then
+    # Only load Flyline native extensions if attached to a terminal AND not disabled
+    if [ -t 1 ] && [ "${FLYLINE_DISABLED}" != "1" ]; then
+        ## Locate and source Flyline
+        #if [ -f "/usr/local/share/flyline/flyline.bash" ]; then
+        #    source /usr/local/share/flyline/flyline.bash
+        #elif [ -f "$(brew --prefix)/opt/flyline/share/flyline/flyline.bash" ]; then
+        #    source "$(brew --prefix)/opt/flyline/share/flyline/flyline.bash"
+        #fi
         if ! enable -p | grep -q ' flyline$'; then
-            enable -f ${HOME}/.local/lib/libflyline.dylib flyline
+            #            enable -f ${HOME}/.local/lib/libflyline.dylib flyline
+            enable -f "${HOME}/.local/lib/libflyline.dylib" flyline 2>/dev/null || true
         fi
-    fi
-
-    ## Locate and source Flyline
-    #if [ -f "/usr/local/share/flyline/flyline.bash" ]; then
-    #    source /usr/local/share/flyline/flyline.bash
-    #elif [ -f "$(brew --prefix)/opt/flyline/share/flyline/flyline.bash" ]; then
-    #    source "$(brew --prefix)/opt/flyline/share/flyline/flyline.bash"
-    #fi
-
-    if [ -f "$HOME/.local/bin/flyline-ollama" ]; then
-      echo "${log_prefix_bashenv} configure flyline agent mode natively"
-      if type flyline &>/dev/null; then
-          flyline set-agent-mode \
-            --trigger-prefix 'ai: ' \
-            --command "${HOME}/.local/bin/flyline-ollama" >/dev/null 2>&1
-      fi
+        if [ -f "$HOME/.local/bin/flyline-ollama" ] && type flyline &>/dev/null; then
+            echo "${log_prefix_bashenv} configure flyline agent mode natively"
+            flyline set-agent-mode \
+                --trigger-prefix 'ai: ' \
+                --command "${HOME}/.local/bin/flyline-ollama" >/dev/null 2>&1
+        fi
     fi
 
 else
@@ -332,8 +362,8 @@ else
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
     if [ -d "/snap/bin" ]; then
-      echo "snap is enabled (see defaults in ansible role bootstrap_linux_package)"
-      export PATH+=:/snap/bin
+        echo "snap is enabled (see defaults in ansible role bootstrap_linux_package)"
+        export PATH+=:/snap/bin
     fi
 
     #if [ "${HOSTNAME}" == "openshift.${NETWORK_INTERNAL_DOMAIN}" ]; then
@@ -342,7 +372,7 @@ else
     #    export PATH+=:$OPENSHIFT_INSTALL
     #fi
 
-    # setenv-python 3
+    # setenv_python 3
 fi
 
 ## using rvm
@@ -358,126 +388,145 @@ fi
 
 unset PYENV_BIN_DIR
 if [ -d "${HOME}/.pyenv/bin" ]; then
-  export PYENV_ROOT="${HOME}/.pyenv"
-  export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
-  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
+    export PYENV_ROOT="${HOME}/.pyenv"
+    export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+    echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 elif [ -d "${HOME}/.pyenv/pyenv-win/bin" ]; then
-  export PYENV_ROOT="${HOME}/.pyenv"
-  export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
-  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
-#elif [ -f "${HOME}/.pyenv/shims/python3" ]; then
-#  export PYENV_BIN_DIR="${HOME}/.pyenv/shims"
-#  echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
+    export PYENV_ROOT="${HOME}/.pyenv"
+    export PYENV_BIN_DIR="${PYENV_ROOT}/bin"
+    echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
+elif [ -f "${HOME}/.pyenv/shims/python3" ]; then
+    export PYENV_BIN_DIR="${HOME}/.pyenv/shims"
+    echo "${log_prefix_bashenv} set PYENV_BIN_DIR to ${PYENV_BIN_DIR}"
 fi
 
 if [ -n "${PYENV_BIN_DIR}" ]; then
-  echo "${log_prefix_bashenv} adding ${PYENV_BIN_DIR} into PATH"
-  export PATH="${PYENV_BIN_DIR}:$PATH"
+    echo "${log_prefix_bashenv} adding ${PYENV_BIN_DIR} into PATH"
+    export PATH="${PYENV_BIN_DIR}:$PATH"
 fi
 
 ## using pyenv
 ## ref: https://opensource.com/article/19/5/python-3-default-mac
 ## https://realpython.com/intro-to-pyenv/
 if command -v pyenv 1>/dev/null 2>&1; then
-  export PYENV_ROOT="$HOME/.pyenv"
-#  [[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+    export PYENV_ROOT="$HOME/.pyenv"
+    # ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
+    # Never block shell startup on synchronous rehash
+    # Use --no-rehash for background subshells to speed up execution
+    eval "$(pyenv init - --no-rehash)"
 
-  # Initialize pyenv shims and autocompletion
-  eval "$(pyenv init -)"
+    # Optional: non-blocking background rehash for interactive shells with stale-lock cleanup
+    if [ -t 1 ]; then
+        (
+            SHIM_LOCK="${PYENV_ROOT}/shims/.pyenv-shim"
+            # Remove stale lockfile if older than 2 minutes
+            if [ -f "${SHIM_LOCK}" ] && [ -n "$(find "${SHIM_LOCK}" -mmin +2 2>/dev/null)" ]; then
+                rm -f "${SHIM_LOCK}"
+            fi
+            pyenv rehash >/dev/null 2>&1
+        ) &
+        disown 2>/dev/null || true
+    fi
 
-  echo "${log_prefix_bashenv} pyenv initialized successfully."
-#  export PYENV_ROOT="$(pyenv root)"
-#  echo "${log_prefix_bashenv} source $(pyenv root)/shims into PATH"
-#  export PATH="$(pyenv root)/shims:$PATH"
-
-  #    ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
-  #    eval "$(pyenv init -)"
-  #    if command -v pyenv-virtualenv-init 1>/dev/null 2>&1; then
-  #      ## https://stackoverflow.com/questions/62532807/pyenv-no-such-command-virtualenv
-  #      ## brew install pyenv-virtualenv
-  #      eval "$(pyenv virtualenv-init -)";
-  #    fi
-
+    echo "${log_prefix_bashenv} pyenv initialized successfully."
 fi
 
-## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
-CERT_PATH=$(python -m certifi)
-export SSL_CERT_FILE=${CERT_PATH}
-export REQUESTS_CA_BUNDLE=${CERT_PATH}
-
-unset SSL_CERT_DIR
-#export SSL_CERT_DIR=$(dirname "${CERT_PATH}")
+if [ -z "${SSL_CERT_FILE}" ]; then
+    ## ref: https://stackoverflow.com/questions/40684543/how-to-make-python-use-ca-certificates-from-mac-os-truststore
+    if command -v python3 &>/dev/null; then
+        CERT_PATH=$(python3 -m certifi 2>/dev/null)
+        export SSL_CERT_FILE="${CERT_PATH}"
+        export REQUESTS_CA_BUNDLE="${CERT_PATH}"
+    fi
+fi
 
 if [ -d "${HOME}/bin" ]; then
+    echo "${log_prefix_bashenv} adding ~/bin to PATH"
     export PATH="${HOME}/bin:${PATH}"
 fi
+## Rust / Cargo environment
+if [ -d "${HOME}/.cargo/bin" ]; then
+    echo "${log_prefix_bashenv} adding ~/.cargo/bin to PATH"
+    export CARGO_HOME="${HOME}/.cargo"
+    export PATH="${HOME}/.cargo/bin:${PATH}"
+fi
 if [ -d "${HOME}/.local/bin" ]; then
+    echo "${log_prefix_bashenv} adding ~/.local/bin to PATH"
     export PATH="${HOME}/.local/bin:${PATH}"
 fi
 
-if ! command -v jenv 1>/dev/null 2>&1; then
-  echo "${log_prefix_bashenv} adding jenv to PATH"
-  if [ -d "${HOME}/.jenv/bin" ]; then
-    export PATH="$HOME/.jenv/bin:$PATH"
-  elif [ -d "${HOME}/.jenv/shims" ]; then
-    export PATH="$HOME/.jenv/shims:$PATH"
-  fi
-  jenv enable-plugin export
+if [[ $IS_TTY -eq 1 ]]; then
+    echo "${log_prefix_bashenv} loading TTY environment"
+
+    ## ref: https://www.jenv.be/
+    ## Check and initialize jenv if installed
+    if command -v jenv 1>/dev/null 2>&1; then
+        echo "${log_prefix_bashenv} init jenv"
+    #    eval "$(jenv init -)"
+        eval "$(jenv init - --no-rehash)"
+    else
+        # If jenv isn't in PATH yet, check standard local directories
+        if [ -d "${HOME}/.jenv/bin" ]; then
+            echo "${log_prefix_bashenv} adding jenv to PATH"
+            export PATH="$HOME/.jenv/bin:$PATH"
+            eval "$(jenv init -)"
+            jenv enable-plugin export
+        elif [ -d "${HOME}/.jenv/shims" ]; then
+            echo "${log_prefix_bashenv} adding jenv shims to PATH"
+            export PATH="$HOME/.jenv/shims:$PATH"
+            eval "$(jenv init -)"
+            jenv enable-plugin export
+        fi
+    fi
+
+    if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
+        ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
+        export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+    fi
+
+    if [ -f "/usr/local/opt/nvm/nvm.sh" ]; then
+        echo "${log_prefix_bashenv} init nvm"
+        export NVM_DIR="$HOME/.nvm"
+        mkdir -p "$NVM_DIR"
+        # This loads nvm
+        [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"
+        # This loads nvm bash_completion
+        [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
+    fi
+
+    if [ "$EUID" -ne 0 ]; then
+        export PATH=".:${PATH}"
+    fi
+
+    #echo "${log_prefix_bashenv} PATH=${PATH}"
+
+    ##############
+    ### Ansible Galaxy env vars
+    ###
+    ###   'ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN' set from ~/.bash_secrets
+    ###
+    ### ref: https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#configuring-the-ansible-galaxy-client
+    #export ANSIBLE_GALAXY_SERVER_LIST="staging_repo,published_repo,rh_certified,community_repo"
+    ##export ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN="c2bcc7e30d4fcc1a1b18a3ae8b1744909d9a88ec"
+    #export ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN="b028ba142a0b76feb0123bac66e127cc7d0638a1"
+    #
+    ###[galaxy_server.staging_repo]
+    #export ANSIBLE_GALAXY_SERVER_STAGING_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/staging/"
+    #export ANSIBLE_GALAXY_SERVER_STAGING_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+    #export ANSIBLE_GALAXY_SERVER_STAGING_REPO_VALIDATE_CERTS=no
+    #
+    ###[galaxy_server.published_repo]
+    #export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/published/"
+    #export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+    #export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_VALIDATE_CERTS=no
+    #
+    ###[galaxy_server.rh_certified]
+    #export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/rh-certified/"
+    #export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+    #export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_VALIDATE_CERTS=no
+    #
+    ###[galaxy_server.community_repo]
+    #export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/community/"
+    #export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
+    #export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_VALIDATE_CERTS=no
 fi
-
-## ref: https://www.jenv.be/
-if command -v jenv 1>/dev/null 2>&1; then
-  echo "${log_prefix_bashenv} init jenv"
-  eval "$(jenv init -)"
-fi
-
-if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
-  ## ref: https://stackoverflow.com/questions/1117398/java-home-directory-in-linux
-  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
-fi
-
-if [ -f "/usr/local/opt/nvm/nvm.sh" ]; then
-  echo "${log_prefix_bashenv} init nvm"
-  export NVM_DIR="$HOME/.nvm"
-  mkdir -p "$NVM_DIR"
-  # This loads nvm
-  [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"
-  # This loads nvm bash_completion
-  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
-fi
-
-if [ "$EUID" -ne 0 ]; then
-  export PATH=".:${PATH}"
-fi
-
-#echo "${log_prefix_bashenv} PATH=${PATH}"
-
-##############
-### Ansible Galaxy env vars
-###
-###   'ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN' set from ~/.bash_secrets
-###
-### ref: https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#configuring-the-ansible-galaxy-client
-#export ANSIBLE_GALAXY_SERVER_LIST="staging_repo,published_repo,rh_certified,community_repo"
-##export ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN="c2bcc7e30d4fcc1a1b18a3ae8b1744909d9a88ec"
-#export ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN="b028ba142a0b76feb0123bac66e127cc7d0638a1"
-#
-###[galaxy_server.staging_repo]
-#export ANSIBLE_GALAXY_SERVER_STAGING_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/staging/"
-#export ANSIBLE_GALAXY_SERVER_STAGING_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
-#export ANSIBLE_GALAXY_SERVER_STAGING_REPO_VALIDATE_CERTS=no
-#
-###[galaxy_server.published_repo]
-#export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/published/"
-#export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
-#export ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_VALIDATE_CERTS=no
-#
-###[galaxy_server.rh_certified]
-#export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/rh-certified/"
-#export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
-#export ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_VALIDATE_CERTS=no
-#
-###[galaxy_server.community_repo]
-#export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_URL="https://ansible-galaxy.${NETWORK_INTERNAL_DOMAIN}/api/galaxy/content/community/"
-#export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_TOKEN="${ANSIBLE_PRIVATE_AUTOMATION_HUB_TOKEN}"
-#export ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_VALIDATE_CERTS=no

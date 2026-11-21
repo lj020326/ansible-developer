@@ -32,7 +32,7 @@ Ensure the following dependencies are installed on your machine:
 Export the following environment variables in your shell (or include them in your `.bashrc` / `.zshrc`):
 
 ```bash
-export VLLM_API_URL="[https://vllm.llm-gb10.johnson.int/v1](https://vllm.llm-gb10.johnson.int/v1)"
+export VLLM_API_URL="[https://vllm-coder.llm-gb10.johnson.int/v1](https://vllm-coder.llm-gb10.johnson.int/v1)"
 export VLLM_API_KEY="your-vllm-api-key"
 
 export OLLAMA_API_URL="[https://ollama.llm-rtx.johnson.int](https://ollama.llm-rtx.johnson.int)"
@@ -95,6 +95,33 @@ Deletes the specified model from Ollama endpoints. *(Note: vLLM does not support
 ./llm-utils.sh remove llama3.1:8b
 ```
 
+### 5. `verify` / `validate` *(vLLM/Llama endpoints)*
+Deep validation of OpenAI-compatible endpoints beyond a plain health ping:
+* `GET /health` and `GET /v1/models` (served-model discovery)
+* **Tool-calls round-trip**: sends a trivial function-calling probe and inspects
+  the returned `tool_calls` — confirms `--enable-auto-tool-choice` and
+  `--tool-call-parser` are actually active (a 400 "does not support tool calls"
+  fails the check)
+* **Long-context ladder**: synthetic prompts of increasing size
+  (`VERIFY_TIERS`, default `30000,90000,140000` words ≈ same token count). A
+  `400` "maximum context length" on the largest tier is **informational**, not
+  a failure — it confirms the enforced ceiling.
+
+```bash
+./llm-utils.sh verify
+./llm-utils.sh -e https://vllm-coder.llm-gb10.johnson.int/v1 verify qwen-coder
+VERIFY_TIERS="5000,30000,100000" ./llm-utils.sh verify
+```
+
+* Exit status is `0` only when every vLLM check passes — suitable for Ansible
+  tasks / post-deploy hooks. Ollama endpoints are skipped with a note.
+* Engine flags (prefix caching, chunked prefill, attention backend) are not
+  exposed over HTTP; confirm on the host:
+
+```bash
+docker logs vllm-coder 2>&1 | grep -Ei 'max_seq_len|prefix|chunked|attention|eager'
+```
+
 ---
 
 ## Default Endpoints Configuration
@@ -102,5 +129,5 @@ Deletes the specified model from Ollama endpoints. *(Note: vLLM does not support
 By default, if no target is specified using the `-e` flag, `llm-utils.sh` runs commands against:
 
 1. `${OLLAMA_API_URL}` *(Defaults to `https://ollama.llm-rtx.johnson.int`)*
-2. `${VLLM_API_URL}` *(Defaults to `https://vllm.llm-gb10.johnson.int/v1`)*
+2. `${VLLM_API_URL}` *(Defaults to `https://vllm-coder.llm-gb10.johnson.int/v1`)*
 3. `https://ollama.llm-gb10.johnson.int`

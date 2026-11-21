@@ -12,4 +12,4 @@ SITE_LIST+=("bootstrap.pypa.io")
 SITE_LIST+=("galaxy.ansible.com")
 SITE_LIST+=("repo.maven.apache.org")
 
-install-cacerts.sh "$@" ${SITE_LIST[@]}
+install-cacerts.sh "$@" "${SITE_LIST[@]}"

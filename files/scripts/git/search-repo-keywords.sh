@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+#SCRIPT_DIR="$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)"
+# shellcheck disable=SC2034
 SCRIPT_DIR="$(dirname "$0")"
 
 ## PURPOSE RELATED VARS
@@ -46,7 +47,7 @@ function search_repo_keywords () {
   local FIND_DELIM=' -o '
 #  printf -v FIND_EXCLUDE_DIRS "\055path %s${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
   printf -v FIND_EXCLUDE_DIRS "! -path %s${FIND_DELIM}" "${REPO_EXCLUDE_DIR_LIST[@]}"
-  FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS%$FIND_DELIM}
+  FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS%"${FIND_DELIM}"}
 
   echo "${LOG_PREFIX} FIND_EXCLUDE_DIRS=${FIND_EXCLUDE_DIRS}"
 

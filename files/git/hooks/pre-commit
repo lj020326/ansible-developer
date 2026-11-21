@@ -4,7 +4,7 @@ run_command_wrapper_fn ()
     files_found=$(find . \( -name venv -o -name save \) -prune -o \( -name '*credential*.yml' -o -name '*secret*' -o -name '*vault*' \) -not -name "*example*" -not -name "*.j2" -type f -print| grep -v collections/ansible_collections);
     for f in ${files_found};
     do
-        if [[ $(head -n1 "$f") != \$ANSIBLE_VAULT* ]]; then
+        if [[ "$(head -n1 $f)" != \$ANSIBLE_VAULT* ]]; then
             echo "ERROR: ${f} must be encrypted";
             bad_file=1;
         fi;

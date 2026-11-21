@@ -8,10 +8,10 @@ function getgitrequestid() {
 #  ISSUE_KEY=`git branch | grep -o "\* \(.*/\)*[A-Z]\{2,\}-[0-9]\+" | grep -o "[A-Z]\{2,\}-[0-9]\+"`
 
   if [[ $COMMENT_PREFIX = *develop* ]]; then
-    if [ -f ${PROJECT_DIR}/.git.request.refid ]; then
-      COMMENT_PREFIX=$(cat ${PROJECT_DIR}/.git.request.refid)
-    elif [ -f ${PROJECT_DIR}/save/.git.request.refid ]; then
-      COMMENT_PREFIX=$(cat ${PROJECT_DIR}/save/.git.request.refid)
+    if [ -f "${PROJECT_DIR}"/.git.request.refid ]; then
+      COMMENT_PREFIX=$(cat "${PROJECT_DIR}"/.git.request.refid)
+    elif [ -f "${PROJECT_DIR}"/save/.git.request.refid ]; then
+      COMMENT_PREFIX=$(cat "${PROJECT_DIR}"/save/.git.request.refid)
     elif [ -f ./.git.request.refid ]; then
       COMMENT_PREFIX=$(cat ./.git.request.refid)
     fi

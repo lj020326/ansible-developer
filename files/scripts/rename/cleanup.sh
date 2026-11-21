@@ -7,10 +7,5 @@ do
     echo "**********************************"
     echo "*** Rolling back changes for DATE=$DATE"
     echo "**********************************"
-    for f in `find . -iname "*.save.$DATE"`;
-    do
-        cmd="rm $f";
-        echo "$cmd"
-        `$cmd`
-    done
+    find . -name -iname "*.save.$DATE" -exec rm -rf {} \;
 done

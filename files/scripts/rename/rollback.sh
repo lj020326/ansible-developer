@@ -8,10 +8,10 @@ echo "*** Rolling back changes for DATE=$DATE"
 echo "**********************************"
 
 ## to rollback changes
-for f in `find . -iname "*.save.$DATE"`;
-do
-#    cmd="cp -p $f "`echo $f | sed s/.save.$DATE//`"";
-    cmd="mv $f "`echo $f | sed s/.save.$DATE//`"";
-    echo "$cmd"
-    `$cmd`
-done
+find . -iname "*.save.$DATE" -exec sh -c '
+  for f do
+    dst="${f%.save."$1"}"
+    printf "mv %s %s\n" "$f" "$dst"
+    mv -- "$f" "$dst"
+  done
+' _ "$DATE" \;

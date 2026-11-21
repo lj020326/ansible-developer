@@ -9,6 +9,7 @@
 #   - python3-requests
 #
 
+import os
 import sys
 import ssl
 import http.client
@@ -24,6 +25,29 @@ try:
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
+
+
+def _resolve_ca_bundle() -> str | bool:
+    """Resolves a valid CA bundle path from environment variables or standard system paths."""
+    # Check if user already provided an environment override
+    env_bundle = os.getenv("REQUESTS_CA_BUNDLE") or os.getenv("SSL_CERT_FILE")
+    if env_bundle and os.path.exists(env_bundle):
+        return env_bundle
+
+    # Common system certificate paths across various distributions
+    candidate_paths = [
+        "/etc/ssl/certs/ca-certificates.crt",  # Ubuntu / Debian / Gentoo
+        "/etc/pki/tls/certs/ca-bundle.crt",  # RHEL / CentOS / Fedora / AlmaLinux
+        "/etc/ssl/cert.pem",  # Alpine / macOS / FreeBSD
+    ]
+    for path in candidate_paths:
+        if os.path.exists(path):
+            # Setting these ensures both requests and underlying libraries use the system bundle
+            os.environ.setdefault("REQUESTS_CA_BUNDLE", path)
+            os.environ.setdefault("SSL_CERT_FILE", path)
+            return path
+
+    return True  # Fallback to default (certifi)
 
 
 def get_executable_name() -> str:
@@ -60,8 +84,19 @@ def validate_with_requests(url):
         print("requests library not found. Skipping validation with requests.")
         return True
 
+    # Resolve the system CA bundle path
+    verify_cert = _resolve_ca_bundle()
+
     try:
-        response = requests.get(url, timeout=10)
+        # Pass verify_cert (which will be a string path or True) to requests
+        response = requests.get(url, timeout=10, verify=verify_cert)
+        # Allow 404 (or other server response codes) as a successful SSL/TLS handshake indicator
+        if response.status_code in (200, 401, 403, 404):
+            print(
+                f"Success with requests: Status Code {response.status_code} (SSL handshake verified)"
+            )
+            return True
+
         response.raise_for_status()
         print(f"Success with requests: Status Code {response.status_code}")
         return True

@@ -14,6 +14,9 @@ SSH_SOURCE="${WORK_USER_ID}@${SSH_HOST}:/home/${WORK_USER_ID}/repos/ansible/"
 TMP_DIR=$(mktemp -d)
 echo "TMP_DIR=${TMP_DIR}"
 
+current_command=""
+last_command=""
+
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
@@ -32,7 +35,7 @@ remount_share() {
   #SSH_DEBUG_OPTS=",debug,sshfs_debug,loglevel=debug"
   SSH_OPTS="kill_on_unmount,reconnect,allow_other,defer_permissions,direct_io,volname=work_sshfs_mount"
   SSH_OPTS+=",IdentityFile=${SSH_ID_FILE}"
-  if [[ ! -z ${SSH_DEBUG_OPTS} ]]; then
+  if [[ -n ${SSH_DEBUG_OPTS} ]]; then
     SSH_OPTS+=",${SSH_DEBUG_OPTS}"
   fi
 
@@ -40,7 +43,7 @@ remount_share() {
   diskutil umount force "${SSH_DEST}"
 
   mountCmd="${SSHFS_EXEC} -o ${SSH_OPTS} ${SSH_SOURCE} ${SSH_DEST}"
-  echo ${mountCmd}
+  echo "${mountCmd}"
   ${mountCmd}
 
 }
@@ -92,22 +95,22 @@ sync_folder() {
   ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
   ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
   RSYNC_OPTS_GIT_MIRROR=(
-      -dar
-      --progress
-      --links
-      --delete-excluded
-      --exclude={"${EXCLUDES},${EXCLUDE_AND_REMOVE}"}
+      "-dar"
+      "--progress"
+      "--links"
+      "--delete-excluded"
+      "--exclude={${EXCLUDES},${EXCLUDE_AND_REMOVE}}"
   )
 
-  rsync_cmd="rsync --temp-dir=${TMP_DIR} ${RSYNC_OPTS_GIT_MIRROR[@]} ${SOURCE_DIR}/ ${DEST_DIR}/"
+  rsync_cmd="rsync --temp-dir=${TMP_DIR} ${RSYNC_OPTS_GIT_MIRROR[*]} ${SOURCE_DIR}/ ${DEST_DIR}/"
   echo "${log_prefix} ${rsync_cmd}"
-  eval $rsync_cmd
+  eval "$rsync_cmd"
 
 }
 
 
 MOUNT_EXISTS=0
-if mount | grep ${DEST_DIR} > /dev/null; then
+if mount | grep "${DEST_DIR}" > /dev/null; then
   MOUNT_EXISTS=1
 fi
 
@@ -127,7 +130,7 @@ echo "SOURCE_DIR=${SOURCE_DIR}"
 echo "DEST_DIR=${DEST_DIR}"
 echo "TMP_DIR=${TMP_DIR}"
 
-PING_RESULT=$(ping -t 5 -c 1 ${SSH_HOST} &> /dev/null)
+PING_RESULT=$(ping -t 5 -c 1 "${SSH_HOST}" &> /dev/null)
 if [[ ${PING_RESULT} -eq 0 ]]; then
   echo "running sync_folder()"
   sync_folder "${SOURCE_DIR}" "${DEST_DIR}" "${TMP_DIR}"

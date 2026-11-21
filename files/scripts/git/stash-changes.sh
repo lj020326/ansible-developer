@@ -5,7 +5,10 @@
 set -e
 
 UNSTASH=0
+# shellcheck disable=SC2034
 CONFIRM=0
+current_command=""
+last_command=""
 
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -13,11 +16,12 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 #trap 'rm -fr "$TMP_DIR"' EXIT
 
+# shellcheck disable=SC2034
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-SCRIPT_NAME=`basename $0`
+SCRIPT_NAME="$(basename "$0")"
 
-if [ ! -z "$(git status --porcelain)" ]; then
-  echo "git repo not clean/found in ${pwd}"
+if [ -n "$(git status --porcelain)" ]; then
+  echo "git repo not clean/found in ${PWD}"
   exit
 fi
 
@@ -46,7 +50,7 @@ usage() {
   echo "     ${SCRIPT_NAME}" 1>&2
   echo "     ${SCRIPT_NAME} -u" 1>&2
   echo "" 1>&2
-  exit ${retcode}
+  exit "${retcode}"
 }
 
 while getopts "uh" opt; do
@@ -65,21 +69,21 @@ while getopts "uh" opt; do
 done
 shift $((OPTIND-1))
 
-if [ $UNSTASH -eq 1 ]; then
+if [ "$UNSTASH" -eq 1 ]; then
+  # shellcheck source=/dev/null
   source ./save/.laststash
   echo "Loading stash from ${LAST_STASH}"
 
   RSYNC_OPTS_GIT_UPDATE=(
-      -ari
-      --links
-      --update
+      "-ari"
+      "--links"
+      "--update"
   )
 
   echo "copy project from stash dir ${LAST_STASH}"
-  #rsync_cmd="rsync ${RSYNC_OPTS} ${PROJECT_DIR}/ ${TMP_DIR}/"
-  rsync_cmd="rsync ${RSYNC_OPTS_GIT_UPDATE[@]} ${LAST_STASH}/ ${PROJECT_DIR}/"
+  rsync_cmd="rsync ${RSYNC_OPTS_GIT_UPDATE[*]} ${LAST_STASH}/${PROJECT_DIR}/"
   echo "${rsync_cmd}"
-  eval $rsync_cmd
+  eval "${rsync_cmd}"
 
   exit 0
 fi
@@ -96,9 +100,9 @@ EXCLUDES_ARRAY+=('.vscode')
 EXCLUDES_ARRAY+=('save')
 EXCLUDES_ARRAY+=('venv')
 
-printf -v EXCLUDES '%s,' "${EXCLUDES_ARRAY[@]}"
-EXCLUDES="${EXCLUDES%,}"
-echo "EXCLUDES=${EXCLUDES}"
+printf -v EXCLUDES_LIST '%s,' "${EXCLUDES_ARRAY[@]}"
+EXCLUDES_LIST="${EXCLUDES_LIST%,}"
+echo "EXCLUDES_LIST=${EXCLUDES_LIST}"
 
 echo "TMP_DIR=${TMP_DIR}"
 
@@ -107,17 +111,16 @@ echo "TMP_DIR=${TMP_DIR}"
 ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
 ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
 RSYNC_OPTS_GIT_MIRROR=(
-    -dar
-    --info=progress2
-    --links
-    --delete-excluded
-    --exclude={"${EXCLUDES}"}
+    "-dar"
+    "--info=progress2"
+    "--links"
+    "--delete-excluded"
+    "--exclude={${EXCLUDES_LIST}}"
 )
 
 echo "copy project to temporary dir $TMP_DIR"
-#rsync_cmd="rsync ${RSYNC_OPTS} ${PROJECT_DIR}/ ${TMP_DIR}/"
-rsync_cmd="rsync ${RSYNC_OPTS_GIT_MIRROR[@]} ${PROJECT_DIR}/ ${TMP_DIR}/"
+rsync_cmd="rsync ${RSYNC_OPTS_GIT_MIRROR[*]} ${PROJECT_DIR}/${TMP_DIR}/"
 echo "${rsync_cmd}"
-eval $rsync_cmd
+eval "${rsync_cmd}"
 
 echo "LAST_STASH=${TMP_DIR}" > ./save/.laststash

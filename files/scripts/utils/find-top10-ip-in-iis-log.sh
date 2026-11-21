@@ -9,8 +9,8 @@ function find_top_ip () {
     echo "--------------------------------------"
     echo "   HIT | IP"
     echo "--------------------------------------"
-    cat $IISLOG | cut -d ' ' -f 9 | sort | uniq -c | sort -r | head -n $TOP
+    cut -d ' ' -f 9 < "$IISLOG" | sort | uniq -c | sort -r | head -n "$TOP"
     echo "--------------------------------------"
 }
 
-for f in *.log; do find_top_ip $f; done
+for f in *.log; do find_top_ip "$f"; done

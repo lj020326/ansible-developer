@@ -41,10 +41,9 @@ if [ "$1" = "--version" ]; then
     printf '0.26\n' && exit
 fi
 
-usage()
-{
-printf '%s\n' \
-'This utility converts ANSI codes in data passed to stdin
+usage() {
+    printf '%s\n' \
+        'This utility converts ANSI codes in data passed to stdin
 It has 4 optional parameters:
 --bg=dark --palette=linux|solarized|tango|xterm --css-only|--body-only
 E.g.: ls -l --color=always | ansi2html.sh --bg=dark > ls.html' >&2
@@ -55,60 +54,128 @@ if [ "$1" = "--help" ]; then
     usage
 fi
 
-processArg()
-{
-    [ "$1" = "--bg=dark" ] && { dark_bg=yes; return; }
-    [ "$1" = "--css-only" ] && { css_only=yes; return; }
-    [ "$1" = "--body-only" ] && { body_only=yes; return; }
+processArg() {
+    [ "$1" = "--bg=dark" ] && {
+        dark_bg=yes
+        return
+    }
+    [ "$1" = "--css-only" ] && {
+        css_only=yes
+        return
+    }
+    [ "$1" = "--body-only" ] && {
+        body_only=yes
+        return
+    }
     if [ "$1" = "--palette=solarized" ]; then
-       # See http://ethanschoonover.com/solarized
-       P0=073642;  P1=D30102;  P2=859900;  P3=B58900;
-       P4=268BD2;  P5=D33682;  P6=2AA198;  P7=EEE8D5;
-       P8=002B36;  P9=CB4B16; P10=586E75; P11=657B83;
-      P12=839496; P13=6C71C4; P14=93A1A1; P15=FDF6E3;
-      return;
+        # See http://ethanschoonover.com/solarized
+        P0=073642
+        P1=D30102
+        P2=859900
+        P3=B58900
+        P4=268BD2
+        P5=D33682
+        P6=2AA198
+        P7=EEE8D5
+        P8=002B36
+        P9=CB4B16
+        P10=586E75
+        P11=657B83
+        P12=839496
+        P13=6C71C4
+        P14=93A1A1
+        P15=FDF6E3
+        return
     elif [ "$1" = "--palette=solarized-xterm" ]; then
-       # Above mapped onto the xterm 256 color palette
-       P0=262626;  P1=AF0000;  P2=5F8700;  P3=AF8700;
-       P4=0087FF;  P5=AF005F;  P6=00AFAF;  P7=E4E4E4;
-       P8=1C1C1C;  P9=D75F00; P10=585858; P11=626262;
-      P12=808080; P13=5F5FAF; P14=8A8A8A; P15=FFFFD7;
-      return;
+        # Above mapped onto the xterm 256 color palette
+        P0=262626
+        P1=AF0000
+        P2=5F8700
+        P3=AF8700
+        P4=0087FF
+        P5=AF005F
+        P6=00AFAF
+        P7=E4E4E4
+        P8=1C1C1C
+        P9=D75F00
+        P10=585858
+        P11=626262
+        P12=808080
+        P13=5F5FAF
+        P14=8A8A8A
+        P15=FFFFD7
+        return
     elif [ "$1" = "--palette=tango" ]; then
-       # Gnome default
-       P0=000000;  P1=CC0000;  P2=4E9A06;  P3=C4A000;
-       P4=3465A4;  P5=75507B;  P6=06989A;  P7=D3D7CF;
-       P8=555753;  P9=EF2929; P10=8AE234; P11=FCE94F;
-      P12=729FCF; P13=AD7FA8; P14=34E2E2; P15=EEEEEC;
-      return;
+        # Gnome default
+        P0=000000
+        P1=CC0000
+        P2=4E9A06
+        P3=C4A000
+        P4=3465A4
+        P5=75507B
+        P6=06989A
+        P7=D3D7CF
+        P8=555753
+        P9=EF2929
+        P10=8AE234
+        P11=FCE94F
+        P12=729FCF
+        P13=AD7FA8
+        P14=34E2E2
+        P15=EEEEEC
+        return
     elif [ "$1" = "--palette=xterm" ]; then
-       P0=000000;  P1=CD0000;  P2=00CD00;  P3=CDCD00;
-       P4=0000EE;  P5=CD00CD;  P6=00CDCD;  P7=E5E5E5;
-       P8=7F7F7F;  P9=FF0000; P10=00FF00; P11=FFFF00;
-      P12=5C5CFF; P13=FF00FF; P14=00FFFF; P15=FFFFFF;
-      return;
+        P0=000000
+        P1=CD0000
+        P2=00CD00
+        P3=CDCD00
+        P4=0000EE
+        P5=CD00CD
+        P6=00CDCD
+        P7=E5E5E5
+        P8=7F7F7F
+        P9=FF0000
+        P10=00FF00
+        P11=FFFF00
+        P12=5C5CFF
+        P13=FF00FF
+        P14=00FFFF
+        P15=FFFFFF
+        return
     else # linux console
-       P0=000000;  P1=AA0000;  P2=00AA00;  P3=AA5500;
-       P4=0000AA;  P5=AA00AA;  P6=00AAAA;  P7=AAAAAA;
-       P8=555555;  P9=FF5555; P10=55FF55; P11=FFFF55;
-      P12=5555FF; P13=FF55FF; P14=55FFFF; P15=FFFFFF;
-      [ "$1" = "--palette=linux" ] && return;
+        P0=000000
+        P1=AA0000
+        P2=00AA00
+        P3=AA5500
+        P4=0000AA
+        P5=AA00AA
+        P6=00AAAA
+        P7=AAAAAA
+        P8=555555
+        P9=FF5555
+        P10=55FF55
+        P11=FFFF55
+        P12=5555FF
+        P13=FF55FF
+        P14=55FFFF
+        P15=FFFFFF
+        [ "$1" = "--palette=linux" ] && return
     fi
 }
 
 processArg #defaults
-for var in "$@"; do processArg $var; done
+for var in "$@"; do processArg "$var"; done
 [ "$css_only" ] && [ "$body_only" ] && usage
 
 # Mac OSX's GNU sed is installed as gsed
 # use e.g. homebrew 'gnu-sed' to get it
 if ! sed --version >/dev/null 2>&1; then
-  if gsed --version >/dev/null 2>&1; then
-    alias sed=gsed
-  else
-    echo "Error, can't find an acceptable GNU sed." >&2
-    exit 1
-  fi
+    if gsed --version >/dev/null 2>&1; then
+        alias sed=gsed
+    else
+        echo "Error, can't find an acceptable GNU sed." >&2
+        exit 1
+    fi
 fi
 
 [ "$css_only" ] || [ "$body_only" ] || printf '%s' "<html>
@@ -117,7 +184,7 @@ fi
 <style type=\"text/css\">
 pre { white-space: pre-wrap; }
 "
-[ "$body_only" ] || printf ".ef0,.f0 { color: #$P0; } .eb0,.b0 { background-color: #$P0; }
+[ "$body_only" ] || printf '%s' ".ef0,.f0 { color: #$P0; } .eb0,.b0 { background-color: #$P0; }
 .ef1,.f1 { color: #$P1; } .eb1,.b1 { background-color: #$P1; }
 .ef2,.f2 { color: #$P2; } .eb2,.b2 { background-color: #$P2; }
 .ef3,.f3 { color: #$P3; } .eb3,.b3 { background-color: #$P3; }
@@ -143,33 +210,33 @@ pre { white-space: pre-wrap; }
 .eb15 { background-color: #$P15; }
 "
 # The default xterm 256 colour palette
-for red in 0 1 2 3 4 5 ; do
-  for green in 0 1 2 3 4 5 ; do
-    for blue in 0 1 2 3 4 5 ; do
-      c=$((16 + ($red * 36) + ($green * 6) + $blue))
-      r=$((($red * 40 + 55) * ($red > 0)))
-      g=$((($green * 40 + 55) * ($green > 0)))
-      b=$((($blue * 40 + 55) * ($blue > 0)))
-      [ "$body_only" ] || printf ".ef%d { color: #%2.2x%2.2x%2.2x; } " $c $r $g $b
-      [ "$body_only" ] || printf ".eb%d { background-color: #%2.2x%2.2x%2.2x; }\n" $c $r $g $b
+for red in 0 1 2 3 4 5; do
+    for green in 0 1 2 3 4 5; do
+        for blue in 0 1 2 3 4 5; do
+            c=$((16 + (red * 36) + (green * 6) + blue))
+            r=$(((red * 40 + 55) * (red > 0)))
+            g=$(((green * 40 + 55) * (green > 0)))
+            b=$(((blue * 40 + 55) * (blue > 0)))
+            [ "$body_only" ] || printf ".ef%d { color: #%2.2x%2.2x%2.2x; } " "$c" "$r" "$g" "$b"
+            [ "$body_only" ] || printf ".eb%d { background-color: #%2.2x%2.2x%2.2x; }\n" "$c" "$r" "$g" "$b"
+        done
     done
-  done
 done
 for gray in $(seq 0 23); do
-  c=$(($gray+232))
-  l=$(($gray*10 + 8))
-  [ "$body_only" ] || printf ".ef%d { color: #%2.2x%2.2x%2.2x; } " $c $l $l $l
-  [ "$body_only" ] || printf ".eb%d { background-color: #%2.2x%2.2x%2.2x; }\n" $c $l $l $l
+    c=$((gray + 232))
+    l=$((gray * 10 + 8))
+    [ "$body_only" ] || printf ".ef%d { color: #%2.2x%2.2x%2.2x; } " "$c" "$l" "$l" "$l"
+    [ "$body_only" ] || printf ".eb%d { background-color: #%2.2x%2.2x%2.2x; }\n" "$c" "$l" "$l" "$l"
 done
 
 [ "$body_only" ] || printf '%s' '
-.f9 { color: '`[ "$dark_bg" ] && printf "#$P7;" || printf "#$P0;"`' }
-.b9 { background-color: #'`[ "$dark_bg" ] && printf $P0 || printf $P15`'; }
+.f9 { color: '"$([ "$dark_bg" ] && printf "#%s;" "$P7" || printf "#%s;" "$P0")"' }
+.b9 { background-color: #'"$([ "$dark_bg" ] && printf '%s' "$P0" || printf '%s' "$P15")"'; }
 .f9 > .bold,.bold > .f9, body.f9 > pre > .bold {
   /* Bold is heavy black on white, or bright white
      depending on the default background */
-  color: '`[ "$dark_bg" ] && printf "#$P15;" || printf "#$P0;"`'
-  font-weight: '`[ "$dark_bg" ] && printf 'normal;' || printf 'bold;'`'
+  color: '"$([ "$dark_bg" ] && printf "#%s;" "$P15" || printf "#%s;" "$P0")"'
+  font-weight: '"$([ "$dark_bg" ] && printf 'normal;' || printf 'bold;')"'
 }
 .reverse {
   /* CSS does not support swapping fg and bg colours unfortunately,
@@ -187,8 +254,8 @@ span { display: inline-block; }
 */
 '
 [ "$body_only" ] || [ "$css_only" ] && printf '%s\n' \
-'To use the css generated from --css-only, do: '\
-'<head><link rel="stylesheet" type="text/css" href="style.css"></head>' >&2
+    'To use the css generated from --css-only, do: '\
+    '<head><link rel="stylesheet" type="text/css" href="style.css"></head>' >&2
 [ "$css_only" ] && exit
 [ "$body_only" ] || printf '%s' '</style>
 </head>
@@ -198,7 +265,7 @@ span { display: inline-block; }
 '
 [ "$body_only" ] && printf '%s\n' 'Be sure to use <body class="f9 b9"> and <pre>' >&2
 
-p='\x1b\['        #shortcut to match escape codes
+p='\x1b\[' #shortcut to match escape codes
 
 # Handle various xterm control sequences.
 # See /usr/share/doc/xterm-*/ctlseqs.txt
@@ -231,8 +298,8 @@ s#${p}[0-9;?]*[^0-9;?m]##g
 
 " |
 
-# Normalize the input before transformation
-sed "
+    # Normalize the input before transformation
+    sed "
 # escape HTML (ampersand and quote done above)
 s#>#\&gt;#g; s#<#\&lt;#g;
 
@@ -251,7 +318,7 @@ s#${p}\([0-9;]\{1,\}\);\([34]8;5;[0-9]\{1,3\}\)m#${p}\1m${p}¬\2m#g; t e
 s#${p}\([34]8;5;[0-9]\{1,3\}\)m#${p}¬\1m#g;
 
 :c
-s#${p}\([0-9]\{1,\}\);\([0-9;]\{1,\}\)m#${p}\1m${p}\2m#g; t c   # split combined
+s#${p}\([0-9;]\{1,\}\);\([0-9;]\{1,\}\)m#${p}\1m${p}\2m#g; t c   # split combined
 s#${p}0\([0-7]\)#${p}\1#g                                 #strip leading 0
 s#${p}1m\(\(${p}[4579]m\)*\)#\1${p}1m#g                   #bold last (with clr)
 s#${p}m#${p}0m#g                                          #add leading 0 to norm
@@ -267,8 +334,8 @@ s#${p}10\([0-7]\)m#${p}4\1m${p}1m#g;
 s#${p}0m#\"R;#g
 " |
 
-# Convert SGR sequences to HTML
-sed "
+    # Convert SGR sequences to HTML
+    sed "
 # common combinations to minimise html (optional)
 :f
 s#${p}3[0-7]m${p}3\([0-7]\)m#${p}3\1m#g; t f
@@ -291,21 +358,21 @@ s#${p}48;5;\([0-9]\{1,3\}\)m#<span class=\"eb\1\">#g
 s#${p}[0-9;]*m##g # strip unhandled codes
 " |
 
-# Convert alternative character set and handle cursor movement codes
-# Note we convert here, as if we do at start we have to worry about avoiding
-# conversion of SGR codes etc., whereas doing here we only have to
-# avoid conversions of stuff between &...; or <...>
-#
-# Note we could use sed to do this based around:
-#   sed 'y/abcdefghijklmnopqrstuvwxyz{}`~/▒␉␌␍␊°±␤␋┘┐┌└┼⎺⎻─⎼⎽├┤┴┬│≤≥π£◆·/'
-# However that would be very awkward as we need to only conv some input.
-# The basic scheme that we do in the awk script below is:
-#  1. enable transliterate once "T1; is seen
-#  2. disable once "T0; is seen (may be on diff line)
-#  3. never transliterate between &; or <> chars
-#  4. track x,y movements and active display mode at each position
-#  5. buffer line/screen and dump when required
-sed "
+    # Convert alternative character set and handle cursor movement codes
+    # Note we convert here, as if we do at start we have to worry about avoiding
+    # conversion of SGR codes etc., whereas doing here we only have to
+    # avoid conversions of stuff between &...; or <...>
+    #
+    # Note we could use sed to do this based around:
+    #   sed 'y/abcdefghijklmnopqrstuvwxyz{}`~/▒␉␌␍␊°±␤␋┘┐┌└┼⎺⎻─⎼⎽├┤┴┬│≤≥π£◆·/'
+    # However that would be very awkward as we need to only conv some input.
+    # The basic scheme that we do in the awk script below is:
+    #  1. enable transliterate once "T1; is seen
+    #  2. disable once "T0; is seen (may be on diff line)
+    #  3. never transliterate between &; or <> chars
+    #  4. track x,y movements and active display mode at each position
+    #  5. buffer line/screen and dump when required
+    sed "
 # change 'smacs' and 'rmacs' to \"T1 and \"T0 to simplify matching.
 s#\x1b(0#\"T1;#g;
 s#\x0E#\"T1;#g;
@@ -313,8 +380,8 @@ s#\x0E#\"T1;#g;
 s#\x1b(B#\"T0;#g
 s#\x0F#\"T0;#g
 " |
-(
-gawk '
+    (
+        gawk '
 function dump_line(l,del,c,blanks,ret) {
   for(c=1;c<maxX;c++) {
     if ((c SUBSEP l) in attr || alength(cur)) {
@@ -520,7 +587,7 @@ END {
     print dump_screen();
   }
 }'
-)
+    )
 
 [ "$body_only" ] || printf '</pre>
 </body>

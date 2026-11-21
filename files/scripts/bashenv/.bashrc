@@ -1,25 +1,17 @@
+# shellcheck shell=bash
 
-#set -x
+log_bash=".bashrc:"
 
-# If not running interactively, don't do anything
-[[ "$-" != *i* ]] && return
+if [ -t 1 ]; then
+    IS_TTY=1
+else
+    IS_TTY=0
+fi
 
-log_bash=".bashrc"
-echo "${log_bash} configuring shell env..."
+echo "IS_TTY=$IS_TTY"
 
-PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
-
-case "${PLATFORM_OS}" in
-    linux*)     PLATFORM=LINUX;;
-    darwin*)    PLATFORM=DARWIN;;
-    cygwin*)    PLATFORM=CYGWIN;;
-    mingw64*)   PLATFORM=MINGW64;;
-    mingw32*)   PLATFORM=MINGW32;;
-    msys*)      PLATFORM=MSYS;;
-    *)          PLATFORM="UNKNOWN:${PLATFORM_OS}"
-esac
-
-echo "${log_bash} PLATFORM=[${PLATFORM}]"
+# Only print logs if running in a real TTY to keep background output clean
+[[ $IS_TTY -eq 1 ]] && echo "${log_bash} configuring shell env..."
 
 function isInstalled() {
     command -v "${1}" >/dev/null 2>&1 || return 1
@@ -27,38 +19,49 @@ function isInstalled() {
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-    echo "${log_bash} loading global shell env..."
+    [[ $IS_TTY -eq 1 ]] && echo "${log_bash} loading global shell env..."
+    # shellcheck source=/dev/null
     source /etc/bashrc
 fi
 
+# Always source environment variables (needed by IntelliJ)
+if [ -f "${HOME}/.bash_env" ]; then
+    [[ $IS_TTY -eq 1 ]] && echo "${log_bash} sourcing .bash_env"
+    # shellcheck source=/dev/null
+    source "${HOME}/.bash_env"
+fi
+
 if [ -f "${HOME}/.bash_functions" ]; then
-    echo "${log_bash} setting functions"
+    [[ $IS_TTY -eq 1 ]] && echo "${log_bash} setting functions"
+    # shellcheck source=/dev/null
     source "${HOME}/.bash_functions"
 fi
 
-if [ -f "${HOME}/.bash_env" ]; then
-    echo "${log_bash} sourcing .bash_env"
-    source ~/.bash_env
+if [ -f "${HOME}/.bash_aliases" ]; then
+    echo "${log_bash} setting aliases"
+    # shellcheck source=/dev/null
+    source "${HOME}/.bash_aliases"
 fi
 
-#if [[ "$PLATFORM" =~ ^(MSYS|MINGW)$ ]]; then
-if [ -f "${HOME}/.bash_prompt" ]; then
-    echo "${log_bash} setting prompt"
-    source ~/.bash_prompt
-fi
+# # 1. Check if running inside a real TTY (Interactive Terminal)
+# # If running non-interactively OR without a real TTY device, exit early.
+# # This prevents IntelliJ/background tools from running heavy interactive setups.
+# if [[ "$-" != *i* ]] || [ ! -t 1 ]; then
+#     echo "${log_bash} non-interactive or without a real TTY device, exiting early"
+#     return 0
+# fi
 
-if [ -f "${HOME}/.bash_secrets" ]; then
-    if [ -f "${HOME}/.vault_pass" ]; then
-        if ! isInstalled ansible-vault; then
-            echo "${log_bash} ansible-vault not installed, skip loading ${HOME}/.bash_secrets"
-        else
+# ALWAYS GUARD INTERACTIVE-ONLY COMPONENTS BEHIND IS_TTY
+if [[ $IS_TTY -eq 1 ]]; then
+    if [ -f "${HOME}/.bash_prompt" ]; then
+        # shellcheck source=/dev/null
+        source "${HOME}/.bash_prompt"
+    fi
+
+    if [ -f "${HOME}/.bash_secrets" ]; then
+        if [ -f "${HOME}/.vault_pass" ] && isInstalled ansible-vault; then
             echo "${log_bash} sourcing ~/.bash_secrets"
-            eval "$(ansible-vault view ${HOME}/.bash_secrets --vault-password-file ${HOME}/.vault_pass)"
+            eval "$(ansible-vault view "${HOME}/.bash_secrets" --vault-password-file "${HOME}/.vault_pass" 2>/dev/null)"
         fi
     fi
-fi
-
-if [ -f "${HOME}/.bash_aliases" ]; then
-    echo "${log_prefix} setting aliases"
-    source "${HOME}/.bash_aliases"
 fi

@@ -12,7 +12,7 @@ run_command_wrapper_fn() {
     # files_found=$(find . -iname "*credentials*.yml" -o -iname "*secret*.yml" -o -iname "*vault*.yml" -not -path "./venv/*" \( ! -name save \))
     files_found=$(find . \( -name venv -o -name save \) -prune -o \( -name '*credential*.yml' -o -name '*secret*' -o -name '*vault*' \) -not -name "*example*" -not -name "*.j2" -type f -print)
     for f in ${files_found}; do
-        if [[ $(head -n1 "$f") != \$ANSIBLE_VAULT* ]]; then
+        if [[ "$(head -n1 "$f")" != "\$ANSIBLE_VAULT"* ]]; then
             # echo "ERROR: $(basename "$f") must be encrypted"
             echo "ERROR: ${f} must be encrypted"
             bad_file=1

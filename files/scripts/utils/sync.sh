@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-FROM=~/repos/python/superset-dev/
-TO=~/repos/python/mwviz/
+FROM="${HOME}/repos/python/superset-dev/"
+TO="${HOME}/repos/python/mwviz/"
 
-IGNORE_DIR=admin
+IGNORE_DIR="admin"
 
 echo "**********************************"
 echo "*** Syncing from $FROM to $TO"
@@ -19,5 +19,5 @@ EXCLUDES+=" --exclude=$IGNORE_DIR"
 
 cmd="rsync -arv --update --progress ${EXCLUDES} ${FROM} ${TO}"
 echo "$cmd"
-results=$(eval $cmd)
+results=$(eval "$cmd")
 echo "results=$results"

@@ -1,4 +1,4 @@
-log_prefix_prompts=".bash_prompt"
+log_prefix_prompts=".bash_prompt:"
 
 # Define colors with standard Readline non-printing wrappers
 COLOR_RED="\[\033[0;31m\]"

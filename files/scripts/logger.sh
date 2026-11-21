@@ -1,141 +1,217 @@
 #!/usr/bin/env bash
 
+# shellcheck disable=SC2034
 LOGGER_VERSION="2025.5.29"
 
 #### LOGGING RELATED
 LOG_ERROR=0
 LOG_WARN=1
-LOG_INFO=2
-LOG_TRACE=3
-LOG_DEBUG=4
+LOG_FAILED=2
+LOG_SUCCESS=3
+LOG_INFO=4
+LOG_TRACE=5
+LOG_DEBUG=6
 
 declare -A LOGLEVEL_TO_STR
 LOGLEVEL_TO_STR["${LOG_ERROR}"]="ERROR"
 LOGLEVEL_TO_STR["${LOG_WARN}"]="WARN"
+LOGLEVEL_TO_STR["${LOG_FAILED}"]="FAILED"
+LOGLEVEL_TO_STR["${LOG_SUCCESS}"]="SUCCESS"
 LOGLEVEL_TO_STR["${LOG_INFO}"]="INFO"
 LOGLEVEL_TO_STR["${LOG_TRACE}"]="TRACE"
 LOGLEVEL_TO_STR["${LOG_DEBUG}"]="DEBUG"
 
+# string formatters
+# Force color if FORCE_COLOR is set, otherwise auto-detect TTY
+if [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; then
+    tty_escape() { printf "\033[%sm" "$1"; }
+else
+    tty_escape() { :; }
+fi
+tty_mkbold() { tty_escape "1;$1"; }
+# shellcheck disable=SC2034
+tty_underline="$(tty_escape "4;39")"
+tty_dim_grey="$(tty_escape "2;39")"
+tty_red="$(tty_mkbold 31)"
+tty_green="$(tty_mkbold 32)"
+tty_yellow="$(tty_mkbold 33)"
+tty_blue="$(tty_mkbold 34)"
+# shellcheck disable=SC2034
+tty_magenta="$(tty_mkbold 35)"
+# shellcheck disable=SC2034
+tty_cyan="$(tty_mkbold 36)"
+tty_bold="$(tty_mkbold 39)"
+tty_reset="$(tty_escape 0)"
+
 function reverse_array() {
-  local -n ARRAY_SOURCE_REF=$1
-  local -n REVERSED_ARRAY_REF=$2
-  # Iterate over the keys of the LOGLEVEL_TO_STR array
-  for KEY in "${!ARRAY_SOURCE_REF[@]}"; do
-    # Get the value associated with the current key
-    VALUE="${ARRAY_SOURCE_REF[$KEY]}"
-    # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
-    REVERSED_ARRAY_REF[$VALUE]="$KEY"
-  done
+    local -n array_source_ref=$1
+    local -n reversed_array_ref=$2
+    # iterate over the keys of the array_source_ref array
+    for key in "${!array_source_ref[@]}"; do
+        # get the value associated with the current key
+        value="${array_source_ref[$key]}"
+        # add the reversed key-value pair to the reversed_array_ref array
+        # shellcheck disable=SC2034
+        reversed_array_ref["$value"]="$key"
+    done
 }
 
 declare -A LOGLEVELSTR_TO_LEVEL
 reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 
-#LOG_LEVEL=${LOG_DEBUG}
-LOG_LEVEL=${LOG_INFO}
+#LOG_LEVEL_IDX=${LOG_DEBUG}
+LOG_LEVEL_IDX=${LOG_INFO}
+LOG_LEVEL_PADDING_LENGTH=7
+#LOG_INCLUDE_INVOKER=true
+LOG_PAD_LEVEL=true
 
-function logError() {
-  if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
-  	logMessage "${LOG_ERROR}" "${1}"
-  fi
+# --- Logging Functions ---
+
+function _log_message() {
+    local log_message_level="${1}"
+    local log_message="${2}"
+    local log_prefix="${3:-}"
+
+    if ((log_message_level > LOG_LEVEL_IDX)); then
+        return 0
+    fi
+
+    local log_level_str="${LOGLEVEL_TO_STR[$log_message_level]}"
+    [[ -z "$log_level_str" ]] && {
+        echo "Unknown level: $log_message_level" >&2
+        return 1
+    }
+
+    local log_level_display="${log_level_str}"
+    if [[ "${LOG_PAD_LEVEL:-false}" = "true" ]] || [[ "${LOG_PAD_LEVEL:-0}" = "1" ]]; then
+        printf -v log_level_display "%-${LOG_LEVEL_PADDING_LENGTH}s" "${log_level_str}"
+    fi
+
+    local log_context=""
+    local _log_tty_color="${tty_reset}"
+
+    if [ -n "${BASH_VERSION:-}" ]; then
+        local script_path="${BASH_SOURCE[2]##*/}"
+
+        # Build Call Stack: skip _log_message (0) and wrapper (1)
+        local stack_parts=("${FUNCNAME[@]:2}")
+        local call_stack=""
+
+        for ((i = ${#stack_parts[@]} - 1; i >= 0; i--)); do
+            local func="${stack_parts[i]}"
+
+            # Normalize 'source' to 'main' or keep existing 'main'
+            if [[ "$func" == "main" || "$func" == "source" ]]; then
+                # Only add 'main' if it's the first thing in our built stack
+                if [[ -z "$call_stack" ]]; then
+                    call_stack="main"
+                fi
+            else
+                # Add real function names, separated by colons
+                [[ -n "$call_stack" ]] && call_stack+=":"
+                call_stack+="$func"
+            fi
+        done
+
+        # If call_stack is empty (called from top-level), just use the script name
+        # Otherwise, append the stack with parentheses
+        local func_context=""
+        if [[ -n "$call_stack" ]]; then
+            func_context="${call_stack%:}()"
+        fi
+
+        local line_no="${BASH_LINENO[1]}"
+
+        case "${log_message_level}" in
+        "$LOG_DEBUG")
+            _log_tty_color="${tty_dim_grey}"
+            log_context="${func_context}[${line_no}]"
+            ;;
+        "$LOG_TRACE")
+            _log_tty_color="${tty_blue}"
+            log_context="${func_context}[${line_no}]"
+            ;;
+        "$LOG_SUCCESS")
+            _log_tty_color="${tty_green}"
+            log_context="${func_context}"
+            ;;
+        "$LOG_FAILED")
+            _log_tty_color="${tty_red}"
+            log_context="${func_context}"
+            ;;
+        "$LOG_WARN")
+            _log_tty_color="${tty_yellow}"
+            log_context="${func_context}"
+            ;;
+        "$LOG_ERROR")
+            _log_tty_color="${tty_red}"
+            log_context="${func_context}[${line_no}]"
+            ;;
+        *)
+            _log_tty_color="${tty_reset}"
+            log_context="${func_context}"
+            ;;
+        esac
+    else
+        log_context="$(basename "$0")"
+    fi
+
+    [[ "${LOG_INCLUDE_INVOKER:-false}" = "true" ]] || [[ "${LOG_INCLUDE_INVOKER:-0}" = "1" ]] && log_context="${script_path}=>${log_context}"
+    [[ -n "${log_prefix}" ]] && log_context="${log_prefix}::${log_context}"
+
+    # Standardized Output
+    #    printf "${_log_tty_color}%s [%s] %s:${tty_reset} %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$log_message_level" "$log_context" "$log_message"
+    printf "[%s] ${_log_tty_color}%s %s${tty_reset}\n" "$log_level_display" "$log_context" "$log_message"
 }
-function logWarn() {
-  if [ $LOG_LEVEL -ge $LOG_WARN ]; then
-  	logMessage "${LOG_WARN}" "${1}"
-  fi
-}
-function logInfo() {
-  if [ $LOG_LEVEL -ge $LOG_INFO ]; then
-  	logMessage "${LOG_INFO}" "${1}"
-  fi
-}
-function logTrace() {
-  if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
-  	logMessage "${LOG_TRACE}" "${1}"
-  fi
-}
-function logDebug() {
-  if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
-  	logMessage "${LOG_DEBUG}" "${1}"
-  fi
-}
+
+# Wrapper Functions with Prefix Support
+log() { _log_message "${LOG_INFO}" "$1" "${2:-}"; }
+log_debug() { _log_message "${LOG_DEBUG}" "$1" "${2:-}"; }
+log_trace() { _log_message "${LOG_TRACE}" "$1" "${2:-}"; }
+log_info() { _log_message "${LOG_INFO}" "$1" "${2:-}"; }
+log_success() { _log_message "${LOG_SUCCESS}" "$1" "${2:-}"; }
+log_failed() { _log_message "${LOG_FAILED}" "$1" "${2:-}"; }
+log_warn() { _log_message "${LOG_WARN}" "$1" "${2:-}"; }
+log_error() { _log_message "${LOG_ERROR}" "$1" "${2:-}"; }
+
+function ohai() { printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$*"; }
 function abort() {
-  logError "$@"
-  exit 1
+    log_error "$1"
+    exit 1
 }
+function warn() { log_warn "$1"; }
+function error() { log_error "$1"; }
 function fail() {
-  logError "$@"
-  exit 1
+    error "$1"
+    exit 1
 }
 
-function logMessage() {
-  local LOG_MESSAGE_LEVEL="${1}"
-  local LOG_MESSAGE="${2}"
-  ## remove first item from FUNCNAME array
-#  local CALLING_FUNCTION_ARRAY=("${FUNCNAME[@]:2}")
-  ## Get the length of the array
-  local CALLING_FUNCTION_ARRAY_LENGTH=${#FUNCNAME[@]}
-  local CALLING_FUNCTION_ARRAY=("${FUNCNAME[@]:2:$((CALLING_FUNCTION_ARRAY_LENGTH - 3))}")
-#  echo "CALLING_FUNCTION_ARRAY[@]=${CALLING_FUNCTION_ARRAY[@]}"
-
-  local CALL_ARRAY_LENGTH=${#CALLING_FUNCTION_ARRAY[@]}
-  local REVERSED_CALL_ARRAY=()
-  for (( i = CALL_ARRAY_LENGTH - 1; i >= 0; i-- )); do
-    REVERSED_CALL_ARRAY+=( "${CALLING_FUNCTION_ARRAY[i]}" )
-  done
-#  echo "REVERSED_CALL_ARRAY[@]=${REVERSED_CALL_ARRAY[@]}"
-
-#  local CALLING_FUNCTION_STR="${CALLING_FUNCTION_ARRAY[*]}"
-  ## ref: https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-a-bash-array-into-a-delimited-string#17841619
-  local SEPARATOR=":"
-  local CALLING_FUNCTION_STR
-  CALLING_FUNCTION_STR=$(printf "${SEPARATOR}%s" "${REVERSED_CALL_ARRAY[@]}")
-  CALLING_FUNCTION_STR=${CALLING_FUNCTION_STR:${#SEPARATOR}}
-
-  ## ref: https://stackoverflow.com/a/13221491
-  if [ "${LOGLEVEL_TO_STR[${LOG_MESSAGE_LEVEL}]+abc}" ]; then
-    LOG_LEVEL_STR="${LOGLEVEL_TO_STR[${LOG_MESSAGE_LEVEL}]}"
-  else
-    abort "Unknown log level of [${LOG_MESSAGE_LEVEL}]"
-  fi
-
-  local LOG_LEVEL_PADDING_LENGTH=5
-
-  local PADDED_LOG_LEVEL
-  PADDED_LOG_LEVEL=$(printf "%-${LOG_LEVEL_PADDING_LENGTH}s" "${LOG_LEVEL_STR}")
-
-  local LOG_PREFIX="${CALLING_FUNCTION_STR}():"
-  echo -e "[${PADDED_LOG_LEVEL}]: ==> ${LOG_PREFIX} ${LOG_MESSAGE}"
-}
-
-function setLogLevel() {
-  LOG_LEVEL_STR=$1
-
-  ## ref: https://stackoverflow.com/a/13221491
-  if [ "${LOGLEVELSTR_TO_LEVEL[${LOG_LEVEL_STR}]+abc}" ]; then
-    LOG_LEVEL="${LOGLEVELSTR_TO_LEVEL[${LOG_LEVEL_STR}]}"
-  else
-    abort "Unknown log level of [${LOG_LEVEL_STR}]"
-  fi
-
+function set_log_level() {
+    local level_idx="${LOGLEVELSTR_TO_LEVEL[${1^^}]}" # ^^ makes it case-insensitive
+    if [[ -n "$level_idx" ]]; then
+        LOG_LEVEL_IDX="$level_idx"
+    else
+        abort "Unknown log level: [$1]"
+    fi
 }
 
 function handle_cmd_return_code() {
-  ## ref: https://unix.stackexchange.com/questions/261305/how-to-determine-callee-function-name-in-a-script
-  local CALLING_FUNCTION="${FUNCNAME[1]}"
-  local RUN_COMMAND=$1
+    ## ref: https://unix.stackexchange.com/questions/261305/how-to-determine-callee-function-name-in-a-script
+    # shellcheck disable=SC2034
+    local CALLING_FUNCTION="${FUNCNAME[1]}"
+    local RUN_COMMAND=$1
 
-  logInfo "${RUN_COMMAND}"
-  eval "${RUN_COMMAND} > /dev/null 2>&1"
-  local RETURN_STATUS=$?
+    log_info "${RUN_COMMAND}"
+    eval "${RUN_COMMAND} > /dev/null 2>&1"
+    local RETURN_STATUS=$?
 
-  if [[ $RETURN_STATUS -eq 0 ]]; then
-    logDebug "SUCCESS => No exceptions found from packer validate!!"
-  else
-    logError "packer validate resulted in return code [${RETURN_STATUS}]!! :("
-    logError "${RUN_COMMAND}"
-    eval "${RUN_COMMAND}"
-    exit 1
-  fi
+    if [[ $RETURN_STATUS -eq 0 ]]; then
+        log_debug "SUCCESS => No exceptions found from packer validate!!"
+    else
+        log_error "packer validate resulted in return code [${RETURN_STATUS}]!! :("
+        log_error "${RUN_COMMAND}"
+        eval "${RUN_COMMAND}"
+        exit 1
+    fi
 
 }

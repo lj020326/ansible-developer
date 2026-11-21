@@ -8,8 +8,8 @@ for KEY in $( \
     | grep -E "([0-9A-F]){8}\b" \
 ); do
     K=${KEY:(-8)}
-    apt-key export $K \
-    | sudo gpg --yes --dearmour -o /etc/apt/trusted.gpg.d/imported-from-trusted-gpg-$K.gpg
+    apt-key export "$K" \
+    | sudo gpg --yes --dearmour -o /etc/apt/trusted.gpg.d/imported-from-trusted-gpg-"$K".gpg
 done
 
 chmod 644 /etc/apt/trusted.gpg.d/imported-from-trusted-gpg-*

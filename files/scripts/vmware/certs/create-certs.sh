@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 
 ## sites referenced:
@@ -16,11 +15,11 @@ echo "create the privatekey and certificate"
 openssl req -nodes -new -x509 -keyout rui.key -out rui.crt -days 3650 -config openssl.cnf
 cp -p rui.crt rui.pem
 
-CERTDIRS="sso vc ngc logbrowser vco vum"
+CERT_DIRS="sso vc ngc logbrowser vco vum"
 
-for dir in $CERTDIRS
+for dir in $CERT_DIRS
 do
-	mkdir -p ${dir}
+	mkdir -p "${dir}"
     echo "copy certs to directory [$dir]"
-    cp -p rui.{key,pem} ${dir}/
+    cp -p rui.{key,pem} "${dir}"/
 done

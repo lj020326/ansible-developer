@@ -7,6 +7,7 @@ set -e
 VERSION="2025.10.2"
 
 #SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC2034
 SCRIPT_DIR="$(dirname "$0")"
 SCRIPT_NAME="$(basename "$0")"
 
@@ -17,6 +18,7 @@ INSTALL_GIT_REPO=1
 
 INSTALL_GIT_REMOTE_DEFAULT="https://github.com/lj020326/ansible-developer.git"
 
+# shellcheck disable=SC2034
 CHMOD=("/bin/chmod")
 MKDIR=("/bin/mkdir" "-p")
 
@@ -32,7 +34,12 @@ REQUIRED_GIT_VERSION=1.8.3
 #REQUIRED_VENV_PYTHON_VERSION="3.12.9"
 REQUIRED_VENV_PYTHON_VERSION="3.13.5"
 
-REQUIRED_PYTHON_LIBS="ansible certifi"
+REQUIRED_PYTHON_LIBS=()
+REQUIRED_PYTHON_LIBS+=("ansible")
+REQUIRED_PYTHON_LIBS+=("certifi")
+REQUIRED_PYTHON_LIBS+=("bcrypt")
+REQUIRED_PYTHON_LIBS+=("passlib")
+REQUIRED_PYTHON_LIBS+=("requests")
 
 #SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
@@ -65,6 +72,7 @@ else
   tty_escape() { :; }
 fi
 tty_mkbold() { tty_escape "1;$1"; }
+# shellcheck disable=SC2034
 tty_underline="$(tty_escape "4;39")"
 tty_blue="$(tty_mkbold 34)"
 tty_red="$(tty_mkbold 31)"
@@ -80,7 +88,8 @@ function reverse_array() {
     # Get the value associated with the current key
     VALUE="${ARRAY_SOURCE_REF[$KEY]}"
     # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
-    REVERSED_ARRAY_REF[$VALUE]="$KEY"
+    # shellcheck disable=SC2034
+    REVERSED_ARRAY_REF[VALUE]="$KEY"
   done
 }
 
@@ -91,31 +100,31 @@ reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 LOG_LEVEL=${LOG_INFO}
 
 function log_error() {
-  if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
+  if [ "$LOG_LEVEL" -ge "$LOG_ERROR" ]; then
   	log_message "${LOG_ERROR}" "${1}"
   fi
 }
 
 function log_warn() {
-  if [ $LOG_LEVEL -ge $LOG_WARN ]; then
+  if [ "$LOG_LEVEL" -ge "$LOG_WARN" ]; then
   	log_message "${LOG_WARN}" "${1}"
   fi
 }
 
 function log_info() {
-  if [ $LOG_LEVEL -ge $LOG_INFO ]; then
+  if [ "$LOG_LEVEL" -ge "$LOG_INFO" ]; then
   	log_message "${LOG_INFO}" "${1}"
   fi
 }
 
 function log_trace() {
-  if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
+  if [ "$LOG_LEVEL" -ge "$LOG_TRACE" ]; then
   	log_message "${LOG_TRACE}" "${1}"
   fi
 }
 
 function log_debug() {
-  if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
+  if [ "$LOG_LEVEL" -ge "$LOG_DEBUG" ]; then
   	log_message "${LOG_DEBUG}" "${1}"
   fi
 }
@@ -253,7 +262,6 @@ function execute_eval_command() {
 
   if [[ $RETURN_STATUS -eq 0 ]]; then
     log_debug $'\n'"${COMMAND_RESULT}"
-    log_debug "SUCCESS!"
   else
     log_error "ERROR (${RETURN_STATUS})"
 #    echo "${COMMAND_RESULT}"
@@ -416,7 +424,7 @@ function setup_python_env() {
 #    local PYENV_BIN="$(which pyenv)"
 
     log_info "PYENV_BIN=${PYENV_BIN}"
-    if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
+    if [[ -z "$(command -v "${PYENV_BIN}")" ]]; then
       abort "PYENV_BIN => ${PYENV_BIN} not found"
     fi
     if ! command -v pyenv &> /dev/null; then
@@ -435,20 +443,13 @@ function setup_python_env() {
     local ANSIBLE_BIN="${PYTHON_VENV_BINDIR}/ansible"
 
     ## ref: https://stackoverflow.com/questions/58679742/set-default-python-with-pyenv
-    echo "pyenv global ${REQUIRED_VENV_PYTHON_VERSION}"
-    eval "pyenv global ${REQUIRED_VENV_PYTHON_VERSION}"
+    execute_eval_command "pyenv global ${REQUIRED_VENV_PYTHON_VERSION}"
     export PATH="${PYTHON_VENV_BINDIR}:${PATH}"
 
-    echo "${PIP_BIN} --version"
-    ${PIP_BIN} --version
+    execute_eval_command "${PIP_BIN} --version"
 
-#    echo "${PIP_BIN} install --upgrade pip"
-#    eval "${PIP_BIN} install --upgrade pip"
-    echo "${PYTHON_BIN} -m pip install --upgrade pip"
-    eval "${PYTHON_BIN} -m pip install --upgrade pip"
-
-    echo "${PIP_BIN} install --upgrade ${REQUIRED_PYTHON_LIBS}"
-    eval "${PIP_BIN} install --upgrade ${REQUIRED_PYTHON_LIBS}"
+    execute_eval_command "${PYTHON_BIN} -m pip install --upgrade pip"
+    execute_eval_command "${PIP_BIN} install --upgrade ${REQUIRED_PYTHON_LIBS[*]}"
 
     eval "${ANSIBLE_BIN} --version"
   ) || exit 1
@@ -628,7 +629,7 @@ function main() {
       L) set_log_level "${OPTARG}" ;;
       r) GIT_REMOTE_URL="${OPTARG}" ;;
       v) echo "${VERSION}" && exit ;;
-      h | help | \?) usage ;;
+      h|\?) usage ;;
       *)
         warn "Unrecognized option: ${opt}"
         usage 1
@@ -712,38 +713,25 @@ Please install Git ${REQUIRED_GIT_VERSION} or newer and add it to your PATH."
   fi
 
   USABLE_PYTHON3=/usr/bin/python3
-  if [[ -n "${INSTALL_ON_LINUX-}" ]]
-  then
+  if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
     USABLE_PYTHON3="$(find_tool python3)"
     if [[ -z "$(command -v python3)" ]]; then
-      abort $(
-        cat <<EOABORT
-    You must install python3 before installing ansible-developer.
-EOABORT
-      )
+      abort "You must install python3 before installing ansible-developer."
     fi
     if [[ -z "${USABLE_PYTHON3}" ]]; then
-      abort $(
-        cat <<EOABORT
-    The version of python3 that was found does not satisfy requirements for install.
-    Please install python3 ${REQUIRED_SYSTEM_PYTHON3_VERSION} or newer and add it to your PATH.
-EOABORT
-      )
+      abort "The version of python3 that was found does not satisfy requirements for install. Please install python3 ${REQUIRED_SYSTEM_PYTHON3_VERSION} or newer and add it to your PATH."
     fi
-    if [[ "${USABLE_PYTHON3}" != /usr/bin/python3 ]]
-    then
+    if [[ "${USABLE_PYTHON3}" != /usr/bin/python3 ]]; then
       export PYTHON3_PATH="${USABLE_PYTHON3}"
       log_info "Found Git: ${PYTHON3_PATH}"
     fi
   fi
 
-  if [[ -n "${INSTALL_ON_MACOS-}" ]]
-  then
+  if [[ -n "${INSTALL_ON_MACOS-}" ]]; then
     setup_macos
   fi
 
-  if [[ -n "${INSTALL_ON_MSYS-}" ]]
-  then
+  if [[ -n "${INSTALL_ON_MSYS-}" ]]; then
     setup_windows
   fi
 

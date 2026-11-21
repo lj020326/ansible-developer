@@ -8,9 +8,10 @@ echo "site=${site}"
 
 IFS=':' read -r -a array <<< "${site}"
 host=${array[0]}
+# shellcheck disable=SC2034
 port=${array[1]}
 
 openssl s_client -showcerts \
-    -servername ${host} \
-    -connect ${site} </dev/null 2>/dev/null \
-	| openssl x509 -outform PEM > ${host}.pem
+    -servername "${host}" \
+    -connect "${site}" </dev/null 2>/dev/null \
+	| openssl x509 -outform PEM > "${host}".pem

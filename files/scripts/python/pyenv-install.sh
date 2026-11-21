@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
+# shellcheck disable=SC2034
 VERSION="2025.6.12"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PLATFORM_OS=$(uname -s | tr "[:upper:]" "[:lower:]")
+PLATFORM_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 # Python 3
 #PYTHON_VERSION_DEFAULT="3.9.7"
@@ -47,6 +48,7 @@ else
   tty_escape() { :; }
 fi
 tty_mkbold() { tty_escape "1;$1"; }
+# shellcheck disable=SC2034
 tty_underline="$(tty_escape "4;39")"
 tty_blue="$(tty_mkbold 34)"
 tty_red="$(tty_mkbold 31)"
@@ -62,7 +64,8 @@ function reverse_array() {
     # Get the value associated with the current key
     VALUE="${ARRAY_SOURCE_REF[$KEY]}"
     # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
-    REVERSED_ARRAY_REF[$VALUE]="$KEY"
+    # shellcheck disable=SC2034
+    REVERSED_ARRAY_REF[VALUE]="$KEY"
   done
 }
 
@@ -72,19 +75,19 @@ reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 #LOG_LEVEL=${LOG_DEBUG}
 LOG_LEVEL=${LOG_INFO}
 
-function logError() {
+function log_error() {
   if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
   	logMessage "${LOG_ERROR}" "${1}"
   fi
 }
 
-function logWarn() {
+function log_warn() {
   if [ $LOG_LEVEL -ge $LOG_WARN ]; then
   	logMessage "${LOG_WARN}" "${1}"
   fi
 }
 
-function logInfo() {
+function log_info() {
   if [ $LOG_LEVEL -ge $LOG_INFO ]; then
   	logMessage "${LOG_INFO}" "${1}"
   fi
@@ -96,7 +99,7 @@ function logTrace() {
   fi
 }
 
-function logDebug() {
+function log_debug() {
   if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
   	logMessage "${LOG_DEBUG}" "${1}"
   fi
@@ -122,13 +125,13 @@ function ohai() {
 }
 
 function abort() {
-  logError "$@"
+  log_error "$@"
   exit 1
 }
 
 function warn() {
-  logWarn "$@"
-#  logWarn "$(chomp "$1")"
+  log_warn "$@"
+#  log_warn "$(chomp "$1")"
 #  printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
 }
 
@@ -138,7 +141,7 @@ function warn() {
 #}
 
 function error() {
-  logError "$@"
+  log_error "$@"
 #  printf "%s\n" "$@" >&2
 ##  echo "$@" 1>&2;
 }
@@ -218,7 +221,7 @@ function setLogLevel() {
 }
 
 function execute() {
-  logInfo "${*}"
+  log_info "${*}"
   if ! "$@"
   then
     abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
@@ -228,16 +231,16 @@ function execute() {
 function execute_eval_command() {
   local RUN_COMMAND=${*}
 
-  logInfo "${RUN_COMMAND}"
+  log_info "${RUN_COMMAND}"
   COMMAND_RESULT=$(eval "${RUN_COMMAND}")
 #  COMMAND_RESULT=$(eval "${RUN_COMMAND} > /dev/null 2>&1")
   local RETURN_STATUS=$?
 
   if [[ $RETURN_STATUS -eq 0 ]]; then
-    logDebug $'\n'"${COMMAND_RESULT}"
-    logDebug "SUCCESS!"
+    log_debug $'\n'"${COMMAND_RESULT}"
+    log_debug "SUCCESS!"
   else
-    logError "ERROR (${RETURN_STATUS})"
+    log_error "ERROR (${RETURN_STATUS})"
 #    echo "${COMMAND_RESULT}"
     abort "$(printf "Failed during: %s" "${RUN_COMMAND}")"
   fi
@@ -254,7 +257,7 @@ function check_tmp_noexec() {
 
   # Try to execute it. If it fails, we likely have noexec set.
   if ! "$test_file" 2>/dev/null; then
-    logWarn "/tmp appears to be mounted with noexec. Falling back to /var/tmp for build."
+    log_warn "/tmp appears to be mounted with noexec. Falling back to /var/tmp for build."
     is_noexec=1
   fi
 
@@ -264,24 +267,24 @@ function check_tmp_noexec() {
 
 function setup_pyenv_linux() {
 
-  logInfo "installing pyenv"
+  log_info "installing pyenv"
 
   if [[ -n "$(command -v dnf)" ]]; then
-    sudo dnf install -y ${PYTHON3_RH_LIBS} && \
+    sudo dnf install -y "${PYTHON3_RH_LIBS}" && \
       sudo yum group install "Development Tools"
   elif [[ -n "$(command -v yum)" ]]; then
-    sudo yum install -y ${PYTHON3_RH_LIBS} && \
+    sudo yum install -y "${PYTHON3_RH_LIBS}" && \
       sudo yum group install "Development Tools"
   elif [[ -n "$(command -v apt-get)" ]]; then
-    sudo apt-get install -y ${PYTHON3_DEB_LIBS}
+    sudo apt-get install -y "${PYTHON3_DEB_LIBS}"
   fi
 
   export PYENV_ROOT="${HOME}/.pyenv"
   PYENV_BIN_DIR="${PYENV_ROOT}/bin"
   PYENV_BIN="${PYENV_BIN_DIR}/pyenv"
 
-  if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
-    logInfo "installing pyenv using [${PYENV_INSTALL_URL}]"
+  if [[ -z "$(command -v "${PYENV_BIN}")" ]]; then
+    log_info "installing pyenv using [${PYENV_INSTALL_URL}]"
 #    curl -L "${PYENV_INSTALL_URL}" | /bin/bash
     curl -L "${PYENV_INSTALL_URL}" | bash -s --
   fi
@@ -291,13 +294,13 @@ function setup_pyenv_linux() {
   eval "${PYENV_BIN} virtualenv-init -"
   mkdir -p "${PYENV_ROOT}/cache"
 
-  if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
+  if [[ -z "$(command -v "${PYENV_BIN}")" ]]; then
     abort "PYENV_BIN => ${PYENV_BIN} not found"
   fi
   if ! command -v pyenv &> /dev/null; then
     fail "pyenv not found"
   fi
-  logInfo "pyenv setup correctly"
+  log_info "pyenv setup correctly"
 
 }
 
@@ -317,24 +320,24 @@ function setup_pyenv_msys2() {
 }
 
 function install_python_version() {
-  logInfo "installing python version ${PYTHON_VERSION}"
+  log_info "installing python version ${PYTHON_VERSION}"
 
-  logInfo "PYENV_BIN=${PYENV_BIN}"
-  if [[ -z "$(command -v ${PYENV_BIN})" ]]; then
+  log_info "PYENV_BIN=${PYENV_BIN}"
+  if [[ -z "$(command -v "${PYENV_BIN}")" ]]; then
     abort "PYENV_BIN => ${PYENV_BIN} not found"
   fi
   if ! command -v pyenv &> /dev/null; then
     fail "pyenv not found"
   fi
-  logInfo "pyenv setup correctly"
+  log_info "pyenv setup correctly"
 
   PYENV_VERSION_EXISTS="$(${PYENV_BIN} versions | grep -c "${PYTHON_VERSION}")"
-  logInfo "PYENV_VERSION_EXISTS=${PYENV_VERSION_EXISTS}"
+  log_info "PYENV_VERSION_EXISTS=${PYENV_VERSION_EXISTS}"
 
 #  if [ -d "$(pyenv root)/versions/${PYTHON_VERSION}" ]; then
-#    logInfo "python version ${PYTHON_VERSION} already exists at [$(pyenv root)/versions/${PYTHON_VERSION}]"
+#    log_info "python version ${PYTHON_VERSION} already exists at [$(pyenv root)/versions/${PYTHON_VERSION}]"
   if [ "${PYENV_VERSION_EXISTS}" -ne 0 ]; then
-    logInfo "python version ${PYTHON_VERSION} already exists"
+    log_info "python version ${PYTHON_VERSION} already exists"
     exit 0
   fi
 
@@ -384,7 +387,7 @@ function install_python_version() {
   mkdir -p "$HOME/.config/pip"
   [ -f "$HOME/.config/pip/pip.conf" ] && mv "$HOME/.config/pip/pip.conf" "$HOME/.config/pip/pip.conf.bak"
 
-  logInfo "Ensure pip.conf setup correctly"
+  log_info "Ensure pip.conf setup correctly"
   cat <<EOF >> "${HOME}/.config/pip/pip.conf"
 # pip.ini (Windows)
 # pip.conf (Unix, macOS)
@@ -417,7 +420,7 @@ function main() {
   ## ref: https://stackoverflow.com/questions/27022373/python3-importerror-no-module-named-ctypes-when-using-value-from-module-mul#48045929
   if [[ -n "${INSTALL_ON_LINUX-}" ]]; then
     setup_pyenv_linux
-    logInfo "update pyenv to get most recent python dist info"
+    log_info "update pyenv to get most recent python dist info"
     pyenv update
   fi
   if [[ -n "${INSTALL_ON_MACOS-}" ]]; then
@@ -434,7 +437,7 @@ function main() {
   fi
   if [[ -n "${INSTALL_ON_MSYS-}" ]]; then
     setup_pyenv_msys2
-    logInfo "update pyenv to get most recent python dist info"
+    log_info "update pyenv to get most recent python dist info"
     pyenv update
   fi
 

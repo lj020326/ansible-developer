@@ -23,14 +23,14 @@ then
     echo "Update your existing configuration file with the new one or WFS may"
     echo "not operate properly due to changes. Press enter to continue."
     echo "-------------------------------------------------------------------"
-    read
+    read -r _reply
     cp "$CONFIG" "$CONFIG_TARGET/$CONFIG.new"
 else
     cp "$CONFIG" "$CONFIG_TARGET/$CONFIG"
 fi
 
 chmod 755 "$BINARY_TARGET/$BINARY"
-chmod 755 "$INITSCRIPT_TARGET/`basename $INITSCRIPT`"
+chmod 755 "$INITSCRIPT_TARGET/$(basename "$INITSCRIPT")"
 
 ##chkconfig chkservices on
 ## ref: https://stackoverflow.com/questions/20680050/how-do-i-install-chkconfig-on-ubuntu

@@ -13,6 +13,7 @@ CERT_DIR=certs
 SUBJECT="/C=US/ST=New York/L=New York City/O=MC-API/OU=Product/CN=${HOSTNAME}.corp.dettonville.org"
 DAYS_TO_EXPIRE=365
 #SITENAME=${1:-"${HOSTNAME}.corp.dettonville.org"}
+# shellcheck disable=SC2034
 SITENAME=${1:-"${HOSTNAME}"}
 
 #cd $CERT_DIR

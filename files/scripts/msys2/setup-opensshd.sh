@@ -71,7 +71,7 @@ fi
 #
 
 add="$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "//add"; fi)"
-if ! net user "${UNPRIV_USER}" ${add} //fullname:"${UNPRIV_NAME}" \
+if ! net user "${UNPRIV_USER}" "${add}" //fullname:"${UNPRIV_NAME}" \
               //homedir:"$(cygpath -w ${EMPTY_DIR})" //active:no; then
     echo "ERROR: Unable to create Windows user ${UNPRIV_USER}"
     exit 1

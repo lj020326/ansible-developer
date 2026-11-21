@@ -6,17 +6,21 @@
 
 set -e
 
-#DATE=`date +%Y%m%d`
-DATE=`date +%Y%m%d%H%M%S`
+#DATE=$(date +%Y%m%d)
+DATE=$(date +%Y%m%d%H%M%S)
 echo "date=$DATE"
 
 IGNORE_DIRS=admin,configs,save,volumes,data
+# shellcheck disable=SC2034
 IGNORE_DIRS_FIND='-not -path "*/admin/*" -not -path "*/configs/*"'
 
+# shellcheck disable=SC2034
 GREP_EXCLUDES="--exclude=\"*.save.*\" --exclude=\"\*.{png,jpg,gz,zip}\" --exclude-dir={node_modules,$IGNORE_DIRS,venv,.idea,.git}"
 
 echo "sourcing util functions"
-. ../utils.sh
+
+# shellcheck source=/dev/null
+source "./../utils.sh"
 
 echo "****cleanup project"
 cleanup_project

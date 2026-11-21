@@ -26,7 +26,8 @@ fetch_file() {
     REMOTE_HOST=$2
     REMOTE_PORT=$3
     REMOTE_FILE=$4
-    FETCHED_FILE=${5:-$(basename ${REMOTE_FILE})}
+    FETCHED_FILE=${5:-$(basename "${REMOTE_FILE}")}
+    # shellcheck disable=SC2034
     REMOTE_HOST_URL="${REMOTE_CREDS}@${REMOTE_HOST}"
 
     IFS=':' read -ra ADDR <<< "${REMOTE_CREDS}"
@@ -35,7 +36,7 @@ fetch_file() {
 
     mkdir -p save/fetched
     #scp -P 4444 "${REMOTE_HOST_URL}:${REMOTE_FILE} save/fetched/${FETCHED_FILE}
-    pscp -P ${REMOTE_PORT} -pw "${REMOTE_PW}" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_FILE}" "save/fetched/${FETCHED_FILE}"
+    pscp -P "${REMOTE_PORT}" -pw "${REMOTE_PW}" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_FILE}" "save/fetched/${FETCHED_FILE}"
 
 }
 
@@ -57,6 +58,7 @@ fi
 while getopts ":x" opt; do
     case "${opt}" in
         x)
+            # shellcheck disable=SC2034
             debug_container=1
             ;;
         \?)
@@ -100,30 +102,30 @@ case "${command}" in
         if [ -z "${remote_filename}" ]; then
             remote_filename="sample.conf"
         fi
-        fetch_file ${devcloud_creds} ${devcloud_host} ${devcloud_port} "${httpd_conf_dir}/${remote_filename}" sample_conf.conf
+        fetch_file "${devcloud_creds}" "${devcloud_host}" "${devcloud_port}" "${httpd_conf_dir}/${remote_filename}" sample_conf.conf
         ;;
     "fetch-vhost")
         if [ -z "${remote_filename}" ]; then
             remote_filename="vhosts-sample/http.inc"
         fi
-        fetch_file ${devcloud_creds} ${devcloud_host} ${devcloud_port} "${httpd_conf_dir}/${remote_filename}" vhost_conf.conf
+        fetch_file "${devcloud_creds}" "${devcloud_host}" "${devcloud_port}" "${httpd_conf_dir}/${remote_filename}" vhost_conf.conf
         ;;
     "fetch-log-access")
         if [ -z "${remote_filename}" ]; then
             remote_filename="access_log"
         fi
-        fetch_file ${devcloud_creds} ${devcloud_host} ${devcloud_port} "${httpd_log_dir}/${remote_filename}" access.log
+        fetch_file "${devcloud_creds}" "${devcloud_host}" "${devcloud_port}" "${httpd_log_dir}/${remote_filename}" access.log
         ;;
     "fetch-log-error")
         if [ -z "${remote_filename}" ]; then
             remote_filename="error_log"
         fi
-        fetch_file ${devcloud_creds} ${devcloud_host} ${devcloud_port} "${httpd_log_dir}/${remote_filename}" error.log
+        fetch_file "${devcloud_creds}" "${devcloud_host}" "${devcloud_port}" "${httpd_log_dir}/${remote_filename}" error.log
         ;;
     "fetch-all")
         for remote_filename in ${remote_filename_list}
         do
-            fetch_file ${devcloud_creds} ${devcloud_host} ${devcloud_port} ${remote_filename}
+            fetch_file "${devcloud_creds}" "${devcloud_host}" "${devcloud_port}" "${remote_filename}"
         done
 
 #        remote_filename="sample.conf"

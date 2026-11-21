@@ -1,5 +1,17 @@
-disable=SC2317
-disable=SC2329
-## TODO remove the following when resolved
-disable=SC2034
-disable=SC2086
+severity=warning
+external-sources=true
+
+# SC1091 (info): Not following: ... was not specified as input (see shellcheck -x).
+# disable=SC1091
+# SC2001 (style): See if you can use ${variable//search/replace} instead.
+# disable=SC2001
+# SC2034 (warning): foo appears unused. Verify use (or export if used externally).
+# disable=SC2034
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# disable=SC2086
+# SC2181 (style): Check exit code directly with e.g. 'if mycmd;', not indirectly with $?.
+# disable=SC2181
+# SC2317 (info): Command appears to be unreachable. Check usage (or ignore if invoked indirectly).
+# disable=SC2317
+# SC2329 (info): This function is never invoked. Check usage (or ignore if invoked indirectly).
+# disable=SC2329

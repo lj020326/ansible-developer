@@ -4,7 +4,7 @@ PROMPT="$1"
 #ENDPOINT="https://ollama.llm-rtx.johnson.int/v1/chat/completions"
 ENDPOINT="${OLLAM_API_URL:-https://ollama.llm-rtx.johnson.int/api/chat}"
 AUTH_HEADER="Authorization: Basic ${OLLAMA_API_KEY}"
-MODEL="qwen3-coder:30b"
+MODEL="qwen3.5:27b"
 
 SYSTEM_PROMPT="You are a shell command assistant. Translate the prompt into a valid Bash command. Return ONLY a valid raw JSON array containing objects with keys 'command' and 'description'. Do not use markdown backticks. Example: [{\"command\": \"find /var/log -mtime -1\", \"description\": \"Find files modified in last 24 hours\"}]"
 

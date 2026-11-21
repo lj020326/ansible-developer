@@ -26,7 +26,7 @@ SERVER_LOCAL_HOST_NAME="${3:-localhost}"
 SERVER_PUBLIC_HOST_NAMES="${4:-}"
 
 for COMMAND in ${CF_COMMANDS}; do
-	if ! command -v ${COMMAND} &> /dev/null; then
+	if ! command -v "${COMMAND}" &> /dev/null; then
 		echo "ERROR: Missing command ${COMMAND}" >&2
 		echo "Install the package from: https://pkg.cfssl.org/" >&2
 		exit 1

@@ -1,4 +1,6 @@
-log_prefix_prompts=".bash_prompt"
+log_prefix_prompts=".bash_prompt:"
+
+echo "${log_prefix_prompts} configuring bash prompt..."
 
 # Define colors with standard Readline non-printing wrappers
 COLOR_RED="\[\033[0;31m\]"

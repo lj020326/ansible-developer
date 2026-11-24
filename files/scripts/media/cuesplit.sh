@@ -6,7 +6,7 @@
 # optional dependencies:    flac, mac, wavpack, ttaenc
 # v1.5 Updated with dependency checks and help
 
-SDIR=`pwd`
+SPLITTER_DIR="${PWD}"
 
 show_help() {
     cat << EOF
@@ -61,10 +61,11 @@ fi
 
 check_dependencies
 
-tracknums()
+track_nums()
 {
-    trackno=$(($1 + 1))
-    boolval=1
+    # shellcheck disable=SC2034
+    track_num=$(($1 + 1))
+    bool_val=1
     for (( i=1; i<$1; i++ ))
       do
         lz=""
@@ -72,46 +73,47 @@ tracknums()
             lz="0"
         fi
         if [[ -f "./split/$lz$i. *.flac" ]] || [[ -f "./split/$lz$i *.flac" ]]; then
-            boolval=$boolval
+            :
         else
-            boolval=0
+            bool_val=0
         fi
     done
-    return $boolval
+    return $bool_val
 }
 
 checker()
 {
-    retval=1
+    ret_val=1
     ft="$1"
     cf="$2.cue"
-    adjfactor="0.88"
+    adj_factor="0.88"
     # Fixed: used grep -E and wc -l for line counts
-    tracksincue=$(grep -Ec "TRACK [0-9]{1,3} AUDIO" "./$cf")
-    indexincue=$(grep -Ec "INDEX [0-9]{1,3}" "./$cf")
-    trackssplitted=$(find ./split -type f -name "*.flac" | wc -l)
+    tracks_in_cue=$(grep -Ec "TRACK [0-9]{1,3} AUDIO" "./$cf")
+    index_in_cue=$(grep -Ec "INDEX [0-9]{1,3}" "./$cf")
+    split_tracks=$(find ./split -type f -name "*.flac" | wc -l)
 
-    if [ "$tracksincue" -gt "$trackssplitted" ] && [ "$indexincue" -gt "$trackssplitted" ]; then
-        retval=0
+    if [ "$tracks_in_cue" -gt "$split_tracks" ] && [ "$index_in_cue" -gt "$split_tracks" ]; then
+        ret_val=0
         printf "\n\nERROR: Track count mismatch!\n"
-        printf "Cue Tracks: $tracksincue | Split Files: $trackssplitted\n"
+        printf "Cue Tracks: %s | Split Files: %s\n" "$tracks_in_cue" "$split_tracks"
     fi
 
     if [ "$ft" == "wav" ]; then
-        adjfactor="0.6"
+        adj_factor="0.6"
     fi
-    origsize=$(find ./ -type f -maxdepth 1 -name "*.$ft" -print -exec sh -c "stat -c%s \"{}\"" \; | awk '{ SUM += $1} END { print SUM }')
-    origsizeadj=$(echo "$origsize*$adjfactor" | bc)
-    sourcefile=$((${origsizeadj%.*} - 1488))
+    # orig_size=$(find ./ -type f -maxdepth 1 -name "*.$ft" -print -exec sh -c "stat -c%s \"{}\"" \; | awk '{ SUM += $1} END { print SUM }')
+    orig_size=$(find ./ -type f -maxdepth 1 -name "*.$ft" -print -exec sh -c 'stat -c%s "$1"' _ {} \; | awk '{ SUM += $1} END { print SUM }')
+    orig_size_adj=$(echo "$orig_size*$adj_factor" | bc)
+    source_file=$((${orig_size_adj%.*} - 1488))
 
     if [[ "$ft" == "mp3" ]] || [[ "$ft" == "ogg" ]]; then
-        totsize=$(find ./split -type f -name "*.$ft" -print -exec sh -c "stat -c%s \"{}\"" \; | awk '{ SUM += $1} END { print SUM }')
+        tot_size=$(find ./split -type f -name "*.$ft" -print -exec sh -c 'stat -c%s "$1"' _ {} \; | awk '{ SUM += $1} END { print SUM }')
     else
-        totsize=$(find ./split -type f -name "*.flac" -print -exec sh -c "stat -c%s \"{}\"" \; | awk '{ SUM += $1} END { print SUM }')
+        tot_size=$(find ./split -type f -name "*.flac" -print -exec sh -c 'stat -c%s "$1"' _ {} \; | awk '{ SUM += $1} END { print SUM }')
     fi
 
-    if [ "$totsize" -gt "$sourcefile" ]; then
-        return $retval
+    if [ "$tot_size" -gt "$source_file" ]; then
+        return $ret_val
     else
         return 0
     fi
@@ -122,24 +124,39 @@ splitter()
     cfn="$2"
     DIR="$1"
 
-    if [ -z "$DIR" ]; then DIR="$SDIR"; fi
+    if [ -z "$DIR" ]; then DIR="$SPLITTER_DIR"; fi
 
     echo "Processing Directory: $DIR"
     cd "$DIR" || return
 
     # Fixed: wc -l to count files properly
-    cuefiles=$(find ./ -maxdepth 1 -type f -name "*.cue" | wc -l)
+    cue_files=$(find ./ -maxdepth 1 -type f -name "*.cue" | wc -l)
 
     # Determine type from the first relevant file found
-    TYPE=$(ls -t1 *.flac *.ape *.wav *.wv *.mp3 2>/dev/null | head -n 1)
+    # TYPE=$(ls -t1 *.flac *.ape *.wav *.wv *.mp3 2>/dev/null | head -n 1)
+    # Determine type from the newest relevant file found (Linux GNU stat)
+    shopt -s nullglob
+    newest_file=""
+    newest_mtime=-1
+
+    for file in *.flac *.ape *.wav *.wv *.mp3; do
+        [[ -e "${file}" ]] || continue
+        mtime=$(stat -c '%Y' -- "${file}") || continue
+        if (( mtime > newest_mtime )); then
+            newest_mtime=${mtime}
+            newest_file=${file}
+        fi
+    done
+
+    TYPE="${newest_file}"
 
     case $TYPE in
         *.flac*)
             mkdir -p split
-            if [ "$cuefiles" -gt 1 ] && [[ -f "$cfn.flac" ]]; then
+            if [ "$cue_files" -gt 1 ] && [[ -f "$cfn.flac" ]]; then
                 shnsplit -d split -f "$cfn.cue" -o "flac flac -V --best -o %f -" "$cfn.flac" -t "%n. %p - %t"
             else
-                shnsplit -d split -f *.cue -o "flac flac -V --best -o %f -" *.flac -t "%n. %p - %t"
+                shnsplit -d split -f ./*.cue -o "flac flac -V --best -o %f -" ./*.flac -t "%n. %p - %t"
             fi
             rm -f split/00.*pregap*
             cuetag "$cfn.cue" split/*.flac
@@ -147,11 +164,19 @@ splitter()
             if [ -z "$(ls -A ./split)" ]; then
                 echo "Failure: No files in split directory"
                 rmdir split
-            elif [[ "$(checker 'flac' "$cfn")" -eq 0 ]]; then
+            fi
+
+            checker 'flac' "${cfn}"
+            rc="$?"
+            if [[ "${rc}" -eq 0 ]]; then
                 echo "Failure: Checker validation failed"
             else
                 # Clean up and move
-                [[ -f "$cfn.flac" ]] && rm "$cfn.flac" || rm *.flac
+                if [[ -f "$cfn.flac" ]]; then
+                    rm -- "$cfn.flac"
+                else
+                    rm -f -- ./*.flac
+                fi
                 mv split/*.flac ./
                 rmdir split
                 echo "Success"

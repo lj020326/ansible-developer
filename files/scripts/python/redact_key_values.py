@@ -14,6 +14,7 @@ from typing import List, Optional
 DEFAULT_REDACT_KEYS = [
     "key",
     "password",
+    "passwd",
     "pwd",
     "secret",
     "token",

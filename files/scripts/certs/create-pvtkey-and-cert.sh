@@ -14,6 +14,7 @@ SERVER_NAME=${1:-$(hostname -f)}
 
 CERT_DIR=certs
 SUBJECT="/C=US/ST=New York/L=New York City/O=Dettonville/OU=Internal/CN=${SERVER_NAME}"
+# shellcheck disable=SC2034
 DAYS_TO_EXPIRE=365
 
 #cd $CERT_DIR
@@ -21,6 +22,6 @@ mkdir -p $CERT_DIR
 
 echo "create the privatekey and certificate"
 openssl req \
-        -newkey rsa:2048 -nodes -keyout $CERT_DIR/${SERVER_NAME}.key \
-        -x509 -days 365 -out $CERT_DIR/${SERVER_NAME}.crt \
+        -newkey rsa:2048 -nodes -keyout "$CERT_DIR"/"${SERVER_NAME}".key \
+        -x509 -days 365 -out "$CERT_DIR"/"${SERVER_NAME}".crt \
         -subj "$SUBJECT"

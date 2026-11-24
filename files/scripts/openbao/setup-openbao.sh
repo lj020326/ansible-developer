@@ -126,7 +126,8 @@ if [ "$(docker inspect -f '{{.State.Running}}' openbao 2>/dev/null)" = "true" ];
         RETRY_COUNT=0
         until [ $RETRY_COUNT -ge $MAX_RETRIES ]; do
             docker exec openbao vault operator init -key-shares=1 -key-threshold=1 > init.txt 2>&1
-            if [ $? -eq 0 ] && [ -s init.txt ] && grep -q 'Unseal Key 1' init.txt; then
+            rc="$?"
+            if [ "${rc}" -ne 0 ] && [ -s init.txt ] && grep -q 'Unseal Key 1' init.txt; then
                 break
             fi
             RETRY_COUNT=$((RETRY_COUNT + 1))
@@ -160,13 +161,13 @@ if [ "$(docker inspect -f '{{.State.Running}}' openbao 2>/dev/null)" = "true" ];
 
     # Unseal OpenBao
     echo "Unsealing OpenBao..."
-    docker exec openbao vault operator unseal $UNSEAL_KEY
+    docker exec openbao vault operator unseal "$UNSEAL_KEY"
 
     # Check if OpenBao is unsealed
     if docker exec openbao vault status | grep -q "Sealed.*false"; then
         echo "OpenBao is unsealed!"
         # Login with root token
-        docker exec openbao vault login $ROOT_TOKEN
+        docker exec openbao vault login "$ROOT_TOKEN"
 
         echo "OpenBao is initialized and unsealed!"
         echo "Root Token: $ROOT_TOKEN"

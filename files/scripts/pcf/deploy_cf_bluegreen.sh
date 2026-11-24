@@ -22,17 +22,17 @@
 
 DEPLOYED_APP_NAME=$(cf apps | grep 'map-build-' | cut -d" " -f1)
 
-cf push $APP_NAME -n $HOST_NAME -m 1GB -p artifacts/pcfdemo.war -t 180 -i 2 --no-start
-cf bind-service $APP_NAME myRabbit
-cf start $APP_NAME
-cf map-route $APP_NAME $DOMAIN -n maps
+cf push "$APP_NAME" -n "$HOST_NAME" -m 1GB -p artifacts/pcfdemo.war -t 180 -i 2 --no-start
+cf bind-service "$APP_NAME" myRabbit
+cf start "$APP_NAME"
+cf map-route "$APP_NAME" "$DOMAIN" -n maps
 
 #Perform Blue Green deployment
-if [ ! -z "$DEPLOYED_APP_NAME" -a "$DEPLOYED_APP_NAME" != " " -a "$DEPLOYED_APP_NAME" != "$APP_NAME" ]; then
-  echo "Performing zero-downtime cutover to $BUILD_VERSION"
-  cf scale "$DEPLOYED_APP_NAME" -i 1
-  cf unmap-route "$DEPLOYED_APP_NAME" $DOMAIN -n maps
-  cf delete "$DEPLOYED_APP_NAME" -f -r
+if [[ -n "$DEPLOYED_APP_NAME" && "$DEPLOYED_APP_NAME" != " " && "$DEPLOYED_APP_NAME" != "$APP_NAME" ]]; then
+    echo "Performing zero-downtime cutover to $BUILD_VERSION"
+    cf scale "$DEPLOYED_APP_NAME" -i 1
+    cf unmap-route "$DEPLOYED_APP_NAME" "$DOMAIN" -n maps
+    cf delete "$DEPLOYED_APP_NAME" -f -r
 fi
 
 cf lo

@@ -10,14 +10,13 @@
 
 # prepend a value to a potentially empty path variable
 # usage: prepend_path variable_name value
-prepend_path()
-{
+prepend_path() {
     variable_name="$1"
     value="$2"
 
-    old_value=$( eval "echo \$$variable_name" )
+    old_value=$(eval "echo \$$variable_name")
 
-    if [ "x$old_value" != "x" ]; then
+    if [ "$old_value" != "" ]; then
         value="$value:"
     fi
 
@@ -38,12 +37,12 @@ if [ "$verbosity" = -q ]; then
 fi
 
 # When run using source as directed, $0 gets set to bash, so we must use $BASH_SOURCE
-if [ -n "$BASH_SOURCE" ] ; then
+if [ -n "${BASH_SOURCE[0]:-}" ]; then
     HACKING_DIR=$(dirname "$BASH_SOURCE")
-elif [ $(basename -- "$0") = "env-setup" ]; then
+elif [ "$(basename -- "$0")" = "env-setup" ]; then
     HACKING_DIR=$(dirname "$0")
 # Works with ksh93 but not pdksh, have to eval to keep ash happy...
-elif [ -n "$KSH_VERSION" ] && echo $KSH_VERSION | grep -qv '^@(#)PD KSH'; then
+elif [ -n "$KSH_VERSION" ] && echo "$KSH_VERSION" | grep -qv '^@(#)PD KSH'; then
     eval "HACKING_DIR=\$(dirname \"\${.sh.file}\")"
 else
     HACKING_DIR="$PWD/hacking"
@@ -59,18 +58,17 @@ ANSIBLE_TEST_PREFIX_PYTHONPATH="$ANSIBLE_DEV_HOME/test/lib"
 PREFIX_PATH="$ANSIBLE_DEV_HOME/bin"
 PREFIX_MANPATH="$ANSIBLE_DEV_HOME/docs/man"
 
-expr "$PYTHONPATH" : "${PREFIX_PYTHONPATH}.*" > /dev/null || prepend_path PYTHONPATH "$PREFIX_PYTHONPATH"
-expr "$PYTHONPATH" : "${ANSIBLE_TEST_PREFIX_PYTHONPATH}.*" > /dev/null || prepend_path PYTHONPATH "$ANSIBLE_TEST_PREFIX_PYTHONPATH"
-expr "$PATH" : "${PREFIX_PATH}.*" > /dev/null || prepend_path PATH "$PREFIX_PATH"
-expr "$MANPATH" : "${PREFIX_MANPATH}.*" > /dev/null || prepend_path MANPATH "$PREFIX_MANPATH"
+expr "$PYTHONPATH" : "${PREFIX_PYTHONPATH}.*" >/dev/null || prepend_path PYTHONPATH "$PREFIX_PYTHONPATH"
+expr "$PYTHONPATH" : "${ANSIBLE_TEST_PREFIX_PYTHONPATH}.*" >/dev/null || prepend_path PYTHONPATH "$ANSIBLE_TEST_PREFIX_PYTHONPATH"
+expr "$PATH" : "${PREFIX_PATH}.*" >/dev/null || prepend_path PATH "$PREFIX_PATH"
+expr "$MANPATH" : "${PREFIX_MANPATH}.*" >/dev/null || prepend_path MANPATH "$PREFIX_MANPATH"
 
 #
 # Generate egg_info so that pkg_resources works
 #
 
 # Do the work in a function so we don't repeat ourselves later
-gen_egg_info()
-{
+gen_egg_info() {
     # check for current and past egg-info directory names
     if ls "$PREFIX_PYTHONPATH"/ansible*.egg-info >/dev/null 2>&1; then
         # bypass shell aliases with leading backslash
@@ -80,9 +78,10 @@ gen_egg_info()
     "$PYTHON_BIN" setup.py egg_info
 }
 
-if [ "$ANSIBLE_DEV_HOME" != "$PWD" ] ; then
+if [ "$ANSIBLE_DEV_HOME" != "$PWD" ]; then
     current_dir="$PWD"
 else
+    # shellcheck disable=SC2034
     current_dir="$ANSIBLE_DEV_HOME"
 fi
 #(
@@ -97,8 +96,8 @@ fi
 #	cd "$current_dir"
 #)
 
-if [ "$verbosity" != silent ] ; then
-    cat <<- EOF
+if [ "$verbosity" != silent ]; then
+    cat <<-EOF
 
 	Setting up Ansible to run out of checkout...
 

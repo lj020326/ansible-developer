@@ -5,7 +5,8 @@ set -o pipefail
 function main()
 {
   readonly template="$1"; shift
-  readonly content="$(cat "$template")"
+  readonly content
+  content="$(cat "$template")"
 
   eval "echo \"$content\""
 }

@@ -1,5 +1,7 @@
+#!/bin/bash
+# shellcheck disable=SC2139
 
-log_prefix_aliases=".bash_aliases"
+log_prefix_aliases=".bash_aliases:"
 echo "${log_prefix_aliases} configuring shell aliases..."
 
 #
@@ -21,16 +23,30 @@ echo "${log_prefix_aliases} configuring shell aliases..."
 # Misc :)
 # alias less='less -r'                          # raw control characters
 
-alias whence='type -a'                        # where, of a sort
-alias grep='grep --color'                     # show differences in colour
-alias egrep='egrep --color=auto'              # show differences in colour
-alias fgrep='fgrep --color=auto'              # show differences in colour
+alias whence='type -a'           # where, of a sort
+alias grep='grep --color'        # show differences in colour
+alias egrep='egrep --color=auto' # show differences in colour
+alias fgrep='fgrep --color=auto' # show differences in colour
 
 alias stop-flyline='export FLYLINE_DISABLED=1; enable -d flyline 2>/dev/null'
 alias start-flyline='unset FLYLINE_DISABLED; enable -f ${HOME}/.local/lib/libflyline.dylib flyline 2>/dev/null'
 
+# ref: https://stackoverflow.com/questions/60756020/print-environment-variables-sorted-by-name-including-variables-with-newlines
+alias showenvvars="export -p | sed 's/declare -x //' | sed 's/export //'"
+alias showenvvarnames="export -p | sed 's/declare -x //' | sed 's/export //' | cut -d'=' -f1"
+
+#alias timeinteractiveshell='time /usr/local/bin/bash -l -i -c "/usr/bin/env -0" < /dev/null > /dev/null'
+alias timeinteractiveshell='time /usr/local/bin/bash -l -i -c "showenvvarnames"'
+alias timeloginshell='time /usr/local/bin/bash -l -c "showenvvarnames"'
+
 alias rununits='./run-tests.sh units'
 alias runsanity='./run-tests.sh sanity'
+
+alias runshellcheckgit='pre-commit run shellcheck --files $(git ls-files files/scripts/)'
+alias runshellchecks="fix_shellchecks.py -g"
+#alias fixshellchecks="fix_shellchecks.py -w"
+alias fixshellchecks="run_shellchecks_apply"
+alias runshellchecksapply="run_shellchecks_apply"
 
 #
 # Some shortcuts for different directory listings
@@ -49,30 +65,31 @@ alias lll='ll | grep ^l'
 alias findlinks="find . -type l"
 alias findchown="find_chown_nonmatching"
 
-alias installdevenv="install-dev-env"
+alias installdevenv="install_dev_env"
 
-alias cdrepos='cd ~/repos'
-alias cddocs='cd ~/docs'
-alias cdtechdocs='cd ~/repos/docs/docs-tech/infrastructure'
+alias cdrepos="cd ${HOME}/repos"
+alias cddocs="cd ${HOME}/docs"
+alias cdtechdocs="cd ${HOME}/repos/docs/docs-tech/infrastructure"
+alias cdnvm='cd_nvm'
 
-alias cddocker='cd ~/docker'
+alias cddocker="cd ${HOME}/docker"
 
-alias cddockerrepo='cd ~/repos/docker'
+alias cddockerrepo="cd ${HOME}/repos/docker"
 alias cddockerhome='cd /home/container-user/docker'
 alias cddockermedia='cd /home/media/docker'
-alias cdjenkinsrepo='cd ~/repos/jenkins'
-alias cdnoderepo='cd ~/repos/nodejs'
-alias cdpythonrepo='cd ~/repos/python'
-alias cdansiblerepo='cd ~/repos/ansible'
+alias cdjenkinsrepo="cd ${HOME}/repos/jenkins"
+alias cdnoderepo="cd ${HOME}/repos/nodejs"
+alias cdpythonrepo="cd ${HOME}/repos/python"
+alias cdansiblerepo="cd ${HOME}/repos/ansible"
 
 alias cddc="cd ${ANSIBLE_DATACENTER_REPO}"
 alias cddev="cd ${ANSIBLE_DEVELOPER_REPO}"
-alias cdkube='cd ~/repos/ansible/ansible-kubespray'
-alias cdmeteor='cd ~/repos/meteor'
-alias cdreact='cd ~/repos/react-native'
-alias cdjava='cd ~/repos/java'
-alias cdcpp='cd ~/repos/cpp'
-alias cdblog='cd ~/repos/leeblog'
+alias cdkube="cd ${HOME}/repos/ansible/ansible-kubespray"
+alias cdmeteor="cd ${HOME}/repos/meteor"
+alias cdreact="cd ${HOME}/repos/react-native"
+alias cdjava="cd ${HOME}/repos/java"
+alias cdcpp="cd ${HOME}/repos/cpp"
+alias cdblog="cd ${HOME}/repos/leeblog"
 alias cdk8s='cd ${PYUTILS_DIR}/k8s'
 alias cdkolla='cd ${PYUTILS_DIR}/kolla-ansible'
 alias cdpyutils='cd ${PYUTILS_DIR}'
@@ -113,7 +130,11 @@ alias genpwd32='openssl rand -base64 32 | md5sum | head -c32;echo'
 ## ref: https://ioflood.com/blog/openssl-view-certificate/#:~:text=To%20view%20a%20certificate%20using,in%20a%20file%20named%20certificate.
 ## openssl x509 -text -noout -in certificate.crt
 alias getcertinfo="openssl x509 -text -noout -in"
+alias getcertfingerprint="get_cert_fingerprint"
+alias gethostcertinfo="get_host_cert_info"
 alias findcertsbyserialnumber="find_certs_by_serial_number"
+alias validatehostcert="validate_host_cert.py"
+alias fixchromedns="sudo fix-chrome-dns.sh"
 
 ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
 ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
@@ -195,6 +216,7 @@ alias sshesx11='ssh root@esx11.dettonville.int'
 
 ## this is a function instead
 #alias sshpacker="ssh -i ~/.ssh/${SSH_KEY}"
+alias sshpacker="ssh_packer"
 alias sshosbuild="ssh osbuild@10.10.100.10"
 
 alias sshpfsense='ssh admin@pfsense.johnson.int'
@@ -243,21 +265,28 @@ alias getansiblelog="scp administrator@admin01.johnson.int:/home/administrator/r
 alias ansibletestintegration="ansible-test-integration.sh"
 alias ansibledebugvar="ansible_debug_variable"
 alias explodeansibletest="explode_ansible_test"
+alias ansiblevaultscramble="vault_scrambler.py"
+alias ansiblevaultorganize="vault_organizer.py"
+alias gitrebaseupstream="git_rebase_upstream"
 alias gitbranchdiffs="git_branch_diffs"
 alias packagedirorig="package_directory"
-alias packagedir="package-dir.sh"
+alias packagedirsh="package-dir.sh"
+alias packagedir="package_dir.py"
+alias packagebigdir="package_dir.py --max-subdir-files 400 --max-subdir-lines 40000"
 alias packagejavadir="package_java_directory"
 alias packagegitdir="package_git_directory"
 alias packageansiblerole="package_ansible_role"
 alias explodeansiblerole="explode_ansible_role"
+alias precommitrunall="pre-commit run --all-files"
 
 alias cagetaccountpwd="ca_get_account_pwd"
 
 ## ref: https://askubuntu.com/questions/20865/is-it-possible-to-remove-a-particular-host-key-from-sshs-known-hosts-file
 alias sshclearhostkey='ssh-keygen -R'
-alias sshresetkeys="ssh-keygen -R ${TARGET_HOST} && ssh-keyscan -H ${TARGET_HOST}"
+alias sshresetkeys="ssh_reset_key"
 
 alias create-crypt-passwd="openssl passwd -1 "
+alias verifyhtpasswd="verify_htpasswd.py"
 
 alias swarmstatus="swarm_status"
 alias swarmrestartsvc="swarm_restart_service"
@@ -269,12 +298,18 @@ alias dockerserviceupdate="docker service update --force"
 alias dockerstackstat="docker stack ps --filter='desired-state=running' docker_stack"
 alias dockerstackps="docker stack ps --filter='desired-state=running' docker_stack"
 
-alias dockerbash="docker_bash"
 alias dockerexecsh="docker_exec_sh"
 alias dockerexecbash="docker_exec_bash"
+alias dockerbash="docker_bash"
 
 ## llm utils
-alias llmutils="llm-utils.sh"
+alias llmutilsv1="llm-utils.sh"
+alias llmutils="llm_utils.py"
+alias llmfitchoicescoding="docker exec -it llmfit llmfit recommend --use-case coding --json"
+alias llmfitchoicesreasoning="docker exec -it llmfit llmfit recommend --use-case reasoning --json"
+alias llmfitchoices="docker exec -it llmfit llmfit recommend --json"
+
+## gpu utilities
 alias checknvidiaversion="check_nvidia_version"
 alias postmortem="sre-shutdown-postmortem.sh"
 
@@ -285,6 +320,10 @@ alias testudp="nc -v -u -z -w 3"
 alias testudpvpn="nc -v -u -z -w 3 dettonville.cloud 1194"
 alias pingupdvpn="nping --udp -p 1194 dettonville.cloud --count 4"
 
+alias pulpstatuscheck="pulp_status_check"
+
+#------------------
+# DOCKER aliases
 ## ref: https://www.virtualizationhowto.com/2023/11/docker-overlay2-cleanup-5-ways-to-reclaim-disk-space/
 alias dockerprune='docker system prune -a -f; docker system df'
 alias dockernuke='docker ps -a -q | xargs --no-run-if-empty docker rm -f'
@@ -388,30 +427,31 @@ alias gitgraphall="git log --graph --all --oneline --decorate"
 alias gitrebase="git rebase --interactive HEAD"
 alias gitrewind="git reset --hard HEAD && git clean -d -f"
 
-
 ## ref: http://erikaybar.name/git-deleting-old-local-branches/
 alias gitcleanupoldlocal="git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D "
 
 ## ref: https://stackoverflow.com/questions/1371261/get-current-directory-name-without-full-path-in-a-bash-script
-#alias gitaddorigin="git remote add origin ssh://git@gitea.admin.johnson.int:2222/gitadmin/${PWD##*/}.git && git push -u origin master"
-alias gitaddorigin="git remote add origin ssh://git@gitea.admin.dettonville.int:2222/infra/${PWD##*/}.git && git push -u origin master"
+#alias gitaddorigin="git remote add origin ssh://git@gitea.admin.johnson.int:2222/gitadmin/${PWD##*/}.git && git push -u origin main"
+alias gitaddorigin="git remote add origin ssh://git@gitea.admin.dettonville.int:2222/infra/${PWD##*/}.git && git push -u origin main"
 
 ## ref: https://stackoverflow.com/questions/9662249/how-to-overwrite-local-tags-with-git-fetch
 alias gitfetchtags="git fetch origin --tags --force"
 alias gitsynctags="git fetch origin --tags --force --prune"
 
-alias gitfold="bash folder.sh fold"
-alias gitunfold="bash folder.sh unfold"
+alias gitremoveremote="bash ensure-git-remote.sh remove"
+alias gitremoteadd="bash ensure-git-remote.sh add"
 alias gitfetchmain="git fetch origin main:main"
 alias gitfetchdevelopment="git fetch origin development:development"
 
-alias syncpublicbranch="~/bin/sync-public-branch.sh"
+alias syncpublicbranch="${HOME}/bin/sync-public-branch.sh"
 
-alias searchrepokeywords="search-repo-keywords"
+alias searchrepokeywords="search_repo_keywords"
 
 alias decrypt="ansible-vault decrypt"
 alias vaultdecrypt="ansible-vault decrypt --vault-password-file=~/.vault_pass"
 alias vaultencrypt="ansible-vault encrypt --vault-password-file=~/.vault_pass"
+alias vaultscramble="vault_scrambler.py"
+alias vaultorganize="vault_organizer.py"
 
 alias kubelog='kubectl logs --all-namespaces -f'
 alias watchkube='watch -d "kubectl get pods --all-namespaces -o wide"'
@@ -425,7 +465,7 @@ alias venv2="virtualenv --python=${PYTHON2_BIN_DIR}/python venv"
 ## ref: https://realpython.com/intro-to-pyenv/
 ## use pyenv to set the python env
 ## pyenv versions   # to show current installed versions
-alias pyenv310="pyenv global 3.10.2"
+alias pyenv310="pyenv global 3.13.5"
 
 #    alias venv3="virtualenv --python=/c/apps/python35/python-3.5.4.amd64/python.exe venv"
 #    alias venv3="virtualenv --python=/c/apps/python36/python-3.6.8.amd64/python.exe venv"
@@ -435,119 +475,147 @@ alias .venv=". ./venv/${VENV_BINDIR}/activate"
 
 alias venvinit="pip install -r requirements.txt"
 
+## python linting
+alias mypylint="mypy_lint"
+
 ## ref: https://emacs.stackexchange.com/questions/4253/how-to-start-emacs-with-a-custom-user-emacs-directory
 ## ref: https://emacs.stackexchange.com/questions/19936/running-spacemacs-alongside-regular-emacs-how-to-keep-a-separate-emacs-d
 alias demacs='emacs -q --load "$HOME/.demacs.d/init.el"'
 alias spacemacs='emacs -q --load "$HOME/.spacemacs.d/init.el"'
 
-alias fetchimagesfrommarkdown="~/bin/fetch-images-from-markdown.sh"
-alias fetchsitesslcert.sh="~/bin/fetch-site-ssl-cert.sh"
-alias fetchstepcarootcacert="~/bin/fetch-stepca-root-cacert.sh"
+alias fetchimagesfrommarkdown="${HOME}/bin/fetch-images-from-markdown.sh"
+alias fetchsitesslcert="${HOME}/bin/fetch-site-ssl-cert.sh"
+alias fetchstepcarootcacert="${HOME}/bin/fetch-stepca-root-cacert.sh"
 
 ## use with host:port
-#alias fetch-and-import-site-cert="sudo ~/bin/fetch-and-import-site-cert-pem.sh"
+#alias fetch-and-import-site-cert="sudo ${HOME}/bin/fetch-and-import-site-cert-pem.sh"
 ## use with host:port
-alias importsitecerts="sudo ~/bin/install-cacerts.sh"
-alias installcacerts="sudo ~/bin/install-cacerts.sh"
+alias importsitecerts="sudo ${HOME}/bin/install-cacerts.sh"
+alias installcacerts="sudo ${HOME}/bin/install-cacerts.sh"
 
 ## use with host:port
-alias importsslcerts="sudo ~/bin/import-ssl-certs.sh"
-alias importworksslcerts="sudo ~/bin/import-worksite-ssl-certs.sh"
+alias importsslcerts="sudo ${HOME}/bin/import-ssl-certs.sh"
+alias importworksslcerts="sudo ${HOME}/bin/import-worksite-ssl-certs.sh"
 
-alias syncpythoncerts="sudo ~/bin/sync-python-certs-with-system-cabundle.sh"
-
-alias dockerlogin="docker login -u ${DOCKER_REGISTRY_USERNAME} -p \"${DOCKER_REGISTRY_PASSWORD}\" ${DOCKER_REGISTRY_INTERNAL}"
+#alias syncpythoncerts="sudo ${HOME}/bin/sync-python-certs-with-system-cabundle.sh"
+alias verifypythonsslconnection="verify_ssl_connection.py"
+alias dockerlogin="docker_login"
 
 if [[ "${PLATFORM}" =~ ^(MSYS|MINGW32|MINGW64)$ ]]; then
-  echo "${log_prefix_aliases} setting aliases specific to MSYS/MINGW platform"
+    echo "${log_prefix_aliases} setting aliases specific to MSYS/MINGW platform"
 
-  alias flushdns="ipconfig //flushdns"
+    alias flushdns="ipconfig //flushdns"
 
-  if [[ "${PYTHON_VERSION}" == *"WIN"* ]]; then
-      alias python="winpty python"
-      alias pip="winpty pip"
-  fi
-  alias venv2="virtualenv --python=${PYTHON2_BIN_DIR}/python.exe venv"
+    if [[ "${PYTHON_VERSION}" == *"WIN"* ]]; then
+        alias python="winpty python"
+        alias pip="winpty pip"
+    fi
+    alias venv2="virtualenv --python=${PYTHON2_BIN_DIR}/python.exe venv"
 
-  alias notepad='/c/apps/notepad++/notepad++.exe'
-  alias startheroku='heroku local web -f Procfile.windows'
-  alias syncjdrive='rsync2 /c/data/* /j/'
+    alias notepad='/c/apps/notepad++/notepad++.exe'
+    alias startheroku='heroku local web -f Procfile.windows'
+    alias syncjdrive='rsync2 /c/data/* /j/'
 
-  ## Lee@ljlaptop:[Zenkom](master)$ whereis meteor.bat
-  ## meteor: /c/Users/Lee/AppData/Local/.meteor/meteor.bat
-  ## SET PYTHON=c:\apps\python27\python-2.7.13.amd64\python
-  alias meteor='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; meteor.bat'
-  alias meteor2='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; cmd //c meteor.bat'
-  #alias meteor='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; meteor.bat'
-  #alias meteor='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; winpty meteor.bat'
-  #alias meteor='winpty meteor.bat'
-  #alias meteor-list-depends='for p in `meteor list | grep "^[a-z]" | awk \'{ print $1"@"$2 }\'`; do echo "$p"; meteor show "$p" | grep -E "^  [a-z]"; echo; done'
+    ## Lee@ljlaptop:[Zenkom](master)$ whereis meteor.bat
+    ## meteor: /c/Users/Lee/AppData/Local/.meteor/meteor.bat
+    ## SET PYTHON=c:\apps\python27\python-2.7.13.amd64\python
+    alias meteor='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; meteor.bat'
+    alias meteor2='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; cmd //c meteor.bat'
+    #alias meteor='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; meteor.bat'
+    #alias meteor='PYTHON=c:\apps\python27\python-2.7.13.amd64\python; winpty meteor.bat'
+    #alias meteor='winpty meteor.bat'
+    #alias meteor_list_depends='for p in `meteor list | grep "^[a-z]" | awk \'{ print $1"@"$2 }\'`; do echo "$p"; meteor show "$p" | grep -E "^  [a-z]"; echo; done'
 
-  alias choco="cmd //c choco"
-  alias vc='cmd //c "C:\Program^ Files^ ^(x86^)\Microsoft^ Visual^ Studio^ 14.0\VC\vcvarsall.bat & bash"'
+    alias choco="cmd //c choco"
+    alias vc='cmd //c "C:\Program^ Files^ ^(x86^)\Microsoft^ Visual^ Studio^ 14.0\VC\vcvarsall.bat & bash"'
 
-  # per https://epsil.github.io/blog/2016/04/20/
-  alias open='start'
+    # per https://epsil.github.io/blog/2016/04/20/
+    alias open='start'
 
 elif [[ "${PLATFORM}" == *"DARWIN"* ]]; then
-  echo "${log_prefix_aliases} setting aliases for DARWIN env"
-  echo ""
-  # alias emacs='emacs -q --load "${HOME}/.emacs.d/init.el"'
+    echo "${log_prefix_aliases} setting aliases for DARWIN env"
+    echo ""
+    # alias emacs='emacs -q --load "${HOME}/.emacs.d/init.el"'
 
-  ######
-  # instantly grabs the updated Cellar target path, copies it to the clipboard,
-  # and opens both Finder and System Settings to the exact page,
-  # minimizing the update fix to just a quick 'Cmd + Shift + G' -> 'Cmd + V'
-  alias fixbashtcc="fix-bash-tcc.sh"
+    ## If permissions keep breaking repeatedly, the local networkextension database file
+    ## in macOS has likely become corrupt.
+    ## You can reset it using Terminal:
+    alias resetnetworkpreferences="sudo rm /Library/Preferences/com.apple.networkextension.plist"
 
-  ## ref: https://opensource.com/article/19/5/python-3-default-mac
-  # alias python=/usr/local/bin/python3
-  # alias pip=/usr/local/bin/pip3
+    ## pycharm - workaround for repeated network access issue in PyCharm
+    ## Because Terminal.app (or iTerm) maintains persistent Local Network permissions,
+    ## launching PyCharm from your active terminal forces PyCharm and all child subshells
+    ## to inherit Terminal's validated network context
+    alias pycharm="open -a PyCharm.app"
 
-  alias editvscodesettings="emacs ${VSCODE_SETTINGS_DIR}/settings.json"
+    ######
+    # instantly grabs the updated Cellar target path, copies it to the clipboard,
+    # and opens both Finder and System Settings to the exact page,
+    # minimizing the update fix to just a quick 'Cmd + Shift + G' -> 'Cmd + V'
+    alias fixbashtcc="fix-bash-tcc.sh"
 
-  alias java8='export JAVA_HOME=$JAVA_8_HOME'
-  alias java11='export JAVA_HOME=$JAVA_11_HOME'
-  alias java17='export JAVA_HOME=$JAVA_17_HOME'
-  alias java24='export JAVA_HOME=$JAVA_24_HOME'
+    #------
+    # Chrome
+    # following will immediately launch a clean Chrome instance with site isolation bypassed for your local environment
+    # to prevent ERR_ADDRESS_UNREACHABLE for internal '.int' domains.
+    # set as plist option:
+    # run `defaults write com.google.Chrome SitePerProcess -bool false`
+    # To revert this later, simply run `defaults delete com.google.Chrome SitePerProcess`
+    alias chrome-lab="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-features=IsolateOrigins,site-per-process >/dev/null 2>&1 &"
 
-  ## ref: https://superuser.com/questions/1400250/how-to-query-macos-dns-resolver-from-terminal
-  alias dnslookup='scutil -W -r '
-  alias dnslookup2='dscacheutil -q host -a name '
-  alias dnslookup3='dns-sd -G v4v6 '
-  alias dnsflushcache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
-#  alias dnsresetcache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
-  alias dnsresolvers='scutil --dns'
+    ## ref: https://opensource.com/article/19/5/python-3-default-mac
+    # alias python=/usr/local/bin/python3
+    # alias pip=/usr/local/bin/pip3
 
-  ## ref: https://discussions.apple.com/thread/250681170
-  alias getzombies="ps -A -ostat,ppid,pid,command | grep -e '^[Zz]'"
+    alias editvscodesettings="emacs ${VSCODE_SETTINGS_DIR}/settings.json"
 
-  ## ref: https://www.servernoobs.com/how-to-find-and-kill-all-zombie-processes/
-  alias getpidparents="pstree -paul"
-  alias getparentpids="pstree -paul"
+    alias java8='export JAVA_HOME=$JAVA_8_HOME'
+    alias java11='export JAVA_HOME=$JAVA_11_HOME'
+    alias java17='export JAVA_HOME=$JAVA_17_HOME'
+    alias java24='export JAVA_HOME=$JAVA_24_HOME'
+
+    ## ref: https://superuser.com/questions/1400250/how-to-query-macos-dns-resolver-from-terminal
+    alias dnslookup='scutil -W -r '
+    alias dnslookup2='dscacheutil -q host -a name '
+    alias dnslookup3='dns-sd -G v4v6 '
+    alias dnsflushcache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+    #  alias dnsresetcache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+    alias dnsresolvers='scutil --dns'
+
+    ## ref: https://discussions.apple.com/thread/250681170
+    alias getzombies="ps -A -ostat,ppid,pid,command | grep -e '^[Zz]'"
+
+    ## ref: https://www.servernoobs.com/how-to-find-and-kill-all-zombie-processes/
+    alias getpidparents="pstree -paul"
+    alias getparentpids="pstree -paul"
 
 #  alias find="gfind"
 #  alias sed="gsed"
 #  alias grep="ggrep"
 
-else  ## linux
-  # alias venv2="virtualenv --python=/usr/bin/python2.7 venv"
-  # alias venv3="virtualenv --python=/usr/bin/python3.5 venv"
-  # alias .venv=". ./venv/bin/activate"
+else ## linux
+    # alias venv2="virtualenv --python=/usr/bin/python2.7 venv"
+    # alias venv3="virtualenv --python=/usr/bin/python3.5 venv"
+    # alias .venv=". ./venv/bin/activate"
 
-  # alias python=/usr/local/bin/python3
-  # alias pip=/usr/local/bin/pip3
+    # alias python=/usr/local/bin/python3
+    # alias pip=/usr/local/bin/pip3
 
-  ## useful iscsi commands
-  alias getiscsi='iscsiadm --mode session -P 3 | grep -i -e attached -e target'
-
+    ## useful iscsi commands
+    alias getiscsi='iscsiadm --mode session -P 3 | grep -i -e attached -e target'
+    ## useful apt commands
+    alias aptlistupgradableall="apt list --upgradable"
+    alias aptlistupgradesall="apt list --upgradable"
+    alias aptlistupgradable="apt list --upgradable 2>/dev/null | grep -vFf <(apt-mark showhold)"
+    alias aptlistupgrades="apt list --upgradable 2>/dev/null | grep -vFf <(apt-mark showhold)"
+    alias aptupgradesimulated="apt-get -s upgrade | grep '^Inst'"
 fi
 
 ## work related
-alias cdwork='cd ~/repos/work'
+alias cdwork="cd ${HOME}/repos/work"
 
-alias importworksitecerts="sudo ~/bin/install-worksite-cacerts.sh"
-alias installworksitecerts="sudo ~/bin/install-worksite-cacerts.sh"
+alias importworksitecerts="sudo ${HOME}/bin/install-worksite-cacerts.sh"
+alias installworksitecerts="sudo ${HOME}/bin/install-worksite-cacerts.sh"
 
 alias gitaddworkkey="git config core.sshCommand 'ssh -i ~/.ssh/${SSH_KEY_WORK}'"
 alias gitaddworkkey2="git config core.sshCommand 'ssh -i ~/.ssh/${SSH_KEY_WORK2}'"

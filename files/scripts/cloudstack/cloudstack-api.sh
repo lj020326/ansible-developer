@@ -14,52 +14,60 @@
 ## please set your secret key
 #secret_key="zTl4qQtSZPijMkNYgkX1lQh6QlEUXyjSKeXSPZQl2MJifzOBFhNDA5cQlfK7Ds5BFEM_ua_5ELMPL-z4JNJBIA"
 
-#cs_config_file="~/.cloudstack.ini"
+#cs_config_file="${HOME}/.cloudstack.ini"
 cs_config_file="/root/.cloudstack.ini"
 
 ## ref: https://stackoverflow.com/questions/6318809/how-do-i-grab-an-ini-value-within-a-shell-script
-#source ~/.cloudstack.ini
-source <(grep = $cs_config_file | sed 's/ *= */=/g')
+#source "${HOME}/.cloudstack.ini"
+
+set -a
+# shellcheck source=/dev/null
+source <(grep -v '^[[:space:]]*$' "$cs_config_file" | sed 's/[[:space:]]*=[[:space:]]*/=/g')
+set +a
 
 #address=$(lookup endpoint $cs_config_file)
 #api_key=$(lookup key $cs_config_file}
 #secret_key=$(lookup secret $cs_config_file)?
 
+endpoint="${endpoint:-}"
+key="${key:-}"
+secret="${secret:-}"
 address="${endpoint}?"
-api_key=$key
-secret_key=$secret
-
+api_key="$key"
+secret_key="$secret"
+# shellcheck disable=SC2034
 api_path="/client/api?"
 
 if [ $# -lt 1 ]; then
   echo "usage: $0 command=... paramter=... parameter=..."; exit;
 elif [[ $1 != "command="* ]]; then
   echo "usage: $0 command=... paramter=... parameter=..."; exit;
-elif [ $1 == "command=" ]; then
+elif [ "$1" == "command=" ]; then
   echo "usage: $0 command=... paramter=... parameter=..."; exit;
 fi
 
 data_array=("$@" "apikey=${api_key}")
 
-temp1=$(echo -n ${data_array[@]} | \
+temp1=$(echo -n "${data_array[*]}" | \
    tr " " "\n" | \
    sort -fd -t'=' | \
    perl -pe's/([^-_.~A-Za-z0-9=\s])/sprintf("%%%02X", ord($1))/seg'| \
-   tr "A-Z" "a-z" | \
+   tr '[:upper:]' '[:lower:]' | \
    tr "\n" "&" )
 
-signature=$(echo -n ${temp1[@]})
+signature=$(echo -n "${temp1[*]}")
 signature=${signature%&}
-signature=$(echo -n $signature | \
-   openssl sha1 -binary -hmac $secret_key | \
+signature=$(echo -n "$signature" | \
+   openssl sha1 -binary -hmac "$secret_key" | \
    openssl base64 )
-signature=$(echo -n $signature | \
+signature=$(echo -n "$signature" | \
    perl -pe's/([^-_.~A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg')
 
-#url=${address}${api_path}$(echo -n $@ | tr " " "&")"&"apikey=$api_key"&"signature=$signature
-url=${address}$(echo -n $@ | tr " " "&")"&"apikey=$api_key"&"signature=$signature
+#url=${address}${api_path}$(echo -n "$@" | tr " " "&")"&"apikey=$api_key"&"signature=$signature
+url=${address}$(echo -n "$@" | tr " " "&")"&"apikey=$api_key"&"signature=$signature
 
 echo " SEND URL: $url"
-curl ${url} | xmllint --format -
+curl "${url}" | xmllint --format -
+rc="$?"
 
-exit ${?}
+exit "${rc}"

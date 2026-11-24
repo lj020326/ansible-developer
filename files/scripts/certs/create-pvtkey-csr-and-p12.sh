@@ -12,6 +12,7 @@ CERT_DIR=certs
 SUBJECT="/C=US/ST=New York/L=New York City/O=Global Security/OU=IT Department/CN=example.com"
 ALIASNAME="myalias123"
 PASSWD="password123"
+# shellcheck disable=SC2034
 DAYS_TO_EXPIRE=365
 
 #cd $CERT_DIR

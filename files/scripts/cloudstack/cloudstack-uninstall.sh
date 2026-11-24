@@ -2,12 +2,12 @@
 
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
-${SCRIPT_DIR}/cloudstack-dropdb.sh
+"${SCRIPT_DIR}"/cloudstack-dropdb.sh
 
 echo "archiving cloudstack api config"
 snap_date=$(date +%Y%m%d_%H%M)
 
-mv ~/.cloudstack.ini ~/.cloudstack.ini.${snap_date}
+mv ~/.cloudstack.ini ~/.cloudstack.ini."${snap_date}"
 
 ## ref: https://gist.github.com/CrackerJackMack/2972401
 ##
@@ -24,5 +24,6 @@ yum remove -y cloudstack-management \
     qemu-img
 
 systemctl daemon-reload
+rc="$?"
 
-exit ${?}
+exit "${rc}"

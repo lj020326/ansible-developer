@@ -306,6 +306,7 @@ while [ $# -gt 0 ]; do
 
 	token="$(curl -fsSL "$authBase/token?service=$authService&scope=repository:$image:pull" | jq --raw-output '.token')"
 
+    # shellcheck disable=SC2086
 	manifestJson="$(
 		curl -fsSL \
 			-H "Authorization: Bearer $token" \
@@ -348,10 +349,11 @@ while [ $# -gt 0 ]; do
 						if [[ "$maniArch" = "${targetArch}" ]] && [[ -z "${targetVariant}" || "$maniVariant" = "${targetVariant}" ]]; then
 							digest="$(echo "$layerMeta" | jq --raw-output '.digest')"
 							# get second level single manifest
+                            # shellcheck disable=SC2086
 							submanifestJson="$(
 								curl -fsSL \
 									-H "Authorization: Bearer $token" \
-            			${DOCKER_HTTP_CURL_HEADERS} \
+                        			${DOCKER_HTTP_CURL_HEADERS} \
 									"$DOCKER_HUB_HOST/v2/$image/manifests/$digest"
 							)"
 							handle_single_manifest_v2 "$submanifestJson"

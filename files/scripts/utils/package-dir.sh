@@ -8,18 +8,21 @@ usage() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS] <directory_path> [ignore_dir1] [ignore_dir2] ...
 
-Packages text files within a directory into a single text file, skipping binaries
-and excluded directories.
+Packages text files within a directory into a single text file, skipping binaries,
+images, and excluded directories.
 
 Options:
   -o <file_path>  Specify a custom output file path.
                   (Default: <directory_path>/save/directory.<dir_name>.txt)
+  -s <size_mb>    Specify file size threshold warning in megabytes (MB).
+                  (Default: 10)
   -n              Disable Git integration. Forces standard 'find' search even
                   if target directory is inside a Git repository.
   -h              Show this help message and exit.
 
 Examples:
   $(basename "$0") my_project
+  $(basename "$0") -s 15 my_project
   $(basename "$0") -n my_project node_modules .venv
   $(basename "$0") -o /tmp/dump.txt my_project
 EOF
@@ -29,16 +32,24 @@ EOF
 function main() {
     # --- Parse Options ---
     OUTPUT_FILE_CUSTOM=""
+    SIZE_THRESHOLD_MB=10
     USE_GIT=true
 
-    while getopts "o:nh" opt; do
-        case " ${opt} " in
+    while getopts "o:s:nh" opt; do
+        case "${opt}" in
             o) OUTPUT_FILE_CUSTOM="$OPTARG" ;;
+            s) SIZE_THRESHOLD_MB="$OPTARG" ;;
             n) USE_GIT=false ;;
             h) usage ;;
             *) usage ;;
         esac
     done
+
+    # Validate that size threshold is a positive integer
+    if ! [[ "$SIZE_THRESHOLD_MB" =~ ^[0-9]+$ ]]; then
+        echo "Error: Size threshold (-s) must be a positive integer in MB." >&2
+        exit 1
+    fi
 
     # Shift away the parsed options ($OPTIND is the index of the next argument)
     shift $((OPTIND - 1))
@@ -57,14 +68,19 @@ function main() {
         exit 1
     fi
 
-    # Base exclude patterns
-    BASE_EXCLUDES="\.git|\.idea|\.DS_Store|\.test|\.tmp|\.vault|__pycache__|output|save|releases|archive|old"
+    # Base folder exclusions
+    BASE_EXCLUDE_DIRS="\.git|\.idea|\.DS_Store|\.test|\.tmp|vault|\.vault|__pycache__"
+    BASE_EXCLUDE_DIRS+="|output|save|assets|build|releases|archive|old"
+
+    # Image / non-code media extensions to exclude
+    FILE_EXT_EXCLUDES="\.(svg|png|jpg|jpeg|gif|ico|webp|pdf|zip|tar|gz|7z)$"
 
     # Capture all trailing arguments as custom ignores
     shift
     CUSTOM_EXCLUDES=""
     for arg in "$@"; do
         # Escape any dots or special regex characters in user input
+        # shellcheck disable=SC2001
         escaped_arg=$(echo "$arg" | sed 's/\./\\./g')
         if [ -z "$CUSTOM_EXCLUDES" ]; then
             CUSTOM_EXCLUDES="$escaped_arg"
@@ -73,19 +89,18 @@ function main() {
         fi
     done
 
-    # Combine base and custom excludes into the final regex
+    # Combine directory excludes
     if [ -n "$CUSTOM_EXCLUDES" ]; then
-        ALL_EXCLUDES="${BASE_EXCLUDES}|${CUSTOM_EXCLUDES}"
+        ALL_DIR_EXCLUDES="${BASE_EXCLUDE_DIRS}|${CUSTOM_EXCLUDES}"
     else
-        ALL_EXCLUDES="${BASE_EXCLUDES}"
+        ALL_DIR_EXCLUDES="${BASE_EXCLUDE_DIRS}"
     fi
 
     # Regex for standard 'find' command
-    EXCLUDE_REGEX=".*/(${ALL_EXCLUDES})$"
+    EXCLUDE_REGEX=".*/(${ALL_DIR_EXCLUDES})|.*${FILE_EXT_EXCLUDES}"
 
     # Extended Regex for Bash regex operator (=~) when testing Git paths
-    # Matches excluded directory/file name at start of path, end of path, or surrounded by slashes
-    GIT_EXCLUDE_REGEX="(^|/)(${ALL_EXCLUDES})(/|$)"
+    GIT_DIR_EXCLUDE_REGEX="(^|/)(${ALL_DIR_EXCLUDES})(/|$)"
 
     # Resolve absolute path
     ABS_DIR_PATH=$(cd "$DIR_PATH" && pwd)
@@ -115,15 +130,21 @@ function main() {
 
     if [ "$IS_GIT_REPO" = true ]; then
         echo "Strategy: Git tracking (observing .gitignore rules)"
-        echo "Excluding additional patterns matching: ${GIT_EXCLUDE_REGEX}"
+        echo "Excluding directory patterns matching: ${GIT_DIR_EXCLUDE_REGEX}"
+        echo "Excluding file extensions matching: ${FILE_EXT_EXCLUDES}"
         echo "Filtering out non-text files..."
         echo "---"
 
         git -C "$DIR_PATH" ls-files --cached --others --exclude-standard | while read -r RELATIVE_PATH; do
             FILE_PATH="${DIR_PATH}/${RELATIVE_PATH}"
 
-            # Skip base and custom ignore patterns
-            if [[ "$RELATIVE_PATH" =~ $GIT_EXCLUDE_REGEX ]]; then
+            # Skip directory ignore patterns
+            if [[ "$RELATIVE_PATH" =~ $GIT_DIR_EXCLUDE_REGEX ]]; then
+                continue
+            fi
+
+            # Skip image and excluded file extensions
+            if [[ "$RELATIVE_PATH" =~ $FILE_EXT_EXCLUDES ]]; then
                 continue
             fi
 
@@ -171,7 +192,7 @@ function main() {
             fi
 
             if [ -z "$IS_BINARY" ] && [ -f "$FILE_PATH" ]; then
-                RELATIVE_PATH="${FILE_PATH#$DIR_PATH/}"
+                RELATIVE_PATH="${FILE_PATH#"${DIR_PATH}"/}"
 
                 {
                     echo "### FILE: $RELATIVE_PATH ###"
@@ -189,6 +210,18 @@ function main() {
 
     echo "---"
     echo "Packaging complete! Saved in '$OUTPUT_FILE'."
+
+    # --- File Size Check ---
+    FILE_SIZE_BYTES=$(wc -c < "$OUTPUT_FILE" | tr -d ' ')
+    THRESHOLD_BYTES=$((SIZE_THRESHOLD_MB * 1024 * 1024))
+
+    # Format human-readable output size
+    FILE_SIZE_MB=$(awk -v bytes="$FILE_SIZE_BYTES" 'BEGIN { printf "%.2f", bytes / (1024 * 1024) }')
+
+    if [ "$FILE_SIZE_BYTES" -gt "$THRESHOLD_BYTES" ]; then
+        echo ""
+        echo "WARNING: Output file size (${FILE_SIZE_MB} MB) exceeds the threshold limit of ${SIZE_THRESHOLD_MB} MB!" >&2
+    fi
 }
 
 main "$@"

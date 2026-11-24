@@ -13,10 +13,10 @@ This repository employs a multi-layered testing strategy, ranging from static an
 ## Running PyTest Tests
 
 ### Execution
-Run unit tests directly from the repository root:
+Run pytest unit tests from the repository python source directory:
 
 ```bash
-pytest tests/unit/
+pytest files/scripts/python/tests/unit/
 ```
 
 Or target a specific module:

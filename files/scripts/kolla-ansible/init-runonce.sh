@@ -71,7 +71,7 @@ if ! [ -f "${IMAGE_PATH}/${IMAGE}" ]; then
     IMAGE_PATH='./'
     if ! [ -f "${IMAGE_PATH}/${IMAGE}" ]; then
         echo None found, downloading cirros image.
-        curl -L -o ${IMAGE_PATH}/${IMAGE} ${IMAGE_URL}/${IMAGE}
+        curl -L -o "${IMAGE_PATH}"/"${IMAGE}" "${IMAGE_URL}"/"${IMAGE}"
     fi
 else
     echo Using cached cirros image from the nodepool node.
@@ -79,7 +79,7 @@ fi
 
 echo Creating glance image.
 openstack image create --disk-format qcow2 --container-format bare --public \
-    --property os_type=${IMAGE_TYPE} --file ${IMAGE_PATH}/${IMAGE} ${IMAGE_NAME}
+    --property os_type="${IMAGE_TYPE}" --file "${IMAGE_PATH}"/"${IMAGE}" "${IMAGE_NAME}"
 
 echo Configuring neutron.
 if [[ $ENABLE_EXT_NET -eq 1 ]]; then
@@ -103,20 +103,21 @@ if [[ $ENABLE_EXT_NET -eq 1 ]]; then
 fi
 
 # Get admin user and tenant IDs
+# shellcheck disable=SC2034
 ADMIN_USER_ID=$(openstack user list | awk '/ admin / {print $2}')
 ADMIN_PROJECT_ID=$(openstack project list | awk '/ admin / {print $2}')
-ADMIN_SEC_GROUP=$(openstack security group list --project ${ADMIN_PROJECT_ID} | awk '/ default / {print $2}')
+ADMIN_SEC_GROUP=$(openstack security group list --project "${ADMIN_PROJECT_ID}" | awk '/ default / {print $2}')
 
 # Sec Group Config
 openstack security group rule create --ingress --ethertype IPv4 \
-    --protocol icmp ${ADMIN_SEC_GROUP}
+    --protocol icmp "${ADMIN_SEC_GROUP}"
 openstack security group rule create --ingress --ethertype IPv4 \
-    --protocol tcp --dst-port 22 ${ADMIN_SEC_GROUP}
+    --protocol tcp --dst-port 22 "${ADMIN_SEC_GROUP}"
 # Open heat-cfn so it can run on a different host
 openstack security group rule create --ingress --ethertype IPv4 \
-    --protocol tcp --dst-port 8000 ${ADMIN_SEC_GROUP}
+    --protocol tcp --dst-port 8000 "${ADMIN_SEC_GROUP}"
 openstack security group rule create --ingress --ethertype IPv4 \
-    --protocol tcp --dst-port 8080 ${ADMIN_SEC_GROUP}
+    --protocol tcp --dst-port 8080 "${ADMIN_SEC_GROUP}"
 
 if [ ! -f ~/.ssh/id_rsa.pub ]; then
     echo Generating ssh key.
@@ -130,13 +131,13 @@ fi
 # Increase the quota to allow 40 m1.small instances to be created
 
 # 40 instances
-openstack quota set --instances 40 ${ADMIN_PROJECT_ID}
+openstack quota set --instances 40 "${ADMIN_PROJECT_ID}"
 
 # 40 cores
-openstack quota set --cores 40 ${ADMIN_PROJECT_ID}
+openstack quota set --cores 40 "${ADMIN_PROJECT_ID}"
 
 # 96GB ram
-openstack quota set --ram 96000 ${ADMIN_PROJECT_ID}
+openstack quota set --ram 96000 "${ADMIN_PROJECT_ID}"
 
 # add default flavors, if they don't already exist
 if ! openstack flavor list | grep -q m1.tiny; then

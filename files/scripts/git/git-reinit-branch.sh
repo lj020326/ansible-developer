@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CONFIRM=0
-SCRIPT_NAME=$(basename $0)
+SCRIPT_NAME=$(basename "$0")
 
 usage() {
   retcode=${1:-1}
@@ -17,7 +17,7 @@ usage() {
   echo "     ${SCRIPT_NAME} -y public" 1>&2
   echo "     ${SCRIPT_NAME} master" 1>&2
   echo "" 1>&2
-  exit ${retcode}
+  exit "${retcode}"
 }
 
 while getopts "yhf" opt; do
@@ -47,7 +47,7 @@ TARGET_BRANCH=${1:-"${CURRENT_GIT_BRANCH}"}
 
 if [ $CONFIRM -eq 0 ]; then
   ## https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
-  read -p "Are you sure you want to re-init branch ${TARGET_BRANCH}? " -n 1 -r
+  read -rp "Are you sure you want to re-init branch ${TARGET_BRANCH}? " -n 1 -r
   echo    # (optional) move to a new line
   if [[ ! $REPLY =~ ^[Yy]$ ]]
   then
@@ -58,6 +58,9 @@ fi
 ## ref: https://intoli.com/blog/exit-on-errors-in-bash-scripts/
 # exit when any command fails
 set -e
+
+current_command=""
+last_command=""
 
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG

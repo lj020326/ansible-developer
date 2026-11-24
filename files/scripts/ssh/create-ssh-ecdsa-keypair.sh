@@ -4,4 +4,4 @@
 
 USERNAME="${1:-ansible@example.int}"
 KEYFILE="${2:-ansible-ssh.key}"
-ssh-keygen -t ecdsa -N "" -b 384 -C ${USERNAME} -f ${KEYFILE}
+ssh-keygen -t ecdsa -N "" -b 384 -C "${USERNAME}" -f "${KEYFILE}"

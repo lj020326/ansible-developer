@@ -1,0 +1,29 @@
+# ================================================
+# LLM Utilities & Multi-Endpoint Management Config
+# ================================================
+
+logging:
+  level: "INFO"
+
+endpoints:
+  ollama:
+    - url: "https://ollama.llm-rtx.example.int"
+      api_key: ""
+    - url: "https://ollama.llm-gb10.example.int"
+      api_key: ""
+    - url: "https://ollama.admin.example.int"
+      api_key: ""
+  vllm:
+    - url: "https://vllm-coder.llm-gb10.example.int/v1"
+      api_key: ""
+    - url: "https://vllm-exec.llm-gb10.example.int/v1"
+      api_key: ""
+  llmfit:
+    - "https://llmfit.llm-gb10..example.int"
+    - "https://llmfit.llm-rtx..example.int"
+    - "https://llmfit.admin..example.int"
+
+options:
+  connect_timeout: 5
+  max_timeout: 120
+  verify_tiers: "30000,90000,140000"

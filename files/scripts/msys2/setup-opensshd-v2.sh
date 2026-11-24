@@ -69,7 +69,7 @@ tmp_pass="$(tr -dc 'a-zA-Z0-9' < /dev/urandom | dd count=14 bs=1 2>/dev/null)"
 
 # Create user
 add="$(if ! net user "${PRIV_USER}" >/dev/null; then echo "//add"; fi)"
-if ! net user "${PRIV_USER}" "${tmp_pass}" ${add} //fullname:"${PRIV_NAME}" \
+if ! net user "${PRIV_USER}" "${tmp_pass}" "${add}" //fullname:"${PRIV_NAME}" \
               //homedir:"$(cygpath -w ${EMPTY_DIR})" //yes; then
     echo "ERROR: Unable to create Windows user ${PRIV_USER}"
     exit 1
@@ -102,7 +102,7 @@ done
 #
 
 add="$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "//add"; fi)"
-if ! net user "${UNPRIV_USER}" ${add} //fullname:"${UNPRIV_NAME}" \
+if ! net user "${UNPRIV_USER}" "${add}" //fullname:"${UNPRIV_NAME}" \
               //homedir:"$(cygpath -w ${EMPTY_DIR})" //active:no; then
     echo "ERROR: Unable to create Windows user ${PRIV_USER}"
     exit 1

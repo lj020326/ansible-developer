@@ -6,6 +6,9 @@ GIT_DEFAULT_BRANCH=main
 # exit when any command fails
 set -e
 
+current_command=""
+last_command=""
+
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
@@ -34,8 +37,8 @@ git add -A
 echo "Commit the changes:"
 git commit -am "Initial commit"
 
-#echo "Merge master changes to public branch:"
-#git merge master
+#echo "Merge main changes to public branch:"
+#git merge main
 
 echo "Delete the old branch:"
 git branch -D public

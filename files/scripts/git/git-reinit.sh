@@ -11,7 +11,7 @@ echo "reinitializing git repo"
 rm -fr .git
 git init
 git checkout -b main
-git remote add origin ${GIT_ORIGIN_REPO}
+git remote add origin "${GIT_ORIGIN_REPO}"
 git add .
 git commit -m "Initial commit"
 git push -u --force origin main

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 verbosity=1
+# shellcheck disable=SC2034
 local_identifier="proxy-test"
 
 usage() {
@@ -28,7 +29,7 @@ run_curltest() {
     VERBOSITY=${4:-1}
 
     mkdir -p logs
-    SCRIPT_FILE=$(basename $0)
+    SCRIPT_FILE=$(basename "$0")
     LOG_FILE="logs/${SCRIPT_FILE%.*}.log"
 
     VERBOSE_ARGS=""
@@ -42,9 +43,9 @@ run_curltest() {
     fi
 
     cmd="curl --proxy-insecure ${VERBOSE_ARGS} -IsS --proxy http://${PROXY_HOST}:${PROXY_PORT} ${TARGET_URL}"
-    echo "${cmd}" > ${LOG_FILE}
+    echo "${cmd}" > "${LOG_FILE}"
     echo "${cmd}"
-    ${cmd} 2>&1 | tee -a ${LOG_FILE}
+    ${cmd} 2>&1 | tee -a "${LOG_FILE}"
 }
 
 while getopts ":v:" opt; do
@@ -68,6 +69,7 @@ done
 shift $((OPTIND-1))
 
 proxy_target=${1:-"localhost"}
+# shellcheck disable=SC2034
 bs_key=${BROWSERSTACK_KEY}
 proxy_port=80
 target_url=${2:-"https://www.browserstack.com/"}
@@ -89,4 +91,4 @@ case "${proxy_target}" in
         ;;
 esac
 
-run_curltest ${proxy_host} ${proxy_port} ${target_url} ${verbosity}
+run_curltest "${proxy_host}" "${proxy_port}" "${target_url}" "${verbosity}"

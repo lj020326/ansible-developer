@@ -4,7 +4,7 @@ VERSION="2025.6.12"
 
 SCRIPT_NAME="$(basename "$0")"
 
-MEDIA_DIR_DEFAULT="~/data/media/photos/"
+MEDIA_DIR_DEFAULT="${HOME}/data/media/photos/"
 
 DRYRUN_MODE=0
 
@@ -30,7 +30,8 @@ function reverse_array() {
     # Get the value associated with the current key
     VALUE="${ARRAY_SOURCE_REF[$KEY]}"
     # Add the reversed key-value pair to the REVERSED_ARRAY_REF array
-    REVERSED_ARRAY_REF[$VALUE]="$KEY"
+    # shellcheck disable=SC2034
+    REVERSED_ARRAY_REF[VALUE]="$KEY"
   done
 }
 
@@ -40,37 +41,37 @@ reverse_array LOGLEVEL_TO_STR LOGLEVELSTR_TO_LEVEL
 #LOG_LEVEL=${LOG_DEBUG}
 LOG_LEVEL=${LOG_INFO}
 
-function logError() {
-  if [ $LOG_LEVEL -ge $LOG_ERROR ]; then
+function log_error() {
+  if [ "$LOG_LEVEL" -ge "$LOG_ERROR" ]; then
   	logMessage "${LOG_ERROR}" "${1}"
   fi
 }
-function logWarn() {
-  if [ $LOG_LEVEL -ge $LOG_WARN ]; then
+function log_warn() {
+  if [ "$LOG_LEVEL" -ge "$LOG_WARN" ]; then
   	logMessage "${LOG_WARN}" "${1}"
   fi
 }
-function logInfo() {
-  if [ $LOG_LEVEL -ge $LOG_INFO ]; then
+function log_info() {
+  if [ "$LOG_LEVEL" -ge "$LOG_INFO" ]; then
   	logMessage "${LOG_INFO}" "${1}"
   fi
 }
-function logTrace() {
-  if [ $LOG_LEVEL -ge $LOG_TRACE ]; then
+function log_trace() {
+  if [ "$LOG_LEVEL" -ge "$LOG_TRACE" ]; then
   	logMessage "${LOG_TRACE}" "${1}"
   fi
 }
-function logDebug() {
-  if [ $LOG_LEVEL -ge $LOG_DEBUG ]; then
+function log_debug() {
+  if [ "$LOG_LEVEL" -ge "$LOG_DEBUG" ]; then
   	logMessage "${LOG_DEBUG}" "${1}"
   fi
 }
 function abort() {
-  logError "$@"
+  log_error "$@"
   exit 1
 }
 function fail() {
-  logError "$@"
+  log_error "$@"
   exit 1
 }
 
@@ -145,7 +146,7 @@ function arrange_photos_by_month() {
   ## or
   #RENAME_CMD+=("-MImage::ExifTool=:Public '$_ = \"$1-$2/$_\" if ImageInfo($_)->{\"CreateDate\"} =~ /(\d\d\d\d):(\d\d)/' ${MEDIA_DIR}/*.jpeg")
 
-  logInfo "${RENAME_CMD[*]}"
+  log_info "${RENAME_CMD[*]}"
   if [ $DRYRUN_MODE -eq 0 ]; then
     eval "${RENAME_CMD[*]}"
   fi
@@ -186,7 +187,7 @@ function main() {
   shift $((OPTIND-1))
 
   MEDIA_DIR=${1:-"${MEDIA_DIR_DEFAULT}"}
-  logInfo "MEDIA_DIR => ${MEDIA_DIR}"
+  log_info "MEDIA_DIR => ${MEDIA_DIR}"
 
   checkRequiredCommands rename
 
@@ -196,7 +197,7 @@ function main() {
     arrange_photos_by_month "${MEDIA_DIR}" "${FILE_EXTENSION}"
   done
 
-  logInfo "Finished repair of media file extensions"
+  log_info "Finished repair of media file extensions"
 }
 
 main "$@"

@@ -5,7 +5,10 @@
 set -e
 
 UNSTASH=0
+# shellcheck disable=SC2034
 CONFIRM=0
+current_command=""
+last_command=""
 
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -13,12 +16,13 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 #trap 'rm -fr "$TMP_DIR"' EXIT
 
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-SCRIPT_NAME=`basename $0`
+# shellcheck disable=SC2034
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_NAME="$(basename "$0")"
 
-if [ ! -z "$(git status --porcelain)" ]; then
-  echo "git repo not clean/found in ${pwd}"
-  exit
+if [ -n "$(git status --porcelain)" ]; then
+    echo "git repo not clean/found in ${PWD}"
+    exit
 fi
 
 #PROJECT_DIR="$( cd "$SCRIPT_DIR/../../../" && pwd )"
@@ -34,54 +38,54 @@ echo "PROJECT_DIR=${PROJECT_DIR}"
 echo "BRANCH_SHORT=${BRANCH_SHORT}"
 
 usage() {
-  retcode=${1:-1}
-  echo "" 1>&2
-  echo "Usage: ${SCRIPT_NAME} [options]" 1>&2
-  echo "" 1>&2
-  echo "     options:" 1>&2
-  echo "       -u : unstash last stash" 1>&2
-  echo "       -h : help" 1>&2
-  echo "" 1>&2
-  echo "  Examples:" 1>&2
-  echo "     ${SCRIPT_NAME}" 1>&2
-  echo "     ${SCRIPT_NAME} -u" 1>&2
-  echo "" 1>&2
-  exit ${retcode}
+    retcode=${1:-1}
+    echo "" 1>&2
+    echo "Usage: ${SCRIPT_NAME} [options]" 1>&2
+    echo "" 1>&2
+    echo "     options:" 1>&2
+    echo "       -u : unstash last stash" 1>&2
+    echo "       -h : help" 1>&2
+    echo "" 1>&2
+    echo "  Examples:" 1>&2
+    echo "     ${SCRIPT_NAME}" 1>&2
+    echo "     ${SCRIPT_NAME} -u" 1>&2
+    echo "" 1>&2
+    exit "${retcode}"
 }
 
 while getopts "uh" opt; do
     case "${opt}" in
-        u) UNSTASH=1 ;;
-        h) usage 1 ;;
-        \?) usage 2 ;;
-        :)
-            echo "Option -$OPTARG requires an argument." >&2
-            usage 3
-            ;;
-        *)
-            usage 4
-            ;;
+    u) UNSTASH=1 ;;
+    h) usage 1 ;;
+    \?) usage 2 ;;
+    :)
+        echo "Option -$OPTARG requires an argument." >&2
+        usage 3
+        ;;
+    *)
+        usage 4
+        ;;
     esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
-if [ $UNSTASH -eq 1 ]; then
-  source ./save/.laststash
-  echo "Loading stash from ${LAST_STASH}"
+if [ "$UNSTASH" -eq 1 ]; then
+    # shellcheck source=/dev/null
+    source ./save/.laststash
+    echo "Loading stash from ${LAST_STASH}"
 
-  RSYNC_OPTS_GIT_UPDATE=(
-      -ari
-      --links
-      --update
-  )
+    RSYNC_OPTS_GIT_UPDATE=(
+        "-ari"
+        "--links"
+        "--update"
+    )
 
-  echo "copy project from stash dir ${LAST_STASH}"
-  #rsync_cmd="rsync ${RSYNC_OPTS} ${PROJECT_DIR}/ ${TMP_DIR}/"
-  rsync_cmd="rsync ${RSYNC_OPTS_GIT_UPDATE[@]} ${LAST_STASH}/ ${PROJECT_DIR}/"
-  echo "${rsync_cmd}"
-  eval $rsync_cmd
+    echo "copy project from stash dir ${LAST_STASH}"
+    rsync_cmd="rsync ${RSYNC_OPTS_GIT_UPDATE[*]} ${LAST_STASH}/${PROJECT_DIR}/"
+    echo "${rsync_cmd}"
+    eval "${rsync_cmd}"
 
-  exit 0
+    exit 0
 fi
 
 ## https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
@@ -96,9 +100,9 @@ EXCLUDES_ARRAY+=('.vscode')
 EXCLUDES_ARRAY+=('save')
 EXCLUDES_ARRAY+=('venv')
 
-printf -v EXCLUDES '%s,' "${EXCLUDES_ARRAY[@]}"
-EXCLUDES="${EXCLUDES%,}"
-echo "EXCLUDES=${EXCLUDES}"
+printf -v EXCLUDES_LIST '%s,' "${EXCLUDES_ARRAY[@]}"
+EXCLUDES_LIST="${EXCLUDES_LIST%,}"
+echo "EXCLUDES_LIST=${EXCLUDES_LIST}"
 
 echo "TMP_DIR=${TMP_DIR}"
 
@@ -107,17 +111,16 @@ echo "TMP_DIR=${TMP_DIR}"
 ## https://serverfault.com/questions/219013/showing-total-progress-in-rsync-is-it-possible
 ## https://www.studytonight.com/linux-guide/how-to-exclude-files-and-directory-using-rsync
 RSYNC_OPTS_GIT_MIRROR=(
-    -dar
-    --info=progress2
-    --links
-    --delete-excluded
-    --exclude={"${EXCLUDES}"}
+    "-dar"
+    "--info=progress2"
+    "--links"
+    "--delete-excluded"
+    "--exclude={${EXCLUDES_LIST}}"
 )
 
 echo "copy project to temporary dir $TMP_DIR"
-#rsync_cmd="rsync ${RSYNC_OPTS} ${PROJECT_DIR}/ ${TMP_DIR}/"
-rsync_cmd="rsync ${RSYNC_OPTS_GIT_MIRROR[@]} ${PROJECT_DIR}/ ${TMP_DIR}/"
+rsync_cmd="rsync ${RSYNC_OPTS_GIT_MIRROR[*]} ${PROJECT_DIR}/${TMP_DIR}/"
 echo "${rsync_cmd}"
-eval $rsync_cmd
+eval "${rsync_cmd}"
 
-echo "LAST_STASH=${TMP_DIR}" > ./save/.laststash
+echo "LAST_STASH=${TMP_DIR}" >./save/.laststash

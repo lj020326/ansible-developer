@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 verbosity=1
 local_identifier="proxy-test"
 
@@ -35,7 +34,7 @@ run_browserstacklocal() {
     VERBOSE_ARGS=""
 
     mkdir -p logs
-    SCRIPT_FILE=$(basename $0)
+    SCRIPT_FILE=$(basename "$0")
     LOG_FILE="logs/${SCRIPT_FILE%.*}.log"
 
     if [[ ${VERBOSITY} -ne 0 ]]; then
@@ -43,10 +42,10 @@ run_browserstacklocal() {
     fi
 
     cmd="browserstacklocal --key ${BS_KEY} --local-identifier ${LOCAL_IDENTIFIER} --proxy-host ${REMOTE_HOST} --proxy-port ${REMOTE_PORT} --force-proxy -F ${VERBOSE_ARGS}"
-    masked_cmd=`echo $cmd | sed "s/\(.*\)$BS_KEY/\1***/g"`
-    echo "${masked_cmd}" > ${LOG_FILE}
+    masked_cmd="${cmd//"$BS_KEY"/***}"
+    echo "${masked_cmd}" >"${LOG_FILE}"
     echo "${masked_cmd}"
-    ${cmd} 2>&1 | tee -a ${LOG_FILE}
+    ${cmd} 2>&1 | tee -a "${LOG_FILE}"
 
 }
 
@@ -55,35 +54,34 @@ if [ -z "${BROWSERSTACK_KEY}" ]; then
     exit 1
 fi
 
-if [[ ! $(type -P browserstacklocal) ]] ; then
+if [[ ! $(type -P browserstacklocal) ]]; then
     echo "browserstacklocal executable must be in PATH"
     echo "browserstacklocal not found in PATH=[${PATH}]"
     exit 1
 fi
 
-
 while getopts ":v:i:" opt; do
     case "${opt}" in
-        v)
-            verbosity=${OPTARG}
-            ;;
-        i)
-            local_identifier=${OPTARG}
-            ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
-            usage
-            ;;
-        :)
-            echo "Option -$OPTARG requires an argument." >&2
-            usage
-            ;;
-        *)
-            usage
-            ;;
+    v)
+        verbosity=${OPTARG}
+        ;;
+    i)
+        local_identifier=${OPTARG}
+        ;;
+    \?)
+        echo "Invalid option: -$OPTARG" >&2
+        usage
+        ;;
+    :)
+        echo "Option -$OPTARG requires an argument." >&2
+        usage
+        ;;
+    *)
+        usage
+        ;;
     esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 if [ $# != 1 ]; then
     echo "required proxy_target not specified" >&2
@@ -94,22 +92,22 @@ proxy_target=$1
 bs_key=${BROWSERSTACK_KEY}
 
 case "${proxy_target}" in
-    "localhost")
-        proxy_host=localhost
-        proxy_port=80
-        ;;
-    "devcloud41")
-        proxy_host=ech-10-170-129-41.dettonville.int
-        proxy_port=80
-        ;;
-    "devcloud105")
-        proxy_host=ech-10-170-129-105.dettonville.int
-        proxy_port=1080
-        ;;
-    *)
-        echo "Invalid proxy_target: $proxy_target" >&2
-        usage
-        ;;
+"localhost")
+    proxy_host=localhost
+    proxy_port=80
+    ;;
+"devcloud41")
+    proxy_host=ech-10-170-129-41.dettonville.int
+    proxy_port=80
+    ;;
+"devcloud105")
+    proxy_host=ech-10-170-129-105.dettonville.int
+    proxy_port=1080
+    ;;
+*)
+    echo "Invalid proxy_target: $proxy_target" >&2
+    usage
+    ;;
 esac
 
-run_browserstacklocal ${bs_key} ${proxy_host} ${proxy_port} ${local_identifier} ${verbosity}
+run_browserstacklocal "${bs_key}" "${proxy_host}" "${proxy_port}" "${local_identifier}" "${verbosity}"

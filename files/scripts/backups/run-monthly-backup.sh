@@ -9,5 +9,6 @@ destDir=/srv/backups/records/${backupLabel}
 
 # Run the backup
 bash -x ${backupScript} ${backupLabel} ${srcDir} ${destDir}
+rc="$?"
 
-exit ${?}
+exit "${rc}"

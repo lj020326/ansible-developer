@@ -1,0 +1,34 @@
+# ================================================
+# LLM Utilities & Multi-Endpoint Management Config
+# ================================================
+
+logging:
+  level: "INFO"
+
+endpoints:
+  ollama:
+    control02:
+      url: "https://ollama.admin.johnson.int"
+      api_key: ""
+  vllm:
+    gpu01-coder:
+      url: "https://vllm-coder.llm-gb10.johnson.int/v1"
+      api_key: ""
+    gpu01-exec:
+      url: "https://vllm-exec.llm-gb10.johnson.int/v1"
+      api_key: ""
+    gpu02:
+      url: "https://vllm-coder.llm-rtx.johnson.int/v1"
+      api_key: ""
+  llmfit:
+    gpu01:
+      url: "https://llmfit.llm-gb10.johnson.int"
+    gpu02:
+      url: "https://llmfit.llm-rtx.johnson.int"
+    control02:
+      url: "https://llmfit.admin.johnson.int"
+
+options:
+  connect_timeout: 5
+  max_timeout: 120
+  verify_tiers: "30000,90000,140000"
